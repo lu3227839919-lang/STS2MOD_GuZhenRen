@@ -46,10 +46,8 @@ public static class GuCardPileSystem
                 {
                     Scope = ModCardPileScope.CombatOnly,
                     Style = ModCardPileUiStyle.BottomLeft,
-                    // Reuse the game's draw-pile marker so the custom pile reads
-                    // as the same kind of source pile in combat UI and flight
-                    // animations.
-                    IconPath = "res://images/packed/combat_ui/draw_pile.png",
+                    // Keep the original bottom-left layout and default card-flight animation.
+                    IconPath = "res://GuZhenRen/images/ui/GuPaiDui.png",
                     Anchor = new ModCardPileAnchor(
                         ModCardPileAnchorKind.BottomLeftPrimary,
                         Vector2.Zero
