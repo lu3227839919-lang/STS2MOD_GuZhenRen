@@ -94,6 +94,42 @@ public static class GuCardPileSystem
     }
 
     /// <summary>
+    /// Moves Gu cards cloned into a combat draw pile into this pile before the
+    /// opening hand is drawn.  The operation is synchronous because it runs as
+    /// a postfix of <c>Player.PopulateCombatState</c>, before combat actions
+    /// begin.
+    /// </summary>
+    internal static void MoveGuCardsToPile(Player owner)
+    {
+        ArgumentNullException.ThrowIfNull(owner);
+
+        EnsureInitialized();
+
+        CardPile drawPile = PileType.Draw.GetPile(owner);
+        CardPile guPile = PileType.GetPile(owner);
+
+        CardModel[] guCards =
+            drawPile
+                .Cards
+                .Where(card => card is IGuWormCard)
+                .ToArray();
+
+        if (guCards.Length == 0)
+        {
+            return;
+        }
+
+        foreach (CardModel card in guCards)
+        {
+            drawPile.RemoveInternal(card, silent: true);
+            guPile.AddInternal(card, silent: true);
+        }
+
+        drawPile.InvokeContentsChanged();
+        guPile.InvokeContentsChanged();
+    }
+
+    /// <summary>
     /// Adds a generated card to the normal hand.  This is deliberately kept
     /// separate from <see cref="AddGuCardToCombat"/> for generated killer moves
     /// and other temporary cards.

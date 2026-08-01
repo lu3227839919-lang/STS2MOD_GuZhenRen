@@ -18,10 +18,10 @@ public partial class GuZhenRenEnergyCounter : Control
 	[ExportGroup("能量设置")]
 
 	[Export(PropertyHint.Range, "1,99,1")]
-	public int MaxEnergy { get; set; } = 3;
+	public int MaxEnergy { get; set; } = 5;
 
 	[Export(PropertyHint.Range, "0,99,1")]
-	public int StartingEnergy { get; set; } = 3;
+	public int StartingEnergy { get; set; } = 4;
 
 
 	[ExportGroup("旋转设置")]

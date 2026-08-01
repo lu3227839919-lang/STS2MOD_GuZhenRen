@@ -1,8 +1,11 @@
 {
-  "GU_ZHEN_REN_CARD_GU_ZHEN_REN_STRIKE.title": "Gu Zhen Ren Strike",
+  "GU_ZHEN_REN_CARD_GU_ZHEN_REN_STRIKE.title": "Punch",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_STRIKE.description": "Deal {Damage:diff()} damage.",
-  "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.title": "Gu Zhen Ren Defend",
+  "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.title": "Defend",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.description": "Gain {Block:diff()} Block.",
+  "GU_ZHEN_REN_CARD_CHUI_DONG.title": "Activate",
+  "GU_ZHEN_REN_CARD_CHUI_DONG.description": "Choose and play a Gu card from the Gu pile.",
+  "GU_ZHEN_REN_CARD_CHUI_DONG.selectionScreenPrompt": "Choose a Gu card to activate.",
   "GU_ZHEN_REN_CARD_SHA_ZHAO_TUI_YAN.title": "Killer Move Deduction",
   "GU_ZHEN_REN_CARD_SHA_ZHAO_TUI_YAN.description": "Choose any number of Gu cards. If they match a killer move recipe, consume the selected materials and add the corresponding killer move to your hand; otherwise, if you have enough Energy, pay the costs of the selected cards and automatically play them in order. If you do not have enough Energy, take {Backlash} damage that cannot be Blocked. NL After being played, return this card to your hand. It does not count toward your hand size limit.",
   "GU_ZHEN_REN_CARD_HE_LIAN_GU.title": "Joint Refinement Gu",

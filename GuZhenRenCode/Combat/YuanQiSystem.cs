@@ -16,11 +16,11 @@ public static class YuanQiSystem
 
     public static SecondaryResourceDefinition Definition { get; private set; } =
         new(
-            defaultAmount: 0,
+            defaultAmount: 5,
             baseMaxAmount: 99,
             minAmount: 0,
             hardMaxAmount: 999,
-            turnStartPolicy: SecondaryResourceTurnStartPolicy.Clear,
+            turnStartPolicy: SecondaryResourceTurnStartPolicy.AddMaxToCurrent,
             persistencePolicy: SecondaryResourcePersistencePolicy.Combat,
             locTable: "secondary_resources",
             titleKey: "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.title",

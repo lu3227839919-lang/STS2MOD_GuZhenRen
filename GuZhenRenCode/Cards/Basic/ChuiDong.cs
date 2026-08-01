@@ -1,0 +1,104 @@
+using GuZhenRen.Cards;
+using GuZhenRen.Characters;
+
+using MegaCrit.Sts2.Core.CardSelection;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Models;
+
+using STS2RitsuLib.Interop.AutoRegistration;
+using STS2RitsuLib.Scaffolding.Content;
+
+namespace GuZhenRen.Cards.Basic;
+
+[RegisterCard(typeof(GuZhenRenCardPool))]
+[RegisterCharacterStarterCard(typeof(GuZhenRenCharacter), 4)]
+public sealed class ChuiDong
+    : ModCardTemplate, ICardRewardExcluded
+{
+    public override CardAssetProfile AssetProfile =>
+        new(
+            PortraitPath:
+                $"{Entry.ResPath}/images/cards/ChuiDong.png"
+        );
+
+    public ChuiDong()
+        : base(
+            baseCost: 1,
+            type: CardType.Skill,
+            rarity: CardRarity.Basic,
+            target: TargetType.Self
+        )
+    {
+    }
+
+    protected override async Task OnPlay(
+        PlayerChoiceContext choiceContext,
+        CardPlay cardPlay
+    )
+    {
+        ArgumentNullException.ThrowIfNull(choiceContext);
+        ArgumentNullException.ThrowIfNull(cardPlay);
+
+        if (Owner.PlayerCombatState == null)
+        {
+            return;
+        }
+
+        CardPile guPile =
+            GuCardPileSystem.PileType.GetPile(Owner);
+
+        if (guPile.Cards.Count == 0)
+        {
+            return;
+        }
+
+        var selected =
+            (
+                await CardSelectCmd.FromCombatPile(
+                    choiceContext,
+                    guPile,
+                    Owner,
+                    new CardSelectorPrefs(
+                        SelectionScreenPrompt,
+                        1,
+                        1
+                    ),
+                    card => card is IGuWormCard
+                )
+            ).FirstOrDefault();
+
+        if (selected is null)
+        {
+            return;
+        }
+
+        Creature? target = null;
+
+        if (selected.TargetType == TargetType.AnyEnemy)
+        {
+            target =
+                Owner.Creature.CombatState?.HittableEnemies
+                    .FirstOrDefault();
+
+            if (target == null)
+            {
+                return;
+            }
+        }
+
+        await CardCmd.AutoPlay(
+            choiceContext,
+            selected,
+            target,
+            skipCardPileVisuals: false
+        );
+    }
+
+    protected override void OnUpgrade()
+    {
+        AddKeyword(CardKeyword.Ethereal);
+    }
+}

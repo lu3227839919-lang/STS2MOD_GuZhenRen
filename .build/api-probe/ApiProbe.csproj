@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings></PropertyGroup>
+  <ItemGroup><Reference Include="sts2"><HintPath>../../.godot/mono/temp/bin/Debug/sts2.dll</HintPath></Reference><Reference Include="0Harmony"><HintPath>../../.godot/mono/temp/bin/Debug/0Harmony.dll</HintPath></Reference><Reference Include="GodotSharp"><HintPath>D:\Tools\Godot\GodotSharp\Api\Debug\GodotSharp.dll</HintPath></Reference></ItemGroup>
+</Project>

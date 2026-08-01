@@ -33,6 +33,27 @@ namespace GuZhenRen.Cards;
 public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuWormCard
 {
     /// <summary>
+    /// Gu cards are activated from the dedicated Gu pile.  After activation,
+    /// return them to that pile instead of allowing the normal discard result,
+    /// so they never become drawable hand cards.
+    /// </summary>
+    public override CardLocation ModifyCardPlayResultLocation(
+        CardModel card,
+        bool isAutoPlay,
+        ResourceInfo resources,
+        CardLocation location
+    )
+    {
+        if (ReferenceEquals(card, this))
+        {
+            GuCardPileSystem.Initialize();
+            location.pileType = GuCardPileSystem.PileType;
+        }
+
+        return location;
+    }
+
+    /// <summary>
     /// 显式返回普通蛊虫卡池。
     ///
     /// STS2 0.107.1 的 CardModel.Pool 会按 ModelDb.AllCardPools 顺序扫描；
