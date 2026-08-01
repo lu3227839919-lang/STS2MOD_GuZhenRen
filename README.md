@@ -272,7 +272,7 @@ Copy-Item .\local.props.template .\local.props
   <PropertyGroup>
     <Sts2Dir>E:\SteamLibrary\steamapps\common\Slay the Spire 2</Sts2Dir>
     <Sts2DataDir>$(Sts2Dir)\data_sts2_windows_x86_64</Sts2DataDir>
-    <GodotExe>C:\Tools\Godot\Godot_v4.5.1-stable_mono_win64.exe</GodotExe>
+    <GodotExe>C:\path\to\Godot_v4.5.1-stable_mono_win64.exe</GodotExe>
   </PropertyGroup>
 </Project>
 ```

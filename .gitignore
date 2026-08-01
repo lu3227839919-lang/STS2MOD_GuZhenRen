@@ -1,10 +1,12 @@
 .godot/
 .idea/
 .vs/
+.build/
 bin/
 obj/
 local.props
 *.user
+*.log
 src/ 
 steam/
 .vscode/
