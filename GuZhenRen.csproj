@@ -44,7 +44,7 @@
     <Compile Remove=".godot/**;.idea/**;.vs/**;bin/**;obj/**;GuZhenRen/**" />
     <EmbeddedResource Remove=".godot/**;.idea/**;.vs/**;bin/**;obj/**;GuZhenRen/**" />
     <None Remove=".godot/**;.idea/**;.vs/**;bin/**;obj/**" />
-    <Compile Include="GuZhenRen/scenes/ui/nodes/OrbPreview.cs" />
+    <Compile Include="GuZhenRen/scenes/ui/nodes/GuZhenRenEnergyCounter.cs" />
     <AdditionalFiles Include="GuZhenRen/localization/**/*.json" />
   </ItemGroup>
 

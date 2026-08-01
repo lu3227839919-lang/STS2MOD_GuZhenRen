@@ -60,17 +60,7 @@ internal static class ShaZhaoTuiYanPatch
 
         PatchContextMethod(
             harmony,
-            AccessTools.Method(
-                typeof(CardPileCmd),
-                nameof(CardPileCmd.Add),
-                [
-                    typeof(IEnumerable<CardModel>),
-                    typeof(CardPile),
-                    typeof(CardPilePosition),
-                    typeof(AbstractModel),
-                    typeof(bool),
-                ]
-            ),
+            FindCardsToPileAddMethod(),
             nameof(AddContextPrefix),
             nameof(AddContextPostfix)
         );
@@ -146,6 +136,46 @@ internal static class ShaZhaoTuiYanPatch
         );
 
         _initialized = true;
+    }
+
+    private static MethodInfo? FindCardsToPileAddMethod()
+    {
+        /*
+         * 0.110.1 adds the trailing isChangingOwners argument to this overload.
+         * Match the stable semantic parameters and accept either API shape so a
+         * patch-level game update cannot prevent the entire mod from loading.
+         */
+        return AccessTools
+            .GetDeclaredMethods(typeof(CardPileCmd))
+            .Where(method =>
+                method.Name == nameof(CardPileCmd.Add)
+            )
+            .Where(method =>
+            {
+                ParameterInfo[] parameters =
+                    method.GetParameters();
+
+                return parameters.Length is 5 or 6
+                    && parameters[0].ParameterType ==
+                        typeof(IEnumerable<CardModel>)
+                    && parameters[1].ParameterType ==
+                        typeof(CardPile)
+                    && parameters[2].ParameterType ==
+                        typeof(CardPilePosition)
+                    && parameters[3].ParameterType ==
+                        typeof(AbstractModel)
+                    && parameters[4].ParameterType ==
+                        typeof(bool)
+                    && (
+                        parameters.Length == 5
+                        || parameters[5].ParameterType ==
+                            typeof(bool)
+                    );
+            })
+            .OrderByDescending(method =>
+                method.GetParameters().Length
+            )
+            .FirstOrDefault();
     }
 
     internal static void Uninitialize()
