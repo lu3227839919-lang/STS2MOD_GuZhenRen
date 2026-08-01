@@ -1,0 +1,21 @@
+{
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.aromaPrinciple": "[sine][blue]Refine the world; refine the self.[/blue][/sine]",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.banter.alive.endTurnPing": "The turn is complete.",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.banter.dead.endTurnPing": "I will withdraw for now.",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.cardsModifierDescription": "Gu Zhen Ren cards can now appear in rewards and shops.",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.cardsModifierTitle": "Gu Zhen Ren Cards",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.defeatMessage": "The path to immortality is not yet complete.",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.description": "A Gu cultivator who refines cards, advances Gu ranks, and converts path marks into combat power.",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.eventDeathPrevention": "The aperture endures.",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.flavor": "With Gu as tools and resolve as fuel, he pursues the road beyond mortality.",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.goldMonologue": "Resources are merely another material to refine.",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.possessiveAdjective": "his",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.pronounObject": "him",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.pronounPossessive": "his",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.pronounSubject": "he",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.selectMessage": "The refinement begins.",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.title": "Gu Zhen Ren",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.titleObject": "Gu Zhen Ren",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.unlockText": "Complete a run with [pink]{Prerequisite}[/pink] to unlock this character.",
+  "GU_ZHEN_REN_CHARACTER_GU_ZHEN_REN_CHARACTER.victoryMessage": "Another step on the path to immortality."
+}

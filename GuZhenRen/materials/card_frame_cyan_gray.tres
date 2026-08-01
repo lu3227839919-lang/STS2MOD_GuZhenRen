@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://GuZhenRen/shaders/card_frame_cyan_gray.gdshader" id="1_shader"]
+
+[resource]
+resource_local_to_scene = true
+shader = ExtResource("1_shader")
+shader_parameter/shadow_color = Color(0.1, 0.17, 0.19, 1)
+shader_parameter/middle_color = Color(0.31, 0.43, 0.45, 1)
+shader_parameter/highlight_color = Color(0.62, 0.7, 0.7, 1)
+shader_parameter/contrast = 1.08
+shader_parameter/detail_strength = 0.12
+shader_parameter/brightness = 1.0

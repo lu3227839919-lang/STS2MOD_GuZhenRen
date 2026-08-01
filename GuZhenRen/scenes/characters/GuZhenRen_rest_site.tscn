@@ -1,0 +1,53 @@
+[gd_scene load_steps=3 format=3 uid="uid://4bbmnth2u2of"]
+
+[ext_resource type="Texture2D" uid="uid://bdnluv5jjpdau" path="res://GuZhenRen/images/characters/FangYuan_idle.png" id="1_xg78g"]
+[ext_resource type="Texture2D" uid="uid://ts3yj66gjmjt" path="res://GuZhenRen/images/characters/GuZhenRen_shadow.png" id="2_vxihv"]
+
+[node name="GuZhenRenCharacterRestSite" type="Node2D"]
+
+[node name="Visuals" type="Sprite2D" parent="."]
+position = Vector2(0, -96)
+scale = Vector2(1.25, 1.25)
+texture = ExtResource("1_xg78g")
+
+[node name="Shadow" type="Sprite2D" parent="."]
+modulate = Color(0.25, 0.25, 0.25, 0.45)
+position = Vector2(-25, -20)
+texture = ExtResource("2_vxihv")
+
+[node name="ControlRoot" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+
+[node name="SelectionReticle" type="Control" parent="ControlRoot"]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = -153.0
+offset_top = -350.0
+offset_right = 267.0
+offset_bottom = 320.0
+
+[node name="Hitbox" type="Control" parent="ControlRoot"]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = -155.0
+offset_top = -165.0
+offset_right = 154.0
+offset_bottom = 166.0
+
+[node name="ThoughtBubbleRight" type="Control" parent="ControlRoot"]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 121.0
+offset_top = -125.0
+offset_right = 121.0
+offset_bottom = -125.0
+
+[node name="ThoughtBubbleLeft" type="Control" parent="ControlRoot"]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = -113.0
+offset_top = -95.0
+offset_right = -113.0
+offset_bottom = -95.0

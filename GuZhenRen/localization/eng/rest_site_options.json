@@ -1,0 +1,8 @@
+{
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.name": "Gu Refinement",
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "Choose one or two Gu cards below rank 9 and increase each selected card by 1 rank. Refinement can succeed once per rest site.",
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Choose one or two Gu cards to increase by 1 rank, then click Confirm.",
+  "OPTION_GU_ZHEN_REN_HE_LIAN.name": "Gu Fusion",
+  "OPTION_GU_ZHEN_REN_HE_LIAN.description": "Choose one or more Gu cards and click Confirm manually. The selection limit is determined by currently craftable recipes. Materials are consumed only when both their types and quantities match a recipe. A failed attempt does not consume the use. Fusion can succeed once per rest site.",
+  "OPTION_GU_ZHEN_REN_HE_LIAN.selectionPrompt": "Choose fusion materials, then click Confirm. The required count depends on the recipe."
+}

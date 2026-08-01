@@ -1,0 +1,37 @@
+[gd_scene load_steps=3 format=3 uid="uid://bnqhfog1nrr2n"]
+
+[ext_resource type="Texture2D" uid="uid://bdnluv5jjpdau" path="res://GuZhenRen/images/characters/FangYuan_idle.png" id="1_fangyuan"]
+[ext_resource type="Texture2D" uid="uid://ts3yj66gjmjt" path="res://GuZhenRen/images/characters/GuZhenRen_shadow.png" id="1_hmdf0"]
+
+[node name="GuZhenRenCharacter" type="Node2D"]
+
+[node name="shadow" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(-10, -192)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("1_hmdf0")
+
+[node name="Visuals" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -256)
+texture = ExtResource("1_fangyuan")
+
+[node name="Bounds" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+offset_left = -80.0
+offset_top = -325.0
+offset_right = 80.0
+
+[node name="IntentPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(25, -335)
+
+[node name="CenterPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -160)
+
+[node name="TalkPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -285)

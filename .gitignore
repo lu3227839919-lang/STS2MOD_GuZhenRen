@@ -1,0 +1,7 @@
+.godot/
+.idea/
+.vs/
+bin/
+obj/
+local.props
+*.user
