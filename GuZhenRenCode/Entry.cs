@@ -37,6 +37,7 @@ public partial class Entry
         new(nameof(LocalizationCompatibilityPatch), LocalizationCompatibilityPatch.Initialize, LocalizationCompatibilityPatch.Uninitialize),
         new(nameof(GuRestSiteChoicePatch), GuRestSiteChoicePatch.Initialize, GuRestSiteChoicePatch.Uninitialize),
         new(nameof(CardCarouselPreviewPatch), CardCarouselPreviewPatch.Initialize, CardCarouselPreviewPatch.Uninitialize),
+        new(nameof(GuCardStackSelectionPatch), GuCardStackSelectionPatch.Initialize, GuCardStackSelectionPatch.Uninitialize),
         new(nameof(DeckCardSelectionManualConfirmationPatch), DeckCardSelectionManualConfirmationPatch.Initialize, DeckCardSelectionManualConfirmationPatch.Uninitialize),
         new(nameof(StartingDeckGuRankPatch), StartingDeckGuRankPatch.Initialize, StartingDeckGuRankPatch.Uninitialize),
         new(nameof(NCardXuYingEnergyIconPatch), NCardXuYingEnergyIconPatch.Initialize, NCardXuYingEnergyIconPatch.Uninitialize),
