@@ -2,6 +2,7 @@ using System.Reflection;
 
 using GuZhenRen.Aperture;
 using GuZhenRen.Cards;
+using GuZhenRen.Combat;
 using GuZhenRen.Patches;
 
 using MegaCrit.Sts2.Core.Logging;
@@ -29,6 +30,7 @@ public partial class Entry
 
     private static readonly PatchLifecycle[] Lifecycles =
     [
+        new(nameof(YuanQiSystem), YuanQiSystem.Initialize, YuanQiSystem.Uninitialize),
         new(nameof(ApertureSystem), ApertureSystem.Initialize, ApertureSystem.Uninitialize),
         new(nameof(GuRestSiteChoicePatch), GuRestSiteChoicePatch.Initialize, GuRestSiteChoicePatch.Uninitialize),
         new(nameof(CardCarouselPreviewPatch), CardCarouselPreviewPatch.Initialize, CardCarouselPreviewPatch.Uninitialize),
