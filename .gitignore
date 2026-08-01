@@ -5,3 +5,7 @@ bin/
 obj/
 local.props
 *.user
+src/ 
+steam/
+.vscode/
+build/
