@@ -19,11 +19,20 @@ public static class GuCardPileSystem
 {
     public const string LocalId = "gu_cards";
 
+    public const string DiscardLocalId = "gu_discard";
+
     /// <summary>Fully-qualified RitsuLib card-pile ID used by localization.</summary>
     public const string PileId = "GU_ZHEN_REN_CARDPILE_GU_CARDS";
 
+    /// <summary>Fully-qualified RitsuLib ID for the spent Gu pile.</summary>
+    public const string DiscardPileId =
+        "GU_ZHEN_REN_CARDPILE_GU_DISCARD";
+
     /// <summary>The runtime pile type assigned by RitsuLib.</summary>
     public static PileType PileType { get; private set; }
+
+    /// <summary>The runtime pile type used by Gu cards with no uses left.</summary>
+    public static PileType DiscardPileType { get; private set; }
 
     private static readonly object SyncRoot = new();
     private static bool _initialized;
@@ -55,7 +64,26 @@ public static class GuCardPileSystem
                 }
             );
 
+            ModCardPileDefinition discardDefinition =
+                registry.RegisterOwned(
+                    DiscardLocalId,
+                    new ModCardPileSpec
+                    {
+                        Scope = ModCardPileScope.CombatOnly,
+                        Style = ModCardPileUiStyle.BottomLeft,
+                        // Place the Gu discard pile beside the base-game discard pile.
+                        // RitsuLib's default pile movement keeps the vanilla animation.
+                        IconPath =
+                            "res://GuZhenRen/images/ui/QiPaiDui.png",
+                        Anchor = new ModCardPileAnchor(
+                            ModCardPileAnchorKind.BottomLeftSecondary,
+                            Vector2.Zero
+                        ),
+                    }
+                );
+
             PileType = definition.PileType;
+            DiscardPileType = discardDefinition.PileType;
             _initialized = true;
         }
     }
@@ -105,6 +133,7 @@ public static class GuCardPileSystem
 
         CardPile drawPile = PileType.Draw.GetPile(owner);
         CardPile guPile = PileType.GetPile(owner);
+        CardPile guDiscardPile = DiscardPileType.GetPile(owner);
 
         CardModel[] guCards =
             drawPile
@@ -120,11 +149,117 @@ public static class GuCardPileSystem
         foreach (CardModel card in guCards)
         {
             drawPile.RemoveInternal(card, silent: true);
-            guPile.AddInternal(card, silent: true);
+
+            if (GuCardUsageRules.CanUse(card))
+            {
+                guPile.AddInternal(card, silent: true);
+            }
+            else
+            {
+                guDiscardPile.AddInternal(card, silent: true);
+            }
         }
 
         drawPile.InvokeContentsChanged();
         guPile.InvokeContentsChanged();
+        guDiscardPile.InvokeContentsChanged();
+    }
+
+    /// <summary>
+    /// Chooses the result pile before a Gu card begins resolving.  The current
+    /// play is not yet present in combat history at this point, so it is added
+    /// explicitly when calculating the remaining uses.
+    /// </summary>
+    public static PileType GetResultPileAfterActivation(CardModel card)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+
+        EnsureInitialized();
+
+        if (card is not IGuWormCard guCard)
+        {
+            return PileType;
+        }
+
+        int remainingUses = Math.Max(
+            0,
+            guCard.MaxUsesPerTurn -
+            GuCardUsageRules.CountUsesThisTurn(card) -
+            1
+        );
+
+        return remainingUses == 0
+            ? DiscardPileType
+            : PileType;
+    }
+
+    /// <summary>
+    /// Moves every Gu card that has no uses left out of the active Gu pile.
+    /// CardPileCmd supplies the same pile-flight animation used by the base game.
+    /// </summary>
+    public static async Task DiscardDepletedGuCardsAsync(Player owner)
+    {
+        ArgumentNullException.ThrowIfNull(owner);
+
+        EnsureInitialized();
+
+        CardModel[] depletedCards =
+            PileType
+                .GetPile(owner)
+                .Cards
+                .Where(card =>
+                    card is IGuWormCard &&
+                    !GuCardUsageRules.CanUse(card)
+                )
+                .ToArray();
+
+        if (depletedCards.Length == 0)
+        {
+            return;
+        }
+
+        await CardPileCmd.Add(
+            depletedCards,
+            DiscardPileType,
+            CardPilePosition.Bottom,
+            clonedBy: null,
+            skipVisuals: false
+        );
+    }
+
+    /// <summary>
+    /// At the beginning of a new player turn, returns Gu cards whose per-turn
+    /// uses have reset to the active Gu pile.  Permanently unusable cards remain
+    /// in the Gu discard pile.
+    /// </summary>
+    public static async Task RestoreAvailableGuCardsAsync(Player owner)
+    {
+        ArgumentNullException.ThrowIfNull(owner);
+
+        EnsureInitialized();
+
+        CardModel[] availableCards =
+            DiscardPileType
+                .GetPile(owner)
+                .Cards
+                .Where(card =>
+                    card is IGuWormCard &&
+                    GuCardUsageRules.CanUse(card)
+                )
+                .ToArray();
+
+        if (availableCards.Length == 0)
+        {
+            return;
+        }
+
+        await CardPileCmd.Add(
+            availableCards,
+            PileType,
+            CardPilePosition.Bottom,
+            clonedBy: null,
+            skipVisuals: false
+        );
     }
 
     /// <summary>

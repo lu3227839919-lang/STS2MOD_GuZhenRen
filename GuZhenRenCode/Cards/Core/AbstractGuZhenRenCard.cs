@@ -65,7 +65,8 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuWormCard
         if (ReferenceEquals(card, this))
         {
             GuCardPileSystem.Initialize();
-            location.pileType = GuCardPileSystem.PileType;
+            location.pileType =
+                GuCardPileSystem.GetResultPileAfterActivation(this);
         }
 
         return location;

@@ -132,13 +132,19 @@ public sealed class KongQiaoRelic
         return ApertureSystem.HandleCombatVictoryAsync(Owner, room);
     }
 
-    public override Task AfterCardPlayed(
+    public override async Task AfterCardPlayed(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay
     )
     {
         ApertureSystem.HandleCardPlayed(Owner, cardPlay);
-        return Task.CompletedTask;
+
+        if (ReferenceEquals(cardPlay.Card.Owner, Owner) &&
+            cardPlay.Card is IGuWormCard)
+        {
+            await GuCardPileSystem
+                .DiscardDepletedGuCardsAsync(Owner);
+        }
     }
 
     /// <summary>
@@ -222,8 +228,14 @@ public sealed class KongQiaoRelic
         await base.AfterEnergyReset(player);
 
         if (!ReferenceEquals(player, Owner) ||
-            player.PlayerCombatState == null ||
-            player.PlayerCombatState.TurnNumber <= 1)
+            player.PlayerCombatState == null)
+        {
+            return;
+        }
+
+        await GuCardPileSystem.RestoreAvailableGuCardsAsync(player);
+
+        if (player.PlayerCombatState.TurnNumber <= 1)
         {
             return;
         }

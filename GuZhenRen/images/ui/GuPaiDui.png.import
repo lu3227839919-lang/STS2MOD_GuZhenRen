@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dt7k1mbpskrol"
-path="res://.godot/imported/4d.png-718931267085d28108f6086de2b5db1e.ctex"
+uid="uid://crimja83yuabl"
+path="res://.godot/imported/GuPaiDui.png-f4f313fc2ad10213c1915566f6a2d24e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GuZhenRen/images/ui/orb/4d.png"
-dest_files=["res://.godot/imported/4d.png-718931267085d28108f6086de2b5db1e.ctex"]
+source_file="res://GuZhenRen/images/ui/GuPaiDui.png"
+dest_files=["res://.godot/imported/GuPaiDui.png-f4f313fc2ad10213c1915566f6a2d24e.ctex"]
 
 [params]
 

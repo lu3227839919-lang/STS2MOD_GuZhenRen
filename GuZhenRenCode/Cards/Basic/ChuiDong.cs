@@ -1,6 +1,7 @@
 using GuZhenRen.Cards;
 using GuZhenRen.Cards.ImmortalEssence;
 using GuZhenRen.Characters;
+using GuZhenRen.Patches;
 
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
@@ -56,23 +57,21 @@ public sealed class ChuiDong
             return;
         }
 
-        var selected =
-            (
-                await CardSelectCmd.FromCombatPile(
-                    choiceContext,
-                    guPile,
-                    Owner,
-                    new CardSelectorPrefs(
-                        SelectionScreenPrompt,
-                        1,
-                        1
-                    ),
-                    card => card is IGuWormCard
-                            && GuCardUsageRules.CanUse(card)
-                            && ImmortalEssenceSystem
-                                .CanPayForActivation(card)
-                )
-            ).FirstOrDefault();
+        CardModel? selected =
+            await GuCardStackSelectionPatch.SelectOne(
+                choiceContext,
+                guPile,
+                Owner,
+                new CardSelectorPrefs(
+                    SelectionScreenPrompt,
+                    1,
+                    1
+                ),
+                card => card is IGuWormCard
+                        && GuCardUsageRules.CanUse(card)
+                        && ImmortalEssenceSystem
+                            .CanPayForActivation(card)
+            );
 
         if (selected is null)
         {

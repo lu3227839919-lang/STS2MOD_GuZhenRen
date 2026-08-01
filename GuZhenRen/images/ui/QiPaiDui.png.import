@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://crsscsd70aaa0"
-path="res://.godot/imported/5d.png-727f95f2b0e06b690024442d0613a382.ctex"
+uid="uid://bv8gmsqo2d4px"
+path="res://.godot/imported/QiPaiDui.png-9ccbbea16aa869dace52100bd36e288c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GuZhenRen/images/ui/orb/5d.png"
-dest_files=["res://.godot/imported/5d.png-727f95f2b0e06b690024442d0613a382.ctex"]
+source_file="res://GuZhenRen/images/ui/QiPaiDui.png"
+dest_files=["res://.godot/imported/QiPaiDui.png-9ccbbea16aa869dace52100bd36e288c.ctex"]
 
 [params]
 

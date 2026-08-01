@@ -66,6 +66,27 @@ public abstract class AbstractBenMingGuCard : ModCardTemplate, IGuWormCard
     }
 
     /// <summary>
+    /// 本命蛊从专属蛊牌堆催动；剩余使用次数归零后进入蛊弃牌堆，
+    /// 否则返回可催动的蛊牌堆。
+    /// </summary>
+    public override CardLocation ModifyCardPlayResultLocation(
+        CardModel card,
+        bool isAutoPlay,
+        ResourceInfo resources,
+        CardLocation location
+    )
+    {
+        if (ReferenceEquals(card, this))
+        {
+            GuCardPileSystem.Initialize();
+            location.pileType =
+                GuCardPileSystem.GetResultPileAfterActivation(this);
+        }
+
+        return location;
+    }
+
+    /// <summary>
     /// 本命蛊固定属于角色普通卡池，避免 CardModel.Pool 扫描 MockCardPool。
     /// </summary>
     public override CardPoolModel Pool =>
