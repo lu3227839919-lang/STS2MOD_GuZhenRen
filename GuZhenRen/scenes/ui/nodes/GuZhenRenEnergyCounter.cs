@@ -74,19 +74,19 @@ public partial class GuZhenRenEnergyCounter : Control
 
 
 	private const string DarkLayer1Path =
-		"res://GuZhenRen/images/ui/orb/1d.png";
+		"res://GuZhenRen/images/ui/orb1/1d.png";
 
 	private const string DarkLayer2Path =
-		"res://GuZhenRen/images/ui/orb/2d.png";
+		"res://GuZhenRen/images/ui/orb1/2d.png";
 
 	private const string DarkLayer3Path =
-		"res://GuZhenRen/images/ui/orb/3d.png";
+		"res://GuZhenRen/images/ui/orb1/3d.png";
 
 	private const string DarkLayer4Path =
-		"res://GuZhenRen/images/ui/orb/4d.png";
+		"res://GuZhenRen/images/ui/orb1/4d.png";
 
 	private const string DarkLayer5Path =
-		"res://GuZhenRen/images/ui/orb/5d.png";
+		"res://GuZhenRen/images/ui/orb1/5d.png";
 
 
 	private TextureRect _layer1 = null!;
