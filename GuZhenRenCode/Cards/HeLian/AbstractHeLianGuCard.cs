@@ -17,7 +17,7 @@ namespace GuZhenRen.Cards.HeLian;
 /// 4. 不允许被战斗内随机生成。
 /// </summary>
 [RegisterCard(
-    typeof(GuZhenRenCardPool),
+    typeof(GuZhenRenGuCardPool),
     Inherit = true
 )]
 public abstract class AbstractHeLianGuCard

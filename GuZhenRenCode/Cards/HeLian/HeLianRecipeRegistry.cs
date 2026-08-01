@@ -73,7 +73,7 @@ public static class HeLianRecipeRegistry
         }
 
         CardModel canonical = ModelDb
-            .CardPool<GuZhenRenCardPool>()
+            .CardPool<GuZhenRenGuCardPool>()
             .AllCards
             .Single(card =>
                 card.GetType() ==
@@ -251,7 +251,7 @@ public static class HeLianRecipeRegistry
         List<Recipe> recipes = [];
 
         IEnumerable<CardModel> cards = ModelDb
-            .CardPool<GuZhenRenCardPool>()
+            .CardPool<GuZhenRenGuCardPool>()
             .AllCards;
 
         foreach (CardModel canonical in cards

@@ -62,7 +62,7 @@ namespace GuZhenRen.Cards.Rare;
 /// 合练配方：三张蛊真人打击。材料选择顺序不限。
 ///
 /// </summary>
-[RegisterCard(typeof(GuZhenRenCardPool))]
+[RegisterCard(typeof(GuZhenRenGuCardPool))]
 
 public sealed class FeiXiongZhiLiGu
     : AbstractGuZhenRenCard,

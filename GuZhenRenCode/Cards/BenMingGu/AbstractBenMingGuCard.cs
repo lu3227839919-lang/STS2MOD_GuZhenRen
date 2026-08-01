@@ -42,7 +42,7 @@ namespace GuZhenRen.Cards;
 /// 抽象类本身不会成为一张实际卡牌。
 /// </summary>
 [RegisterCard(
-    typeof(GuZhenRenCardPool),
+    typeof(GuZhenRenGuCardPool),
     Inherit = true
 )]
 public abstract class AbstractBenMingGuCard : ModCardTemplate, IGuRankProvider
@@ -51,7 +51,7 @@ public abstract class AbstractBenMingGuCard : ModCardTemplate, IGuRankProvider
     /// 本命蛊固定属于角色普通卡池，避免 CardModel.Pool 扫描 MockCardPool。
     /// </summary>
     public override CardPoolModel Pool =>
-        ModelDb.CardPool<GuZhenRenCardPool>();
+        ModelDb.CardPool<GuZhenRenGuCardPool>();
 
     
     /// <summary>

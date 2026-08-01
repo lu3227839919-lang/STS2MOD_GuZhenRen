@@ -41,7 +41,7 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuWormCard
     /// 模组卡牌已在编译期知道所属卡池，因此不应走该全局扫描回退。
     /// </summary>
     public override CardPoolModel Pool =>
-        ModelDb.CardPool<GuZhenRenCardPool>();
+        ModelDb.CardPool<GuZhenRenGuCardPool>();
 
     
 // =====================================================================

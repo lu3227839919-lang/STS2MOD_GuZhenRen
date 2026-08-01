@@ -30,7 +30,7 @@ namespace GuZhenRen.Cards.Basic;
 ///
 /// 初始拥有消耗；普通卡牌升级移除消耗。
 /// </summary>
-[RegisterCard(typeof(GuZhenRenCardPool))]
+[RegisterCard(typeof(GuZhenRenGuCardPool))]
 [RegisterCharacterStarterCard(typeof(GuZhenRenCharacter), 2)]
 public sealed class BaiShiGu
     : AbstractGuZhenRenCard

@@ -5,6 +5,10 @@ namespace GuZhenRen.Characters;
 
 public sealed class GuZhenRenCardPool : TypeListCardPoolModel
 {
+    /// <summary>
+    /// General Gu Zhen Ren card pool for non-Gu cards. Phantom cards and
+    /// killer-move cards are registered in their dedicated pools instead.
+    /// </summary>
     // Title 和 EnergyColorName 是池子的稳定标识，不是玩家看到的角色名。
     // 自定义角色卡、遗物、药水池保持同一个 EnergyColorName，方便实验室和文本统一读取能量图标。
     public override string Title => "GuZhenRen";

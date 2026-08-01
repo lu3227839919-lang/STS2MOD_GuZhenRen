@@ -28,7 +28,7 @@ namespace GuZhenRen.Cards.Basic;
 ///
 /// 本牌是技能牌，因此获得的闪耀不会被自身立即消耗。
 /// </summary>
-[RegisterCard(typeof(GuZhenRenCardPool))]
+[RegisterCard(typeof(GuZhenRenGuCardPool))]
 [RegisterCharacterStarterCard(typeof(GuZhenRenCharacter), 2)]
 public sealed class XiaoGuangGu
     : AbstractGuZhenRenCard

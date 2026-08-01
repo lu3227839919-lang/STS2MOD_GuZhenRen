@@ -30,7 +30,7 @@ namespace GuZhenRen.Cards.Basic;
 ///
 /// 普通卡牌升级只添加虚无，不改变转数或伤害。
 /// </summary>
-[RegisterCard(typeof(GuZhenRenCardPool))]
+[RegisterCard(typeof(GuZhenRenGuCardPool))]
 [RegisterCharacterStarterCard(typeof(GuZhenRenCharacter), 4)]
 public sealed class YueGuangGu
     : AbstractGuZhenRenCard

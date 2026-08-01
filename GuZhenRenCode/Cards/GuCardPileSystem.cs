@@ -2,6 +2,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
+using Godot;
 
 using STS2RitsuLib.CardPiles;
 
@@ -45,7 +46,14 @@ public static class GuCardPileSystem
                 {
                     Scope = ModCardPileScope.CombatOnly,
                     Style = ModCardPileUiStyle.BottomLeft,
-                    IconPath = $"{Entry.ResPath}/images/ui/gu_cards.svg",
+                    // Reuse the game's draw-pile marker so the custom pile reads
+                    // as the same kind of source pile in combat UI and flight
+                    // animations.
+                    IconPath = "res://images/packed/combat_ui/draw_pile.png",
+                    Anchor = new ModCardPileAnchor(
+                        ModCardPileAnchorKind.BottomLeftPrimary,
+                        Vector2.Zero
+                    ),
                 }
             );
 
