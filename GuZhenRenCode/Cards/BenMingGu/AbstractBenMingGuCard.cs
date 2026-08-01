@@ -45,8 +45,26 @@ namespace GuZhenRen.Cards;
     typeof(GuZhenRenGuCardPool),
     Inherit = true
 )]
-public abstract class AbstractBenMingGuCard : ModCardTemplate, IGuRankProvider
+public abstract class AbstractBenMingGuCard : ModCardTemplate, IGuWormCard
 {
+    /// <summary>
+    /// 本命蛊默认每个玩家回合最多催动一次。
+    /// </summary>
+    public virtual int MaxUsesPerTurn => 1;
+
+    protected override bool IsPlayable =>
+        GuCardUsageRules.CanUse(this);
+
+    public override bool ShouldPlay(
+        CardModel card,
+        AutoPlayType autoPlayType
+    )
+    {
+        return base.ShouldPlay(card, autoPlayType) &&
+               (!ReferenceEquals(card, this) ||
+                GuCardUsageRules.CanUse(this));
+    }
+
     /// <summary>
     /// 本命蛊固定属于角色普通卡池，避免 CardModel.Pool 扫描 MockCardPool。
     /// </summary>

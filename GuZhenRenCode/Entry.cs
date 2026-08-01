@@ -34,6 +34,7 @@ public partial class Entry
         new(nameof(GuCardPileCombatPatch), GuCardPileCombatPatch.Initialize, GuCardPileCombatPatch.Uninitialize),
         new(nameof(YuanQiSystem), YuanQiSystem.Initialize, YuanQiSystem.Uninitialize),
         new(nameof(ApertureSystem), ApertureSystem.Initialize, ApertureSystem.Uninitialize),
+        new(nameof(LocalizationCompatibilityPatch), LocalizationCompatibilityPatch.Initialize, LocalizationCompatibilityPatch.Uninitialize),
         new(nameof(GuRestSiteChoicePatch), GuRestSiteChoicePatch.Initialize, GuRestSiteChoicePatch.Uninitialize),
         new(nameof(CardCarouselPreviewPatch), CardCarouselPreviewPatch.Initialize, CardCarouselPreviewPatch.Uninitialize),
         new(nameof(DeckCardSelectionManualConfirmationPatch), DeckCardSelectionManualConfirmationPatch.Initialize, DeckCardSelectionManualConfirmationPatch.Uninitialize),

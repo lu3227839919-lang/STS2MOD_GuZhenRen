@@ -5,6 +5,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <LangVersion>13.0</LangVersion>
     <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);RITSU001</NoWarn>
     <ImplicitUsings>true</ImplicitUsings>
     <RootNamespace>GuZhenRen</RootNamespace>
     <PathMap>$(MSBuildProjectDirectory)\=.\</PathMap>
@@ -41,9 +42,9 @@
 
   <ItemGroup>
     <!-- Godot resources are packed into the PCK; only the attached C# script is compiled here. -->
-    <Compile Remove=".godot/**;.idea/**;.vs/**;bin/**;obj/**;GuZhenRen/**" />
-    <EmbeddedResource Remove=".godot/**;.idea/**;.vs/**;bin/**;obj/**;GuZhenRen/**" />
-    <None Remove=".godot/**;.idea/**;.vs/**;bin/**;obj/**" />
+    <Compile Remove=".godot/**;.idea/**;.vs/**;.build/**;src/**;bin/**;obj/**;GuZhenRen/**" />
+    <EmbeddedResource Remove=".godot/**;.idea/**;.vs/**;.build/**;src/**;bin/**;obj/**;GuZhenRen/**" />
+    <None Remove=".godot/**;.idea/**;.vs/**;.build/**;src/**;bin/**;obj/**" />
     <Compile Include="GuZhenRen/scenes/ui/nodes/GuZhenRenEnergyCounter.cs" />
     <AdditionalFiles Include="GuZhenRen/localization/**/*.json" />
   </ItemGroup>

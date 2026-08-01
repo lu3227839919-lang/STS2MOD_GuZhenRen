@@ -33,6 +33,24 @@ namespace GuZhenRen.Cards;
 public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuWormCard
 {
     /// <summary>
+    /// 普通蛊虫默认每个玩家回合最多催动一次。
+    /// </summary>
+    public virtual int MaxUsesPerTurn => 1;
+
+    protected override bool IsPlayable =>
+        GuCardUsageRules.CanUse(this);
+
+    public override bool ShouldPlay(
+        CardModel card,
+        AutoPlayType autoPlayType
+    )
+    {
+        return base.ShouldPlay(card, autoPlayType) &&
+               (!ReferenceEquals(card, this) ||
+                GuCardUsageRules.CanUse(this));
+    }
+
+    /// <summary>
     /// Gu cards are activated from the dedicated Gu pile.  After activation,
     /// return them to that pile instead of allowing the normal discard result,
     /// so they never become drawable hand cards.

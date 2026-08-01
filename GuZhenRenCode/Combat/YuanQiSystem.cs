@@ -7,7 +7,7 @@ namespace GuZhenRen.Combat;
 /// 元气：本模组使用的第二套战斗资源。
 ///
 /// 元气由 RitsuLib 的次级资源系统保存、同步并接入战斗界面；它与游戏原生能量
-/// 和辉星完全独立，默认在每回合开始时清空，并且只在当前战斗内持久化。
+/// 和辉星完全独立。初始为5点，上限随空窍转数提升至25点，并在回合开始回复2点。
 /// </summary>
 public static class YuanQiSystem
 {
@@ -17,10 +17,10 @@ public static class YuanQiSystem
     public static SecondaryResourceDefinition Definition { get; private set; } =
         new(
             defaultAmount: 5,
-            baseMaxAmount: 99,
+            baseMaxAmount: 5,
             minAmount: 0,
-            hardMaxAmount: 999,
-            turnStartPolicy: SecondaryResourceTurnStartPolicy.AddMaxToCurrent,
+            hardMaxAmount: 25,
+            turnStartPolicy: SecondaryResourceTurnStartPolicy.None,
             persistencePolicy: SecondaryResourcePersistencePolicy.Combat,
             locTable: "secondary_resources",
             titleKey: "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.title",

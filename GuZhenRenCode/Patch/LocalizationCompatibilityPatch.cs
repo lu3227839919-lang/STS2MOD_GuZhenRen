@@ -66,6 +66,54 @@ internal static partial class LocalizationCompatibilityPatch
                 Eng:
                     "Whenever you play an Attack, have a {ChancePercent}% chance to deal {Damage:diff()} damage to ALL enemies. NL Strength affects this damage {StrengthMultiplier} times."
             ),
+            [
+                "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description"
+            ] = new(
+                Zhs:
+                    "作为仙元保留在手中。可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
+                Eng:
+                    "Retain as immortal essence. Provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted."
+            ),
+            [
+                "GU_ZHEN_REN_CARD_HONG_ZAO_XIAN_YUAN.description"
+            ] = new(
+                Zhs:
+                    "作为仙元保留在手中。等于两张青提仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
+                Eng:
+                    "Retain as immortal essence. Equals two Green Grape essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted."
+            ),
+            [
+                "GU_ZHEN_REN_CARD_BAI_LI_XIAN_YUAN.description"
+            ] = new(
+                Zhs:
+                    "作为仙元保留在手中。等于两张红枣仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
+                Eng:
+                    "Retain as immortal essence. Equals two Red Date essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted."
+            ),
+            [
+                "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description"
+            ] = new(
+                Zhs:
+                    "作为仙元保留在手中。等于两张白荔仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
+                Eng:
+                    "Retain as immortal essence. Equals two White Litchi essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted."
+            ),
+        };
+
+    private static readonly IReadOnlyDictionary<
+        string,
+        KeywordLocalizationFallback
+    > CharacterNameOverrides =
+        new Dictionary<string, KeywordLocalizationFallback>
+        {
+            ["title"] = new(
+                Zhs: "古月方源",
+                Eng: "Gu Yue Fang Yuan"
+            ),
+            ["titleObject"] = new(
+                Zhs: "古月方源",
+                Eng: "Gu Yue Fang Yuan"
+            ),
         };
 
     private static readonly IReadOnlyDictionary<
@@ -146,6 +194,9 @@ internal static partial class LocalizationCompatibilityPatch
             >();
             _patcher.RegisterPatch<
                 ProvideCardDescriptionOverridePatch
+            >();
+            _patcher.RegisterPatch<
+                ProvideCharacterNameOverridePatch
             >();
             _patcher.RegisterPatch<
                 NormalizeLegacyEnergyIconSyntaxPatch
@@ -484,6 +535,71 @@ internal static partial class LocalizationCompatibilityPatch
                 ) ||
                 !CardDescriptionOverrides.TryGetValue(
                     __instance.LocEntryKey,
+                    out KeywordLocalizationFallback fallback
+                ))
+            {
+                return true;
+            }
+
+            __result = string.Equals(
+                LocManager.Instance.Language,
+                "zhs",
+                StringComparison.OrdinalIgnoreCase
+            )
+                ? fallback.Zhs
+                : fallback.Eng;
+
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 角色显示名始终使用“古月方源”，同时覆盖旧 PCK 里可能存在的“蛊真人”名称。
+    /// </summary>
+    private sealed class
+        ProvideCharacterNameOverridePatch
+        : IPatchMethod
+    {
+        public static string PatchId =>
+            Entry.ModId +
+            ".Localization.CharacterNameOverride";
+
+        public static bool IsCritical => false;
+
+        public static string Description =>
+            "Override Gu Zhen Ren character name with Gu Yue Fang Yuan";
+
+        public static ModPatchTarget[] GetTargets() =>
+        [
+            PatchTarget.OptionalMethod<LocString>(
+                nameof(LocString.GetRawText)
+            ),
+        ];
+
+        private static bool Prefix(
+            LocString __instance,
+            ref string __result
+        )
+        {
+            if (!string.Equals(
+                    __instance.LocTable,
+                    "characters",
+                    StringComparison.Ordinal
+                ))
+            {
+                return true;
+            }
+
+            string entryKey = __instance.LocEntryKey;
+            int separator = entryKey.LastIndexOf('.');
+
+            if (separator <= 0 ||
+                !entryKey[..separator].Contains(
+                    "GU_ZHEN_REN_CHARACTER",
+                    StringComparison.Ordinal
+                ) ||
+                !CharacterNameOverrides.TryGetValue(
+                    entryKey[(separator + 1)..],
                     out KeywordLocalizationFallback fallback
                 ))
             {

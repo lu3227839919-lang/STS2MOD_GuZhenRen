@@ -1,4 +1,5 @@
 using GuZhenRen.Cards;
+using GuZhenRen.Cards.ImmortalEssence;
 using GuZhenRen.Characters;
 
 using MegaCrit.Sts2.Core.CardSelection;
@@ -67,6 +68,9 @@ public sealed class ChuiDong
                         1
                     ),
                     card => card is IGuWormCard
+                            && GuCardUsageRules.CanUse(card)
+                            && ImmortalEssenceSystem
+                                .CanPayForActivation(card)
                 )
             ).FirstOrDefault();
 

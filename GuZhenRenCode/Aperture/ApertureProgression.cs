@@ -28,11 +28,33 @@ public static class ApertureProgression
             [9] = 0,
         };
 
+    /// <summary>
+    /// 空窍转数对应的元气容量。六转达到 25 点后不再提高。
+    /// </summary>
+    private static readonly IReadOnlyDictionary<int, int>
+        YuanQiCapacityByRank = new Dictionary<int, int>
+        {
+            [1] = 5,
+            [2] = 7,
+            [3] = 10,
+            [4] = 14,
+            [5] = 19,
+            [6] = 25,
+        };
+
     public static int GetRequiredXp(int rank)
     {
         return RequiredXpByRank.TryGetValue(rank, out int value)
             ? value
             : 0;
+    }
+
+    public static int GetYuanQiCapacity(int rank)
+    {
+        int normalizedRank = Math.Max(MinimumRank, rank);
+        return normalizedRank >= ImmortalRank
+            ? YuanQiCapacityByRank[ImmortalRank]
+            : YuanQiCapacityByRank[normalizedRank];
     }
 
     /// <summary>

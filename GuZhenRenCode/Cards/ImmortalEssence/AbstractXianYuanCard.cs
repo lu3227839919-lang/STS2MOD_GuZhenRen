@@ -1,8 +1,5 @@
 using GuZhenRen.Characters;
-using MegaCrit.Sts2.Core.Commands;
-
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 
@@ -13,7 +10,8 @@ namespace GuZhenRen.Cards.ImmortalEssence;
 
 /// <summary>
 /// 四张仙元牌的公共父类。
-/// 仙元牌均为 0 费、保留、消耗，并且只由仙窍在战斗中生成。
+/// 仙元牌均为 0 费、保留、不能手动打出，并且只由仙窍在战斗中生成。
+/// 它们留在手牌中，由仙蛊催动流程按剩余单位自动消耗。
 /// </summary>
 [RegisterCard(
     typeof(GuZhenRenXianYuanCardPool),
@@ -27,7 +25,10 @@ public abstract class AbstractXianYuanCard : ModCardTemplate
     public override CardPoolModel Pool =>
         ModelDb.CardPool<GuZhenRenXianYuanCardPool>();
 
-    protected abstract int EnergyGain { get; }
+    /// <summary>
+    /// 以“一次六转仙蛊催动”为单位的总价值。
+    /// </summary>
+    public abstract int ActivationUnits { get; }
 
     /// <summary>
     /// 每张具体仙元牌必须声明非空的静态图片路径。
@@ -48,6 +49,8 @@ public abstract class AbstractXianYuanCard : ModCardTemplate
 
     public override bool CanBeGeneratedInCombat => false;
 
+    protected sealed override bool IsPlayable => false;
+
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         base.CanonicalKeywords
             .Append(CardKeyword.Retain)
@@ -58,17 +61,10 @@ public abstract class AbstractXianYuanCard : ModCardTemplate
     )
     {
         base.AddExtraArgsToDescription(description);
-        description.Add("Energy", EnergyGain);
-    }
-
-    protected override async Task OnPlay(
-        PlayerChoiceContext choiceContext,
-        CardPlay cardPlay
-    )
-    {
-        await PlayerCmd.GainEnergy(
-            EnergyGain,
-            Owner
+        description.Add("ActivationUnits", ActivationUnits);
+        description.Add(
+            "RemainingActivationUnits",
+            ImmortalEssenceSystem.GetRemainingUnits(this)
         );
     }
 

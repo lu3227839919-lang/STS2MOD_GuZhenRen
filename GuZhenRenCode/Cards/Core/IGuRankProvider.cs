@@ -26,4 +26,9 @@ public interface IGuRankProvider
 /// </summary>
 public interface IGuWormCard : IGuRankProvider
 {
+    /// <summary>
+    /// 同一张蛊虫牌在一个玩家回合内最多可催动的次数。
+    /// 具体蛊虫可以重写该值；默认每回合一次。
+    /// </summary>
+    int MaxUsesPerTurn => 1;
 }
