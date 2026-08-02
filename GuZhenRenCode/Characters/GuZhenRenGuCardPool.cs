@@ -26,7 +26,7 @@ public sealed class GuZhenRenGuCardPool : TypeListCardPoolModel
 
     public override Material? PoolFrameMaterial =>
         GD.Load<Material>(
-            $"{Entry.ResPath}/materials/card_frame_cyan_gray.tres"
+            $"{Entry.ResPath}/materials/card_frame_ink_wash.tres"
         );
 
     public override bool IsColorless => false;

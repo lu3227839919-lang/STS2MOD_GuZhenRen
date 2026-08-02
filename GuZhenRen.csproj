@@ -18,7 +18,7 @@
     <ModOutputDir>$(Sts2Dir)\mods\$(MSBuildProjectName)\</ModOutputDir>
     <ModPckPath>$(ModOutputDir)$(MSBuildProjectName).pck</ModPckPath>
 
-    <RitsuLibVersion Condition="'$(RitsuLibVersion)' == ''">0.5.2</RitsuLibVersion>
+    <RitsuLibVersion Condition="'$(RitsuLibVersion)' == ''">0.5.4</RitsuLibVersion>
     <CopyModOnBuild Condition="'$(CopyModOnBuild)' == ''">true</CopyModOnBuild>
     <RunPckExport Condition="'$(RunPckExport)' == '' and '$(DesignTimeBuild)' != 'true'">true</RunPckExport>
     <RunPckExport Condition="'$(RunPckExport)' == ''">false</RunPckExport>
@@ -42,9 +42,9 @@
 
   <ItemGroup>
     <!-- Godot resources are packed into the PCK; explicitly listed C# scene scripts are compiled here. -->
-    <Compile Remove=".godot/**;.idea/**;.vs/**;.build/**;src/**;bin/**;obj/**;GuZhenRen/**;GuZhenRenCode/Cards/Basic/ShaZhaoTuiYan.cs;GuZhenRenCode/Patch/ShaZhaoTuiYanPatch.cs" />
-    <EmbeddedResource Remove=".godot/**;.idea/**;.vs/**;.build/**;src/**;bin/**;obj/**;GuZhenRen/**" />
-    <None Remove=".godot/**;.idea/**;.vs/**;.build/**;src/**;bin/**;obj/**" />
+    <Compile Remove=".godot/**;.idea/**;.vs/**;.build/**;src/**;Slay the Spire 2/**;bin/**;obj/**;GuZhenRen/**;GuZhenRenCode/Cards/Basic/ShaZhaoTuiYan.cs;GuZhenRenCode/Patch/ShaZhaoTuiYanPatch.cs" />
+    <EmbeddedResource Remove=".godot/**;.idea/**;.vs/**;.build/**;src/**;Slay the Spire 2/**;bin/**;obj/**;GuZhenRen/**" />
+    <None Remove=".godot/**;.idea/**;.vs/**;.build/**;src/**;Slay the Spire 2/**;bin/**;obj/**" />
 
     <Compile Include="GuZhenRen/scenes/ui/nodes/GuZhenRenEnergyCounter.cs"
              Condition="Exists('GuZhenRen/scenes/ui/nodes/GuZhenRenEnergyCounter.cs')" />

@@ -19,10 +19,10 @@ public sealed class GuZhenRenShaZhaoCardPool : TypeListCardPoolModel
     public override Color EnergyOutlineColor => new(0.08f, 0.18f, 0.24f);
 
 
-    // 普通卡统一使用青灰色卡框材质；单张卡自己的 FrameMaterialPath 仍可覆盖它。
+    // 普通卡统一使用水墨卡框材质；单张卡自己的 FrameMaterialPath 仍可覆盖它。
     public override Material? PoolFrameMaterial =>
     GD.Load<Material>(
-        $"{Entry.ResPath}/materials/card_frame_cyan_gray.tres"
+        $"{Entry.ResPath}/materials/card_frame_ink_wash.tres"
     );
 
     // false 表示这是角色专属卡池，不是事件/状态那类无色卡池。

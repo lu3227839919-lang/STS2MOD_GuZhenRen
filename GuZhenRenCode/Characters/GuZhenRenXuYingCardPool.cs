@@ -41,11 +41,11 @@ public sealed class GuZhenRenXuYingCardPool
         new(0.08f, 0.18f, 0.24f);
 
     /// <summary>
-    /// 与蛊真人普通卡共用青灰色卡框。
+    /// 与蛊真人普通卡共用水墨卡框。
     /// </summary>
     public override Material? PoolFrameMaterial =>
         GD.Load<Material>(
-            $"{Entry.ResPath}/materials/card_frame_cyan_gray.tres"
+            $"{Entry.ResPath}/materials/card_frame_ink_wash.tres"
         );
 
     public override bool IsColorless =>

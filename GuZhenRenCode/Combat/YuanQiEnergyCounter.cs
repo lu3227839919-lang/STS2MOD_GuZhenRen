@@ -5,7 +5,6 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Nodes.Combat;
-using MegaCrit.Sts2.Core.Nodes.Vfx.Utilities;
 
 using STS2RitsuLib.Combat.SecondaryResources;
 
@@ -35,11 +34,11 @@ public sealed partial class YuanQiEnergyCounter : Control
 
     private SecondaryResourceDefinition _definition = null!;
     private string _scenePath = string.Empty;
-    private MegaLabel _amountLabel = null!;
+    private Label _amountLabel = null!;
     private Control? _layers;
     private Control? _rotationLayers;
-    private NParticlesContainer? _backVfx;
-    private NParticlesContainer? _frontVfx;
+    private Node? _backVfx;
+    private Node? _frontVfx;
     private Player? _player;
     private int _amount;
     private int? _maxAmount;
@@ -97,11 +96,9 @@ public sealed partial class YuanQiEnergyCounter : Control
         _maxAmount =
             SecondaryResourceCmd.GetMax(player, _definition.Id);
 
-        _amountLabel.SetTextAutoSize(
-            _maxAmount.HasValue
-                ? $"{_amount}/{_maxAmount.Value}"
-                : _amount.ToString()
-        );
+        _amountLabel.Text = _maxAmount.HasValue
+            ? $"{_amount}/{_maxAmount.Value}"
+            : _amount.ToString();
         _amountLabel.AddThemeColorOverride(
             ThemeConstants.Label.FontColor,
             _amount <= 0 ? StsColors.red : StsColors.cream
@@ -117,8 +114,8 @@ public sealed partial class YuanQiEnergyCounter : Control
 
         if (_amount > oldAmount)
         {
-            _backVfx?.Restart();
-            _frontVfx?.Restart();
+            RestartParticlesRecursive(_backVfx);
+            RestartParticlesRecursive(_frontVfx);
         }
 
         Visible = _definition.IsVisibleInCombatUi(player);
@@ -192,6 +189,10 @@ public sealed partial class YuanQiEnergyCounter : Control
                 return false;
             }
 
+            Vector2 sourceSize = source.Size == Vector2.Zero
+                ? FallbackSize
+                : source.Size;
+
             Position = source.Position == Vector2.Zero
                 ? FallbackLocalPosition
                 : source.Position;
@@ -199,11 +200,9 @@ public sealed partial class YuanQiEnergyCounter : Control
             PivotOffset = source.PivotOffset;
             CustomMinimumSize =
                 source.CustomMinimumSize == Vector2.Zero
-                    ? FallbackSize
+                    ? sourceSize
                     : source.CustomMinimumSize;
-            Size = source.Size == Vector2.Zero
-                ? FallbackSize
-                : source.Size;
+            Size = sourceSize;
 
             foreach (Node child in source.GetChildren().ToArray())
             {
@@ -227,20 +226,17 @@ public sealed partial class YuanQiEnergyCounter : Control
     private void EnsureAmountLabel(bool loadedScene)
     {
         _amountLabel =
-            GetNodeOrNull<MegaLabel>("Label") ??
+            GetNodeOrNull<Label>("Label") ??
             FindChild(
                 "Label",
                 recursive: true,
                 owned: false
-            ) as MegaLabel ??
-            new MegaLabel();
+            ) as Label ??
+            new Label();
 
-        if (_amountLabel.GetParent() != null)
-        {
-            return;
-        }
+        bool needsParent = _amountLabel.GetParent() == null;
 
-        if (!loadedScene)
+        if (!loadedScene && needsParent)
         {
             Position = FallbackLocalPosition;
             CustomMinimumSize = FallbackSize;
@@ -271,20 +267,25 @@ public sealed partial class YuanQiEnergyCounter : Control
 
         _amountLabel.Name = "Label";
         _amountLabel.MouseFilter = MouseFilterEnum.Ignore;
-        _amountLabel.CustomMinimumSize = Size;
-        _amountLabel.Size = Size;
         _amountLabel.HorizontalAlignment =
             HorizontalAlignment.Center;
         _amountLabel.VerticalAlignment =
             VerticalAlignment.Center;
-        _amountLabel.AutoSizeEnabled = true;
-        _amountLabel.MinFontSize = 24;
-        _amountLabel.MaxFontSize = 44;
         _amountLabel.AddThemeConstantOverride(
             ThemeConstants.Label.OutlineSize,
             9
         );
-        AddChild(_amountLabel);
+
+        if (needsParent)
+        {
+            _amountLabel.CustomMinimumSize = Size;
+            _amountLabel.Size = Size;
+            _amountLabel.AddThemeFontSizeOverride(
+                ThemeConstants.Label.FontSize,
+                36
+            );
+            AddChild(_amountLabel);
+        }
     }
 
     private void ResolveVisualNodes()
@@ -303,12 +304,12 @@ public sealed partial class YuanQiEnergyCounter : Control
             "EnergyVfxBack",
             recursive: true,
             owned: false
-        ) as NParticlesContainer;
+        );
         _frontVfx = FindChild(
             "EnergyVfxFront",
             recursive: true,
             owned: false
-        ) as NParticlesContainer;
+        );
     }
 
     private void ApplyZeroAmountVisualState()
@@ -330,6 +331,12 @@ public sealed partial class YuanQiEnergyCounter : Control
                 _amount <= 0 ? Colors.DarkGray : Colors.White;
         }
 
+        if (_amount <= 0)
+        {
+            StopParticlesRecursive(_backVfx);
+            StopParticlesRecursive(_frontVfx);
+        }
+
         if (_rotationLayers == null)
         {
             return;
@@ -339,6 +346,56 @@ public sealed partial class YuanQiEnergyCounter : Control
                  _rotationLayers.GetChildren().OfType<Control>())
         {
             layer.Material = darkMaterial;
+        }
+    }
+
+    private static void RestartParticlesRecursive(Node? root)
+    {
+        if (root == null)
+        {
+            return;
+        }
+
+        if (root is CpuParticles2D cpuParticles)
+        {
+            cpuParticles.Visible = true;
+            cpuParticles.Restart();
+            cpuParticles.Emitting = true;
+        }
+        else if (root is GpuParticles2D gpuParticles)
+        {
+            gpuParticles.Visible = true;
+            gpuParticles.Restart();
+            gpuParticles.Emitting = true;
+        }
+
+        foreach (Node child in root.GetChildren())
+        {
+            RestartParticlesRecursive(child);
+        }
+    }
+
+    private static void StopParticlesRecursive(Node? root)
+    {
+        if (root == null)
+        {
+            return;
+        }
+
+        if (root is CpuParticles2D cpuParticles)
+        {
+            cpuParticles.Emitting = false;
+            cpuParticles.Visible = false;
+        }
+        else if (root is GpuParticles2D gpuParticles)
+        {
+            gpuParticles.Emitting = false;
+            gpuParticles.Visible = false;
+        }
+
+        foreach (Node child in root.GetChildren())
+        {
+            StopParticlesRecursive(child);
         }
     }
 

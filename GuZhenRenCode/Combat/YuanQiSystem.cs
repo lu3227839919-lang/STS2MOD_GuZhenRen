@@ -17,7 +17,7 @@ public static class YuanQiSystem
     public static string ResourceId => $"{Entry.ModId}:{LocalId}";
 
     public const string SecondaryEnergyCounterScenePath =
-        "res://GuZhenRen/scenes/ui/nodes2/GuZhenRen_energy_counter2.tscn";
+        "res://GuZhenRen/scenes/ui/nodes/GuZhenRen_energy_counter2.tscn";
 
     public const string LargeIconPath =
         "res://GuZhenRen/images/characters/energy2_big.png";

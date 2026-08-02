@@ -38,25 +38,28 @@ public static class GuCardPileSystem
     private static bool _initialized;
 
     public static void Initialize()
+{
+    lock (SyncRoot)
     {
-        lock (SyncRoot)
+        if (_initialized)
         {
-            if (_initialized)
-            {
-                return;
-            }
+            return;
+        }
 
-            ModCardPileRegistry registry =
-                ModCardPileRegistry.For(Entry.ModId);
+        ModCardPileRegistry registry =
+            ModCardPileRegistry.For(Entry.ModId);
 
-            ModCardPileDefinition definition = registry.RegisterOwned(
+        // 放在原版抽牌堆右侧
+        ModCardPileDefinition definition =
+            registry.RegisterOwned(
                 LocalId,
                 new ModCardPileSpec
                 {
                     Scope = ModCardPileScope.CombatOnly,
                     Style = ModCardPileUiStyle.BottomLeft,
-                    // Keep the original bottom-left layout and default card-flight animation.
-                    IconPath = "res://GuZhenRen/images/ui/GuPaiDui.png",
+                    IconPath =
+                        "res://GuZhenRen/images/ui/GuPaiDui.png",
+
                     Anchor = new ModCardPileAnchor(
                         ModCardPileAnchorKind.BottomLeftPrimary,
                         Vector2.Zero
@@ -64,29 +67,30 @@ public static class GuCardPileSystem
                 }
             );
 
-            ModCardPileDefinition discardDefinition =
-                registry.RegisterOwned(
-                    DiscardLocalId,
-                    new ModCardPileSpec
-                    {
-                        Scope = ModCardPileScope.CombatOnly,
-                        Style = ModCardPileUiStyle.BottomLeft,
-                        // Place the Gu discard pile beside the base-game discard pile.
-                        // RitsuLib's default pile movement keeps the vanilla animation.
-                        IconPath =
-                            "res://GuZhenRen/images/ui/QiPaiDui.png",
-                        Anchor = new ModCardPileAnchor(
-                            ModCardPileAnchorKind.BottomLeftSecondary,
-                            Vector2.Zero
-                        ),
-                    }
-                );
+        // 放在原版弃牌堆左侧
+        ModCardPileDefinition discardDefinition =
+            registry.RegisterOwned(
+                DiscardLocalId,
+                new ModCardPileSpec
+                {
+                    Scope = ModCardPileScope.CombatOnly,
+                    Style = ModCardPileUiStyle.BottomLeft,
+                    IconPath =
+                        "res://GuZhenRen/images/ui/QiPaiDui.png",
 
-            PileType = definition.PileType;
-            DiscardPileType = discardDefinition.PileType;
-            _initialized = true;
-        }
+                    Anchor = new ModCardPileAnchor(
+                        ModCardPileAnchorKind.BottomLeftSecondary,
+                        new Vector2(-200f, 0f)
+                    ),
+                }
+            );
+
+        PileType = definition.PileType;
+        DiscardPileType = discardDefinition.PileType;
+        _initialized = true;
     }
+}
+
 
     public static void Uninitialize()
     {
