@@ -45,7 +45,7 @@ public partial class GuZhenRenEnergyCounterController2 : Control
 	/// </summary>
 	[Export]
 	public Vector2 RotationPivot { get; set; } =
-		new Vector2(128.0f, 112.0f);
+		new Vector2(128.0f, 128.0f);
 
 	[Export(PropertyHint.Range, "0.0,1.0,0.05")]
 	public float EmptyRotationMultiplier { get; set; } = 0.25f;
