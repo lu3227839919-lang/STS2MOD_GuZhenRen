@@ -30,7 +30,7 @@ namespace GuZhenRen.Cards;
 /// 因此，战斗能力重算、正式存档、奖励过滤、免费使用等功能，
 /// 目前通过独立方法和虚钩子提供接入点。
 /// </summary>
-public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuWormCard
+public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
 {
     /// <summary>
     /// 普通蛊虫默认每个玩家回合最多催动一次。
@@ -51,9 +51,8 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuWormCard
     }
 
     /// <summary>
-    /// Gu cards are activated from the dedicated Gu pile.  After activation,
-    /// return them to that pile instead of allowing the normal discard result,
-    /// so they never become drawable hand cards.
+    /// 真正实现 IGuWormCard 的蛊虫从专属蛊牌堆催动；杀招与虚影虽然
+    /// 复用品阶和流派数据，但不是蛊虫，按普通卡牌规则进入手牌与弃牌堆。
     /// </summary>
     public override CardLocation ModifyCardPlayResultLocation(
         CardModel card,
@@ -62,7 +61,8 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuWormCard
         CardLocation location
     )
     {
-        if (ReferenceEquals(card, this))
+        if (ReferenceEquals(card, this) &&
+            this is IGuWormCard)
         {
             GuCardPileSystem.Initialize();
             location.pileType =

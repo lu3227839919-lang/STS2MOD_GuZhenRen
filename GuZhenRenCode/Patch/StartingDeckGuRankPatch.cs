@@ -85,7 +85,8 @@ internal static class StartingDeckGuRankPatch
         foreach (AbstractGuZhenRenCard card in __instance
                      .Deck
                      .Cards
-                     .OfType<AbstractGuZhenRenCard>())
+                     .OfType<AbstractGuZhenRenCard>()
+                     .Where(card => card is IGuWormCard))
         {
             if (card.EnsureMinimumGuRank())
             {

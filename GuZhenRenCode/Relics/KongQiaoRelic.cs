@@ -3,10 +3,12 @@ using GuZhenRen.Cards;
 using GuZhenRen.Cards.ImmortalEssence;
 using GuZhenRen.Characters;
 using GuZhenRen.Combat;
+using GuZhenRen.Powers.GuangDao;
 using GuZhenRen.RestSite;
 
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
@@ -107,10 +109,71 @@ public sealed class KongQiaoRelic
         return modified;
     }
 
-    public override Task BeforeCombatStart()
+    public override async Task BeforeCombatStart()
     {
         ApertureSystem.HandleCombatStarting(Owner);
-        return Task.CompletedTask;
+        await GuangDaoPowerSystem.EnsureZheGuang(Owner);
+    }
+
+    /// <summary>
+    /// 光辉与照破只能由光道卡牌改变。这里位于原生 PowerCmd 的
+    /// giver 修正链中，因此也会拦住绕过 GuangDaoPowerSystem 的误调用；
+    /// 同时保证光辉初次施加时不超过 9 点。
+    /// </summary>
+    public override decimal ModifyPowerAmountGivenAdditive(
+        PowerModel power,
+        Creature giver,
+        decimal amount,
+        Creature? target,
+        CardModel? cardSource
+    )
+    {
+        if (!ReferenceEquals(giver, Owner.Creature) ||
+            power is not GuangHuiPower ||
+            amount <= 0 ||
+            !ReferenceEquals(target, Owner.Creature) ||
+            !GuangDaoPowerSystem.IsGuangDaoCard(cardSource))
+        {
+            return 0;
+        }
+
+        int existing = Owner.Creature
+            .GetPower<GuangHuiPower>()?.Amount ?? 0;
+        decimal allowed = Math.Min(
+            amount,
+            Math.Max(0, GuangHuiPower.MaximumAmount - existing)
+        );
+        return allowed - amount;
+    }
+
+    public override decimal ModifyPowerAmountGivenMultiplicative(
+        PowerModel power,
+        Creature giver,
+        decimal amount,
+        Creature? target,
+        CardModel? cardSource
+    )
+    {
+        if (!ReferenceEquals(giver, Owner.Creature) ||
+            power is not (GuangHuiPower or ZhaoPoPower))
+        {
+            return 1;
+        }
+
+        bool validTarget = power switch
+        {
+            GuangHuiPower => ReferenceEquals(
+                target,
+                Owner.Creature
+            ),
+            ZhaoPoPower => target?.IsEnemy == true,
+            _ => false,
+        };
+
+        return validTarget &&
+            GuangDaoPowerSystem.IsGuangDaoCard(cardSource)
+                ? 1
+                : 0;
     }
 
     /// <summary>

@@ -94,6 +94,7 @@ internal static class GuRankRewardPatch
         foreach (CardModel card in cards)
         {
             if (card is not AbstractGuZhenRenCard guCard ||
+                card is not IGuWormCard ||
                 !guCard.NeedsInitialGuRankAssignment)
             {
                 continue;

@@ -181,8 +181,8 @@ internal static partial class LocalizationCompatibilityPatch
                     GuCardPileSystem.PileId + ".description"
                 )
             ] = new(
-                Zhs: "存放当前可催动的蛊虫牌。左键仅查看牌堆；右键花费1点能量开始杀招推演。按配方顺序逐张选择材料，已选择至少一张后可确认或返回以完成输入。配方错误时，若能量足够会支付材料费用并依序催动；否则受到5点不可格挡的反噬伤害。",
-                Eng: "Stores Gu Worm cards that can currently be activated. Left-click only inspects the pile; right-click and spend 1 Energy to deduce a killer move. Choose materials one at a time in recipe order, then confirm or go back after choosing at least one. A wrong recipe pays the materials' costs and activates them in order when possible; otherwise, take 5 unblockable backlash damage."
+                Zhs: "存放当前可催动的蛊虫牌。左键仅查看牌堆；右键花费1点能量开始杀招推演。按配方顺序逐张选择材料；成功时再支付所有材料有效元气消耗平均值的2倍（向上取整），杀招加入手牌且不属于蛊虫。配方错误时，若能量足够会支付材料费用并依序催动；否则受到5点不可格挡的反噬伤害。",
+                Eng: "Stores Gu Worm cards that can currently be activated. Left-click only inspects the pile; right-click and spend 1 Energy to deduce a killer move. Choose materials in recipe order. On success, also pay twice the average effective Primeval Essence cost of all materials, rounded up; the Killer Move enters your hand and is not a Gu Worm. A wrong recipe pays the materials' costs and activates them in order when possible; otherwise, take 5 unblockable backlash damage."
             ),
             [
                 (
@@ -228,6 +228,60 @@ internal static partial class LocalizationCompatibilityPatch
             ] = new(
                 Zhs: "蛊虫弃牌堆为空。",
                 Eng: "The spent Gu Worm pile is empty."
+            ),
+            [
+                (
+                    "powers",
+                    "GU_ZHEN_REN_POWER_GUANG_HUI_POWER.title"
+                )
+            ] = new(
+                Zhs: "光辉",
+                Eng: "Brilliance"
+            ),
+            [
+                (
+                    "powers",
+                    "GU_ZHEN_REN_POWER_GUANG_HUI_POWER.description"
+                )
+            ] = new(
+                Zhs: "角色资源，上限为9点。光辉不会在回合结束时消失；光道卡牌可以获得或消耗光辉。",
+                Eng: "A character resource capped at 9. Brilliance does not disappear at end of turn; Light Path cards can gain or spend it."
+            ),
+            [
+                (
+                    "powers",
+                    "GU_ZHEN_REN_POWER_ZHE_GUANG_POWER.title"
+                )
+            ] = new(
+                Zhs: "折光",
+                Eng: "Refraction"
+            ),
+            [
+                (
+                    "powers",
+                    "GU_ZHEN_REN_POWER_ZHE_GUANG_POWER.description"
+                )
+            ] = new(
+                Zhs: "本回合打出的牌与上一张牌类型不同时，若当前牌是光道牌，获得1点光辉。上一张牌可来自任意流派；每回合最多通过折光获得3点光辉。",
+                Eng: "When a card you play has a different type from the previous card, gain 1 Brilliance if the current card is a Light Path card. The previous card may be from any path. Gain at most 3 Brilliance from Refraction each turn."
+            ),
+            [
+                (
+                    "powers",
+                    "GU_ZHEN_REN_POWER_ZHAO_PO_POWER.title"
+                )
+            ] = new(
+                Zhs: "照破",
+                Eng: "Illumination Break"
+            ),
+            [
+                (
+                    "powers",
+                    "GU_ZHEN_REN_POWER_ZHAO_PO_POWER.description"
+                )
+            ] = new(
+                Zhs: "下一次受到攻击牌的单段伤害时，额外受到3点伤害并移除1层照破。多段攻击可以连续消耗多层。",
+                Eng: "The next time a single hit from an Attack card deals damage, take 3 additional damage and remove 1 Illumination Break. Multi-hit attacks can consume multiple stacks."
             ),
             [
                 (

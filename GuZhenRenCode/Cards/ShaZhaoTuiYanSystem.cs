@@ -4,6 +4,7 @@ using Godot;
 
 using GuZhenRen.Cards.ShaZhao;
 using GuZhenRen.Characters;
+using GuZhenRen.Combat;
 using GuZhenRen.Multiplayer;
 using GuZhenRen.Relics;
 
@@ -21,6 +22,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib;
 using STS2RitsuLib.CardPiles.Nodes;
+using STS2RitsuLib.Combat.SecondaryResources;
 using STS2RitsuLib.Interactions.RightClick;
 
 namespace GuZhenRen.Cards;
@@ -267,32 +269,150 @@ internal static class ShaZhaoTuiYanSystem
             return;
         }
 
+        bool hasMatchingRecipe =
+            ShaZhaoRecipeRegistry.HasMatchingRecipe(
+                selectedCards
+            );
+
+        if (!hasMatchingRecipe)
+        {
+            // 错误配方保持原规则：先支付 1 点基础能量，再结算催动或反噬。
+            await PlayerCmd.LoseEnergy(
+                ActivationEnergyCost,
+                player
+            );
+            await ResolveFailedRecipe(
+                choiceContext,
+                player,
+                selectedCards,
+                playerCombatState
+            );
+            return;
+        }
+
+        int yuanQiCost = CalculateShaZhaoYuanQiCost(
+            player,
+            selectedCards
+        );
+
+        if (SecondaryResourceCmd.Get(
+                player,
+                YuanQiSystem.ResourceId
+            ) < yuanQiCost ||
+            !ShaZhaoRecipeRegistry.TryCreateResult(
+                selectedCards,
+                player,
+                out AbstractShaZhaoCard? shaZhao
+            ))
+        {
+            return;
+        }
+
+        bool spentYuanQi =
+            await SecondaryResourceCmd.Spend(
+                player,
+                YuanQiSystem.ResourceId,
+                yuanQiCost,
+                card: shaZhao,
+                source: shaZhao
+            );
+
+        if (!spentYuanQi)
+        {
+            var combatState = shaZhao.CombatState;
+            shaZhao.RemoveFromState();
+            combatState?.RemoveCard(shaZhao);
+            return;
+        }
+
         // 保留原“杀招推演”系统牌的 1 点基础能量费用。
         await PlayerCmd.LoseEnergy(
             ActivationEnergyCost,
             player
         );
 
-        if (ShaZhaoRecipeRegistry.TryCreateResult(
-                selectedCards,
-                player,
-                out AbstractShaZhaoCard? shaZhao
-            ))
-        {
-            await ResolveSuccessfulRecipe(
-                choiceContext,
-                player,
-                selectedCards,
-                shaZhao
-            );
-            return;
-        }
-
-        await ResolveFailedRecipe(
+        await ResolveSuccessfulRecipe(
             choiceContext,
             player,
             selectedCards,
-            playerCombatState
+            shaZhao
+        );
+    }
+
+    /// <summary>
+    /// 成功推演费用 = 所有材料有效元气消耗的平均值 × 2。
+    /// 元气是整数资源，因此非整数结果统一向上取整。
+    /// 优先读取 RitsuLib 已解析的元气支付计划；没有声明次级费用的旧蛊牌
+    /// 则使用当前原生能量消耗兼容计算。
+    /// </summary>
+    private static int CalculateShaZhaoYuanQiCost(
+        Player player,
+        IReadOnlyList<CardModel> materials
+    )
+    {
+        if (materials.Count == 0)
+        {
+            return 0;
+        }
+
+        long totalMaterialCost = materials.Sum(card =>
+            (long)GetMaterialYuanQiCost(player, card)
+        );
+        long doubledTotal = Math.Min(
+            int.MaxValue,
+            totalMaterialCost * 2L
+        );
+
+        return (int)Math.Min(
+            int.MaxValue,
+            (doubledTotal + materials.Count - 1L) /
+                materials.Count
+        );
+    }
+
+    private static int GetMaterialYuanQiCost(
+        Player player,
+        CardModel card
+    )
+    {
+        SecondaryResourcePaymentPlan plan =
+            SecondaryResourcePaymentResolver.Plan(
+                card,
+                source: card
+            );
+
+        SecondaryResourcePaymentLine[] yuanQiLines =
+            plan.Lines
+                .Where(line => string.Equals(
+                    line.ResourceId,
+                    YuanQiSystem.ResourceId,
+                    StringComparison.OrdinalIgnoreCase
+                ))
+                .ToArray();
+
+        if (yuanQiLines.Length > 0)
+        {
+            long resolvedCost = yuanQiLines.Sum(line =>
+                (long)(line.BlocksPlay || line.Activated
+                    ? line.CostsX
+                        ? line.AmountToSpend
+                        : line.Cost
+                    : 0)
+            );
+
+            return (int)Math.Min(
+                int.MaxValue,
+                Math.Max(0L, resolvedCost)
+            );
+        }
+
+        return Math.Max(
+            0,
+            card.EnergyCost.CostsX
+                ? player.PlayerCombatState?.Energy ?? 0
+                : card.EnergyCost.GetWithModifiers(
+                    CostModifiers.All
+                )
         );
     }
 

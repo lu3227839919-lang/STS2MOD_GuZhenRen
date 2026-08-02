@@ -58,24 +58,7 @@ public static class ShaZhaoRecipeRegistry
         CardModel[] orderedMaterials =
             selectedCards.ToArray();
 
-        Type[] orderedSelectedTypes =
-            orderedMaterials
-                .Select(card => card.GetType())
-                .ToArray();
-
-        Recipe? recipe =
-            Recipes.Value.FirstOrDefault(
-                candidate =>
-                    candidate
-                        .OrderedMaterialCardTypes
-                        .Count ==
-                    orderedSelectedTypes.Length &&
-                    candidate
-                        .OrderedMaterialCardTypes
-                        .SequenceEqual(
-                            orderedSelectedTypes
-                        )
-            );
+        Recipe? recipe = FindRecipe(orderedMaterials);
 
         if (recipe == null)
         {
@@ -126,6 +109,37 @@ public static class ShaZhaoRecipeRegistry
         );
 
         return true;
+    }
+
+    /// <summary>
+    /// 只检查有序材料是否匹配杀招配方，不创建战斗卡牌。
+    /// 推演系统用它在创建结果前验证元气费用，避免支付失败时留下
+    /// 已登记但不可见的战斗卡牌实例。
+    /// </summary>
+    public static bool HasMatchingRecipe(
+        IEnumerable<CardModel> selectedCards
+    )
+    {
+        ArgumentNullException.ThrowIfNull(selectedCards);
+        return FindRecipe(selectedCards.ToArray()) != null;
+    }
+
+    private static Recipe? FindRecipe(
+        IReadOnlyList<CardModel> orderedMaterials
+    )
+    {
+        Type[] orderedSelectedTypes = orderedMaterials
+            .Select(card => card.GetType())
+            .ToArray();
+
+        return Recipes.Value.FirstOrDefault(
+            candidate =>
+                candidate.OrderedMaterialCardTypes.Count ==
+                    orderedSelectedTypes.Length &&
+                candidate.OrderedMaterialCardTypes.SequenceEqual(
+                    orderedSelectedTypes
+                )
+        );
     }
 
     /// <summary>

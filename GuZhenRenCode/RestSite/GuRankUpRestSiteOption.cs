@@ -240,8 +240,7 @@ public sealed class GuRankUpRestSiteOption
     private static bool IsEligibleCard(CardModel card)
     {
         return card is AbstractGuZhenRenCard gu &&
-            card is not AbstractShaZhaoCard &&
-            card is not AbstractXuYingCard &&
+            card is IGuWormCard &&
             gu.GuRank < gu.MaxGuRank &&
             GuZhenRenCardRules.CanReachGuRank(
                 gu,

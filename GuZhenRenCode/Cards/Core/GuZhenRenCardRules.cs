@@ -39,20 +39,8 @@ public static class GuZhenRenCardRules
     {
         ArgumentNullException.ThrowIfNull(card);
 
-        return card switch
-        {
-            // 杀招虽然拥有转数，但并不属于蛊虫，
-            // 因此不会因达到六转而成为仙蛊。
-            AbstractShaZhaoCard => false,
-
-            AbstractGuZhenRenCard guCard =>
-                guCard.GuRank >= XianGuRank,
-
-            AbstractBenMingGuCard benMingGuCard =>
-                benMingGuCard.GuRank >= XianGuRank,
-
-            _ => false,
-        };
+        return card is IGuWormCard guWorm &&
+            guWorm.GuRank >= XianGuRank;
     }
 
     /// <summary>
@@ -68,14 +56,9 @@ public static class GuZhenRenCardRules
     {
         ArgumentNullException.ThrowIfNull(card);
 
-        rank = card switch
-        {
-            AbstractShaZhaoCard => 0,
-            AbstractGuZhenRenCard guCard => guCard.GuRank,
-            AbstractBenMingGuCard benMingGuCard =>
-                benMingGuCard.GuRank,
-            _ => 0,
-        };
+        rank = card is IGuWormCard guWorm
+            ? guWorm.GuRank
+            : 0;
 
         return rank is >= 1 and <= 9;
     }
@@ -399,7 +382,8 @@ public static class GuZhenRenCardRules
     {
         switch (card)
         {
-            case AbstractGuZhenRenCard guCard:
+            case AbstractGuZhenRenCard guCard
+                when guCard is IGuWormCard:
                 guCard.ReconcileGuRankForUniqueness(
                     XianGuRank - 1
                 );

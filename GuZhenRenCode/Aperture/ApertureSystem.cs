@@ -730,7 +730,8 @@ public static class ApertureSystem
                     }
                     break;
 
-                case AbstractGuZhenRenCard guCard:
+                case AbstractGuZhenRenCard guCard
+                    when guCard is IGuWormCard:
                     while (guCard.GuRank < targetRank &&
                            guCard.TryIncreaseGuRank())
                     {

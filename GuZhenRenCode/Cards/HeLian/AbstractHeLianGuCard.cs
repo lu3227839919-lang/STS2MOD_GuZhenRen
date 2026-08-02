@@ -21,7 +21,7 @@ namespace GuZhenRen.Cards.HeLian;
     Inherit = true
 )]
 public abstract class AbstractHeLianGuCard
-    : AbstractGuZhenRenCard
+    : AbstractGuWormCard
 {
     protected AbstractHeLianGuCard(
         int baseCost,
