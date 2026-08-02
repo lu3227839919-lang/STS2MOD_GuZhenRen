@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bhrrq4jeb3op2"
-path="res://.godot/imported/layer2.png-dbce2cde2e6d7964c5b3cc591d9ca224.ctex"
+uid="uid://dw68gpp3hanxv"
+path="res://.godot/imported/energy2_big.png-2294a674d70b7dede4fe3bb2f5c9fc52.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GuZhenRen/images/ui/orb2/layer2.png"
-dest_files=["res://.godot/imported/layer2.png-dbce2cde2e6d7964c5b3cc591d9ca224.ctex"]
+source_file="res://GuZhenRen/images/characters/energy2_big.png"
+dest_files=["res://.godot/imported/energy2_big.png-2294a674d70b7dede4fe3bb2f5c9fc52.ctex"]
 
 [params]
 

@@ -1,4 +1,3 @@
-using GuZhenRen.Cards.Basic;
 using GuZhenRen.Cards.HeLian;
 
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -87,11 +86,6 @@ public static class GuZhenRenCardRules
     {
         ArgumentNullException.ThrowIfNull(card);
 
-        if (card is ShaZhaoTuiYan)
-        {
-            return CardUniqueScope.None;
-        }
-
         // 仙蛊的唯一性由实时转数和仙蛊规则独立决定，
         // 与普通“唯一”展示关键词完全无关。
         if (IsXianGu(card))
@@ -166,11 +160,6 @@ public static class GuZhenRenCardRules
     {
         ArgumentNullException.ThrowIfNull(original);
         ArgumentNullException.ThrowIfNull(replacement);
-
-        if (replacement is ShaZhaoTuiYan)
-        {
-            return false;
-        }
 
         // 战斗内转换不改变永久牌组。
         if (original.Pile?.Type != PileType.Deck)
@@ -525,11 +514,6 @@ public static class GuZhenRenCardRules
         ArgumentNullException.ThrowIfNull(runState);
         ArgumentNullException.ThrowIfNull(receivingPlayer);
         ArgumentNullException.ThrowIfNull(candidate);
-
-        if (candidate is ShaZhaoTuiYan)
-        {
-            return false;
-        }
 
         CardUniqueScope scope = GetUniqueScope(candidate);
 

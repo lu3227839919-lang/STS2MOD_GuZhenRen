@@ -151,6 +151,98 @@ internal static partial class LocalizationCompatibilityPatch
             ),
         };
 
+    private static readonly IReadOnlyDictionary<
+        (string Table, string Key),
+        KeywordLocalizationFallback
+    > CombatInterfaceLocalizationFallbacks =
+        new Dictionary<
+            (string Table, string Key),
+            KeywordLocalizationFallback
+        >
+        {
+            [
+                (
+                    "static_hover_tips",
+                    GuCardPileSystem.PileId + ".title"
+                )
+            ] = new(
+                Zhs: "蛊虫牌堆",
+                Eng: "Gu Worm Pile"
+            ),
+            [
+                (
+                    "static_hover_tips",
+                    GuCardPileSystem.PileId + ".description"
+                )
+            ] = new(
+                Zhs: "存放当前可催动的蛊虫牌。左键查看；右键花费1点能量开始杀招推演。按配方顺序逐张选择材料，已选择至少一张后可确认或返回以完成输入。配方错误时，若能量足够会支付材料费用并依序催动；否则受到5点不可格挡的反噬伤害。",
+                Eng: "Stores Gu Worm cards that can currently be activated. Left-click to inspect; right-click and spend 1 Energy to deduce a killer move. Choose materials one at a time in recipe order, then confirm or go back after choosing at least one. A wrong recipe pays the materials' costs and activates them in order when possible; otherwise, take 5 unblockable backlash damage."
+            ),
+            [
+                (
+                    "static_hover_tips",
+                    GuCardPileSystem.PileId + ".empty"
+                )
+            ] = new(
+                Zhs: "蛊虫牌堆中没有可用于杀招推演的蛊虫。",
+                Eng: "There are no Gu Worms available for killer-move deduction."
+            ),
+            [
+                (
+                    "static_hover_tips",
+                    GuCardPileSystem.PileId + ".selectionPrompt"
+                )
+            ] = new(
+                Zhs: "按配方顺序选择下一张蛊虫牌。已选择{SelectedCount}张；选择过至少一张后，可点击确认或返回完成推演。",
+                Eng: "Choose the next Gu Worm in recipe order. {SelectedCount} selected; after choosing at least one, confirm or go back to finish."
+            ),
+            [
+                (
+                    "static_hover_tips",
+                    GuCardPileSystem.DiscardPileId + ".title"
+                )
+            ] = new(
+                Zhs: "蛊虫弃牌堆",
+                Eng: "Spent Gu Worm Pile"
+            ),
+            [
+                (
+                    "static_hover_tips",
+                    GuCardPileSystem.DiscardPileId + ".description"
+                )
+            ] = new(
+                Zhs: "存放本回合催动次数已经耗尽的蛊虫牌；新回合开始时，可再次催动的蛊虫会回到蛊虫牌堆。",
+                Eng: "Stores Gu Worm cards whose activations are spent this turn. Gu Worms that can be used again return to the Gu Worm pile when a new turn begins."
+            ),
+            [
+                (
+                    "static_hover_tips",
+                    GuCardPileSystem.DiscardPileId + ".empty"
+                )
+            ] = new(
+                Zhs: "蛊虫弃牌堆为空。",
+                Eng: "The spent Gu Worm pile is empty."
+            ),
+            [
+                (
+                    "secondary_resources",
+                    "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.title"
+                )
+            ] = new(
+                Zhs: "元气",
+                Eng: "Primeval Essence"
+            ),
+            [
+                (
+                    "secondary_resources",
+                    "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.description"
+                )
+            ] = new(
+                Zhs: "蛊师空窍中的次能量。初始为5点，从第二回合起每回合回复2点，上限随空窍转数提高。",
+                Eng: "A Gu Master's secondary energy. Starts at 5, restores 2 each turn after the first, and has a maximum that increases with aperture rank."
+            ),
+        };
+
     private static ModPatcher? _patcher;
     private static bool _initialized;
 
@@ -191,6 +283,9 @@ internal static partial class LocalizationCompatibilityPatch
             >();
             _patcher.RegisterPatch<
                 ProvideRestSiteLocalizationFallbackPatch
+            >();
+            _patcher.RegisterPatch<
+                ProvideCombatInterfaceLocalizationFallbackPatch
             >();
             _patcher.RegisterPatch<
                 ProvideCardDescriptionOverridePatch
@@ -486,6 +581,58 @@ internal static partial class LocalizationCompatibilityPatch
 
             // 自定义篝火规则经常只通过 DLL 更新，因此这些 key
             // 始终由当前代码覆盖，避免继续读取旧 PCK 文本。
+            __result = string.Equals(
+                LocManager.Instance.Language,
+                "zhs",
+                StringComparison.OrdinalIgnoreCase
+            )
+                ? fallback.Zhs
+                : fallback.Eng;
+
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 为蛊虫牌堆右键操作、弃牌堆和元气表提供代码内文本。
+    /// 始终覆盖旧 PCK 中同名条目，避免只替换 DLL 时仍显示旧说明。
+    /// </summary>
+    private sealed class
+        ProvideCombatInterfaceLocalizationFallbackPatch
+        : IPatchMethod
+    {
+        public static string PatchId =>
+            Entry.ModId +
+            ".Localization.CombatInterfaceFallback";
+
+        public static bool IsCritical => false;
+
+        public static string Description =>
+            "Provide localization for Gu piles and Yuan Qi UI";
+
+        public static ModPatchTarget[] GetTargets() =>
+        [
+            PatchTarget.OptionalMethod<LocString>(
+                nameof(LocString.GetRawText)
+            ),
+        ];
+
+        private static bool Prefix(
+            LocString __instance,
+            ref string __result
+        )
+        {
+            if (!CombatInterfaceLocalizationFallbacks.TryGetValue(
+                    (
+                        __instance.LocTable,
+                        __instance.LocEntryKey
+                    ),
+                    out KeywordLocalizationFallback fallback
+                ))
+            {
+                return true;
+            }
+
             __result = string.Equals(
                 LocManager.Instance.Language,
                 "zhs",

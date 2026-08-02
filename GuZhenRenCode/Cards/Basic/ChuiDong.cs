@@ -1,6 +1,7 @@
 using GuZhenRen.Cards;
 using GuZhenRen.Cards.ImmortalEssence;
 using GuZhenRen.Characters;
+using GuZhenRen.Multiplayer;
 using GuZhenRen.Patches;
 
 using MegaCrit.Sts2.Core.CardSelection;
@@ -83,7 +84,9 @@ public sealed class ChuiDong
         if (selected.TargetType == TargetType.AnyEnemy)
         {
             target =
-                Owner.Creature.CombatState?.HittableEnemies
+                GuZhenRenDeterminism.OrderCreatures(
+                    Owner.Creature.CombatState?.HittableEnemies ?? []
+                )
                     .FirstOrDefault();
 
             if (target == null)

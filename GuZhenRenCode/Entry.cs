@@ -45,7 +45,7 @@ public partial class Entry
         new(nameof(GuRankRewardPatch), GuRankRewardPatch.Initialize, GuRankRewardPatch.Uninitialize),
         new(nameof(CardUniquenessPatch), CardUniquenessPatch.Initialize, CardUniquenessPatch.Uninitialize),
         new(nameof(MerchantInventoryCompatibilityPatch), MerchantInventoryCompatibilityPatch.Initialize, MerchantInventoryCompatibilityPatch.Uninitialize),
-        new(nameof(ShaZhaoTuiYanPatch), ShaZhaoTuiYanPatch.Initialize, ShaZhaoTuiYanPatch.Uninitialize),
+        new(nameof(ShaZhaoTuiYanSystem), ShaZhaoTuiYanSystem.Initialize, ShaZhaoTuiYanSystem.Uninitialize),
     ];
 
     private static bool _contentRegistered;

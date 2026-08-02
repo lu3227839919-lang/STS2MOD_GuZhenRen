@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://ckrutfaa5o8wk"]
 
-[ext_resource type="Texture2D" uid="uid://di72o7n5636wh" path="res://GuZhenRen/images/ui/orb/vfx_back.png" id="1_f1xvl"]
+[ext_resource type="Texture2D" uid="uid://di72o7n5636wh" path="res://GuZhenRen/images/ui/orb1/vfx_back.png" id="1_f1xvl"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_f1xvl"]
 blend_mode = 1

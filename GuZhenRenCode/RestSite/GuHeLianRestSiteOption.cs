@@ -1,7 +1,6 @@
 using Godot;
 
 using GuZhenRen.Cards;
-using GuZhenRen.Cards.Basic;
 using GuZhenRen.Cards.HeLian;
 
 using MegaCrit.Sts2.Core.CardSelection;
@@ -417,12 +416,6 @@ public sealed class GuHeLianRestSiteOption
     {
         // 只允许显式标记为 IGuWormCard 的真正蛊虫卡。
         if (card is not IGuWormCard)
-        {
-            return false;
-        }
-
-        // 杀招推演是固定系统牌，不能被合练移除。
-        if (card is ShaZhaoTuiYan)
         {
             return false;
         }

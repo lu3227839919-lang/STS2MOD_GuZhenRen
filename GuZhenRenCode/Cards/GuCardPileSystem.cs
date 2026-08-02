@@ -92,7 +92,8 @@ public static class GuCardPileSystem
     {
         lock (SyncRoot)
         {
-            _initialized = false;
+            // RitsuLib 的牌堆注册是进程级且不可撤销的。初始化回滚时保留
+            // 标记，避免后续重试以相同 ID 重复注册并导致模组无法加载。
         }
     }
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ciym2kqfj8sh"
-path="res://.godot/imported/border.png-171e53e29573bcddeaaa1b1d72822c64.ctex"
+uid="uid://b5ouw62afcvmc"
+path="res://.godot/imported/energy2_text.png-ebcc97c1f71fe11f8636a334a03ab52f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GuZhenRen/images/ui/orb2/border.png"
-dest_files=["res://.godot/imported/border.png-171e53e29573bcddeaaa1b1d72822c64.ctex"]
+source_file="res://GuZhenRen/images/characters/energy2_text.png"
+dest_files=["res://.godot/imported/energy2_text.png-ebcc97c1f71fe11f8636a334a03ab52f.ctex"]
 
 [params]
 

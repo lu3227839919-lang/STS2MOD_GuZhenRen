@@ -47,15 +47,11 @@ public sealed class GuZhenRenStrike
         ArgumentNullException.ThrowIfNull(choiceContext);
         ArgumentNullException.ThrowIfNull(cardPlay);
 
-        if (Owner.Creature.CombatState is not { } combatState)
-        {
-            return;
-        }
+        Creature? target = cardPlay.Target;
 
-        Creature? firstEnemy =
-            combatState.HittableEnemies.FirstOrDefault();
-
-        if (firstEnemy == null)
+        // 使用行动队列中已经同步的目标。直接取敌人集合首项会忽略玩家
+        // 实际点击的敌人，并可能在多人端集合顺序不一致时造成分歧。
+        if (target == null || !IsValidTarget(target))
         {
             return;
         }
@@ -63,7 +59,7 @@ public sealed class GuZhenRenStrike
         await DamageCmd
             .Attack(DynamicVars.Damage.BaseValue)
             .FromCard(this, cardPlay)
-            .Targeting(firstEnemy)
+            .Targeting(target)
             .WithHitFx("vfx/vfx_attack_blunt")
             .Execute(choiceContext);
     }
