@@ -9,7 +9,8 @@ namespace GuZhenRen.Combat;
 /// 元气：本模组使用的第二套战斗资源。
 ///
 /// 元气由 RitsuLib 的次级资源系统保存、同步并接入战斗界面；它与游戏原生能量
-/// 和辉星完全独立。初始为5点，上限随空窍转数提升至25点，并在回合开始回复2点。
+/// 和辉星完全独立。战斗开始时为5点，上限随空窍转数提升至25点；从第二
+/// 回合起，每回合开始回复2点。
 /// </summary>
 public static class YuanQiSystem
 {
@@ -82,7 +83,7 @@ public static class YuanQiSystem
                     context.Node.Bind(context.Player);
 
                     // 节点挂载注册会作用于所有角色的战斗界面；只有本模组
-                    // 角色才移动原版能量容器，避免影响其他角色或联机队友。
+                    // 角色才把元气表定位到原生能量表右上方。
                     if (context.Player?.Character is
                         Characters.GuZhenRenCharacter)
                     {

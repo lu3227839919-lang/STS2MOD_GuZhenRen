@@ -166,8 +166,8 @@ internal static partial class LocalizationCompatibilityPatch
                     GuCardPileSystem.PileId + ".title"
                 )
             ] = new(
-                Zhs: "蛊虫牌堆",
-                Eng: "Gu Worm Pile"
+                Zhs: "蛊抽牌堆",
+                Eng: "Gu Draw Pile"
             ),
             [
                 (
@@ -175,8 +175,8 @@ internal static partial class LocalizationCompatibilityPatch
                     GuCardPileSystem.PileId + ".description"
                 )
             ] = new(
-                Zhs: "存放当前可催动的蛊虫牌。左键查看；右键花费1点能量开始杀招推演。按配方顺序逐张选择材料，已选择至少一张后可确认或返回以完成输入。配方错误时，若能量足够会支付材料费用并依序催动；否则受到5点不可格挡的反噬伤害。",
-                Eng: "Stores Gu Worm cards that can currently be activated. Left-click to inspect; right-click and spend 1 Energy to deduce a killer move. Choose materials one at a time in recipe order, then confirm or go back after choosing at least one. A wrong recipe pays the materials' costs and activates them in order when possible; otherwise, take 5 unblockable backlash damage."
+                Zhs: "存放当前可催动的蛊虫牌。左键仅查看牌堆；右键花费1点能量开始杀招推演。按配方顺序逐张选择材料，已选择至少一张后可确认或返回以完成输入。配方错误时，若能量足够会支付材料费用并依序催动；否则受到5点不可格挡的反噬伤害。",
+                Eng: "Stores Gu Worm cards that can currently be activated. Left-click only inspects the pile; right-click and spend 1 Energy to deduce a killer move. Choose materials one at a time in recipe order, then confirm or go back after choosing at least one. A wrong recipe pays the materials' costs and activates them in order when possible; otherwise, take 5 unblockable backlash damage."
             ),
             [
                 (
@@ -238,8 +238,8 @@ internal static partial class LocalizationCompatibilityPatch
                     "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.description"
                 )
             ] = new(
-                Zhs: "蛊师空窍中的次能量。初始为5点，从第二回合起每回合回复2点，上限随空窍转数提高。",
-                Eng: "A Gu Master's secondary energy. Starts at 5, restores 2 each turn after the first, and has a maximum that increases with aperture rank."
+                Zhs: "储存在蛊师空窍中的元气。战斗开始时拥有5点；从第2回合起，每回合开始恢复2点。元气上限随空窍转数提升，最高为25点。",
+                Eng: "Primeval essence stored in a Gu Master's aperture. Begin combat with 5; from turn 2 onward, restore 2 at the start of each turn. Maximum essence increases with aperture rank, up to 25."
             ),
         };
 
@@ -286,6 +286,9 @@ internal static partial class LocalizationCompatibilityPatch
             >();
             _patcher.RegisterPatch<
                 ProvideCombatInterfaceLocalizationFallbackPatch
+            >();
+            _patcher.RegisterPatch<
+                ProvideFormattedCombatInterfaceLocalizationFallbackPatch
             >();
             _patcher.RegisterPatch<
                 ProvideCardDescriptionOverridePatch
@@ -622,6 +625,76 @@ internal static partial class LocalizationCompatibilityPatch
             ref string __result
         )
         {
+            if (!CombatInterfaceLocalizationFallbacks.TryGetValue(
+                    (
+                        __instance.LocTable,
+                        __instance.LocEntryKey
+                    ),
+                    out KeywordLocalizationFallback fallback
+                ))
+            {
+                return true;
+            }
+
+            __result = string.Equals(
+                LocManager.Instance.Language,
+                "zhs",
+                StringComparison.OrdinalIgnoreCase
+            )
+                ? fallback.Zhs
+                : fallback.Eng;
+
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// HoverTip 会直接调用 LocString.GetFormattedText；在部分游戏构建中，
+    /// SmartFormat 内部对 GetRawText 的调用会被内联，导致上面的原始文本
+    /// 回退无法接管。这里为不含格式变量的战斗界面文本补充同等回退。
+    ///
+    /// selectionPrompt 含 {SelectedCount}，继续交给 SmartFormat 处理，
+    /// 避免直接返回文本时丢失动态变量替换。
+    /// </summary>
+    private sealed class
+        ProvideFormattedCombatInterfaceLocalizationFallbackPatch
+        : IPatchMethod
+    {
+        public static string PatchId =>
+            Entry.ModId +
+            ".Localization.FormattedCombatInterfaceFallback";
+
+        public static bool IsCritical => false;
+
+        public static string Description =>
+            "Provide formatted localization for Gu piles and Yuan Qi UI";
+
+        public static ModPatchTarget[] GetTargets() =>
+        [
+            PatchTarget.OptionalMethod<LocString>(
+                nameof(LocString.GetFormattedText)
+            ),
+        ];
+
+        private static bool Prefix(
+            LocString __instance,
+            ref string __result
+        )
+        {
+            if (string.Equals(
+                    __instance.LocTable,
+                    "static_hover_tips",
+                    StringComparison.Ordinal
+                ) &&
+                string.Equals(
+                    __instance.LocEntryKey,
+                    GuCardPileSystem.PileId + ".selectionPrompt",
+                    StringComparison.Ordinal
+                ))
+            {
+                return true;
+            }
+
             if (!CombatInterfaceLocalizationFallbacks.TryGetValue(
                     (
                         __instance.LocTable,

@@ -25,12 +25,13 @@ public sealed partial class YuanQiEnergyCounter : Control
     private static readonly Vector2 FallbackSize =
         new(180f, 180f);
 
-    // 原版储君会把能量容器移到此处，为左侧的第二表盘留出空间。
-    private static readonly Vector2 RegentEnergyContainerPosition =
-        new(100f, 806f);
+    // 元气表以原生能量表为坐标原点，放在其右上方。正向 X 偏移能
+    // 避免左下角界面越过屏幕边界，负向 Y 偏移则保留斜向层叠效果。
+    private static readonly Vector2 SecondaryCounterOffset =
+        new(96f, -102f);
 
     private static readonly Vector2 FallbackLocalPosition =
-        new(-132f, -16f);
+        SecondaryCounterOffset;
 
     private SecondaryResourceDefinition _definition = null!;
     private string _scenePath = string.Empty;
@@ -58,7 +59,9 @@ public sealed partial class YuanQiEnergyCounter : Control
             _scenePath = scenePath,
             Visible = false,
             MouseFilter = MouseFilterEnum.Stop,
-            ZIndex = 1,
+            // 保持默认绘制层级，让 NGame 的 HoverTipsContainer 按
+            // 场景树顺序绘制在元气表上方，避免能量球遮挡牌堆说明。
+            ZIndex = 0,
         };
 
         bool loadedScene = counter.TryAdoptSceneVisuals();
@@ -123,17 +126,13 @@ public sealed partial class YuanQiEnergyCounter : Control
 
     /// <summary>
     /// NCombatUi.Activate 的后置刷新发生在原生能量表创建之后。
-    /// 此时按储君的布局移动容器，并把元气表挂到原生能量表下，使二者
-    /// 共用进出场动画。
+    /// 此时把元气表挂到原生能量表下，使二者共用进出场动画；原生能量
+    /// 容器保持游戏自己的自适应位置，避免固定屏幕坐标在不同分辨率下
+    /// 把元气表推到视口之外。
     /// </summary>
     public void AttachBesideNativeEnergyCounter(NCombatUi ui)
     {
         ArgumentNullException.ThrowIfNull(ui);
-
-        ui.EnergyCounterContainer.SetPosition(
-            RegentEnergyContainerPosition,
-            keepOffsets: true
-        );
 
         NEnergyCounter? nativeEnergyCounter =
             ui.EnergyCounterContainer
@@ -141,13 +140,15 @@ public sealed partial class YuanQiEnergyCounter : Control
                 .OfType<NEnergyCounter>()
                 .FirstOrDefault();
 
-        if (nativeEnergyCounter == null ||
-            ReferenceEquals(GetParent(), nativeEnergyCounter))
+        Node anchor = nativeEnergyCounter ??
+            ui.EnergyCounterContainer;
+
+        if (!ReferenceEquals(GetParent(), anchor))
         {
-            return;
+            Reparent(anchor, keepGlobalTransform: false);
         }
 
-        Reparent(nativeEnergyCounter, keepGlobalTransform: false);
+        Position = SecondaryCounterOffset;
     }
 
     public override void _Process(double delta)
@@ -193,9 +194,9 @@ public sealed partial class YuanQiEnergyCounter : Control
                 ? FallbackSize
                 : source.Size;
 
-            Position = source.Position == Vector2.Zero
-                ? FallbackLocalPosition
-                : source.Position;
+            // 场景文件里的旧绝对坐标会在窄屏或缩放界面中越界。
+            // 根节点统一使用相对原生能量表的偏移；视觉子树仍保持原样。
+            Position = SecondaryCounterOffset;
             Scale = source.Scale;
             PivotOffset = source.PivotOffset;
             CustomMinimumSize =

@@ -35,18 +35,16 @@ public sealed class GuZhenRenXuYingCardPool
         $"{Entry.ResPath}/images/characters/energy_text.png";
 
     public override Color DeckEntryCardColor =>
-        GuZhenRenCharacter.ThemeColor;
+        GuZhenRenCardVisualStyle.CardBackgroundColor;
 
     public override Color EnergyOutlineColor =>
         new(0.08f, 0.18f, 0.24f);
 
     /// <summary>
-    /// 与蛊真人普通卡共用水墨卡框。
+    /// 与蛊真人普通卡共用黑框灰底样式。
     /// </summary>
     public override Material? PoolFrameMaterial =>
-        GD.Load<Material>(
-            $"{Entry.ResPath}/materials/card_frame_ink_wash.tres"
-        );
+        GuZhenRenCardVisualStyle.FrameMaterial;
 
     public override bool IsColorless =>
         false;

@@ -82,9 +82,9 @@ internal static class ShaZhaoTuiYanSystem
 
             harmony.Patch(
                 guiInput,
-                postfix: new HarmonyMethod(
+                prefix: new HarmonyMethod(
                     typeof(ShaZhaoTuiYanSystem),
-                    nameof(GuiInputPostfix)
+                    nameof(GuiInputPrefix)
                 )
             );
 
@@ -114,11 +114,12 @@ internal static class ShaZhaoTuiYanSystem
     }
 
     /// <summary>
-    /// RitsuLib 0.5.2 的自定义牌堆按钮只处理左键，因此在这里接入右键。
+    /// RitsuLib 的自定义牌堆按钮用左键查看牌堆；这里在原逻辑之前独占
+    /// 右键事件并发起杀招推演，确保左键永远不会触发推演。
     /// 空窍遗物仅作为联机可序列化的行动锚点；元数据保证普通遗物右键
     /// 不会触发本系统。
     /// </summary>
-    private static void GuiInputPostfix(
+    private static bool GuiInputPrefix(
         NModCardPileButton __instance,
         InputEvent __0,
         Player? ____player
@@ -127,17 +128,25 @@ internal static class ShaZhaoTuiYanSystem
         if (__0 is not InputEventMouseButton
             {
                 ButtonIndex: MouseButton.Right,
-                Pressed: false,
-            })
+            } mouse)
         {
-            return;
+            // 左键及其他输入完整交还给 RitsuLib：左键只负责查看牌堆。
+            return true;
+        }
+
+        // 右键按下与释放都不再进入牌堆的普通点击路径。
+        __instance.AcceptEvent();
+
+        if (mouse.Pressed)
+        {
+            return false;
         }
 
         if (__instance.Definition?.PileType !=
                 GuCardPileSystem.PileType ||
             ____player is not { } player)
         {
-            return;
+            return false;
         }
 
         CardPile guPile =
@@ -145,14 +154,7 @@ internal static class ShaZhaoTuiYanSystem
 
         if (!guPile.Cards.Any(IsEligibleMaterial))
         {
-            // 空牌堆沿用原按钮的本地化气泡提示。
-            if (guPile.Cards.Count == 0)
-            {
-                __instance.TriggerOpen();
-                __instance.AcceptEvent();
-            }
-
-            return;
+            return false;
         }
 
         KongQiaoRelic? anchor =
@@ -160,7 +162,7 @@ internal static class ShaZhaoTuiYanSystem
 
         if (anchor == null)
         {
-            return;
+            return false;
         }
 
         ModRightClickTrigger trigger = new(
@@ -176,6 +178,8 @@ internal static class ShaZhaoTuiYanSystem
         {
             __instance.AcceptEvent();
         }
+
+        return false;
     }
 
     private static bool CanHandleLocal(
