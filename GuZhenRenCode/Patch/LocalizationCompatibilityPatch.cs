@@ -1,4 +1,6 @@
+using System.IO;
 using System.Reflection;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 using GuZhenRen.Cards;
@@ -20,288 +22,67 @@ namespace GuZhenRen.Patches;
 /// <summary>
 /// 本地化兼容层。
 ///
-/// 1. 为“虚影”“仙蛊”和一至九转关键词提供中英文代码本地化；
-/// 2. 为旧 PCK 中缺失的合练/升炼文本提供中英文回退；
-/// 3. 覆盖白豕蛊与小光蛊的旧版卡牌描述，使效果文本与新代码一致；
+/// 1. 按当前语言从 localization.zhs.json 或 localization.eng.json 读取文本；
+/// 2. 从 JSON 为旧 PCK 中缺失的合练/升炼文本提供中英文回退；
+/// 3. 从 JSON 覆盖旧版卡牌描述，使效果文本与新代码一致；
 /// 4. 修正旧 PCK 中缺少 SmartFormat 空格式段分隔符的能量图标写法。
 ///
-/// 所有逻辑都只读取 LocString、当前语言和确定性的静态映射，
-/// 不读取本地玩家、战斗状态或随机数；多人各端会得到相同文本。
+/// 所有逻辑都只读取 LocString、当前语言和 GuZhenRen/localization/{language} 下的 JSON，
+/// 不读取本地玩家、战斗状态或随机数；多人各端使用相同 JSON 时会得到相同文本。
 /// </summary>
 internal static partial class LocalizationCompatibilityPatch
 {
     private const string PatcherName =
         "LocalizationCompatibility";
 
-    private static readonly IReadOnlyDictionary<
+    private const string LocalizationFileNamePrefix =
+        "LocalizationCompatibilityPatch.localization.";
+
+    private static readonly JsonSerializerOptions
+        LocalizationJsonOptions =
+        new()
+        {
+            PropertyNameCaseInsensitive = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            AllowTrailingCommas = true,
+        };
+
+    private static string? _loadedLanguage;
+    private static LocalizationDocument? _loadedLocalizationData;
+
+    private static LocalizationDocument
+        LocalizationData =>
+        GetLocalizationDocument();
+
+    private static IReadOnlyDictionary<
         string,
-        KeywordLocalizationFallback
-    > KeywordLocalizationFallbacks =
+        string
+    > KeywordLocalizationFallbacks =>
         BuildKeywordLocalizationFallbacks();
 
-    private static readonly IReadOnlyDictionary<
+    private static IReadOnlyDictionary<
         string,
-        KeywordLocalizationFallback
-    > CardDescriptionOverrides =
-        new Dictionary<
-            string,
-            KeywordLocalizationFallback
-        >
-        {
-            [
-                "GU_ZHEN_REN_CARD_BAI_SHI_GU.description"
-            ] = new(
-                Zhs:
-                    "获得{Dexterity:diff()}层临时[gold]敏捷[/gold]。{BlockRetentionTurns:cond:>0?接下来{BlockRetentionTurns}个回合，防御不会在你的回合开始时消失。|}",
-                Eng:
-                    "Gain {Dexterity:diff()} temporary [gold]Dexterity[/gold]. {BlockRetentionTurns:cond:>0?For the next {BlockRetentionTurns} turn(s), your Block is not removed at the start of your turn.|}"
-            ),
-            [
-                "GU_ZHEN_REN_CARD_XIAO_GUANG_GU.description"
-            ] = new(
-                Zhs:
-                    "施加{WeakPower:diff()}层[gold]虚弱[/gold]。获得{ShanYao}层[gold]闪耀[/gold]。",
-                Eng:
-                    "Apply {WeakPower:diff()} [gold]Weak[/gold]. Gain {ShanYao} [gold]Radiance[/gold]."
-            ),
-            [
-                "GU_ZHEN_REN_CARD_FEI_XIONG_XU_YING.description"
-            ] = new(
-                Zhs:
-                    "当你打出一张攻击牌时，有{ChancePercent}%概率对所有敌人造成{Damage:diff()}点伤害。 NL 力量对这次伤害提供{StrengthMultiplier}倍效果。",
-                Eng:
-                    "Whenever you play an Attack, have a {ChancePercent}% chance to deal {Damage:diff()} damage to ALL enemies. NL Strength affects this damage {StrengthMultiplier} times."
-            ),
-            [
-                "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description"
-            ] = new(
-                Zhs:
-                    "作为仙元保留在手中。可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
-                Eng:
-                    "Retain as immortal essence. Provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted."
-            ),
-            [
-                "GU_ZHEN_REN_CARD_HONG_ZAO_XIAN_YUAN.description"
-            ] = new(
-                Zhs:
-                    "作为仙元保留在手中。等于两张青提仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
-                Eng:
-                    "Retain as immortal essence. Equals two Green Grape essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted."
-            ),
-            [
-                "GU_ZHEN_REN_CARD_BAI_LI_XIAN_YUAN.description"
-            ] = new(
-                Zhs:
-                    "作为仙元保留在手中。等于两张红枣仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
-                Eng:
-                    "Retain as immortal essence. Equals two Red Date essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted."
-            ),
-            [
-                "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description"
-            ] = new(
-                Zhs:
-                    "作为仙元保留在手中。等于两张白荔仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
-                Eng:
-                    "Retain as immortal essence. Equals two White Litchi essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted."
-            ),
-        };
+        string
+    > CardDescriptionOverrides =>
+        LocalizationData.CardDescriptionOverrides;
 
-    private static readonly IReadOnlyDictionary<
+    private static IReadOnlyDictionary<
         string,
-        KeywordLocalizationFallback
-    > CharacterNameOverrides =
-        new Dictionary<string, KeywordLocalizationFallback>
-        {
-            ["title"] = new(
-                Zhs: "古月方源",
-                Eng: "Gu Yue Fang Yuan"
-            ),
-            ["titleObject"] = new(
-                Zhs: "古月方源",
-                Eng: "Gu Yue Fang Yuan"
-            ),
-        };
+        string
+    > CharacterNameOverrides =>
+        LocalizationData.CharacterNameOverrides;
 
-    private static readonly IReadOnlyDictionary<
+    private static IReadOnlyDictionary<
         string,
-        KeywordLocalizationFallback
-    > RestSiteLocalizationFallbacks =
-        new Dictionary<
-            string,
-            KeywordLocalizationFallback
-        >
-        {
-            ["OPTION_GU_ZHEN_REN_GU_RANK_UP.name"] = new(
-                Zhs: "升炼",
-                Eng: "Gu Refinement"
-            ),
-            ["OPTION_GU_ZHEN_REN_GU_RANK_UP.description"] = new(
-                Zhs: "选择一至两张尚未达到九转的蛊牌，使每张各提升一转。每个休息点只能成功升炼一次。",
-                Eng: "Choose one or two Gu cards below rank 9 and increase each selected card by 1 rank. Refinement can succeed once per rest site."
-            ),
-            ["OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt"] = new(
-                Zhs: "选择一至两张要提升一转的蛊牌，然后点击确认。",
-                Eng: "Choose one or two Gu cards to increase by 1 rank, then click Confirm."
-            ),
-            ["OPTION_GU_ZHEN_REN_HE_LIAN.name"] = new(
-                Zhs: "合练",
-                Eng: "Gu Fusion"
-            ),
-            ["OPTION_GU_ZHEN_REN_HE_LIAN.description"] = new(
-                Zhs: "选择一张或多张蛊虫牌并主动点击确认。可选数量上限由当前可制作配方决定；只有材料种类和数量完整匹配配方时才会消耗材料并获得结果。失败不会消耗本次机会。每个休息点只能成功合练一次。",
-                Eng: "Choose one or more Gu cards and click Confirm manually. The selection limit is determined by currently craftable recipes. Materials are consumed only when both their types and quantities match a recipe. A failed attempt does not consume the use. Fusion can succeed once per rest site."
-            ),
-            ["OPTION_GU_ZHEN_REN_HE_LIAN.selectionPrompt"] = new(
-                Zhs: "选择合练材料，然后点击确认。材料数量由配方决定。",
-                Eng: "Choose fusion materials, then click Confirm. The required count depends on the recipe."
-            ),
-        };
+        string
+    > RestSiteLocalizationFallbacks =>
+        LocalizationData.RestSiteLocalizationFallbacks;
 
-    private static readonly IReadOnlyDictionary<
+    private static IReadOnlyDictionary<
         (string Table, string Key),
-        KeywordLocalizationFallback
-    > CombatInterfaceLocalizationFallbacks =
-        new Dictionary<
-            (string Table, string Key),
-            KeywordLocalizationFallback
-        >
-        {
-            [
-                (
-                    "static_hover_tips",
-                    GuCardPileSystem.PileId + ".title"
-                )
-            ] = new(
-                Zhs: "蛊抽牌堆",
-                Eng: "Gu Draw Pile"
-            ),
-            [
-                (
-                    "static_hover_tips",
-                    GuCardPileSystem.PileId + ".description"
-                )
-            ] = new(
-                Zhs: "存放当前可催动的蛊虫牌。左键仅查看牌堆；右键花费1点能量开始杀招推演。按配方顺序逐张选择材料；成功时再支付所有材料有效元气消耗平均值的2倍（向上取整），杀招加入手牌且不属于蛊虫。配方错误时，若能量足够会支付材料费用并依序催动；否则受到5点不可格挡的反噬伤害。",
-                Eng: "Stores Gu Worm cards that can currently be activated. Left-click only inspects the pile; right-click and spend 1 Energy to deduce a killer move. Choose materials in recipe order. On success, also pay twice the average effective Primeval Essence cost of all materials, rounded up; the Killer Move enters your hand and is not a Gu Worm. A wrong recipe pays the materials' costs and activates them in order when possible; otherwise, take 5 unblockable backlash damage."
-            ),
-            [
-                (
-                    "static_hover_tips",
-                    GuCardPileSystem.PileId + ".empty"
-                )
-            ] = new(
-                Zhs: "蛊虫牌堆中没有可用于杀招推演的蛊虫。",
-                Eng: "There are no Gu Worms available for killer-move deduction."
-            ),
-            [
-                (
-                    "static_hover_tips",
-                    GuCardPileSystem.PileId + ".selectionPrompt"
-                )
-            ] = new(
-                Zhs: "按配方顺序选择下一张蛊虫牌。已选择{SelectedCount}张；选择过至少一张后，可点击确认或返回完成推演。",
-                Eng: "Choose the next Gu Worm in recipe order. {SelectedCount} selected; after choosing at least one, confirm or go back to finish."
-            ),
-            [
-                (
-                    "static_hover_tips",
-                    GuCardPileSystem.DiscardPileId + ".title"
-                )
-            ] = new(
-                Zhs: "蛊虫弃牌堆",
-                Eng: "Spent Gu Worm Pile"
-            ),
-            [
-                (
-                    "static_hover_tips",
-                    GuCardPileSystem.DiscardPileId + ".description"
-                )
-            ] = new(
-                Zhs: "存放本回合催动次数已经耗尽的蛊虫牌；新回合开始时，可再次催动的蛊虫会回到蛊虫牌堆。",
-                Eng: "Stores Gu Worm cards whose activations are spent this turn. Gu Worms that can be used again return to the Gu Worm pile when a new turn begins."
-            ),
-            [
-                (
-                    "static_hover_tips",
-                    GuCardPileSystem.DiscardPileId + ".empty"
-                )
-            ] = new(
-                Zhs: "蛊虫弃牌堆为空。",
-                Eng: "The spent Gu Worm pile is empty."
-            ),
-            [
-                (
-                    "powers",
-                    "GU_ZHEN_REN_POWER_GUANG_HUI_POWER.title"
-                )
-            ] = new(
-                Zhs: "光辉",
-                Eng: "Brilliance"
-            ),
-            [
-                (
-                    "powers",
-                    "GU_ZHEN_REN_POWER_GUANG_HUI_POWER.description"
-                )
-            ] = new(
-                Zhs: "角色资源，上限为9点。光辉不会在回合结束时消失；光道卡牌可以获得或消耗光辉。",
-                Eng: "A character resource capped at 9. Brilliance does not disappear at end of turn; Light Path cards can gain or spend it."
-            ),
-            [
-                (
-                    "powers",
-                    "GU_ZHEN_REN_POWER_ZHE_GUANG_POWER.title"
-                )
-            ] = new(
-                Zhs: "折光",
-                Eng: "Refraction"
-            ),
-            [
-                (
-                    "powers",
-                    "GU_ZHEN_REN_POWER_ZHE_GUANG_POWER.description"
-                )
-            ] = new(
-                Zhs: "本回合打出的牌与上一张牌类型不同时，若当前牌是光道牌，获得1点光辉。上一张牌可来自任意流派；每回合最多通过折光获得3点光辉。",
-                Eng: "When a card you play has a different type from the previous card, gain 1 Brilliance if the current card is a Light Path card. The previous card may be from any path. Gain at most 3 Brilliance from Refraction each turn."
-            ),
-            [
-                (
-                    "powers",
-                    "GU_ZHEN_REN_POWER_ZHAO_PO_POWER.title"
-                )
-            ] = new(
-                Zhs: "照破",
-                Eng: "Illumination Break"
-            ),
-            [
-                (
-                    "powers",
-                    "GU_ZHEN_REN_POWER_ZHAO_PO_POWER.description"
-                )
-            ] = new(
-                Zhs: "下一次受到攻击牌的单段伤害时，额外受到3点伤害并移除1层照破。多段攻击可以连续消耗多层。",
-                Eng: "The next time a single hit from an Attack card deals damage, take 3 additional damage and remove 1 Illumination Break. Multi-hit attacks can consume multiple stacks."
-            ),
-            [
-                (
-                    "secondary_resources",
-                    "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.title"
-                )
-            ] = new(
-                Zhs: "元气",
-                Eng: "Primeval Essence"
-            ),
-            [
-                (
-                    "secondary_resources",
-                    "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.description"
-                )
-            ] = new(
-                Zhs: "储存在蛊师空窍中的元气。战斗开始时拥有5点；从第2回合起，每回合开始恢复2点。元气上限随空窍转数提升，最高为25点。",
-                Eng: "Primeval essence stored in a Gu Master's aperture. Begin combat with 5; from turn 2 onward, restore 2 at the start of each turn. Maximum essence increases with aperture rank, up to 25."
-            ),
-        };
+        string
+    > CombatInterfaceLocalizationFallbacks =>
+        BuildCombatInterfaceLocalizationFallbacks();
 
     private static readonly PropertyInfo HoverTipTitleProperty =
         typeof(HoverTip).GetProperty(nameof(HoverTip.Title))!;
@@ -319,11 +100,17 @@ internal static partial class LocalizationCompatibilityPatch
     /// 匹配缺少末尾空格式段冒号的 energyIcons 调用。
     /// 已修正的 “:energyIcons(...):}” 不会再次命中。
     /// </summary>
-    [GeneratedRegex(
-        @":energyIcons\((?<options>[^{}()]*)\)\}",
-        RegexOptions.CultureInvariant
-    )]
-    private static partial Regex LegacyEnergyIconsSyntaxRegex();
+    /*
+     * 不使用 GeneratedRegex：
+     * Godot 的 .godot/mono/temp/obj 可能残留并再次编译生成的 g.cs，
+     * 从而让源声明与生成实现同时成为候选并触发 CS0121。
+     */
+    private static readonly Regex
+        LegacyEnergyIconsSyntaxRegex =
+        new(
+            @":energyIcons\((?<options>[^{}()]*)\)\}",
+            RegexOptions.CultureInvariant
+        );
 
     internal static void Initialize()
     {
@@ -403,6 +190,8 @@ internal static partial class LocalizationCompatibilityPatch
         finally
         {
             _patcher = null;
+            _loadedLanguage = null;
+            _loadedLocalizationData = null;
             _initialized = false;
         }
     }
@@ -435,107 +224,391 @@ internal static partial class LocalizationCompatibilityPatch
     }
 
     /// <summary>
-    /// 构建新关键词的代码内回退本地化。
-    ///
-    /// 若 PCK 后续加入同名 card_keywords 条目，原始本地化优先，
-    /// 此映射会自动停止接管相应 key。
+    /// 按当前语言加载独立 JSON。
+    /// 简体中文使用 zhs；其他语言默认使用 eng。
     /// </summary>
+    private static LocalizationDocument
+        GetLocalizationDocument()
+    {
+        string language = string.Equals(
+            LocManager.Instance.Language,
+            "zhs",
+            StringComparison.OrdinalIgnoreCase
+        )
+            ? "zhs"
+            : "eng";
+
+        if (_loadedLocalizationData is not null &&
+            string.Equals(
+                _loadedLanguage,
+                language,
+                StringComparison.Ordinal
+            ))
+        {
+            return _loadedLocalizationData;
+        }
+
+        _loadedLanguage = language;
+        _loadedLocalizationData =
+            LoadLocalizationDocument(language);
+        return _loadedLocalizationData;
+    }
+
+    private static LocalizationDocument
+        LoadLocalizationDocument(
+            string language
+        )
+    {
+        try
+        {
+            string localizationFileName =
+                LocalizationFileNamePrefix +
+                language +
+                ".json";
+
+            string? assemblyDirectory =
+                Path.GetDirectoryName(
+                    typeof(LocalizationCompatibilityPatch)
+                        .Assembly
+                        .Location
+                );
+
+            string[] candidates =
+            [
+                /*
+                 * 首选项目与模组发布目录：
+                 * GuZhenRen/localization/zhs/<language file>
+                 * GuZhenRen/localization/eng/<language file>
+                 */
+                Path.Combine(
+                    assemblyDirectory ??
+                        AppContext.BaseDirectory,
+                    "GuZhenRen",
+                    "localization",
+                    language,
+                    localizationFileName
+                ),
+                Path.Combine(
+                    AppContext.BaseDirectory,
+                    "GuZhenRen",
+                    "localization",
+                    language,
+                    localizationFileName
+                ),
+                Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "GuZhenRen",
+                    "localization",
+                    language,
+                    localizationFileName
+                ),
+
+                /*
+                 * 兼容上一版目录：
+                 * GuZhenRen/localization/<language file>
+                 */
+                Path.Combine(
+                    assemblyDirectory ??
+                        AppContext.BaseDirectory,
+                    "GuZhenRen",
+                    "localization",
+                    localizationFileName
+                ),
+                Path.Combine(
+                    AppContext.BaseDirectory,
+                    "GuZhenRen",
+                    "localization",
+                    localizationFileName
+                ),
+                Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "GuZhenRen",
+                    "localization",
+                    localizationFileName
+                ),
+
+                /*
+                 * 兼容最早版本：JSON 与 DLL 位于同一目录。
+                 */
+                Path.Combine(
+                    assemblyDirectory ??
+                        AppContext.BaseDirectory,
+                    localizationFileName
+                ),
+                Path.Combine(
+                    AppContext.BaseDirectory,
+                    localizationFileName
+                ),
+                Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    localizationFileName
+                ),
+            ];
+
+            string? localizationPath = null;
+            foreach (string candidate in candidates)
+            {
+                if (File.Exists(candidate))
+                {
+                    localizationPath = candidate;
+                    break;
+                }
+            }
+
+            if (localizationPath is null)
+            {
+                TryWarn(
+                    "未找到本地化 JSON，将继续使用 PCK 原有文本：" +
+                    localizationFileName
+                );
+                return new LocalizationDocument();
+            }
+
+            string json = File.ReadAllText(
+                localizationPath
+            );
+            LocalizationDocument? document =
+                JsonSerializer.Deserialize<
+                    LocalizationDocument
+                >(
+                    json,
+                    LocalizationJsonOptions
+                );
+
+            if (document is null)
+            {
+                TryWarn(
+                    "本地化 JSON 内容为空，将继续使用 PCK 原有文本：" +
+                    localizationPath
+                );
+                return new LocalizationDocument();
+            }
+
+            document.Normalize();
+            return document;
+        }
+        catch (Exception exception)
+        {
+            TryWarn(
+                "加载本地化 JSON 失败，将继续使用 PCK 原有文本：" +
+                exception
+            );
+            return new LocalizationDocument();
+        }
+    }
+
     private static IReadOnlyDictionary<
         string,
-        KeywordLocalizationFallback
+        string
     > BuildKeywordLocalizationFallbacks()
     {
-        Dictionary<string, KeywordLocalizationFallback>
-            fallbacks = new();
-
-        AddKeywordFallback(
-            fallbacks,
-            nameof(GuZhenRenKeywords.XuYing),
-            zhsTitle: "虚影",
-            zhsDescription:
-                "回合结束时保留在手牌中。不能被手动打出。",
-            engTitle: "Phantom",
-            engDescription:
-                "Retained in your hand at the end of the turn. Cannot be played manually."
-        );
-
-        AddKeywordFallback(
-            fallbacks,
-            nameof(GuZhenRenKeywords.XianGu),
-            zhsTitle: "仙蛊",
-            zhsDescription:
-                "六转及以上的蛊。每局所有玩家只能永久拥有一张同名仙蛊；此规则与[gold]唯一[/gold]关键词相互独立。",
-            engTitle: "Immortal Gu",
-            engDescription:
-                "A rank 6 or higher Gu. Across the run, all players may permanently own only one Immortal Gu with the same card identity. This rule is independent of [gold]Unique[/gold]."
-        );
-
-        string[] chineseRankNames =
-        [
-            "一转",
-            "二转",
-            "三转",
-            "四转",
-            "五转",
-            "六转",
-            "七转",
-            "八转",
-            "九转",
-        ];
-
-        for (int rank = 1; rank <= 9; rank++)
-        {
-            string title =
-                chineseRankNames[rank - 1];
-
-            AddKeywordFallback(
-                fallbacks,
-                "Rank" + rank,
-                zhsTitle: title,
-                zhsDescription:
-                    $"这是一张{title}蛊牌。",
-                engTitle: "Rank " + rank,
-                engDescription:
-                    $"This is a rank {rank} Gu card."
+        Dictionary<string, string>
+            fallbacks = new(
+                StringComparer.Ordinal
             );
+
+        foreach (
+            KeyValuePair<
+                string,
+                KeywordLocalizationEntry
+            > pair in LocalizationData.Keywords
+        )
+        {
+            if (string.IsNullOrWhiteSpace(pair.Key))
+            {
+                continue;
+            }
+
+            string keywordId = ModContentRegistry
+                .GetQualifiedKeywordId(
+                    Entry.ModId,
+                    pair.Key
+                );
+
+            fallbacks[keywordId + ".title"] =
+                pair.Value.Title;
+            fallbacks[keywordId + ".description"] =
+                pair.Value.Description;
         }
 
         return fallbacks;
     }
 
-    private static void AddKeywordFallback(
-        IDictionary<string, KeywordLocalizationFallback>
-            fallbacks,
-        string localName,
-        string zhsTitle,
-        string zhsDescription,
-        string engTitle,
-        string engDescription
-    )
+    private static IReadOnlyDictionary<
+        (string Table, string Key),
+        string
+    > BuildCombatInterfaceLocalizationFallbacks()
     {
-        string keywordId = ModContentRegistry
-            .GetQualifiedKeywordId(
-                Entry.ModId,
-                localName
-            );
+        Dictionary<
+            (string Table, string Key),
+            string
+        > fallbacks = new();
 
-        fallbacks[keywordId + ".title"] =
-            new KeywordLocalizationFallback(
-                zhsTitle,
-                engTitle
-            );
-        fallbacks[keywordId + ".description"] =
-            new KeywordLocalizationFallback(
-                zhsDescription,
-                engDescription
-            );
+        foreach (
+            TableLocalizationEntry entry in
+                LocalizationData
+                    .CombatInterfaceLocalizationFallbacks
+        )
+        {
+            if (string.IsNullOrWhiteSpace(entry.Table) ||
+                string.IsNullOrWhiteSpace(entry.Key))
+            {
+                continue;
+            }
+
+            string expandedKey = entry.Key
+                .Replace(
+                    "{GuCardPileId}",
+                    GuCardPileSystem.PileId,
+                    StringComparison.Ordinal
+                )
+                .Replace(
+                    "{GuCardDiscardPileId}",
+                    GuCardPileSystem.DiscardPileId,
+                    StringComparison.Ordinal
+                );
+
+            fallbacks[
+                (
+                    entry.Table,
+                    expandedKey
+                )
+            ] = entry.Text;
+        }
+
+        return fallbacks;
     }
 
-    private readonly record struct
-        KeywordLocalizationFallback(
-            string Zhs,
-            string Eng
+    private sealed class KeywordLocalizationEntry
+    {
+        public KeywordLocalizationEntry()
+        {
+        }
+
+        public string Title
+        {
+            get;
+            set;
+        } = "";
+
+        public string Description
+        {
+            get;
+            set;
+        } = "";
+    }
+
+    private sealed class TableLocalizationEntry
+    {
+        public TableLocalizationEntry()
+        {
+        }
+
+        public string Table
+        {
+            get;
+            set;
+        } = "";
+
+        public string Key
+        {
+            get;
+            set;
+        } = "";
+
+        public string Text
+        {
+            get;
+            set;
+        } = "";
+    }
+
+    private sealed class LocalizationDocument
+    {
+        public LocalizationDocument()
+        {
+        }
+
+        public int SchemaVersion
+        {
+            get;
+            set;
+        } = 1;
+
+        public string Language
+        {
+            get;
+            set;
+        } = "";
+
+        public Dictionary<
+            string,
+            KeywordLocalizationEntry
+        > Keywords
+        {
+            get;
+            set;
+        } = new(
+            StringComparer.Ordinal
         );
+
+        public Dictionary<
+            string,
+            string
+        > CardDescriptionOverrides
+        {
+            get;
+            set;
+        } = new(
+            StringComparer.Ordinal
+        );
+
+        public Dictionary<
+            string,
+            string
+        > CharacterNameOverrides
+        {
+            get;
+            set;
+        } = new(
+            StringComparer.Ordinal
+        );
+
+        public Dictionary<
+            string,
+            string
+        > RestSiteLocalizationFallbacks
+        {
+            get;
+            set;
+        } = new(
+            StringComparer.Ordinal
+        );
+
+        public List<TableLocalizationEntry>
+            CombatInterfaceLocalizationFallbacks
+        {
+            get;
+            set;
+        } = [];
+
+        public void Normalize()
+        {
+            Keywords ??= new(
+                StringComparer.Ordinal
+            );
+            CardDescriptionOverrides ??= new(
+                StringComparer.Ordinal
+            );
+            CharacterNameOverrides ??= new(
+                StringComparer.Ordinal
+            );
+            RestSiteLocalizationFallbacks ??= new(
+                StringComparer.Ordinal
+            );
+            CombatInterfaceLocalizationFallbacks ??= [];
+        }
+    }
 
     private static bool HasLocalizationEntry(
         string tableName,
@@ -591,8 +664,9 @@ internal static partial class LocalizationCompatibilityPatch
                 ) ||
                 !KeywordLocalizationFallbacks.TryGetValue(
                     __instance.LocEntryKey,
-                    out KeywordLocalizationFallback fallback
-                ))
+                    out string? fallback
+                ) ||
+                fallback is null)
             {
                 return true;
             }
@@ -600,13 +674,7 @@ internal static partial class LocalizationCompatibilityPatch
             // PCK 或其他本地化包已提供条目时，完全保留原文本。
             // 这些条目由代码始终覆盖，确保只替换 DLL 时不会继续读取
             // 旧 PCK 中过时的“两张材料”说明。
-            __result = string.Equals(
-                LocManager.Instance.Language,
-                "zhs",
-                StringComparison.OrdinalIgnoreCase
-            )
-                ? fallback.Zhs
-                : fallback.Eng;
+            __result = fallback;
 
             return false;
         }
@@ -614,7 +682,7 @@ internal static partial class LocalizationCompatibilityPatch
 
     /// <summary>
     /// 当旧 PCK 未打包模组篝火文本时，为合练与升炼提供
-    /// 中英文代码回退；实际本地化条目存在时仍以资源文件为准。
+    /// JSON 中英文回退；实际本地化条目存在时仍以资源文件为准。
     /// </summary>
     private sealed class
         ProvideRestSiteLocalizationFallbackPatch
@@ -648,28 +716,23 @@ internal static partial class LocalizationCompatibilityPatch
                 ) ||
                 !RestSiteLocalizationFallbacks.TryGetValue(
                     __instance.LocEntryKey,
-                    out KeywordLocalizationFallback fallback
-                ))
+                    out string? fallback
+                ) ||
+                fallback is null)
             {
                 return true;
             }
 
             // 自定义篝火规则经常只通过 DLL 更新，因此这些 key
-            // 始终由当前代码覆盖，避免继续读取旧 PCK 文本。
-            __result = string.Equals(
-                LocManager.Instance.Language,
-                "zhs",
-                StringComparison.OrdinalIgnoreCase
-            )
-                ? fallback.Zhs
-                : fallback.Eng;
+            // 始终由当前兼容层覆盖，避免继续读取旧 PCK 文本。
+            __result = fallback;
 
             return false;
         }
     }
 
     /// <summary>
-    /// 为蛊虫牌堆右键操作、弃牌堆和元气表提供代码内文本。
+    /// 为蛊虫牌堆右键操作、弃牌堆和元气表提供 JSON 文本。
     /// 始终覆盖旧 PCK 中同名条目，避免只替换 DLL 时仍显示旧说明。
     /// </summary>
     private sealed class
@@ -702,19 +765,14 @@ internal static partial class LocalizationCompatibilityPatch
                         __instance.LocTable,
                         __instance.LocEntryKey
                     ),
-                    out KeywordLocalizationFallback fallback
-                ))
+                    out string? fallback
+                ) ||
+                fallback is null)
             {
                 return true;
             }
 
-            __result = string.Equals(
-                LocManager.Instance.Language,
-                "zhs",
-                StringComparison.OrdinalIgnoreCase
-            )
-                ? fallback.Zhs
-                : fallback.Eng;
+            __result = fallback;
 
             return false;
         }
@@ -772,19 +830,14 @@ internal static partial class LocalizationCompatibilityPatch
                         __instance.LocTable,
                         __instance.LocEntryKey
                     ),
-                    out KeywordLocalizationFallback fallback
-                ))
+                    out string? fallback
+                ) ||
+                fallback is null)
             {
                 return true;
             }
 
-            __result = string.Equals(
-                LocManager.Instance.Language,
-                "zhs",
-                StringComparison.OrdinalIgnoreCase
-            )
-                ? fallback.Zhs
-                : fallback.Eng;
+            __result = fallback;
 
             return false;
         }
@@ -834,25 +887,29 @@ internal static partial class LocalizationCompatibilityPatch
                 return true;
             }
 
-            KeywordLocalizationFallback title =
-                CombatInterfaceLocalizationFallbacks[
+            IReadOnlyDictionary<
+                (string Table, string Key),
+                string
+            > fallbacks =
+                CombatInterfaceLocalizationFallbacks;
+
+            if (!fallbacks.TryGetValue(
                     (
                         "secondary_resources",
                         "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.title"
-                    )
-                ];
-            KeywordLocalizationFallback description =
-                CombatInterfaceLocalizationFallbacks[
+                    ),
+                    out string? title
+                ) ||
+                !fallbacks.TryGetValue(
                     (
                         "secondary_resources",
                         "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.description"
-                    )
-                ];
-            bool isSimplifiedChinese = string.Equals(
-                LocManager.Instance.Language,
-                "zhs",
-                StringComparison.OrdinalIgnoreCase
-            );
+                    ),
+                    out string? description
+                ))
+            {
+                return true;
+            }
 
             Texture2D? icon = null;
             string? iconPath = definition.LargeIconPath ??
@@ -867,10 +924,8 @@ internal static partial class LocalizationCompatibilityPatch
 
             __result = CreateRawHoverTip(
                 definition.Id,
-                isSimplifiedChinese ? title.Zhs : title.Eng,
-                isSimplifiedChinese
-                    ? description.Zhs
-                    : description.Eng,
+                title,
+                description,
                 icon
             );
             return false;
@@ -931,19 +986,14 @@ internal static partial class LocalizationCompatibilityPatch
                 ) ||
                 !CardDescriptionOverrides.TryGetValue(
                     __instance.LocEntryKey,
-                    out KeywordLocalizationFallback fallback
-                ))
+                    out string? fallback
+                ) ||
+                fallback is null)
             {
                 return true;
             }
 
-            __result = string.Equals(
-                LocManager.Instance.Language,
-                "zhs",
-                StringComparison.OrdinalIgnoreCase
-            )
-                ? fallback.Zhs
-                : fallback.Eng;
+            __result = fallback;
 
             return false;
         }
@@ -996,19 +1046,14 @@ internal static partial class LocalizationCompatibilityPatch
                 ) ||
                 !CharacterNameOverrides.TryGetValue(
                     entryKey[(separator + 1)..],
-                    out KeywordLocalizationFallback fallback
-                ))
+                    out string? fallback
+                ) ||
+                fallback is null)
             {
                 return true;
             }
 
-            __result = string.Equals(
-                LocManager.Instance.Language,
-                "zhs",
-                StringComparison.OrdinalIgnoreCase
-            )
-                ? fallback.Zhs
-                : fallback.Eng;
+            __result = fallback;
 
             return false;
         }
@@ -1052,7 +1097,7 @@ internal static partial class LocalizationCompatibilityPatch
             }
 
             __result =
-                LegacyEnergyIconsSyntaxRegex().Replace(
+                LegacyEnergyIconsSyntaxRegex.Replace(
                     __result,
                     ":energyIcons(${options}):}"
                 );

@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "language": "eng",
+  "keywords": {
+    "XuYing": {
+      "title": "Phantom",
+      "description": "Retained in your hand at the end of the turn. Cannot be played manually."
+    },
+    "XianGu": {
+      "title": "Immortal Gu",
+      "description": "A rank 6 or higher Gu. Across the run, all players may permanently own only one Immortal Gu with the same card identity. This rule is independent of [gold]Unique[/gold]."
+    },
+    "Rank1": {
+      "title": "Rank 1",
+      "description": "This is a rank 1 Gu card."
+    },
+    "Rank2": {
+      "title": "Rank 2",
+      "description": "This is a rank 2 Gu card."
+    },
+    "Rank3": {
+      "title": "Rank 3",
+      "description": "This is a rank 3 Gu card."
+    },
+    "Rank4": {
+      "title": "Rank 4",
+      "description": "This is a rank 4 Gu card."
+    },
+    "Rank5": {
+      "title": "Rank 5",
+      "description": "This is a rank 5 Gu card."
+    },
+    "Rank6": {
+      "title": "Rank 6",
+      "description": "This is a rank 6 Gu card."
+    },
+    "Rank7": {
+      "title": "Rank 7",
+      "description": "This is a rank 7 Gu card."
+    },
+    "Rank8": {
+      "title": "Rank 8",
+      "description": "This is a rank 8 Gu card."
+    },
+    "Rank9": {
+      "title": "Rank 9",
+      "description": "This is a rank 9 Gu card."
+    }
+  },
+  "cardDescriptionOverrides": {
+    "GU_ZHEN_REN_CARD_BAI_SHI_GU.description": "Gain {Dexterity:diff()} temporary [gold]Dexterity[/gold]. {BlockRetentionTurns:cond:>0?For the next {BlockRetentionTurns} turn(s), your Block is not removed at the start of your turn.|}",
+    "GU_ZHEN_REN_CARD_XIAO_GUANG_GU.description": "Apply {WeakPower:diff()} [gold]Weak[/gold]. Gain {ShanYao} [gold]Radiance[/gold].",
+    "GU_ZHEN_REN_CARD_FEI_XIONG_XU_YING.description": "Whenever you play an Attack, have a {ChancePercent}% chance to deal {Damage:diff()} damage to ALL enemies. NL Strength affects this damage {StrengthMultiplier} times.",
+    "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description": "Retain as immortal essence. Provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
+    "GU_ZHEN_REN_CARD_HONG_ZAO_XIAN_YUAN.description": "Retain as immortal essence. Equals two Green Grape essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
+    "GU_ZHEN_REN_CARD_BAI_LI_XIAN_YUAN.description": "Retain as immortal essence. Equals two Red Date essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
+    "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description": "Retain as immortal essence. Equals two White Litchi essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted."
+  },
+  "characterNameOverrides": {
+    "title": "Gu Yue Fang Yuan",
+    "titleObject": "Gu Yue Fang Yuan"
+  },
+  "restSiteLocalizationFallbacks": {
+    "OPTION_GU_ZHEN_REN_GU_RANK_UP.name": "Gu Refinement",
+    "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "Choose one or two Gu cards below rank 9 and increase each selected card by 1 rank. Refinement can succeed once per rest site.",
+    "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Choose one or two Gu cards to increase by 1 rank, then click Confirm.",
+    "OPTION_GU_ZHEN_REN_HE_LIAN.name": "Gu Fusion",
+    "OPTION_GU_ZHEN_REN_HE_LIAN.description": "Choose one or more Gu cards and click Confirm manually. The selection limit is determined by currently craftable recipes. Materials are consumed only when both their types and quantities match a recipe. A failed attempt does not consume the use. Fusion can succeed once per rest site.",
+    "OPTION_GU_ZHEN_REN_HE_LIAN.selectionPrompt": "Choose fusion materials, then click Confirm. The required count depends on the recipe."
+  },
+  "combatInterfaceLocalizationFallbacks": [
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardPileId}.title",
+      "text": "Gu Draw Pile"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardPileId}.description",
+      "text": "Stores Gu Worm cards that can currently be activated. Left-click only inspects the pile; right-click and spend 1 Energy to deduce a killer move. Choose materials in recipe order. On success, also pay twice the average effective Primeval Essence cost of all materials, rounded up; the Killer Move enters your hand and is not a Gu Worm. A wrong recipe pays the materials' costs and activates them in order when possible; otherwise, take 5 unblockable backlash damage."
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardPileId}.empty",
+      "text": "There are no Gu Worms available for killer-move deduction."
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardPileId}.selectionPrompt",
+      "text": "Choose the next Gu Worm in recipe order. {SelectedCount} selected; after choosing at least one, confirm or go back to finish."
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardDiscardPileId}.title",
+      "text": "Spent Gu Worm Pile"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardDiscardPileId}.description",
+      "text": "Stores Gu Worm cards whose activations are spent this turn. Gu Worms that can be used again return to the Gu Worm pile when a new turn begins."
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardDiscardPileId}.empty",
+      "text": "The spent Gu Worm pile is empty."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_GUANG_HUI_POWER.title",
+      "text": "Brilliance"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_GUANG_HUI_POWER.description",
+      "text": "A character resource capped at 9. Brilliance does not disappear at end of turn; Light Path cards can gain or spend it."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_ZHE_GUANG_POWER.title",
+      "text": "Refraction"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_ZHE_GUANG_POWER.description",
+      "text": "When a card you play has a different type from the previous card, gain 1 Brilliance if the current card is a Light Path card. The previous card may be from any path. Gain at most 3 Brilliance from Refraction each turn."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_ZHAO_PO_POWER.title",
+      "text": "Illumination Break"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_ZHAO_PO_POWER.description",
+      "text": "The next time a single hit from an Attack card deals damage, take 3 additional damage and remove 1 Illumination Break. Multi-hit attacks can consume multiple stacks."
+    },
+    {
+      "table": "secondary_resources",
+      "key": "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.title",
+      "text": "Primeval Essence"
+    },
+    {
+      "table": "secondary_resources",
+      "key": "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.description",
+      "text": "Primeval essence stored in a Gu Master's aperture. Begin combat with 5; from turn 2 onward, restore 2 at the start of each turn. Maximum essence increases with aperture rank, up to 25."
+    }
+  ]
+}

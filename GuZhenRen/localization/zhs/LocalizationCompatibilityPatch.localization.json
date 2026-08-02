@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "language": "zhs",
+  "keywords": {
+    "XuYing": {
+      "title": "虚影",
+      "description": "回合结束时保留在手牌中。不能被手动打出。"
+    },
+    "XianGu": {
+      "title": "仙蛊",
+      "description": "六转及以上的蛊。每局所有玩家只能永久拥有一张同名仙蛊；此规则与[gold]唯一[/gold]关键词相互独立。"
+    },
+    "Rank1": {
+      "title": "一转",
+      "description": "这是一张一转蛊牌。"
+    },
+    "Rank2": {
+      "title": "二转",
+      "description": "这是一张二转蛊牌。"
+    },
+    "Rank3": {
+      "title": "三转",
+      "description": "这是一张三转蛊牌。"
+    },
+    "Rank4": {
+      "title": "四转",
+      "description": "这是一张四转蛊牌。"
+    },
+    "Rank5": {
+      "title": "五转",
+      "description": "这是一张五转蛊牌。"
+    },
+    "Rank6": {
+      "title": "六转",
+      "description": "这是一张六转蛊牌。"
+    },
+    "Rank7": {
+      "title": "七转",
+      "description": "这是一张七转蛊牌。"
+    },
+    "Rank8": {
+      "title": "八转",
+      "description": "这是一张八转蛊牌。"
+    },
+    "Rank9": {
+      "title": "九转",
+      "description": "这是一张九转蛊牌。"
+    }
+  },
+  "cardDescriptionOverrides": {
+    "GU_ZHEN_REN_CARD_BAI_SHI_GU.description": "获得{Dexterity:diff()}层临时[gold]敏捷[/gold]。{BlockRetentionTurns:cond:>0?接下来{BlockRetentionTurns}个回合，防御不会在你的回合开始时消失。|}",
+    "GU_ZHEN_REN_CARD_XIAO_GUANG_GU.description": "施加{WeakPower:diff()}层[gold]虚弱[/gold]。获得{ShanYao}层[gold]闪耀[/gold]。",
+    "GU_ZHEN_REN_CARD_FEI_XIONG_XU_YING.description": "当你打出一张攻击牌时，有{ChancePercent}%概率对所有敌人造成{Damage:diff()}点伤害。 NL 力量对这次伤害提供{StrengthMultiplier}倍效果。",
+    "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description": "作为仙元保留在手中。可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
+    "GU_ZHEN_REN_CARD_HONG_ZAO_XIAN_YUAN.description": "作为仙元保留在手中。等于两张青提仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
+    "GU_ZHEN_REN_CARD_BAI_LI_XIAN_YUAN.description": "作为仙元保留在手中。等于两张红枣仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
+    "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description": "作为仙元保留在手中。等于两张白荔仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。"
+  },
+  "characterNameOverrides": {
+    "title": "古月方源",
+    "titleObject": "古月方源"
+  },
+  "restSiteLocalizationFallbacks": {
+    "OPTION_GU_ZHEN_REN_GU_RANK_UP.name": "升炼",
+    "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "选择一至两张尚未达到九转的蛊牌，使每张各提升一转。每个休息点只能成功升炼一次。",
+    "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "选择一至两张要提升一转的蛊牌，然后点击确认。",
+    "OPTION_GU_ZHEN_REN_HE_LIAN.name": "合练",
+    "OPTION_GU_ZHEN_REN_HE_LIAN.description": "选择一张或多张蛊虫牌并主动点击确认。可选数量上限由当前可制作配方决定；只有材料种类和数量完整匹配配方时才会消耗材料并获得结果。失败不会消耗本次机会。每个休息点只能成功合练一次。",
+    "OPTION_GU_ZHEN_REN_HE_LIAN.selectionPrompt": "选择合练材料，然后点击确认。材料数量由配方决定。"
+  },
+  "combatInterfaceLocalizationFallbacks": [
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardPileId}.title",
+      "text": "蛊抽牌堆"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardPileId}.description",
+      "text": "存放当前可催动的蛊虫牌。左键仅查看牌堆；右键花费1点能量开始杀招推演。按配方顺序逐张选择材料；成功时再支付所有材料有效元气消耗平均值的2倍（向上取整），杀招加入手牌且不属于蛊虫。配方错误时，若能量足够会支付材料费用并依序催动；否则受到5点不可格挡的反噬伤害。"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardPileId}.empty",
+      "text": "蛊虫牌堆中没有可用于杀招推演的蛊虫。"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardPileId}.selectionPrompt",
+      "text": "按配方顺序选择下一张蛊虫牌。已选择{SelectedCount}张；选择过至少一张后，可点击确认或返回完成推演。"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardDiscardPileId}.title",
+      "text": "蛊虫弃牌堆"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardDiscardPileId}.description",
+      "text": "存放本回合催动次数已经耗尽的蛊虫牌；新回合开始时，可再次催动的蛊虫会回到蛊虫牌堆。"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardDiscardPileId}.empty",
+      "text": "蛊虫弃牌堆为空。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_GUANG_HUI_POWER.title",
+      "text": "光辉"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_GUANG_HUI_POWER.description",
+      "text": "角色资源，上限为9点。光辉不会在回合结束时消失；光道卡牌可以获得或消耗光辉。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_ZHE_GUANG_POWER.title",
+      "text": "折光"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_ZHE_GUANG_POWER.description",
+      "text": "本回合打出的牌与上一张牌类型不同时，若当前牌是光道牌，获得1点光辉。上一张牌可来自任意流派；每回合最多通过折光获得3点光辉。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_ZHAO_PO_POWER.title",
+      "text": "照破"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_ZHAO_PO_POWER.description",
+      "text": "下一次受到攻击牌的单段伤害时，额外受到3点伤害并移除1层照破。多段攻击可以连续消耗多层。"
+    },
+    {
+      "table": "secondary_resources",
+      "key": "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.title",
+      "text": "元气"
+    },
+    {
+      "table": "secondary_resources",
+      "key": "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.description",
+      "text": "储存在蛊师空窍中的元气。战斗开始时拥有5点；从第2回合起，每回合开始恢复2点。元气上限随空窍转数提升，最高为25点。"
+    }
+  ]
+}

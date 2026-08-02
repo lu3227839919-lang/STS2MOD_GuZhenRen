@@ -35,6 +35,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Runtime localization files. Keep them beside the compiled mod DLL. -->
+    <LocalizationJson Include="GuZhenRen\localization\zhs\LocalizationCompatibilityPatch.localization.zhs.json" />
+    <LocalizationJson Include="GuZhenRen\localization\eng\LocalizationCompatibilityPatch.localization.eng.json" />
+
+    <None Update="GuZhenRen\localization\zhs\LocalizationCompatibilityPatch.localization.zhs.json"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest" />
+    <None Update="GuZhenRen\localization\eng\LocalizationCompatibilityPatch.localization.eng.json"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="0Harmony" HintPath="$(Sts2DataDir)\0Harmony.dll" Private="True" />
     <Reference Include="sts2" HintPath="$(Sts2DataDir)\sts2.dll" Private="True" />
     <Reference Include="Steamworks.NET" HintPath="$(Sts2DataDir)\Steamworks.NET.dll" Private="True" />
@@ -63,8 +76,21 @@
 
   <Target Name="CopyMod" AfterTargets="Build" Condition="'$(CopyModOnBuild)' != 'false'">
     <MakeDir Directories="$(ModOutputDir)" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModOutputDir)" />
-    <Copy SourceFiles="$(MSBuildProjectDirectory)\$(MSBuildProjectName).json" DestinationFolder="$(ModOutputDir)" />
+    <Copy SourceFiles="$(TargetPath)"
+          DestinationFolder="$(ModOutputDir)"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\$(MSBuildProjectName).json"
+          DestinationFolder="$(ModOutputDir)"
+          SkipUnchangedFiles="true" />
+    <MakeDir Directories="$(ModOutputDir)GuZhenRen\localization\zhs\" />
+    <MakeDir Directories="$(ModOutputDir)GuZhenRen\localization\eng\" />
+
+    <Copy SourceFiles="GuZhenRen\localization\zhs\LocalizationCompatibilityPatch.localization.json"
+          DestinationFolder="$(ModOutputDir)GuZhenRen\localization\zhs\"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="GuZhenRen\localization\eng\LocalizationCompatibilityPatch.localization.json"
+          DestinationFolder="$(ModOutputDir)GuZhenRen\localization\eng\"
+          SkipUnchangedFiles="true" />
   </Target>
 
   <Target Name="ExportPCK" AfterTargets="Build"
