@@ -1,10 +1,16 @@
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 using GuZhenRen.Cards;
+using GuZhenRen.Combat;
 
+using Godot;
+
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization;
 
 using STS2RitsuLib;
+using STS2RitsuLib.Combat.SecondaryResources;
 using STS2RitsuLib.Content;
 using STS2RitsuLib.Patching.Core;
 using STS2RitsuLib.Patching.Models;
@@ -243,6 +249,15 @@ internal static partial class LocalizationCompatibilityPatch
             ),
         };
 
+    private static readonly PropertyInfo HoverTipTitleProperty =
+        typeof(HoverTip).GetProperty(nameof(HoverTip.Title))!;
+
+    private static readonly PropertyInfo HoverTipDescriptionProperty =
+        typeof(HoverTip).GetProperty(nameof(HoverTip.Description))!;
+
+    private static readonly PropertyInfo HoverTipIconProperty =
+        typeof(HoverTip).GetProperty(nameof(HoverTip.Icon))!;
+
     private static ModPatcher? _patcher;
     private static bool _initialized;
 
@@ -289,6 +304,9 @@ internal static partial class LocalizationCompatibilityPatch
             >();
             _patcher.RegisterPatch<
                 ProvideFormattedCombatInterfaceLocalizationFallbackPatch
+            >();
+            _patcher.RegisterPatch<
+                ProvideSecondaryResourceHoverTipLocalizationPatch
             >();
             _patcher.RegisterPatch<
                 ProvideCardDescriptionOverridePatch
@@ -716,6 +734,110 @@ internal static partial class LocalizationCompatibilityPatch
 
             return false;
         }
+    }
+
+    /// <summary>
+    /// RitsuLib 会先调用 LocTable.GetLocString 检查条目是否真实存在；
+    /// 缝补旧 PCK 时，缺失条目会在 LocString 回退补丁运行前就被转换成
+    /// 键名占位符。这里仅接管本模组的元气 HoverTip 工厂调用，直接创建
+    /// 已本地化的原生 HoverTip，避免依赖缺失的 PCK 条目。
+    /// </summary>
+    private sealed class
+        ProvideSecondaryResourceHoverTipLocalizationPatch
+        : IPatchMethod
+    {
+        public static string PatchId =>
+            Entry.ModId +
+            ".Localization.SecondaryResourceHoverTip";
+
+        public static bool IsCritical => false;
+
+        public static string Description =>
+            "Provide raw localized Yuan Qi hover tip";
+
+        public static ModPatchTarget[] GetTargets() =>
+        [
+            PatchTarget.OptionalMethod(
+                typeof(SecondaryResourceHoverTipFactory),
+                nameof(SecondaryResourceHoverTipFactory.Create),
+                typeof(SecondaryResourceDefinition),
+                typeof(int),
+                typeof(int?)
+            ),
+        ];
+
+        private static bool Prefix(
+            SecondaryResourceDefinition definition,
+            ref HoverTip __result
+        )
+        {
+            if (!string.Equals(
+                    definition.Id,
+                    YuanQiSystem.ResourceId,
+                    StringComparison.Ordinal
+                ))
+            {
+                return true;
+            }
+
+            KeywordLocalizationFallback title =
+                CombatInterfaceLocalizationFallbacks[
+                    (
+                        "secondary_resources",
+                        "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.title"
+                    )
+                ];
+            KeywordLocalizationFallback description =
+                CombatInterfaceLocalizationFallbacks[
+                    (
+                        "secondary_resources",
+                        "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.description"
+                    )
+                ];
+            bool isSimplifiedChinese = string.Equals(
+                LocManager.Instance.Language,
+                "zhs",
+                StringComparison.OrdinalIgnoreCase
+            );
+
+            Texture2D? icon = null;
+            string? iconPath = definition.LargeIconPath ??
+                definition.SmallIconPath;
+            if (!string.IsNullOrWhiteSpace(iconPath) &&
+                ResourceLoader.Exists(iconPath.Trim()))
+            {
+                icon = ResourceLoader.Load<Texture2D>(
+                    iconPath.Trim()
+                );
+            }
+
+            __result = CreateRawHoverTip(
+                definition.Id,
+                isSimplifiedChinese ? title.Zhs : title.Eng,
+                isSimplifiedChinese
+                    ? description.Zhs
+                    : description.Eng,
+                icon
+            );
+            return false;
+        }
+    }
+
+    private static HoverTip CreateRawHoverTip(
+        string id,
+        string title,
+        string description,
+        Texture2D? icon
+    )
+    {
+        object boxed = default(HoverTip);
+        HoverTipTitleProperty.SetValue(boxed, title);
+        HoverTipDescriptionProperty.SetValue(boxed, description);
+        HoverTipIconProperty.SetValue(boxed, icon);
+
+        HoverTip tip = (HoverTip)boxed;
+        tip.Id = id;
+        return tip;
     }
 
     /// <summary>

@@ -15,7 +15,11 @@ namespace GuZhenRen.Combat;
 public static class YuanQiSystem
 {
     public const string LocalId = "yuanqi";
-    public static string ResourceId => $"{Entry.ModId}:{LocalId}";
+    public static string ResourceId =>
+        ModSecondaryResourceRegistry.GetResourceId(
+            Entry.ModId,
+            LocalId
+        );
 
     public const string SecondaryEnergyCounterScenePath =
         "res://GuZhenRen/scenes/ui/nodes/GuZhenRen_energy_counter2.tscn";
@@ -41,7 +45,9 @@ public static class YuanQiSystem
 
     public static SecondaryResourceDefinition Definition { get; private set; } =
         new(
-            defaultAmount: 5,
+            // 从 0 开始，等原生能量重置完成后再由空窍遗物发放
+            // 首回合的 5 点元气，避免次级能量表先于主能量表恢复。
+            defaultAmount: 0,
             baseMaxAmount: 5,
             minAmount: 0,
             hardMaxAmount: 25,

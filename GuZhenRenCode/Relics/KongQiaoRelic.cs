@@ -221,7 +221,8 @@ public sealed class KongQiaoRelic
     }
 
     /// <summary>
-    /// 第一回合使用 5 点初始元气；从第二回合起自动回复 2 点，且不超过转数上限。
+    /// 原生能量重置完成后，第一回合把元气设为 5 点；从第二回合起
+    /// 自动回复 2 点，且不超过转数上限。
     /// </summary>
     public override async Task AfterEnergyReset(Player player)
     {
@@ -237,6 +238,12 @@ public sealed class KongQiaoRelic
 
         if (player.PlayerCombatState.TurnNumber <= 1)
         {
+            await SecondaryResourceCmd.Set(
+                player,
+                YuanQiSystem.ResourceId,
+                5,
+                source: this
+            );
             return;
         }
 
