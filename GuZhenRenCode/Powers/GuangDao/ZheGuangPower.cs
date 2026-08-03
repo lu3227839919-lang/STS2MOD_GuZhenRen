@@ -1,4 +1,5 @@
 using GuZhenRen.Cards;
+using GuZhenRen.Cards.Basic;
 
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -55,6 +56,14 @@ public sealed class ZheGuangPower : ModPowerTemplate
     )
     {
         CardModel card = cardPlay.Card;
+
+        // 催动只是选择并自动打出蛊虫的载体。蛊虫的 AfterCardPlayed
+        // 先于外层催动结算；若记录催动本身，会覆盖刚记录的蛊虫类型，
+        // 从而让“月光蛊（攻击）→小光蛊（技能）”无法连续触发折光。
+        if (card is ChuiDong)
+        {
+            return;
+        }
 
         if (!ReferenceEquals(card.Owner, Owner.Player) ||
             card.Type is not (
