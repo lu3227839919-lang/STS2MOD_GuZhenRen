@@ -1,7 +1,10 @@
+using System.Runtime.CompilerServices;
+
 using GuZhenRen.Characters;
 using GuZhenRen.Combat;
 using GuZhenRen.Cards.Interfaces;
 
+using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -23,6 +26,17 @@ public sealed class YuPiGu
     : AbstractGuWormCard,
       ICarouselCard
 {
+    private sealed class DexterityActivationState
+    {
+        public ICombatState? CombatState;
+        public bool Granted;
+    }
+
+    private static readonly ConditionalWeakTable<
+        YuPiGu,
+        DexterityActivationState
+    > DexterityActivations = new();
+
     public override int MaxUses => IsUpgraded ? 2 : 1;
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
@@ -82,13 +96,18 @@ public sealed class YuPiGu
             Owner
         );
 
-        await PowerCmd.Apply<DexterityPower>(
-            choiceContext,
-            Owner.Creature,
-            DynamicVars.Dexterity.IntValue,
-            Owner.Creature,
-            this
-        );
+        if (cardPlay.PlayIndex == 0 &&
+            TryClaimFirstDexterity(combatState) &&
+            DynamicVars.Dexterity.IntValue > 0)
+        {
+            await PowerCmd.Apply<DexterityPower>(
+                choiceContext,
+                Owner.Creature,
+                DynamicVars.Dexterity.IntValue,
+                Owner.Creature,
+                this
+            );
+        }
 
         if (DynamicVars.Block.BaseValue > 0)
         {
@@ -123,13 +142,47 @@ public sealed class YuPiGu
         return [preview];
     }
 
+    private bool TryClaimFirstDexterity(
+        ICombatState combatState
+    )
+    {
+        DexterityActivationState state =
+            DexterityActivations.GetValue(
+                this,
+                static _ => new DexterityActivationState()
+            );
+
+        if (!ReferenceEquals(state.CombatState, combatState))
+        {
+            state.CombatState = combatState;
+            state.Granted = false;
+        }
+
+        if (state.Granted)
+        {
+            return false;
+        }
+
+        state.Granted = true;
+        return true;
+    }
+
     private void RefreshRankValues()
     {
-        DynamicVars.Dexterity.BaseValue = GuRank >= 6
-            ? GuRank - 2
-            : 1 + Math.Max(0, (GuRank - 1) / 2);
-        DynamicVars.Block.BaseValue = GuRank >= 6
-            ? 8 + (GuRank - 6) * 2
-            : 0;
+        DynamicVars.Dexterity.BaseValue = GuRank switch
+        {
+            <= 2 => 0,
+            <= 6 => 1,
+            <= 8 => 2,
+            _ => 3,
+        };
+        DynamicVars.Block.BaseValue = GuRank switch
+        {
+            6 => 6,
+            7 => 8,
+            8 => 10,
+            >= 9 => 12,
+            _ => 0,
+        };
     }
 }

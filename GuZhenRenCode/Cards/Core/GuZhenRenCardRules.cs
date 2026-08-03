@@ -98,7 +98,79 @@ public static class GuZhenRenCardRules
             receivingPlayer,
             candidate,
             ignoredExistingCards: null,
-            plannedAdditions: null
+            plannedAdditions: null,
+            allowSingleGuReplacementAtCapacity: false
+        );
+    }
+
+    /// <summary>
+    /// 奖励和商店在恰好达到蛊虫容量时仍可展示新蛊虫。
+    /// 真正获得时必须先选择一张现有蛊虫作为替换对象。
+    /// 唯一性与仙蛊冲突规则仍然照常检查。
+    /// </summary>
+    public static bool CanOfferWithGuReplacement(
+        IRunState runState,
+        Player receivingPlayer,
+        CardModel candidate
+    )
+    {
+        if (!CanEnterPermanentDeck(
+                runState,
+                receivingPlayer,
+                candidate,
+                ignoredExistingCards: null,
+                plannedAdditions: null,
+                allowSingleGuReplacementAtCapacity: true
+            ))
+        {
+            return false;
+        }
+
+        if (candidate is not IGuWormCard)
+        {
+            return true;
+        }
+
+        int guCount = receivingPlayer.Deck.Cards.Count(card =>
+            card is IGuWormCard
+        );
+
+        if (guCount < GuWormDeckCapacity)
+        {
+            return true;
+        }
+
+        // 容量已满时至少要存在一张合法替换对象，避免奖励或商店
+        // 展示一张最终无法获得的蛊虫。
+        return receivingPlayer.Deck.Cards.Any(existing =>
+            CanReplaceGuWorm(existing, candidate)
+        );
+    }
+
+    internal static bool CanReplaceGuWorm(
+        CardModel existing,
+        CardModel candidate
+    )
+    {
+        ArgumentNullException.ThrowIfNull(existing);
+        ArgumentNullException.ThrowIfNull(candidate);
+
+        if (existing is not IGuWormCard ||
+            candidate is not IGuWormCard ||
+            existing.Pile?.Type != PileType.Deck ||
+            !ReferenceEquals(existing.Owner, candidate.Owner))
+        {
+            return false;
+        }
+
+        return CanEnterPermanentDeck(
+            candidate.Owner.RunState,
+            candidate.Owner,
+            candidate,
+            ignoredExistingCards:
+                new HashSet<CardModel> { existing },
+            plannedAdditions: null,
+            allowSingleGuReplacementAtCapacity: false
         );
     }
 
@@ -272,7 +344,8 @@ public static class GuZhenRenCardRules
     /// </summary>
     internal static bool TryAuthorizePermanentDeckEntry(
         IRunState runState,
-        CardModel candidate
+        CardModel candidate,
+        CardModel? ignoredExistingCard = null
     )
     {
         ArgumentNullException.ThrowIfNull(runState);
@@ -280,7 +353,20 @@ public static class GuZhenRenCardRules
 
         if (!IsXianGu(candidate))
         {
-            return CanAddToDeck(runState, candidate);
+            return CanEnterPermanentDeck(
+                runState,
+                candidate.Owner,
+                candidate,
+                ignoredExistingCards:
+                    ignoredExistingCard == null
+                        ? null
+                        : new HashSet<CardModel>
+                        {
+                            ignoredExistingCard,
+                        },
+                plannedAdditions: null,
+                allowSingleGuReplacementAtCapacity: false
+            );
         }
 
         lock (XianGuMutationSync)
@@ -288,7 +374,7 @@ public static class GuZhenRenCardRules
             if (!CanCandidateOwnXianGuClaim(
                     runState,
                     candidate,
-                    ignoredCard: null
+                    ignoredCard: ignoredExistingCard
                 ))
             {
                 return false;
@@ -296,7 +382,8 @@ public static class GuZhenRenCardRules
 
             ReconcileConflictingXianGu(
                 runState,
-                candidate
+                candidate,
+                ignoredExistingCard
             );
             RegisterXianGuClaimUnsafe(
                 candidate,
@@ -369,13 +456,15 @@ public static class GuZhenRenCardRules
 
     private static void ReconcileConflictingXianGu(
         IRunState runState,
-        CardModel winner
+        CardModel winner,
+        CardModel? ignoredCard = null
     )
     {
         CardModel[] losers = runState.Players
             .SelectMany(player => player.Deck.Cards)
             .Where(existing =>
                 !ReferenceEquals(existing, winner) &&
+                !ReferenceEquals(existing, ignoredCard) &&
                 IsSameCard(existing, winner) &&
                 IsXianGu(existing)
             )
@@ -508,7 +597,8 @@ public static class GuZhenRenCardRules
         Player receivingPlayer,
         CardModel candidate,
         IReadOnlySet<CardModel>? ignoredExistingCards,
-        IReadOnlyList<PlannedCardAddition>? plannedAdditions
+        IReadOnlyList<PlannedCardAddition>? plannedAdditions,
+        bool allowSingleGuReplacementAtCapacity = false
     )
     {
         ArgumentNullException.ThrowIfNull(runState);
@@ -527,8 +617,15 @@ public static class GuZhenRenCardRules
                 item.Card is IGuWormCard
             ) ?? 0;
 
-            if (existingGuCount + plannedGuCount + 1 >
-                GuWormDeckCapacity)
+            int guCountBeforeCandidate =
+                existingGuCount + plannedGuCount;
+
+            if (guCountBeforeCandidate + 1 >
+                GuWormDeckCapacity &&
+                !(
+                    allowSingleGuReplacementAtCapacity &&
+                    guCountBeforeCandidate == GuWormDeckCapacity
+                ))
             {
                 return false;
             }

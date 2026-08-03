@@ -61,8 +61,8 @@
   },
   "restSiteLocalizationFallbacks": {
     "OPTION_GU_ZHEN_REN_GU_RANK_UP.name": "升炼",
-    "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "选择一至两张尚未达到九转的蛊牌，使每张各提升一转。每个休息点只能成功升炼一次。",
-    "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "选择一至两张要提升一转的蛊牌，然后点击确认。",
+    "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "默认选择1张尚未达到最高转数的蛊牌提升一转；牌组中拥有六转蛊虫后，单次最多可选择2张。每个休息点只能成功升炼一次。",
+    "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "选择要提升一转的蛊牌。拥有六转蛊虫后，本次最多可选择2张。",
     "OPTION_GU_ZHEN_REN_HE_LIAN.name": "合练",
     "OPTION_GU_ZHEN_REN_HE_LIAN.description": "选择一张或多张蛊虫牌并主动点击确认。可选数量上限由当前可制作配方决定；只有材料种类和数量完整匹配配方时才会消耗材料并获得结果。失败不会消耗本次机会。每个休息点只能成功合练一次。",
     "OPTION_GU_ZHEN_REN_HE_LIAN.selectionPrompt": "选择合练材料，然后点击确认。材料数量由配方决定。"
@@ -76,7 +76,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "存放尚有可催动次数的蛊虫牌。剩余次数跨回合保留；耗尽后进入蛊恢复堆，并在自身耗尽回合的两回合后恢复。左键查看；右键花费1点能量开始杀招推演。成功时再支付材料有效元气消耗平均值的2倍（向上取整）；组成杀招的蛊虫材料直接消耗，不进入蛊存放牌堆或蛊恢复堆，杀招加入手牌且不属于蛊虫。"
+      "text": "存放尚有可催动次数的蛊虫牌。剩余次数跨回合保留；耗尽后进入蛊恢复堆，隔一整个回合后，于耗尽回合+2的回合开始恢复。左键查看；右键花费1点能量开始杀招推演。成功时再支付材料有效元气消耗平均值的2倍（向上取整）；组成杀招的蛊虫材料直接消耗，不进入蛊存放牌堆或蛊恢复堆，杀招加入手牌且不属于蛊虫。"
     },
     {
       "table": "static_hover_tips",
@@ -96,7 +96,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.description",
-      "text": "存放可催动次数已耗尽的蛊虫。每张蛊虫在自身耗尽回合的两回合后重新充满催动次数并返回蛊存放牌堆。"
+      "text": "存放可催动次数已耗尽的蛊虫。每张蛊虫隔一整个回合后，于自身耗尽回合+2的回合开始重新充满催动次数并返回蛊存放牌堆。"
     },
     {
       "table": "static_hover_tips",
@@ -141,7 +141,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_POWER_XUE_YIN_POWER.description",
-      "text": "受到施加者的血道蛊攻击牌伤害后，施加者获得1点血元，移除1层血印，并额外失去3点生命。多段攻击每次牌结算只触发一次；重放视为新的结算。"
+      "text": "受到施加者的血道蛊攻击牌伤害后，移除1层血印并额外失去3点生命。同一次CardPlay全场最多返还1点血元；重放视为新的CardPlay。"
     },
     {
       "table": "powers",

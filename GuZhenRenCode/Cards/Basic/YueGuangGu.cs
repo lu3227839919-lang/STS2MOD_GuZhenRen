@@ -81,8 +81,9 @@ public sealed class YueGuangGu : AbstractGuWormCard
             .WithHitFx("vfx/vfx_attack_slash")
             .Execute(choiceContext);
 
-        if (empowered)
+        if (empowered && cardPlay.PlayIndex == 0)
         {
+            // Replay 只重复伤害，不重复施加照破。
             await GuangDaoPowerSystem.ApplyZhaoPo(
                 choiceContext,
                 this,
@@ -100,13 +101,14 @@ public sealed class YueGuangGu : AbstractGuWormCard
 
     private void RefreshRankValues()
     {
-        int preImmortalIncrease = Math.Max(
-            0,
-            Math.Min(GuRank, 5) - 1
-        );
-        DynamicVars.Damage.BaseValue =
-            6 + preImmortalIncrease +
-            Math.Max(0, GuRank - 5) * 2;
+        DynamicVars.Damage.BaseValue = GuRank switch
+        {
+            <= 5 => 5 + GuRank,
+            6 => 11,
+            7 => 12,
+            8 => 13,
+            _ => 14,
+        };
         DynamicVars[typeof(ZhaoPoPower).Name].BaseValue =
             1 + (GuRank >= 6 ? GuRank - 5 : 0);
         // 规范模型构造期间不可写 BaseReplayCount；转数

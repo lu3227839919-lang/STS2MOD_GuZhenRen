@@ -70,11 +70,16 @@ public sealed class XuanYuZhang
             .WithHitFx("vfx/vfx_attack_blunt")
             .Execute(choiceContext);
 
-        await CreatureCmd.GainBlock(
-            Owner.Creature,
-            DynamicVars.Block,
-            cardPlay
-        );
+        // Replay 只重复攻击段。格挡属于本次出牌的首段收益，
+        // 避免八、九转同时把攻防两侧都按 Replay 倍增。
+        if (cardPlay.PlayIndex == 0)
+        {
+            await CreatureCmd.GainBlock(
+                Owner.Creature,
+                DynamicVars.Block,
+                cardPlay
+            );
+        }
     }
 
     protected override void OnUpgrade()
@@ -91,31 +96,27 @@ public sealed class XuanYuZhang
 
     private void RefreshRankValues()
     {
-        int preImmortalIncrease = Math.Max(
-            0,
-            Math.Min(GuRank, 5) - 1
-        );
-        int immortalIncrease = Math.Max(0, GuRank - 5);
-        DynamicVars.Damage.BaseValue =
-            8 + preImmortalIncrease + immortalIncrease * 2;
-        DynamicVars.Block.BaseValue =
-            5 + preImmortalIncrease * 2 + immortalIncrease * 2;
+        (int damage, int block) = GuRank switch
+        {
+            1 => (8, 5),
+            2 => (9, 7),
+            3 => (10, 9),
+            4 => (11, 11),
+            5 => (12, 13),
+            6 => (14, 15),
+            7 => (16, 17),
+            8 => (18, 19),
+            _ => (20, 21),
+        };
 
-        // 五转玉皮蛊生成的六转玄玉掌只获得数值成长，不再同时取得
-        // 降费和 Replay。高阶特性从七转起逐级开放。
+        DynamicVars.Damage.BaseValue = damage;
+        DynamicVars.Block.BaseValue = block;
+
         if (IsMutable)
         {
-            BaseReplayCount = GuRank >= 9
-                ? 2
-                : GuRank >= 8
-                    ? 1
-                    : 0;
+            BaseReplayCount = GuRank >= 8 ? 1 : 0;
 
-            int rankDiscount = GuRank >= 9
-                ? 2
-                : GuRank >= 7
-                    ? 1
-                    : 0;
+            int rankDiscount = GuRank >= 7 ? 1 : 0;
             int rankAdjustedCost = Math.Max(
                 0,
                 2 - (IsUpgraded ? 1 : 0) - rankDiscount

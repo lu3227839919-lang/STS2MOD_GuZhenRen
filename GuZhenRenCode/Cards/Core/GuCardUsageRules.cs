@@ -12,6 +12,7 @@ namespace GuZhenRen.Cards;
 /// <summary>
 /// 蛊虫牌的持久催动次数、资源支付和逐牌恢复规则。
 /// 每次出牌序列只登记一次，Replay 不额外消耗次数、元气或仙元。
+/// 恢复回合为耗尽回合 + 2，即中间完整隔一个回合。
 /// </summary>
 public static class GuCardUsageRules
 {

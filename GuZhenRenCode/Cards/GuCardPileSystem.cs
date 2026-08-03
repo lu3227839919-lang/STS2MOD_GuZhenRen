@@ -290,8 +290,8 @@ public static class GuCardPileSystem
     }
 
     /// <summary>
-    /// 每张蛊虫从自身耗尽回合起独立计算两回合冷却。
-    /// 例如第 2 回合耗尽，会在第 4 回合开始时恢复，而不是被固定奇数回合刷新。
+    /// 每张蛊虫独立记录恢复回合：耗尽回合 + 2。
+    /// 这表示中间完整隔一个回合；例如第 2 回合耗尽，第 4 回合开始恢复。
     /// </summary>
     public static async Task RestoreRecoveredGuCardsAsync(
         Player owner,

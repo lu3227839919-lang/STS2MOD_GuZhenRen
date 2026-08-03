@@ -18,8 +18,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace GuZhenRen.RestSite;
 
 /// <summary>
-/// 篝火选项：一次选择一至两张尚未达到最高转数的蛊卡，
-/// 使每张牌各提升一转。每个休息点只能成功使用一次。
+/// 篝火选项：默认一次只升炼一张蛊卡；牌组中出现六转蛊虫后，
+/// 单次可选择至多两张。每个休息点只能成功使用一次。
 /// </summary>
 public sealed class GuRankUpRestSiteOption
     : ModRestSiteOptionTemplate
@@ -118,10 +118,13 @@ public sealed class GuRankUpRestSiteOption
             return false;
         }
 
+        int maximumSelectionCount =
+            HasReachedImmortalRank(Owner) ? 2 : 1;
+
         CardSelectorPrefs prefs = new(
             SelectionPrompt,
             1,
-            2
+            maximumSelectionCount
         )
         {
             Cancelable = true,
@@ -142,7 +145,7 @@ public sealed class GuRankUpRestSiteOption
         List<AbstractGuZhenRenCard> selectedGuCards =
             selected
                 .OfType<AbstractGuZhenRenCard>()
-                .Take(2)
+                .Take(maximumSelectionCount)
                 .ToList();
 
         if (selectedGuCards.Count == 0)
@@ -230,6 +233,17 @@ public sealed class GuRankUpRestSiteOption
         characterNode.AddChildSafely(vfx);
         vfx.Position = Vector2.Zero;
         return Task.CompletedTask;
+    }
+
+    private static bool HasReachedImmortalRank(
+        Player player
+    )
+    {
+        return player.Deck.Cards.Any(card =>
+            card is AbstractGuZhenRenCard gu &&
+            card is IGuWormCard &&
+            gu.GuRank >= GuZhenRenCardRules.XianGuRank
+        );
     }
 
     private static bool HasEligibleCard(Player player)

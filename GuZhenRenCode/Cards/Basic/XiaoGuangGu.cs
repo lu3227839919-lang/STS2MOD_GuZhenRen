@@ -80,7 +80,11 @@ public sealed class XiaoGuangGu : AbstractGuWormCard
             await PowerCmd.ModifyAmount(
                 choiceContext,
                 zhaoPo,
-                GuRank - 5,
+                GuRank switch
+                {
+                    <= 7 => 1,
+                    _ => 2,
+                },
                 Owner.Creature,
                 this
             );
@@ -95,9 +99,13 @@ public sealed class XiaoGuangGu : AbstractGuWormCard
 
     private void RefreshRankValues()
     {
-        int amount = GuRank >= 6
-            ? GuRank - 2
-            : 1 + Math.Max(0, (GuRank - 1) / 2);
+        int amount = GuRank switch
+        {
+            <= 2 => 1,
+            <= 4 => 2,
+            <= 7 => 3,
+            _ => 4,
+        };
         DynamicVars.Weak.BaseValue = amount;
         DynamicVars.Vulnerable.BaseValue = amount;
     }

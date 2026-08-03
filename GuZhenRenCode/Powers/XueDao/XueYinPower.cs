@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 using GuZhenRen.Cards;
 
 using MegaCrit.Sts2.Core.Commands;
@@ -14,10 +16,10 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace GuZhenRen.Powers.XueDao;
 
 /// <summary>
-/// 血印：受到施加者的血道蛊攻击牌伤害后，施加者获得一点血元，
-/// 消耗一层血印，并使目标额外失去三点生命。
-/// 默认每次 CardPlay 最多触发一次，多段攻击不会连续消耗血印；
-/// 实现 IBloodMarkPerHitTrigger 的卡牌可明确允许逐段触发。
+/// 血印：受到施加者的血道蛊攻击牌伤害后，消耗一层血印，
+/// 使目标额外失去三点生命。同一个 CardPlay 全场最多返还一点血元。
+/// 默认每个目标每次 CardPlay 最多触发一次；实现
+/// IBloodMarkPerHitTrigger 的卡牌可明确允许逐段消耗，但仍共享返还上限。
 /// </summary>
 [RegisterPower]
 public sealed class XueYinPower : ModPowerTemplate
@@ -28,6 +30,18 @@ public sealed class XueYinPower : ModPowerTemplate
         public int PlayIndex { get; set; } = -1;
         public bool Triggered { get; set; }
     }
+
+    private sealed class GlobalRefundState
+    {
+        public bool Active;
+        public int PlayIndex = -1;
+        public bool Granted;
+    }
+
+    private static readonly ConditionalWeakTable<
+        CardModel,
+        GlobalRefundState
+    > GlobalRefundStates = new();
 
     public const int ExtraHpLoss = 3;
 
@@ -56,6 +70,7 @@ public sealed class XueYinPower : ModPowerTemplate
             state.ActiveCard = cardPlay.Card;
             state.PlayIndex = cardPlay.PlayIndex;
             state.Triggered = false;
+            BeginGlobalRefundWindow(cardPlay);
         }
 
         return Task.CompletedTask;
@@ -74,6 +89,7 @@ public sealed class XueYinPower : ModPowerTemplate
             state.ActiveCard = null;
             state.PlayIndex = -1;
             state.Triggered = false;
+            EndGlobalRefundWindow(cardPlay);
         }
 
         return Task.CompletedTask;
@@ -107,11 +123,17 @@ public sealed class XueYinPower : ModPowerTemplate
         state.Triggered = true;
         Flash();
 
-        await XueDaoPowerSystem.GainXueYuan(
-            choiceContext,
-            cardSource,
-            1
-        );
+        // 同一次 CardPlay 即使同时命中多个带血印的敌人，
+        // 全场也只返还一次血元；各目标仍分别消耗血印并承受额外失血。
+        if (TryClaimGlobalRefund(cardSource))
+        {
+            await XueDaoPowerSystem.GainXueYuan(
+                choiceContext,
+                cardSource,
+                1
+            );
+        }
+
         await PowerCmd.Decrement(this);
 
         if (!target.IsDead)
@@ -126,5 +148,60 @@ public sealed class XueYinPower : ModPowerTemplate
                 cardPlay: null
             );
         }
+    }
+
+    private static void BeginGlobalRefundWindow(
+        CardPlay cardPlay
+    )
+    {
+        GlobalRefundState state =
+            GlobalRefundStates.GetValue(
+                cardPlay.Card,
+                static _ => new GlobalRefundState()
+            );
+
+        if (!state.Active ||
+            state.PlayIndex != cardPlay.PlayIndex)
+        {
+            state.Active = true;
+            state.PlayIndex = cardPlay.PlayIndex;
+            state.Granted = false;
+        }
+    }
+
+    private static void EndGlobalRefundWindow(
+        CardPlay cardPlay
+    )
+    {
+        if (!GlobalRefundStates.TryGetValue(
+                cardPlay.Card,
+                out GlobalRefundState? state
+            ) ||
+            !state.Active ||
+            state.PlayIndex != cardPlay.PlayIndex)
+        {
+            return;
+        }
+
+        state.Active = false;
+    }
+
+    private static bool TryClaimGlobalRefund(
+        CardModel card
+    )
+    {
+        if (!GlobalRefundStates.TryGetValue(
+                card,
+                out GlobalRefundState? state
+            ) ||
+            !state.Active ||
+            state.PlayIndex != card.CurrentPlayIndex ||
+            state.Granted)
+        {
+            return false;
+        }
+
+        state.Granted = true;
+        return true;
     }
 }

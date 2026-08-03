@@ -58,6 +58,12 @@ public sealed class XueYueGu : AbstractHeLianGuCard
         CardPlay cardPlay
     )
     {
+        var combatState = CombatState;
+        if (combatState is null)
+        {
+            return;
+        }
+
         await DamageCmd
             .Attack(DynamicVars.Damage.BaseValue)
             .FromCard(this, cardPlay)
@@ -65,10 +71,19 @@ public sealed class XueYueGu : AbstractHeLianGuCard
             .WithHitFx("vfx/vfx_attack_slash")
             .Execute(choiceContext);
 
+        // 七转 Replay 只重复伤害。流血、血元支付和血印分配
+        // 全部只在首段结算。
+        if (cardPlay.PlayIndex != 0)
+        {
+            return;
+        }
+
         IReadOnlyList<Creature> survivingEnemies =
             GuZhenRenDeterminism.OrderCreatures(
                 Owner.Creature.CombatState?.HittableEnemies ?? []
-            ).ToList();
+            )
+            .Where(enemy => !enemy.IsDead)
+            .ToList();
 
         int bleed = DynamicVars[typeof(LiuXuePower).Name].IntValue;
         foreach (Creature enemy in survivingEnemies)
@@ -81,18 +96,17 @@ public sealed class XueYueGu : AbstractHeLianGuCard
             );
         }
 
-        // 血元支付和血印结算只发生在出牌序列首段；Replay 只重放
-        // 伤害与流血，避免同一份血元在多个段落被重复消费或结算。
-        if (cardPlay.PlayIndex != 0)
+        if (survivingEnemies.Count == 0)
         {
             return;
         }
 
         int threshold = DynamicVars[BloodThresholdVar].IntValue;
-        int marks = XueDaoPowerSystem.GetXueYuan(this) / threshold;
-        int cost = marks * threshold;
+        int totalMarks =
+            XueDaoPowerSystem.GetXueYuan(this) / threshold;
+        int cost = totalMarks * threshold;
 
-        if (marks <= 0 ||
+        if (totalMarks <= 0 ||
             !await XueDaoPowerSystem.TrySpendXueYuan(
                 choiceContext,
                 this,
@@ -102,13 +116,30 @@ public sealed class XueYueGu : AbstractHeLianGuCard
             return;
         }
 
-        foreach (Creature enemy in survivingEnemies.Where(e => !e.IsDead))
+        // 血印是总额度，不再把同一份血元完整复制给每个敌人。
+        // 为保证多人确定性，按固定敌人顺序尽量均分，余数给靠前目标。
+        int marksPerEnemy =
+            totalMarks / survivingEnemies.Count;
+        int remainder =
+            totalMarks % survivingEnemies.Count;
+
+        for (int index = 0;
+             index < survivingEnemies.Count;
+             index++)
         {
+            int assignedMarks =
+                marksPerEnemy + (index < remainder ? 1 : 0);
+
+            if (assignedMarks <= 0)
+            {
+                continue;
+            }
+
             await XueDaoPowerSystem.ApplyXueYin(
                 choiceContext,
                 this,
-                enemy,
-                marks
+                survivingEnemies[index],
+                assignedMarks
             );
         }
     }

@@ -61,8 +61,8 @@
   },
   "restSiteLocalizationFallbacks": {
     "OPTION_GU_ZHEN_REN_GU_RANK_UP.name": "Gu Refinement",
-    "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "Choose one or two Gu cards below rank 9 and increase each selected card by 1 rank. Refinement can succeed once per rest site.",
-    "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Choose one or two Gu cards to increase by 1 rank, then click Confirm.",
+    "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "By default, raise 1 eligible Gu Worm by one rank. After your deck contains a rank-6 Gu Worm, you may select up to 2. Each rest site allows one successful refinement.",
+    "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Choose Gu Worms to raise by one rank. After reaching rank 6, you may select up to 2.",
     "OPTION_GU_ZHEN_REN_HE_LIAN.name": "Gu Fusion",
     "OPTION_GU_ZHEN_REN_HE_LIAN.description": "Choose one or more Gu cards and click Confirm manually. The selection limit is determined by currently craftable recipes. Materials are consumed only when both their types and quantities match a recipe. A failed attempt does not consume the use. Fusion can succeed once per rest site.",
     "OPTION_GU_ZHEN_REN_HE_LIAN.selectionPrompt": "Choose fusion materials, then click Confirm. The required count depends on the recipe."
@@ -76,7 +76,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "Stores Gu Worms with activations remaining. Remaining activations persist across turns; a spent Gu Worm enters the Recovery Pile and recovers two turns after its own depletion turn. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move. On success, also pay twice the average effective Primeval Essence cost of all materials, rounded up. The Gu materials are Exhausted directly and enter neither custom Gu pile; the Killer Move enters your hand and is not a Gu Worm."
+      "text": "Stores Gu Worms with activations remaining. Remaining activations persist across turns; after depletion, a Gu Worm enters the Recovery Pile and returns at the start of depletion turn + 2, after one full intervening turn. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move. On success, also pay twice the average effective Primeval Essence cost of all materials, rounded up. The Gu materials are Exhausted directly and enter neither custom Gu pile; the Killer Move enters your hand and is not a Gu Worm."
     },
     {
       "table": "static_hover_tips",
@@ -96,7 +96,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.description",
-      "text": "Stores Gu Worms with no activations remaining. Each Gu Worm refills and returns to the Gu Storage Pile two turns after its own depletion turn."
+      "text": "Stores Gu Worms with no activations remaining. Each Gu Worm refills and returns to the Gu Storage Pile at the start of depletion turn + 2, after one full intervening turn."
     },
     {
       "table": "static_hover_tips",
@@ -141,7 +141,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_POWER_XUE_YIN_POWER.description",
-      "text": "After taking unblocked damage from the applier’s Blood Path Gu Attack, the applier gains 1 Blood Essence, remove 1 Blood Mark, and lose 3 additional HP. Multi-hit attacks trigger once per card play; Replay starts a new play."
+      "text": "After taking unblocked damage from the applier’s Blood Path Gu Attack, remove 1 Blood Mark and lose 3 additional HP. Across the battlefield, each CardPlay grants at most 1 Blood Essence; Replay starts a new CardPlay."
     },
     {
       "table": "powers",
