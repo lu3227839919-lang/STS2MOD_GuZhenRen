@@ -23,5 +23,5 @@
   "GU_ZHEN_REN_CARD_YUE_MANG_GU.title": "月芒蛊",
   "GU_ZHEN_REN_CARD_YUE_MANG_GU.description": "可催动{RemainingUses}/{MaxUses}次。造成{Damage:diff()}点伤害{Hits}次。若有至少{GuangHuiCost}点[gold]光辉[/gold]，消耗该光辉，每段伤害提高{BonusDamage}点并施加{ZhaoPoPower:diff()}层[gold]照破[/gold]。{Rank:cond:>=6? NL [gold]六转：[/gold]敌人有照破时，每段攻击均可触发照破。|}",
   "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.title": "玄玉掌",
-  "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.description": "造成{Damage:diff()}点伤害。获得{Block:diff()}点格挡。[gold]消耗[/gold]。{Rank:cond:>=6? NL [gold]六转：[/gold]能量消耗减少1，重放1次。|}"
+  "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.description": "造成{Damage:diff()}点伤害。获得{Block:diff()}点格挡。{Rank:cond:>=6? NL [gold]六转：[/gold]能量消耗减少1，重放1次。|}"
 }

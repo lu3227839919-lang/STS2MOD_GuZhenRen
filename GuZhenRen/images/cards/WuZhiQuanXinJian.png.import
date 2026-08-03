@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://byvfxyj4ag6va"
-path="res://.godot/imported/ShaZhaoTuiYan.png-46da34881a9740be71ba06e57ff54222.ctex"
+uid="uid://buno82e7mkitr"
+path="res://.godot/imported/WuZhiQuanXinJian.png-edb712314f90fa7ec105ff46c9cac905.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GuZhenRen/images/cards/ShaZhaoTuiYan.png"
-dest_files=["res://.godot/imported/ShaZhaoTuiYan.png-46da34881a9740be71ba06e57ff54222.ctex"]
+source_file="res://GuZhenRen/images/cards/WuZhiQuanXinJian.png"
+dest_files=["res://.godot/imported/WuZhiQuanXinJian.png-edb712314f90fa7ec105ff46c9cac905.ctex"]
 
 [params]
 

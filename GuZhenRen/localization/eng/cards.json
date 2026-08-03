@@ -23,5 +23,5 @@
   "GU_ZHEN_REN_CARD_YUE_MANG_GU.title": "Moonbeam Gu",
   "GU_ZHEN_REN_CARD_YUE_MANG_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Deal {Damage:diff()} damage {Hits} times. If you have at least {GuangHuiCost} [gold]Brilliance[/gold], spend it to deal {BonusDamage} more damage per hit and apply {ZhaoPoPower:diff()} [gold]Illumination[/gold].{Rank:cond:>=6? NL [gold]Rank 6:[/gold] If the enemy has Illumination, every hit can trigger it.|}",
   "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.title": "Mystic Jade Palm",
-  "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.description": "Deal {Damage:diff()} damage. Gain {Block:diff()} Block. [gold]Exhaust[/gold].{Rank:cond:>=6? NL [gold]Rank 6:[/gold] Costs 1 less Energy and Replays once.|}"
+  "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.description": "Deal {Damage:diff()} damage. Gain {Block:diff()} Block.{Rank:cond:>=6? NL [gold]Rank 6:[/gold] Costs 1 less Energy and Replays once.|}"
 }
