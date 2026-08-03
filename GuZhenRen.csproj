@@ -36,13 +36,13 @@
 
   <ItemGroup>
     <!-- Runtime localization files. Keep them beside the compiled mod DLL. -->
-    <LocalizationJson Include="GuZhenRen\localization\zhs\LocalizationCompatibilityPatch.localization.zhs.json" />
-    <LocalizationJson Include="GuZhenRen\localization\eng\LocalizationCompatibilityPatch.localization.eng.json" />
+    <LocalizationJson Include="GuZhenRen\localization\zhs\LocalizationCompatibilityPatch.localization.json" />
+    <LocalizationJson Include="GuZhenRen\localization\eng\LocalizationCompatibilityPatch.localization.json" />
 
-    <None Update="GuZhenRen\localization\zhs\LocalizationCompatibilityPatch.localization.zhs.json"
+    <None Update="GuZhenRen\localization\zhs\LocalizationCompatibilityPatch.localization.json"
           CopyToOutputDirectory="PreserveNewest"
           CopyToPublishDirectory="PreserveNewest" />
-    <None Update="GuZhenRen\localization\eng\LocalizationCompatibilityPatch.localization.eng.json"
+    <None Update="GuZhenRen\localization\eng\LocalizationCompatibilityPatch.localization.json"
           CopyToOutputDirectory="PreserveNewest"
           CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>

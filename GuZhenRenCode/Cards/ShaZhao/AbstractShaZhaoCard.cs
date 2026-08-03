@@ -353,21 +353,4 @@ public abstract class AbstractShaZhaoCard
     {
     }
 
-    /// <summary>
-    /// 向杀招描述提供 {GuRank} 动态参数。
-    /// </summary>
-    protected override void AddExtraArgsToDescription(
-        LocString description
-    )
-    {
-        base.AddExtraArgsToDescription(
-            description
-        );
-
-        description.Add(
-            "Rank",
-            GuRank
-        );
-    }
-
 }

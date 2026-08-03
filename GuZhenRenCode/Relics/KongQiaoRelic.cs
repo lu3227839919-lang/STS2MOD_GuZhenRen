@@ -206,12 +206,12 @@ public sealed class KongQiaoRelic
             cardPlay.Card is IGuWormCard)
         {
             await GuCardPileSystem
-                .DiscardDepletedGuCardsAsync(Owner);
+                .MoveDepletedGuCardsToRecoveryAsync(Owner);
         }
     }
 
     /// <summary>
-    /// 统一拦截蛊虫的每回合次数，并在六转以后检查手牌仙元。
+    /// 统一拦截蛊虫剩余催动次数，并在六转以后检查手牌仙元。
     /// 该遗物位于原版战斗 Hook 列表中，因此也能覆盖从自定义蛊虫牌堆自动打出的牌。
     /// </summary>
     public override bool ShouldPlay(
@@ -241,20 +241,25 @@ public sealed class KongQiaoRelic
 
         if (!ReferenceEquals(cardPlay.Card.Owner, Owner) ||
             cardPlay.Card is not IGuWormCard guCard ||
-            guCard.GuRank < ApertureProgression.ImmortalRank)
+            cardPlay.PlayIndex != 0)
         {
             return;
         }
 
-        bool paid = await ImmortalEssenceSystem
-            .SpendForActivation(cardPlay);
-
-        if (!paid)
+        if (guCard.GuRank >= ApertureProgression.ImmortalRank)
         {
-            throw new InvalidOperationException(
-                $"仙元不足，无法催动 {cardPlay.Card.Id}。"
-            );
+            bool paid = await ImmortalEssenceSystem
+                .SpendForActivation(cardPlay);
+
+            if (!paid)
+            {
+                throw new InvalidOperationException(
+                    $"仙元不足，无法催动 {cardPlay.Card.Id}。"
+                );
+            }
         }
+
+        GuCardUsageRules.RegisterActivation(cardPlay.Card);
     }
 
     /// <summary>
@@ -297,23 +302,31 @@ public sealed class KongQiaoRelic
             return;
         }
 
-        await GuCardPileSystem.RestoreAvailableGuCardsAsync(player);
+        await GuCardPileSystem.RestoreRecoveredGuCardsAsync(
+            player,
+            player.PlayerCombatState.TurnNumber
+        );
 
-        if (player.PlayerCombatState.TurnNumber <= 1)
-        {
-            await SecondaryResourceCmd.Set(
-                player,
-                YuanQiSystem.ResourceId,
-                5,
-                source: this
-            );
-            return;
-        }
+        int currentAmount = SecondaryResourceCmd.Get(
+            player,
+            YuanQiSystem.ResourceId
+        );
+        int maximumAmount = SecondaryResourceCmd.GetMax(
+            player,
+            YuanQiSystem.ResourceId
+        ) ?? YuanQiSystem.Definition.HardMaxAmount;
+        int targetAmount = player.PlayerCombatState.TurnNumber <= 1
+            ? 5
+            : currentAmount + 2;
 
-        await SecondaryResourceCmd.Gain(
+        await SecondaryResourceCmd.Set(
             player,
             YuanQiSystem.ResourceId,
-            2,
+            Math.Clamp(
+                targetAmount,
+                YuanQiSystem.Definition.MinAmount,
+                maximumAmount
+            ),
             source: this
         );
     }

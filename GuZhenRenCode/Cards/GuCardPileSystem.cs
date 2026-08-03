@@ -9,30 +9,31 @@ using STS2RitsuLib.CardPiles;
 namespace GuZhenRen.Cards;
 
 /// <summary>
-/// Combat pile reserved for Gu cards.
-///
-/// The pile is intentionally separate from the normal hand.  Code that creates a
-/// temporary/generated card should use <see cref="AddGeneratedCardToHand"/> so
-/// generated cards continue to appear in the player's hand.
+/// 蛊虫专用战斗牌堆。蛊虫只会存在于蛊村牌堆或蛊恢复堆，
+/// 不会进入普通手牌。
 /// </summary>
 public static class GuCardPileSystem
 {
     public const string LocalId = "gu_cards";
 
-    public const string DiscardLocalId = "gu_discard";
+    public const string RecoveryLocalId = "gu_discard";
 
     /// <summary>Fully-qualified RitsuLib card-pile ID used by localization.</summary>
     public const string PileId = "GU_ZHEN_REN_CARDPILE_GU_CARDS";
 
-    /// <summary>Fully-qualified RitsuLib ID for the spent Gu pile.</summary>
-    public const string DiscardPileId =
+    /// <summary>Fully-qualified RitsuLib ID for the recovering Gu pile.</summary>
+    public const string RecoveryPileId =
         "GU_ZHEN_REN_CARDPILE_GU_DISCARD";
+
+    public const string DiscardPileId = RecoveryPileId;
 
     /// <summary>The runtime pile type assigned by RitsuLib.</summary>
     public static PileType PileType { get; private set; }
 
     /// <summary>The runtime pile type used by Gu cards with no uses left.</summary>
-    public static PileType DiscardPileType { get; private set; }
+    public static PileType RecoveryPileType { get; private set; }
+
+    public static PileType DiscardPileType => RecoveryPileType;
 
     private static readonly object SyncRoot = new();
     private static bool _initialized;
@@ -68,9 +69,9 @@ public static class GuCardPileSystem
             );
 
         // 放在原版弃牌堆左侧
-        ModCardPileDefinition discardDefinition =
+        ModCardPileDefinition recoveryDefinition =
             registry.RegisterOwned(
-                DiscardLocalId,
+                RecoveryLocalId,
                 new ModCardPileSpec
                 {
                     Scope = ModCardPileScope.CombatOnly,
@@ -86,7 +87,7 @@ public static class GuCardPileSystem
             );
 
         PileType = definition.PileType;
-        DiscardPileType = discardDefinition.PileType;
+        RecoveryPileType = recoveryDefinition.PileType;
         _initialized = true;
     }
 }
@@ -113,6 +114,7 @@ public static class GuCardPileSystem
         ArgumentNullException.ThrowIfNull(owner);
 
         EnsureInitialized();
+        GuCardUsageRules.ResetUses(card);
 
         CardPileAddResult result =
             await CardPileCmd.AddGeneratedCardToCombat(
@@ -130,44 +132,75 @@ public static class GuCardPileSystem
     /// a postfix of <c>Player.PopulateCombatState</c>, before combat actions
     /// begin.
     /// </summary>
-    internal static void MoveGuCardsToPile(Player owner)
+    internal static void InitializeGuCardsForCombat(Player owner)
     {
         ArgumentNullException.ThrowIfNull(owner);
 
         EnsureInitialized();
 
-        CardPile drawPile = PileType.Draw.GetPile(owner);
-        CardPile guPile = PileType.GetPile(owner);
-        CardPile guDiscardPile = DiscardPileType.GetPile(owner);
+        foreach (CardPile pile in new[]
+        {
+            PileType.Draw.GetPile(owner),
+            PileType.Discard.GetPile(owner),
+            PileType.Hand.GetPile(owner),
+        })
+        {
+            foreach (CardModel card in pile.Cards)
+            {
+                if (card is IGuWormCard)
+                {
+                    GuCardUsageRules.ResetUses(card);
+                }
+            }
+        }
 
-        CardModel[] guCards =
-            drawPile
-                .Cards
+        MoveStrayGuCardsToVillage(owner);
+    }
+
+    internal static void MoveStrayGuCardsToVillage(Player owner)
+    {
+        ArgumentNullException.ThrowIfNull(owner);
+
+        EnsureInitialized();
+
+        CardPile guPile = PileType.GetPile(owner);
+        CardPile recoveryPile = RecoveryPileType.GetPile(owner);
+
+        foreach (CardPile sourcePile in new[]
+        {
+            PileType.Draw.GetPile(owner),
+            PileType.Discard.GetPile(owner),
+            PileType.Hand.GetPile(owner),
+        })
+        {
+            CardModel[] guCards = sourcePile.Cards
                 .Where(card => card is IGuWormCard)
                 .ToArray();
 
-        if (guCards.Length == 0)
-        {
-            return;
+            if (guCards.Length == 0)
+            {
+                continue;
+            }
+
+            foreach (CardModel card in guCards)
+            {
+                sourcePile.RemoveInternal(card, silent: true);
+
+                if (GuCardUsageRules.CanUse(card))
+                {
+                    guPile.AddInternal(card, silent: true);
+                }
+                else
+                {
+                    recoveryPile.AddInternal(card, silent: true);
+                }
+            }
+
+            sourcePile.InvokeContentsChanged();
         }
 
-        foreach (CardModel card in guCards)
-        {
-            drawPile.RemoveInternal(card, silent: true);
-
-            if (GuCardUsageRules.CanUse(card))
-            {
-                guPile.AddInternal(card, silent: true);
-            }
-            else
-            {
-                guDiscardPile.AddInternal(card, silent: true);
-            }
-        }
-
-        drawPile.InvokeContentsChanged();
         guPile.InvokeContentsChanged();
-        guDiscardPile.InvokeContentsChanged();
+        recoveryPile.InvokeContentsChanged();
     }
 
     /// <summary>
@@ -181,20 +214,18 @@ public static class GuCardPileSystem
 
         EnsureInitialized();
 
-        if (card is not IGuWormCard guCard)
+        if (card is not IGuWormCard)
         {
             return PileType;
         }
 
         int remainingUses = Math.Max(
             0,
-            guCard.MaxUsesPerTurn -
-            GuCardUsageRules.CountUsesThisTurn(card) -
-            1
+            GuCardUsageRules.GetRemainingUses(card) - 1
         );
 
         return remainingUses == 0
-            ? DiscardPileType
+            ? RecoveryPileType
             : PileType;
     }
 
@@ -202,7 +233,9 @@ public static class GuCardPileSystem
     /// Moves every Gu card that has no uses left out of the active Gu pile.
     /// CardPileCmd supplies the same pile-flight animation used by the base game.
     /// </summary>
-    public static async Task DiscardDepletedGuCardsAsync(Player owner)
+    public static async Task MoveDepletedGuCardsToRecoveryAsync(
+        Player owner
+    )
     {
         ArgumentNullException.ThrowIfNull(owner);
 
@@ -225,7 +258,7 @@ public static class GuCardPileSystem
 
         await CardPileCmd.Add(
             depletedCards,
-            DiscardPileType,
+            RecoveryPileType,
             CardPilePosition.Bottom,
             clonedBy: null,
             skipVisuals: false
@@ -233,33 +266,43 @@ public static class GuCardPileSystem
     }
 
     /// <summary>
-    /// At the beginning of a new player turn, returns Gu cards whose per-turn
-    /// uses have reset to the active Gu pile.  Permanently unusable cards remain
-    /// in the Gu discard pile.
+    /// 每经过两个完整回合，把恢复堆内的蛊虫重新充满并送回蛊村。
+    /// 第一批恢复发生在第 3 回合开始时。
     /// </summary>
-    public static async Task RestoreAvailableGuCardsAsync(Player owner)
+    public static async Task RestoreRecoveredGuCardsAsync(
+        Player owner,
+        int turnNumber
+    )
     {
         ArgumentNullException.ThrowIfNull(owner);
 
         EnsureInitialized();
 
-        CardModel[] availableCards =
-            DiscardPileType
-                .GetPile(owner)
-                .Cards
-                .Where(card =>
-                    card is IGuWormCard &&
-                    GuCardUsageRules.CanUse(card)
-                )
-                .ToArray();
-
-        if (availableCards.Length == 0)
+        if (turnNumber <= 1 ||
+            (turnNumber - 1) % 2 != 0)
         {
             return;
         }
 
+        CardModel[] recoveredCards =
+            RecoveryPileType
+                .GetPile(owner)
+                .Cards
+                .Where(card => card is IGuWormCard)
+                .ToArray();
+
+        if (recoveredCards.Length == 0)
+        {
+            return;
+        }
+
+        foreach (CardModel card in recoveredCards)
+        {
+            GuCardUsageRules.ResetUses(card);
+        }
+
         await CardPileCmd.Add(
-            availableCards,
+            recoveredCards,
             PileType,
             CardPilePosition.Bottom,
             clonedBy: null,

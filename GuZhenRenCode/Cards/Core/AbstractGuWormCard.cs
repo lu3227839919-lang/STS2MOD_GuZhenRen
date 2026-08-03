@@ -1,3 +1,5 @@
+using GuZhenRen.Combat;
+
 using MegaCrit.Sts2.Core.Entities.Cards;
 
 namespace GuZhenRen.Cards;
@@ -12,6 +14,14 @@ public abstract class AbstractGuWormCard
     : AbstractGuZhenRenCard,
       IGuWormCard
 {
+    public override bool CanBeGeneratedInCombat => false;
+
+    /// <summary>
+    /// 蛊虫左上角展示元气图标，而不是角色的原生能量图标。
+    /// </summary>
+    public override string? CustomEnergyIconPath =>
+        YuanQiSystem.LargeIconPath;
+
     protected AbstractGuWormCard(
         int baseCost,
         CardType type,

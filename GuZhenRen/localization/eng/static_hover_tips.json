@@ -1,5 +1,8 @@
 {
-  "GU_ZHEN_REN_CARDPILE_GU_CARDS.title": "Gu Cards",
-  "GU_ZHEN_REN_CARDPILE_GU_CARDS.description": "A combat pile reserved for Gu cards.",
-  "GU_ZHEN_REN_CARDPILE_GU_CARDS.empty": "The Gu card pile is empty."
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.title": "Gu Village Pile",
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.description": "Stores Gu Worms with activations remaining; remaining activations persist across turns.",
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.empty": "The Gu Village Pile is empty.",
+  "GU_ZHEN_REN_CARDPILE_GU_DISCARD.title": "Gu Recovery Pile",
+  "GU_ZHEN_REN_CARDPILE_GU_DISCARD.description": "Stores Gu Worms with no activations remaining; every two turns they recover and return to the Gu Village Pile.",
+  "GU_ZHEN_REN_CARDPILE_GU_DISCARD.empty": "The Gu Recovery Pile is empty."
 }

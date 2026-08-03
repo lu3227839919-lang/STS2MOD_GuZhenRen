@@ -1,3 +1,5 @@
+using MegaCrit.Sts2.Core.Models;
+
 using STS2RitsuLib.Scaffolding.Content;
 
 namespace GuZhenRen.Cards.ImmortalEssence;
@@ -6,6 +8,9 @@ namespace GuZhenRen.Cards.ImmortalEssence;
 public sealed class BaiLiXianYuan : AbstractXianYuanCard
 {
     public override int ActivationUnits => 8;
+
+    protected override CardModel ReferencedCard =>
+        ModelDb.Card<HongZaoXianYuan>();
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: "res://GuZhenRen/images/cards/BaiLiXianYuan.png"

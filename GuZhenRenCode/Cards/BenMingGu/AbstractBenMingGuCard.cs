@@ -48,9 +48,9 @@ namespace GuZhenRen.Cards;
 public abstract class AbstractBenMingGuCard : ModCardTemplate, IGuWormCard
 {
     /// <summary>
-    /// 本命蛊默认每个玩家回合最多催动一次。
+    /// 本命蛊每次恢复后默认可催动一次。
     /// </summary>
-    public virtual int MaxUsesPerTurn => 1;
+    public virtual int MaxUses => 1;
 
     protected override bool IsPlayable =>
         GuCardUsageRules.CanUse(this);

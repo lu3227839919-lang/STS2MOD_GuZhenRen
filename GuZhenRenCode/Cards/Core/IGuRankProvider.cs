@@ -27,8 +27,8 @@ public interface IGuRankProvider
 public interface IGuWormCard : IGuRankProvider
 {
     /// <summary>
-    /// 同一张蛊虫牌在一个玩家回合内最多可催动的次数。
-    /// 具体蛊虫可以重写该值；默认每回合一次。
+    /// 同一张蛊虫在进入蛊村牌堆后总共可催动的次数。
+    /// 剩余次数跨回合保留；耗尽后进入蛊恢复堆，恢复时重新充满。
     /// </summary>
-    int MaxUsesPerTurn => 1;
+    int MaxUses => 1;
 }

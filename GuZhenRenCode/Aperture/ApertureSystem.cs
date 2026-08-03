@@ -373,7 +373,7 @@ public static class ApertureSystem
 
         if (player == null ||
             !ReferenceEquals(player, apertureOwner) ||
-            card is not IGuRankProvider guCard ||
+            card is not IGuWormCard guCard ||
             !HasAperture(player))
         {
             return;
@@ -440,14 +440,20 @@ public static class ApertureSystem
         }
     }
 
-    private static bool IsFreeByAperture(CardPlay play)
+    internal static bool IsNextGuActivationFree(CardModel card)
     {
-        CardModel card = play.Card;
+        ArgumentNullException.ThrowIfNull(card);
+
+        if (card.IsCanonical)
+        {
+            return false;
+        }
+
         Player? player = card.Owner;
 
         if (!_initialized ||
             player == null ||
-            card is not IGuRankProvider guCard ||
+            card is not IGuWormCard guCard ||
             !HasAperture(player) ||
             _savedData == null)
         {
@@ -460,6 +466,11 @@ public static class ApertureSystem
                data.Rank is > 1 and <= 5 &&
                guCard.GuRank >= 1 &&
                guCard.GuRank < data.Rank;
+    }
+
+    private static bool IsFreeByAperture(CardPlay play)
+    {
+        return IsNextGuActivationFree(play.Card);
     }
 
     private static CardModel? CreateImmortalEssence(

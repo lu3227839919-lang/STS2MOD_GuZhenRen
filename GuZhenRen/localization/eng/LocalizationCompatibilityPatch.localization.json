@@ -49,7 +49,6 @@
   },
   "cardDescriptionOverrides": {
     "GU_ZHEN_REN_CARD_BAI_SHI_GU.description": "Gain {Dexterity:diff()} temporary [gold]Dexterity[/gold]. {BlockRetentionTurns:cond:>0?For the next {BlockRetentionTurns} turn(s), your Block is not removed at the start of your turn.|}",
-    "GU_ZHEN_REN_CARD_XIAO_GUANG_GU.description": "Apply {WeakPower:diff()} [gold]Weak[/gold]. Gain {ShanYao} [gold]Radiance[/gold].",
     "GU_ZHEN_REN_CARD_FEI_XIONG_XU_YING.description": "Whenever you play an Attack, have a {ChancePercent}% chance to deal {Damage:diff()} damage to ALL enemies. NL Strength affects this damage {StrengthMultiplier} times.",
     "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description": "Retain as immortal essence. Provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
     "GU_ZHEN_REN_CARD_HONG_ZAO_XIAN_YUAN.description": "Retain as immortal essence. Equals two Green Grape essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
@@ -72,17 +71,17 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.title",
-      "text": "Gu Draw Pile"
+      "text": "Gu Village Pile"
     },
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "Stores Gu Worm cards that can currently be activated. Left-click only inspects the pile; right-click and spend 1 Energy to deduce a killer move. Choose materials in recipe order. On success, also pay twice the average effective Primeval Essence cost of all materials, rounded up; the Killer Move enters your hand and is not a Gu Worm. A wrong recipe pays the materials' costs and activates them in order when possible; otherwise, take 5 unblockable backlash damage."
+      "text": "Stores Gu Worms with activations remaining. Remaining activations persist across turns; spent Gu Worms enter the Gu Recovery Pile and recover every two turns. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move. On success, also pay twice the average effective Primeval Essence cost of all materials, rounded up. The Gu materials are Exhausted directly and enter neither custom Gu pile; the Killer Move enters your hand and is not a Gu Worm."
     },
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.empty",
-      "text": "There are no Gu Worms available for killer-move deduction."
+      "text": "There are no Gu Worms available in the Gu Village Pile."
     },
     {
       "table": "static_hover_tips",
@@ -91,18 +90,18 @@
     },
     {
       "table": "static_hover_tips",
-      "key": "{GuCardDiscardPileId}.title",
-      "text": "Spent Gu Worm Pile"
+      "key": "{GuCardRecoveryPileId}.title",
+      "text": "Gu Recovery Pile"
     },
     {
       "table": "static_hover_tips",
-      "key": "{GuCardDiscardPileId}.description",
-      "text": "Stores Gu Worm cards whose activations are spent this turn. Gu Worms that can be used again return to the Gu Worm pile when a new turn begins."
+      "key": "{GuCardRecoveryPileId}.description",
+      "text": "Stores Gu Worms with no activations remaining. Every two turns, Gu Worms here refill their activations and return to the Gu Village Pile."
     },
     {
       "table": "static_hover_tips",
-      "key": "{GuCardDiscardPileId}.empty",
-      "text": "The spent Gu Worm pile is empty."
+      "key": "{GuCardRecoveryPileId}.empty",
+      "text": "The Gu Recovery Pile is empty."
     },
     {
       "table": "powers",

@@ -1,5 +1,4 @@
 using GuZhenRen.Cards;
-using GuZhenRen.Cards.ImmortalEssence;
 using GuZhenRen.Characters;
 using GuZhenRen.Multiplayer;
 using GuZhenRen.Patches;
@@ -8,6 +7,7 @@ using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 
@@ -35,6 +35,26 @@ public sealed class ChuiDong
             target: TargetType.Self
         )
     {
+    }
+
+    protected override bool IsPlayable
+    {
+        get
+        {
+            if (IsCanonical)
+            {
+                return false;
+            }
+
+            Player owner = Owner;
+
+            return base.IsPlayable &&
+                owner.PlayerCombatState != null &&
+                GuCardPileSystem.PileType
+                    .GetPile(owner)
+                    .Cards
+                    .Any(GuCardUsageRules.CanActivate);
+        }
     }
 
     protected override async Task OnPlay(
@@ -68,10 +88,7 @@ public sealed class ChuiDong
                     1,
                     1
                 ),
-                card => card is IGuWormCard
-                        && GuCardUsageRules.CanUse(card)
-                        && ImmortalEssenceSystem
-                            .CanPayForActivation(card)
+                GuCardUsageRules.CanActivate
             );
 
         if (selected is null)
@@ -93,6 +110,12 @@ public sealed class ChuiDong
             {
                 return;
             }
+        }
+
+        if (!await GuCardUsageRules
+                .CommitActivationPayment(selected))
+        {
+            return;
         }
 
         await CardCmd.AutoPlay(

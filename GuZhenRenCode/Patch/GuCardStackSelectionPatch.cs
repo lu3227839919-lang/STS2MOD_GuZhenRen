@@ -307,7 +307,7 @@ internal static class GuCardStackSelectionPatch
 
         Label badge = existingBadge ?? GetOrCreateBadge(holder);
 
-        badge.Text = $"脳{count}";
+        badge.Text = $"×{count}";
         badge.Visible = true;
         holder.MoveChild(badge, holder.GetChildCount() - 1);
     }

@@ -283,23 +283,6 @@ public abstract class AbstractXuYingCard
     {
     }
 
-    /// <summary>
-    /// 所有虚影描述统一提供当前转数变量 {Rank}。
-    /// </summary>
-    protected override void AddExtraArgsToDescription(
-        LocString description
-    )
-    {
-        base.AddExtraArgsToDescription(
-            description
-        );
-
-        description.Add(
-            "Rank",
-            GuRank
-        );
-    }
-
     // =====================================================================
     //  可见标签与隐藏规则
     // =====================================================================

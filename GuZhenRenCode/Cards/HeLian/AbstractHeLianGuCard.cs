@@ -1,5 +1,4 @@
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Localization;
 using STS2RitsuLib.Interop.AutoRegistration;
 
 using GuZhenRen.Cards;
@@ -43,12 +42,4 @@ public abstract class AbstractHeLianGuCard
 
     public override bool CanBeGeneratedInCombat =>
         false;
-
-    protected override void AddExtraArgsToDescription(
-        LocString description
-    )
-    {
-        base.AddExtraArgsToDescription(description);
-        description.Add("Rank", GuRank);
-    }
 }

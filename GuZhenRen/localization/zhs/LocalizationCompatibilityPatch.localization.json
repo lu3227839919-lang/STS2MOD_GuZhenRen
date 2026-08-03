@@ -49,7 +49,6 @@
   },
   "cardDescriptionOverrides": {
     "GU_ZHEN_REN_CARD_BAI_SHI_GU.description": "获得{Dexterity:diff()}层临时[gold]敏捷[/gold]。{BlockRetentionTurns:cond:>0?接下来{BlockRetentionTurns}个回合，防御不会在你的回合开始时消失。|}",
-    "GU_ZHEN_REN_CARD_XIAO_GUANG_GU.description": "施加{WeakPower:diff()}层[gold]虚弱[/gold]。获得{ShanYao}层[gold]闪耀[/gold]。",
     "GU_ZHEN_REN_CARD_FEI_XIONG_XU_YING.description": "当你打出一张攻击牌时，有{ChancePercent}%概率对所有敌人造成{Damage:diff()}点伤害。 NL 力量对这次伤害提供{StrengthMultiplier}倍效果。",
     "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description": "作为仙元保留在手中。可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
     "GU_ZHEN_REN_CARD_HONG_ZAO_XIAN_YUAN.description": "作为仙元保留在手中。等于两张青提仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
@@ -72,17 +71,17 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.title",
-      "text": "蛊抽牌堆"
+      "text": "蛊村牌堆"
     },
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "存放当前可催动的蛊虫牌。左键仅查看牌堆；右键花费1点能量开始杀招推演。按配方顺序逐张选择材料；成功时再支付所有材料有效元气消耗平均值的2倍（向上取整），杀招加入手牌且不属于蛊虫。配方错误时，若能量足够会支付材料费用并依序催动；否则受到5点不可格挡的反噬伤害。"
+      "text": "存放尚有可催动次数的蛊虫牌。剩余次数跨回合保留；耗尽后进入蛊恢复堆，每两回合恢复并返回。左键查看；右键花费1点能量开始杀招推演。成功时再支付材料有效元气消耗平均值的2倍（向上取整）；组成杀招的蛊虫材料直接消耗，不进入蛊村牌堆或蛊恢复堆，杀招加入手牌且不属于蛊虫。"
     },
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.empty",
-      "text": "蛊虫牌堆中没有可用于杀招推演的蛊虫。"
+      "text": "蛊村牌堆中没有可催动的蛊虫。"
     },
     {
       "table": "static_hover_tips",
@@ -91,18 +90,18 @@
     },
     {
       "table": "static_hover_tips",
-      "key": "{GuCardDiscardPileId}.title",
-      "text": "蛊虫弃牌堆"
+      "key": "{GuCardRecoveryPileId}.title",
+      "text": "蛊恢复堆"
     },
     {
       "table": "static_hover_tips",
-      "key": "{GuCardDiscardPileId}.description",
-      "text": "存放本回合催动次数已经耗尽的蛊虫牌；新回合开始时，可再次催动的蛊虫会回到蛊虫牌堆。"
+      "key": "{GuCardRecoveryPileId}.description",
+      "text": "存放可催动次数已耗尽的蛊虫。每两回合，堆内蛊虫重新充满催动次数并返回蛊村牌堆。"
     },
     {
       "table": "static_hover_tips",
-      "key": "{GuCardDiscardPileId}.empty",
-      "text": "蛊虫弃牌堆为空。"
+      "key": "{GuCardRecoveryPileId}.empty",
+      "text": "蛊恢复堆为空。"
     },
     {
       "table": "powers",

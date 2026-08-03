@@ -2,6 +2,7 @@
 using MegaCrit.Sts2.Core.Models;
 using GuZhenRen.Characters;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Random; 
 // RitsuLib 提供的 Mod 卡牌模板。
 using STS2RitsuLib.Scaffolding.Content;
@@ -33,9 +34,9 @@ namespace GuZhenRen.Cards;
 public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
 {
     /// <summary>
-    /// 普通蛊虫默认每个玩家回合最多催动一次。
+    /// 普通蛊虫每次恢复后默认可催动一次。
     /// </summary>
-    public virtual int MaxUsesPerTurn => 1;
+    public virtual int MaxUses => 1;
 
     protected override bool IsPlayable =>
         GuCardUsageRules.CanUse(this);
@@ -82,6 +83,23 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
     /// </summary>
     public override CardPoolModel Pool =>
         ModelDb.CardPool<GuZhenRenGuCardPool>();
+
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add("Rank", GuRank);
+
+        if (this is IGuWormCard)
+        {
+            description.Add("MaxUses", MaxUses);
+            description.Add(
+                "RemainingUses",
+                GuCardUsageRules.GetRemainingUses(this)
+            );
+        }
+    }
 
     
 // =====================================================================
@@ -632,6 +650,11 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
         InitialGuRankAssignedState[this] = true;
 
         OnGuRankChanged();
+    }
+
+    internal void InitializeGuRankFromSource(int rank)
+    {
+        SetGuRank(rank);
     }
 
     /// <summary>

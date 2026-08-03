@@ -1,4 +1,5 @@
 using GuZhenRen.Characters;
+using GuZhenRen.Cards.Interfaces;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
@@ -17,7 +18,9 @@ namespace GuZhenRen.Cards.ImmortalEssence;
     typeof(GuZhenRenXianYuanCardPool),
     Inherit = true
 )]
-public abstract class AbstractXianYuanCard : ModCardTemplate
+public abstract class AbstractXianYuanCard
+    : ModCardTemplate,
+      ICarouselCard
 {
     /// <summary>
     /// 仙元牌固定属于仙元隐藏卡池。
@@ -29,6 +32,11 @@ public abstract class AbstractXianYuanCard : ModCardTemplate
     /// 以“一次六转仙蛊催动”为单位的总价值。
     /// </summary>
     public abstract int ActivationUnits { get; }
+
+    /// <summary>
+    /// 描述中作为价值参照的上一档仙元牌。
+    /// </summary>
+    protected virtual CardModel? ReferencedCard => null;
 
     /// <summary>
     /// 每张具体仙元牌必须声明非空的静态图片路径。
@@ -66,6 +74,13 @@ public abstract class AbstractXianYuanCard : ModCardTemplate
             "RemainingActivationUnits",
             ImmortalEssenceSystem.GetRemainingUnits(this)
         );
+    }
+
+    public IReadOnlyList<CardModel> GetCarouselCards()
+    {
+        return ReferencedCard is { } card
+            ? [card]
+            : [];
     }
 
     protected override void OnUpgrade()

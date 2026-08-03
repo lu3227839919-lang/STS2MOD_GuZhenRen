@@ -4,7 +4,7 @@
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.title": "Defend",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.description": "Gain {Block:diff()} Block.",
   "GU_ZHEN_REN_CARD_CHUI_DONG.title": "Activate",
-  "GU_ZHEN_REN_CARD_CHUI_DONG.description": "Choose and play a Gu card from the Gu pile.",
+  "GU_ZHEN_REN_CARD_CHUI_DONG.description": "Choose and play a Gu card from the Gu Village pile.",
   "GU_ZHEN_REN_CARD_CHUI_DONG.selectionScreenPrompt": "Choose a Gu card to activate.",
   "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.title": "Green Grape Immortal Essence",
   "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description": "Retain as immortal essence. Provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
@@ -13,5 +13,15 @@
   "GU_ZHEN_REN_CARD_BAI_LI_XIAN_YUAN.title": "White Lychee Immortal Essence",
   "GU_ZHEN_REN_CARD_BAI_LI_XIAN_YUAN.description": "Retain as immortal essence. Equals two Red Date essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
   "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.title": "Yellow Apricot Immortal Essence",
-  "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description": "Retain as immortal essence. Equals two White Litchi essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted."
+  "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description": "Retain as immortal essence. Equals two White Litchi essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
+  "GU_ZHEN_REN_CARD_YUE_GUANG_GU.title": "Moonlight Gu",
+  "GU_ZHEN_REN_CARD_YUE_GUANG_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Deal {Damage:diff()} damage. If you have at least 2 [gold]Brilliance[/gold], spend 2 Brilliance to deal {BonusDamage} more damage and apply {ZhaoPoPower:diff()} [gold]Illumination[/gold].{Rank:cond:>=6? NL [gold]Rank 6:[/gold] Replay once.|}",
+  "GU_ZHEN_REN_CARD_XIAO_GUANG_GU.title": "Little Light Gu",
+  "GU_ZHEN_REN_CARD_XIAO_GUANG_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Apply {WeakPower:diff()} [gold]Weak[/gold] and {VulnerablePower:diff()} [gold]Vulnerable[/gold].{Rank:cond:>=6? NL [gold]Rank 6:[/gold] Double the enemy current Illumination.|}",
+  "GU_ZHEN_REN_CARD_YU_PI_GU.title": "Jade Skin Gu",
+  "GU_ZHEN_REN_CARD_YU_PI_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Add a [gold]Mystic Jade Palm[/gold] 1 rank above this card to your hand and gain {DexterityPower:diff()} [gold]Dexterity[/gold].{Block:cond:>0? NL Gain {Block:diff()} Block.|}",
+  "GU_ZHEN_REN_CARD_YUE_MANG_GU.title": "Moonbeam Gu",
+  "GU_ZHEN_REN_CARD_YUE_MANG_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Deal {Damage:diff()} damage {Hits} times. If you have at least {GuangHuiCost} [gold]Brilliance[/gold], spend it to deal {BonusDamage} more damage per hit and apply {ZhaoPoPower:diff()} [gold]Illumination[/gold].{Rank:cond:>=6? NL [gold]Rank 6:[/gold] If the enemy has Illumination, every hit can trigger it.|}",
+  "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.title": "Mystic Jade Palm",
+  "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.description": "Deal {Damage:diff()} damage. Gain {Block:diff()} Block. [gold]Exhaust[/gold].{Rank:cond:>=6? NL [gold]Rank 6:[/gold] Costs 1 less Energy and Replays once.|}"
 }

@@ -22,7 +22,7 @@ namespace GuZhenRen.Patches;
 /// <summary>
 /// 本地化兼容层。
 ///
-/// 1. 按当前语言从 localization.zhs.json 或 localization.eng.json 读取文本；
+/// 1. 按当前语言从对应语言目录的单一 JSON 读取文本；
 /// 2. 从 JSON 为旧 PCK 中缺失的合练/升炼文本提供中英文回退；
 /// 3. 从 JSON 覆盖旧版卡牌描述，使效果文本与新代码一致；
 /// 4. 修正旧 PCK 中缺少 SmartFormat 空格式段分隔符的能量图标写法。
@@ -35,8 +35,8 @@ internal static partial class LocalizationCompatibilityPatch
     private const string PatcherName =
         "LocalizationCompatibility";
 
-    private const string LocalizationFileNamePrefix =
-        "LocalizationCompatibilityPatch.localization.";
+    private const string LocalizationFileName =
+        "LocalizationCompatibilityPatch.localization.json";
 
     private static readonly JsonSerializerOptions
         LocalizationJsonOptions =
@@ -262,9 +262,7 @@ internal static partial class LocalizationCompatibilityPatch
         try
         {
             string localizationFileName =
-                LocalizationFileNamePrefix +
-                language +
-                ".json";
+                LocalizationFileName;
 
             string? assemblyDirectory =
                 Path.GetDirectoryName(
@@ -465,6 +463,11 @@ internal static partial class LocalizationCompatibilityPatch
                 .Replace(
                     "{GuCardDiscardPileId}",
                     GuCardPileSystem.DiscardPileId,
+                    StringComparison.Ordinal
+                )
+                .Replace(
+                    "{GuCardRecoveryPileId}",
+                    GuCardPileSystem.RecoveryPileId,
                     StringComparison.Ordinal
                 );
 

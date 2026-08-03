@@ -5,8 +5,10 @@ using GuZhenRen.Cards;
 using HarmonyLib;
 
 using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Random;
 
 namespace GuZhenRen.Patches;
@@ -43,11 +45,39 @@ internal static class GuCardPileCombatPatch
             );
         }
 
-        new Harmony(HarmonyId).Patch(
+        MethodInfo? drawInternal =
+            AccessTools.DeclaredMethod(
+                typeof(CardPileCmd),
+                "DrawInternal",
+                [
+                    typeof(PlayerChoiceContext),
+                    typeof(decimal),
+                    typeof(Player),
+                    typeof(bool),
+                ]
+            );
+
+        if (drawInternal == null)
+        {
+            throw new MissingMethodException(
+                "CardPileCmd.DrawInternal was not found."
+            );
+        }
+
+        Harmony harmony = new(HarmonyId);
+        harmony.Patch(
             populateCombatState,
             postfix: new HarmonyMethod(
                 typeof(GuCardPileCombatPatch),
                 nameof(PopulateCombatStatePostfix)
+            )
+        );
+
+        harmony.Patch(
+            drawInternal,
+            prefix: new HarmonyMethod(
+                typeof(GuCardPileCombatPatch),
+                nameof(DrawInternalPrefix)
             )
         );
 
@@ -70,6 +100,11 @@ internal static class GuCardPileCombatPatch
         Player __instance
     )
     {
-        GuCardPileSystem.MoveGuCardsToPile(__instance);
+        GuCardPileSystem.InitializeGuCardsForCombat(__instance);
+    }
+
+    private static void DrawInternalPrefix(Player player)
+    {
+        GuCardPileSystem.MoveStrayGuCardsToVillage(player);
     }
 }

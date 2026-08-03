@@ -35,7 +35,8 @@ public sealed class ZhaoPoPower : ModPowerTemplate
     {
         return ReferenceEquals(target, Owner) &&
             Amount > 0 &&
-            cardSource?.Type == CardType.Attack
+            cardSource?.Type == CardType.Attack &&
+            ZhaoPoTriggerScope.CanTrigger
                 ? DamagePerLayer
                 : 0;
     }
@@ -51,7 +52,8 @@ public sealed class ZhaoPoPower : ModPowerTemplate
     {
         if (!ReferenceEquals(target, Owner) ||
             Amount <= 0 ||
-            cardSource?.Type != CardType.Attack)
+            cardSource?.Type != CardType.Attack ||
+            !ZhaoPoTriggerScope.CanTrigger)
         {
             return;
         }
