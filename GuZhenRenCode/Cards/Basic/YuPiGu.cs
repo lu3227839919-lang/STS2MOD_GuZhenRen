@@ -125,8 +125,9 @@ public sealed class YuPiGu
 
     private void RefreshRankValues()
     {
-        DynamicVars.Dexterity.BaseValue =
-            1 + Math.Max(0, (GuRank - 1) / 2);
+        DynamicVars.Dexterity.BaseValue = GuRank >= 6
+            ? GuRank - 2
+            : 1 + Math.Max(0, (GuRank - 1) / 2);
         DynamicVars.Block.BaseValue = GuRank >= 6
             ? 8 + (GuRank - 6) * 2
             : 0;

@@ -76,7 +76,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "Stores Gu Worms with activations remaining. Remaining activations persist across turns; spent Gu Worms enter the Gu Recovery Pile and recover every two turns. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move. On success, also pay twice the average effective Primeval Essence cost of all materials, rounded up. The Gu materials are Exhausted directly and enter neither custom Gu pile; the Killer Move enters your hand and is not a Gu Worm."
+      "text": "Stores Gu Worms with activations remaining. Remaining activations persist across turns; a spent Gu Worm enters the Recovery Pile and recovers two turns after its own depletion turn. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move. On success, also pay twice the average effective Primeval Essence cost of all materials, rounded up. The Gu materials are Exhausted directly and enter neither custom Gu pile; the Killer Move enters your hand and is not a Gu Worm."
     },
     {
       "table": "static_hover_tips",
@@ -96,7 +96,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.description",
-      "text": "Stores Gu Worms with no activations remaining. Every two turns, Gu Worms here refill their activations and return to the Gu Storage Pile."
+      "text": "Stores Gu Worms with no activations remaining. Each Gu Worm refills and returns to the Gu Storage Pile two turns after its own depletion turn."
     },
     {
       "table": "static_hover_tips",
@@ -122,6 +122,46 @@
       "table": "powers",
       "key": "GU_ZHEN_REN_POWER_ZHAO_PO_POWER.description",
       "text": "The next time a single hit from an Attack card deals damage, take 3 additional damage and remove 1 Illumination Break. Multi-hit attacks can consume multiple stacks."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_YUAN_POWER.title",
+      "text": "Blood Essence"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_YUAN_POWER.description",
+      "text": "A personal character resource capped at 12. Only Blood Path Gu cards and their exclusive debuffs can gain or spend Blood Essence."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_YIN_POWER.title",
+      "text": "Blood Mark"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_YIN_POWER.description",
+      "text": "After taking unblocked damage from the applier’s Blood Path Gu Attack, the applier gains 1 Blood Essence, remove 1 Blood Mark, and lose 3 additional HP. Multi-hit attacks trigger once per card play; Replay starts a new play."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_LIU_XUE_POWER.title",
+      "text": "Bleed"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_LIU_XUE_POWER.description",
+      "text": "At the end of the owner’s turn, remove 1 Bleed, grant the applier 1 Blood Essence, and deal 3 damage to the owner."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_QI_RECOVERY_POWER.title",
+      "text": "Blood Qi Recovery"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_QI_RECOVERY_POWER.description",
+      "text": "At the start of your next turn, heal {Amount} HP, then remove this effect."
     },
     {
       "table": "secondary_resources",

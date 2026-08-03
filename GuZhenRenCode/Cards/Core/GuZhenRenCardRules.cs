@@ -26,6 +26,9 @@ public static class GuZhenRenCardRules
 {
     public const int XianGuRank = 6;
 
+    // 蛊虫不进入普通抽牌循环，因此以永久牌组容量承担构筑代价。
+    public const int GuWormDeckCapacity = 10;
+
     private static readonly object XianGuMutationSync = new();
 
     // 0 表示旧存档或尚未登记；其他值保存“首次成为仙蛊的楼层 + 1”。
@@ -511,6 +514,25 @@ public static class GuZhenRenCardRules
         ArgumentNullException.ThrowIfNull(runState);
         ArgumentNullException.ThrowIfNull(receivingPlayer);
         ArgumentNullException.ThrowIfNull(candidate);
+
+        if (receivingPlayer.Character is GuZhenRenCharacter &&
+            candidate is IGuWormCard)
+        {
+            int existingGuCount = receivingPlayer.Deck.Cards.Count(card =>
+                card is IGuWormCard &&
+                ignoredExistingCards?.Contains(card) != true
+            );
+            int plannedGuCount = plannedAdditions?.Count(item =>
+                ReferenceEquals(item.Player, receivingPlayer) &&
+                item.Card is IGuWormCard
+            ) ?? 0;
+
+            if (existingGuCount + plannedGuCount + 1 >
+                GuWormDeckCapacity)
+            {
+                return false;
+            }
+        }
 
         CardUniqueScope scope = GetUniqueScope(candidate);
 

@@ -25,7 +25,7 @@ public sealed class YueMangGu : AbstractHeLianGuCard
 {
     private const int GuangHuiCost = 2;
 
-    public override int MaxUses => IsUpgraded ? 3 : 1;
+    public override int MaxUses => IsUpgraded ? 2 : 1;
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
@@ -74,7 +74,12 @@ public sealed class YueMangGu : AbstractHeLianGuCard
         }
 
         bool empowered = await GuangDaoPowerSystem
-            .TrySpendGuangHui(choiceContext, this, GuangHuiCost);
+            .TrySpendGuangHui(
+                choiceContext,
+                this,
+                cardPlay,
+                GuangHuiCost
+            );
         decimal damage = DynamicVars.Damage.BaseValue;
 
         if (empowered)
@@ -117,7 +122,8 @@ public sealed class YueMangGu : AbstractHeLianGuCard
 
     private void RefreshRankValues()
     {
-        DynamicVars["Hits"].BaseValue =
-            2 + Math.Max(0, (GuRank - 1) / 2);
+        DynamicVars["Hits"].BaseValue = GuRank >= 6
+            ? GuRank - 2
+            : 2 + Math.Max(0, (GuRank - 1) / 2);
     }
 }

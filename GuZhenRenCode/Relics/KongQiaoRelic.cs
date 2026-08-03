@@ -15,6 +15,7 @@ using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Entities.RestSite;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Rooms;
+using MegaCrit.Sts2.Core.Rewards;
 
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Combat.SecondaryResources;
@@ -226,8 +227,7 @@ public sealed class KongQiaoRelic
             return allowedByBase;
         }
 
-        return GuCardUsageRules.CanUse(card) &&
-               ImmortalEssenceSystem.CanPayForActivation(card);
+        return GuCardUsageRules.CanActivate(card);
     }
 
     /// <summary>
@@ -242,6 +242,14 @@ public sealed class KongQiaoRelic
             cardPlay.PlayIndex != 0)
         {
             return;
+        }
+
+        if (!await GuCardUsageRules
+                .EnsureActivationPayment(cardPlay.Card))
+        {
+            throw new InvalidOperationException(
+                $"元气不足，无法催动 {cardPlay.Card.Id}。"
+            );
         }
 
         if (guCard.GuRank >= ApertureProgression.ImmortalRank)
@@ -327,6 +335,41 @@ public sealed class KongQiaoRelic
             ),
             source: this
         );
+    }
+
+
+    /// <summary>
+    /// 所有奖励完成 Populate 后移除空卡牌奖励，避免空列表进入奖励界面。
+    /// </summary>
+    public override bool TryModifyRewardsLate(
+        Player player,
+        List<Reward> rewards,
+        AbstractRoom? room
+    )
+    {
+        bool modified = base.TryModifyRewardsLate(
+            player,
+            rewards,
+            room
+        );
+
+        if (!ReferenceEquals(player, Owner))
+        {
+            return modified;
+        }
+
+        int removed = rewards.RemoveAll(reward =>
+            reward is CardReward && !reward.IsPopulated
+        );
+
+        if (removed > 0)
+        {
+            Entry.Logger.Info(
+                $"移除了 {removed} 个没有候选牌的空卡牌奖励。"
+            );
+        }
+
+        return modified || removed > 0;
     }
 
     public override Task AfterObtained()

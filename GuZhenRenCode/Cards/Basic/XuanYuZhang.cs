@@ -95,20 +95,30 @@ public sealed class XuanYuZhang
             0,
             Math.Min(GuRank, 5) - 1
         );
-        DynamicVars.Damage.BaseValue = 8 + preImmortalIncrease;
-        DynamicVars.Block.BaseValue = 5 + preImmortalIncrease * 2;
-        // 规范卡牌模型在 ModelDb 启动期间不可写。奖励牌、
-        // 生成牌和读档卡均会在可变实例上重新调用本方法。
+        int immortalIncrease = Math.Max(0, GuRank - 5);
+        DynamicVars.Damage.BaseValue =
+            8 + preImmortalIncrease + immortalIncrease * 2;
+        DynamicVars.Block.BaseValue =
+            5 + preImmortalIncrease * 2 + immortalIncrease * 2;
+
+        // 五转玉皮蛊生成的六转玄玉掌只获得数值成长，不再同时取得
+        // 降费和 Replay。高阶特性从七转起逐级开放。
         if (IsMutable)
         {
-            BaseReplayCount = GuRank >= 6 ? 1 : 0;
-        }
+            BaseReplayCount = GuRank >= 9
+                ? 2
+                : GuRank >= 8
+                    ? 1
+                    : 0;
 
-        if (GuRank >= 6)
-        {
+            int rankDiscount = GuRank >= 9
+                ? 2
+                : GuRank >= 7
+                    ? 1
+                    : 0;
             int rankAdjustedCost = Math.Max(
                 0,
-                2 - (IsUpgraded ? 1 : 0) - 1
+                2 - (IsUpgraded ? 1 : 0) - rankDiscount
             );
             EnergyCost.SetThisCombat(rankAdjustedCost);
         }

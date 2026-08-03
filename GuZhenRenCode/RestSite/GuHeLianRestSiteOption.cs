@@ -420,10 +420,10 @@ public sealed class GuHeLianRestSiteOption
             return false;
         }
 
-        // 杀招、虚影与专属合练结果不能再次作为源材料。
+        // 杀招与虚影不能作为源材料。专属合练结果不再一刀切排除：
+        // 只要其具体类型确实出现在配方中，就允许继续参与高阶合练。
         if (card is AbstractShaZhaoCard ||
-            card is AbstractXuYingCard ||
-            card is AbstractHeLianGuCard)
+            card is AbstractXuYingCard)
         {
             return false;
         }

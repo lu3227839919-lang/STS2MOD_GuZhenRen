@@ -49,6 +49,18 @@ public static class ApertureProgression
             : 0;
     }
 
+    public static int GetMaxHpAward(int rank)
+    {
+        return rank switch
+        {
+            6 => 2,
+            7 => 2,
+            8 => 3,
+            9 => 3,
+            _ => 0,
+        };
+    }
+
     public static int GetYuanQiCapacity(int rank)
     {
         int normalizedRank = Math.Max(MinimumRank, rank);

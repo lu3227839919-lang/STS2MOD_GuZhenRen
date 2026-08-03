@@ -76,7 +76,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "存放尚有可催动次数的蛊虫牌。剩余次数跨回合保留；耗尽后进入蛊恢复堆，每两回合恢复并返回。左键查看；右键花费1点能量开始杀招推演。成功时再支付材料有效元气消耗平均值的2倍（向上取整）；组成杀招的蛊虫材料直接消耗，不进入蛊存放牌堆或蛊恢复堆，杀招加入手牌且不属于蛊虫。"
+      "text": "存放尚有可催动次数的蛊虫牌。剩余次数跨回合保留；耗尽后进入蛊恢复堆，并在自身耗尽回合的两回合后恢复。左键查看；右键花费1点能量开始杀招推演。成功时再支付材料有效元气消耗平均值的2倍（向上取整）；组成杀招的蛊虫材料直接消耗，不进入蛊存放牌堆或蛊恢复堆，杀招加入手牌且不属于蛊虫。"
     },
     {
       "table": "static_hover_tips",
@@ -96,7 +96,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.description",
-      "text": "存放可催动次数已耗尽的蛊虫。每两回合，堆内蛊虫重新充满催动次数并返回蛊存放牌堆。"
+      "text": "存放可催动次数已耗尽的蛊虫。每张蛊虫在自身耗尽回合的两回合后重新充满催动次数并返回蛊存放牌堆。"
     },
     {
       "table": "static_hover_tips",
@@ -122,6 +122,46 @@
       "table": "powers",
       "key": "GU_ZHEN_REN_POWER_ZHAO_PO_POWER.description",
       "text": "下一次受到攻击牌的单段伤害时，额外受到3点伤害并移除1层照破。多段攻击可以连续消耗多层。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_YUAN_POWER.title",
+      "text": "血元"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_YUAN_POWER.description",
+      "text": "角色个人资源，上限为12点。仅血道蛊牌及其专属减益能够获得或消耗血元。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_YIN_POWER.title",
+      "text": "血印"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_YIN_POWER.description",
+      "text": "受到施加者的血道蛊攻击牌伤害后，施加者获得1点血元，移除1层血印，并额外失去3点生命。多段攻击每次牌结算只触发一次；重放视为新的结算。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_LIU_XUE_POWER.title",
+      "text": "流血"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_LIU_XUE_POWER.description",
+      "text": "持有者回合结束时移除1层流血，使施加者获得1点血元，并使持有者受到3点伤害。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_QI_RECOVERY_POWER.title",
+      "text": "血气回生"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_QI_RECOVERY_POWER.description",
+      "text": "下回合开始时回复{Amount}点生命，然后移除此效果。"
     },
     {
       "table": "secondary_resources",

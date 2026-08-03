@@ -61,7 +61,12 @@ public sealed class YueGuangGu : AbstractGuWormCard
         }
 
         bool empowered = await GuangDaoPowerSystem
-            .TrySpendGuangHui(choiceContext, this, GuangHuiCost);
+            .TrySpendGuangHui(
+                choiceContext,
+                this,
+                cardPlay,
+                GuangHuiCost
+            );
         decimal damage = DynamicVars.Damage.BaseValue;
 
         if (empowered)
@@ -99,7 +104,9 @@ public sealed class YueGuangGu : AbstractGuWormCard
             0,
             Math.Min(GuRank, 5) - 1
         );
-        DynamicVars.Damage.BaseValue = 6 + preImmortalIncrease;
+        DynamicVars.Damage.BaseValue =
+            6 + preImmortalIncrease +
+            Math.Max(0, GuRank - 5) * 2;
         DynamicVars[typeof(ZhaoPoPower).Name].BaseValue =
             1 + (GuRank >= 6 ? GuRank - 5 : 0);
         // 规范模型构造期间不可写 BaseReplayCount；转数

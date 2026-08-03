@@ -3,6 +3,8 @@ using System.Threading;
 
 using HarmonyLib;
 
+using GuZhenRen.Characters;
+
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -260,13 +262,32 @@ internal static class CardUniquenessPatch
         ref IEnumerable<CardModel> __result
     )
     {
-        __result = __result.Where(card =>
-            GuZhenRenCardRules.CanOfferToPlayer(
-                runState,
-                player,
-                card
+        IEnumerable<CardModel> candidates = __result;
+        if (player.Character is GuZhenRenCharacter)
+        {
+            candidates = candidates.Concat(
+                ModelDb.CardPool<GuZhenRenGuCardPool>().AllCards
+            );
+        }
+
+        __result = candidates
+            .GroupBy(card => card.Id)
+            .Select(group => group.First())
+            .Where(card =>
+                player.Character is not GuZhenRenCharacter ||
+                GuZhenRenCardRules.CanAppearInCardReward(
+                    player,
+                    card
+                )
             )
-        ).ToArray();
+            .Where(card =>
+                GuZhenRenCardRules.CanOfferToPlayer(
+                    runState,
+                    player,
+                    card
+                )
+            )
+            .ToArray();
     }
 
     private static void RewardPoolPostfix(
@@ -274,17 +295,33 @@ internal static class CardUniquenessPatch
         ref IEnumerable<CardModel> __result
     )
     {
-        __result = __result.Where(card =>
-            GuZhenRenCardRules.CanAppearInCardReward(
-                player,
-                card
-            ) &&
-            GuZhenRenCardRules.CanOfferToPlayer(
-                player.RunState,
-                player,
-                card
+        IEnumerable<CardModel> candidates = __result;
+
+        // 角色主池只装普通操作牌；真正蛊虫注册在独立蛊池。
+        // 奖励候选必须显式合并蛊池，否则再经过“只允许蛊虫”过滤后
+        // 会稳定得到空列表。
+        if (player.Character is GuZhenRenCharacter)
+        {
+            candidates = candidates.Concat(
+                ModelDb.CardPool<GuZhenRenGuCardPool>().AllCards
+            );
+        }
+
+        __result = candidates
+            .GroupBy(card => card.Id)
+            .Select(group => group.First())
+            .Where(card =>
+                GuZhenRenCardRules.CanAppearInCardReward(
+                    player,
+                    card
+                ) &&
+                GuZhenRenCardRules.CanOfferToPlayer(
+                    player.RunState,
+                    player,
+                    card
+                )
             )
-        ).ToArray();
+            .ToArray();
     }
 
     private static void RewardResultsPostfix(

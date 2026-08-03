@@ -192,6 +192,15 @@ public static class GuCardPileSystem
                 }
                 else
                 {
+                    if (!GuCardUsageRules.HasRecoverySchedule(card))
+                    {
+                        int currentTurn =
+                            owner.PlayerCombatState?.TurnNumber ?? 1;
+                        GuCardUsageRules.ScheduleRecovery(
+                            card,
+                            currentTurn
+                        );
+                    }
                     recoveryPile.AddInternal(card, silent: true);
                 }
             }
@@ -224,9 +233,15 @@ public static class GuCardPileSystem
             GuCardUsageRules.GetRemainingUses(card) - 1
         );
 
-        return remainingUses == 0
-            ? RecoveryPileType
-            : PileType;
+        if (remainingUses == 0)
+        {
+            int currentTurn =
+                card.Owner.PlayerCombatState?.TurnNumber ?? 1;
+            GuCardUsageRules.ScheduleRecovery(card, currentTurn);
+            return RecoveryPileType;
+        }
+
+        return PileType;
     }
 
     /// <summary>
@@ -256,6 +271,15 @@ public static class GuCardPileSystem
             return;
         }
 
+        int currentTurn = owner.PlayerCombatState?.TurnNumber ?? 1;
+        foreach (CardModel card in depletedCards)
+        {
+            if (!GuCardUsageRules.HasRecoverySchedule(card))
+            {
+                GuCardUsageRules.ScheduleRecovery(card, currentTurn);
+            }
+        }
+
         await CardPileCmd.Add(
             depletedCards,
             RecoveryPileType,
@@ -266,8 +290,8 @@ public static class GuCardPileSystem
     }
 
     /// <summary>
-    /// 每经过两个完整回合，把恢复堆内的蛊虫重新充满并送回蛊存放牌堆。
-    /// 第一批恢复发生在第 3 回合开始时。
+    /// 每张蛊虫从自身耗尽回合起独立计算两回合冷却。
+    /// 例如第 2 回合耗尽，会在第 4 回合开始时恢复，而不是被固定奇数回合刷新。
     /// </summary>
     public static async Task RestoreRecoveredGuCardsAsync(
         Player owner,
@@ -278,18 +302,33 @@ public static class GuCardPileSystem
 
         EnsureInitialized();
 
-        if (turnNumber <= 1 ||
-            (turnNumber - 1) % 2 != 0)
-        {
-            return;
-        }
-
-        CardModel[] recoveredCards =
+        CardModel[] allRecoveringCards =
             RecoveryPileType
                 .GetPile(owner)
                 .Cards
                 .Where(card => card is IGuWormCard)
                 .ToArray();
+
+        if (allRecoveringCards.Length == 0)
+        {
+            return;
+        }
+
+        // 兼容旧存档：没有逐牌时间戳的恢复牌，从当前回合重新开始冷却，
+        // 避免在加载后被错误地立即刷新。
+        foreach (CardModel card in allRecoveringCards)
+        {
+            if (!GuCardUsageRules.HasRecoverySchedule(card))
+            {
+                GuCardUsageRules.ScheduleRecovery(card, turnNumber);
+            }
+        }
+
+        CardModel[] recoveredCards = allRecoveringCards
+            .Where(card =>
+                GuCardUsageRules.IsRecoveryReady(card, turnNumber)
+            )
+            .ToArray();
 
         if (recoveredCards.Length == 0)
         {

@@ -1,6 +1,5 @@
 using GuZhenRen.Cards;
 using GuZhenRen.Characters;
-using GuZhenRen.Multiplayer;
 using GuZhenRen.Patches;
 
 using MegaCrit.Sts2.Core.CardSelection;
@@ -100,11 +99,11 @@ public sealed class ChuiDong
 
         if (selected.TargetType == TargetType.AnyEnemy)
         {
-            target =
-                GuZhenRenDeterminism.OrderCreatures(
-                    Owner.Creature.CombatState?.HittableEnemies ?? []
-                )
-                    .FirstOrDefault();
+            target = await GuTargetSelection.SelectEnemy(
+                choiceContext,
+                Owner,
+                selected
+            );
 
             if (target == null)
             {
@@ -113,21 +112,31 @@ public sealed class ChuiDong
         }
 
         if (!await GuCardUsageRules
-                .CommitActivationPayment(selected))
+                .PrepareActivationPayment(selected))
         {
             return;
         }
 
-        await CardCmd.AutoPlay(
-            choiceContext,
-            selected,
-            target,
-            skipCardPileVisuals: false
-        );
+        try
+        {
+            await CardCmd.AutoPlay(
+                choiceContext,
+                selected,
+                target,
+                skipCardPileVisuals: false
+            );
+        }
+        finally
+        {
+            // 若 AutoPlay 在进入 BeforeCardPlayed 前被取消，不能让预付标记
+            // 泄漏到下一次催动并形成免费支付。
+            GuCardUsageRules.ClearPreparedActivationPayment(selected);
+        }
     }
 
     protected override void OnUpgrade()
     {
-        AddKeyword(CardKeyword.Ethereal);
+        // 升级应提高可用性，而不是通过“虚无”永久减少后续检索次数。
+        EnergyCost.UpgradeBy(-1);
     }
 }

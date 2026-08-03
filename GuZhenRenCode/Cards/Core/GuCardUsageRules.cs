@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 using GuZhenRen.Cards.ImmortalEssence;
 
 using MegaCrit.Sts2.Core.Models;
@@ -8,16 +10,35 @@ using STS2RitsuLib.Utils;
 namespace GuZhenRen.Cards;
 
 /// <summary>
-/// 蛊虫牌的持久催动次数规则。每次出牌序列只登记一次，Replay 不额外
-/// 消耗次数；剩余次数跨回合保存，直到蛊虫进入恢复堆并完成恢复。
+/// 蛊虫牌的持久催动次数、资源支付和逐牌恢复规则。
+/// 每次出牌序列只登记一次，Replay 不额外消耗次数、元气或仙元。
 /// </summary>
 public static class GuCardUsageRules
 {
+    private sealed class PreparedPaymentState
+    {
+        public int Count;
+    }
+
     private static readonly SavedAttachedState<CardModel, int>
         SpentActivationsState = new(
             "gu_zhen_ren.gu_spent_activations",
             () => 0
         );
+
+    // 0 表示尚未进入恢复；其他值是可恢复的回合编号。
+    private static readonly SavedAttachedState<CardModel, int>
+        RecoveryReadyTurnState = new(
+            "gu_zhen_ren.gu_recovery_ready_turn",
+            () => 0
+        );
+
+    // 元气可能在 AutoPlay 创建 CardPlay 之前预付。该状态只在当前进程
+    // 的一次出牌链中使用，不写入存档；真正的资源数量仍由游戏同步。
+    private static readonly ConditionalWeakTable<
+        CardModel,
+        PreparedPaymentState
+    > PreparedPayments = new();
 
     public static int GetRemainingUses(CardModel card)
     {
@@ -49,6 +70,8 @@ public static class GuCardUsageRules
         if (card is IGuWormCard)
         {
             SpentActivationsState[card] = 0;
+            RecoveryReadyTurnState[card] = 0;
+            PreparedPayments.Remove(card);
         }
     }
 
@@ -56,18 +79,10 @@ public static class GuCardUsageRules
     {
         ArgumentNullException.ThrowIfNull(card);
 
-        if (card is not IGuWormCard guCard)
-        {
-            return true;
-        }
-
-        return GetRemainingUses(card, guCard) > 0;
+        return card is not IGuWormCard guCard ||
+            GetRemainingUses(card, guCard) > 0;
     }
 
-    /// <summary>
-    /// 创建蛊虫本次催动的次级资源支付计划。催动始终支付实际费用；
-    /// 提交后的计划会绑定到 AutoPlay 生成的 CardPlay。
-    /// </summary>
     internal static SecondaryResourcePaymentPlan
         CreateActivationPaymentPlan(CardModel card)
     {
@@ -87,10 +102,110 @@ public static class GuCardUsageRules
         return card is IGuWormCard &&
                CanUse(card) &&
                ImmortalEssenceSystem.CanPayForActivation(card) &&
-               CreateActivationPaymentPlan(card).IsAffordable;
+               (
+                   HasPreparedActivationPayment(card) ||
+                   CreateActivationPaymentPlan(card).IsAffordable
+               );
     }
 
-    public static async Task<bool> CommitActivationPayment(
+    /// <summary>
+    /// 在 AutoPlay 前预付元气，并登记为本次出牌序列已付款。
+    /// Replay 后续段不会再次调用本方法。
+    /// </summary>
+    public static bool HasPreparedActivationPayment(
+        CardModel card
+    )
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        return PreparedPayments.TryGetValue(card, out var state) &&
+            state.Count > 0;
+    }
+
+    public static void ClearPreparedActivationPayment(
+        CardModel card
+    )
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        PreparedPayments.Remove(card);
+    }
+
+    public static async Task<bool> PrepareActivationPayment(
+        CardModel card
+    )
+    {
+        if (!await CommitActivationPaymentCore(card))
+        {
+            return false;
+        }
+
+        PreparedPayments.GetValue(
+            card,
+            static _ => new PreparedPaymentState()
+        ).Count++;
+        return true;
+    }
+
+    /// <summary>
+    /// 在 BeforeCardPlayed 中保证元气恰好支付一次。常规“催动”已预付时
+    /// 消费预付标记；其他自动打出入口则在这里补付。
+    /// </summary>
+    internal static async Task<bool> EnsureActivationPayment(
+        CardModel card
+    )
+    {
+        ArgumentNullException.ThrowIfNull(card);
+
+        if (PreparedPayments.TryGetValue(card, out var state) &&
+            state.Count > 0)
+        {
+            state.Count--;
+            if (state.Count == 0)
+            {
+                PreparedPayments.Remove(card);
+            }
+            return true;
+        }
+
+        return await CommitActivationPaymentCore(card);
+    }
+
+    public static void ScheduleRecovery(
+        CardModel card,
+        int depletedOnTurn
+    )
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        if (card is not IGuWormCard)
+        {
+            return;
+        }
+
+        int readyTurn = Math.Max(1, depletedOnTurn) + 2;
+        int existing = RecoveryReadyTurnState[card];
+        if (existing <= 0 || readyTurn < existing)
+        {
+            RecoveryReadyTurnState[card] = readyTurn;
+        }
+    }
+
+    public static bool HasRecoverySchedule(CardModel card) =>
+        card is IGuWormCard && RecoveryReadyTurnState[card] > 0;
+
+    public static bool IsRecoveryReady(
+        CardModel card,
+        int currentTurn
+    )
+    {
+        if (card is not IGuWormCard)
+        {
+            return false;
+        }
+
+        int readyTurn = RecoveryReadyTurnState[card];
+        return readyTurn > 0 && currentTurn >= readyTurn;
+    }
+
+    private static async Task<bool> CommitActivationPaymentCore(
         CardModel card
     )
     {

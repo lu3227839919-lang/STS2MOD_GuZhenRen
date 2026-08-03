@@ -499,7 +499,7 @@ public static class ApertureSystem
                 int awardRank = state.MaxHpAwardInProgressRank;
                 int expectedMaxHp = checked(
                     state.MaxHpBeforePendingAward +
-                    awardRank
+                    ApertureProgression.GetMaxHpAward(awardRank)
                 );
                 decimal missingMaxHp = Math.Max(
                     0m,

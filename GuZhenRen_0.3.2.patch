@@ -1,0 +1,1650 @@
+diff --git a/GuZhenRen.json b/GuZhenRen.json
+index efa2832..0004193 100644
+--- a/GuZhenRen.json
++++ b/GuZhenRen.json
+@@ -2,8 +2,8 @@
+   "id": "GuZhenRen",
+   "name": "蛊真人",
+   "author": "LU",
+-  "description": "《杀戮尖塔 2》蛊真人 Mod。面向游戏 0.110.0，使用 RitsuLib 0.5.4。",
+-  "version": "0.3.1",
++  "description": "《杀戮尖塔 2》蛊真人 Mod。面向游戏 0.110.0，使用 RitsuLib 0.5.4；包含 0.3.2 平衡与稳定性修复。",
++  "version": "0.3.2",
+   "has_pck": true,
+   "has_dll": true,
+   "affects_gameplay": true,
+diff --git a/GuZhenRen/localization/eng/LocalizationCompatibilityPatch.localization.json b/GuZhenRen/localization/eng/LocalizationCompatibilityPatch.localization.json
+index da02d99..1045ebe 100644
+--- a/GuZhenRen/localization/eng/LocalizationCompatibilityPatch.localization.json
++++ b/GuZhenRen/localization/eng/LocalizationCompatibilityPatch.localization.json
+@@ -76,7 +76,7 @@
+     {
+       "table": "static_hover_tips",
+       "key": "{GuCardPileId}.description",
+-      "text": "Stores Gu Worms with activations remaining. Remaining activations persist across turns; spent Gu Worms enter the Gu Recovery Pile and recover every two turns. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move. On success, also pay twice the average effective Primeval Essence cost of all materials, rounded up. The Gu materials are Exhausted directly and enter neither custom Gu pile; the Killer Move enters your hand and is not a Gu Worm."
++      "text": "Stores Gu Worms with activations remaining. Remaining activations persist across turns; a spent Gu Worm enters the Recovery Pile and recovers two turns after its own depletion turn. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move. On success, also pay twice the average effective Primeval Essence cost of all materials, rounded up. The Gu materials are Exhausted directly and enter neither custom Gu pile; the Killer Move enters your hand and is not a Gu Worm."
+     },
+     {
+       "table": "static_hover_tips",
+@@ -96,7 +96,7 @@
+     {
+       "table": "static_hover_tips",
+       "key": "{GuCardRecoveryPileId}.description",
+-      "text": "Stores Gu Worms with no activations remaining. Every two turns, Gu Worms here refill their activations and return to the Gu Storage Pile."
++      "text": "Stores Gu Worms with no activations remaining. Each Gu Worm refills and returns to the Gu Storage Pile two turns after its own depletion turn."
+     },
+     {
+       "table": "static_hover_tips",
+diff --git a/GuZhenRen/localization/eng/cards.json b/GuZhenRen/localization/eng/cards.json
+index cdfdc66..6eacf95 100644
+--- a/GuZhenRen/localization/eng/cards.json
++++ b/GuZhenRen/localization/eng/cards.json
+@@ -4,7 +4,7 @@
+   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.title": "Defend",
+   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.description": "Gain {Block:diff()} Block.",
+   "GU_ZHEN_REN_CARD_CHUI_DONG.title": "Activate",
+-  "GU_ZHEN_REN_CARD_CHUI_DONG.description": "Choose and play a Gu card from the Gu Storage Pile.",
++  "GU_ZHEN_REN_CARD_CHUI_DONG.description": "Choose and play a Gu card from the Gu Storage Pile; you choose the target for attacking Gu.",
+   "GU_ZHEN_REN_CARD_CHUI_DONG.selectionScreenPrompt": "Choose a Gu card to activate.",
+   "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.title": "Green Grape Immortal Essence",
+   "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description": "Retain as immortal essence. Provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
+@@ -15,17 +15,25 @@
+   "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.title": "Yellow Apricot Immortal Essence",
+   "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description": "Retain as immortal essence. Equals two White Litchi essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
+   "GU_ZHEN_REN_CARD_YUE_GUANG_GU.title": "Moonlight Gu",
+-  "GU_ZHEN_REN_CARD_YUE_GUANG_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Deal {Damage:diff()} damage. If you have at least 2 [gold]Brilliance[/gold], spend 2 Brilliance to deal {BonusDamage} more damage and apply {ZhaoPoPower:diff()} [gold]Illumination[/gold].{Rank:cond:>=6? NL [gold]Rank 6:[/gold] Replay once.|}",
++  "GU_ZHEN_REN_CARD_YUE_GUANG_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Deal {Damage:diff()} damage. You may spend 2 [gold]Brilliance[/gold] to deal {BonusDamage} more damage and apply {ZhaoPoPower:diff()} [gold]Illumination[/gold].{Rank:cond:>=6? NL [gold]Rank 6:[/gold] Replay once; Brilliance is paid only on the first segment.|}",
+   "GU_ZHEN_REN_CARD_XIAO_GUANG_GU.title": "Little Light Gu",
+-  "GU_ZHEN_REN_CARD_XIAO_GUANG_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Apply {WeakPower:diff()} [gold]Weak[/gold] and {VulnerablePower:diff()} [gold]Vulnerable[/gold].{Rank:cond:>=6? NL [gold]Rank 6:[/gold] Double the enemy current Illumination.|}",
++  "GU_ZHEN_REN_CARD_XIAO_GUANG_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Apply {WeakPower:diff()} [gold]Weak[/gold] and {VulnerablePower:diff()} [gold]Vulnerable[/gold].{Rank:cond:>=6? NL [gold]Rank 6+:[/gold] If the target already has Illumination, add a flat amount instead of doubling it.|}",
+   "GU_ZHEN_REN_CARD_YU_PI_GU.title": "Jade Skin Gu",
+   "GU_ZHEN_REN_CARD_YU_PI_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Add a [gold]Mystic Jade Palm[/gold] 1 rank above this card to your hand and gain {DexterityPower:diff()} [gold]Dexterity[/gold].{Block:cond:>0? NL Gain {Block:diff()} Block.|}",
+   "GU_ZHEN_REN_CARD_YUE_MANG_GU.title": "Moonbeam Gu",
+-  "GU_ZHEN_REN_CARD_YUE_MANG_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Deal {Damage:diff()} damage {Hits} times. If you have at least {GuangHuiCost} [gold]Brilliance[/gold], spend it to deal {BonusDamage} more damage per hit and apply {ZhaoPoPower:diff()} [gold]Illumination[/gold].{Rank:cond:>=6? NL [gold]Rank 6:[/gold] If the enemy has Illumination, every hit can trigger it.|}",
++  "GU_ZHEN_REN_CARD_YUE_MANG_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Deal {Damage:diff()} damage {Hits} times. You may spend {GuangHuiCost} [gold]Brilliance[/gold] to deal {BonusDamage} more damage per hit and apply {ZhaoPoPower:diff()} [gold]Illumination[/gold].{Rank:cond:>=6? NL [gold]Rank 6:[/gold] Every hit can trigger Illumination; Brilliance is paid only on the first segment.|}",
+   "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.title": "Mystic Jade Palm",
+-  "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.description": "Deal {Damage:diff()} damage. Gain {Block:diff()} Block.{Rank:cond:>=6? NL [gold]Rank 6:[/gold] Costs 1 less Energy and Replays once.|}",
++  "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.description": "Deal {Damage:diff()} damage. Gain {Block:diff()} Block.{Rank:cond:>=7? NL [gold]Rank 7:[/gold] Costs 1 less Energy.|}{Rank:cond:>=8? NL [gold]Rank 8:[/gold] Replay once.|}{Rank:cond:>=9? NL [gold]Rank 9:[/gold] Costs 2 less Energy in total and Replays twice.|}",
+   "GU_ZHEN_REN_CARD_XUE_QI_GU.title": "Blood Qi Gu",
+-  "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Lose {HpLoss:diff()} HP and gain {XueYuanPower:diff()} [gold]Blood Essence[/gold]. At the start of your next turn, heal {Heal:diff()} HP. NL This Gu is capped at rank 5 and cannot become an Immortal Gu.",
++  "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Lose {HpLoss:diff()} HP and gain {XueYuanPower:diff()} [gold]Blood Essence[/gold]. At the start of your next turn, heal {Heal:diff()} HP. HP lost and healed are always equal. NL This Gu is capped at rank 5 and cannot become an Immortal Gu.",
+   "GU_ZHEN_REN_CARD_XUE_YUE_GU.title": "Blood Moon Gu",
+-  "GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Deal {Damage:diff()} damage to ALL enemies and apply {LiuXuePower:diff()} [gold]Bleed[/gold]. For every {BloodThreshold} [gold]Blood Essence[/gold], spend that much and apply 1 [gold]Blood Mark[/gold] to ALL enemies. {Rank:cond:>=7? NL [gold]Rank 7:[/gold] Replay 1.|} NL This Gu is capped at rank 7."
++  "GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Deal {Damage:diff()} damage to ALL enemies and apply {LiuXuePower:diff()} [gold]Bleed[/gold]. For every {BloodThreshold} [gold]Blood Essence[/gold], spend it on the first segment and apply 1 [gold]Blood Mark[/gold] to ALL enemies. {Rank:cond:>=7? NL [gold]Rank 7:[/gold] Replay once; Replay does not spend Blood Essence or apply Blood Mark again.|} NL This Gu is capped at rank 7.",
++  "GU_ZHEN_REN_CARD_ENEMY_TARGET_CHOICE.title": "Choose Target",
++  "GU_ZHEN_REN_CARD_ENEMY_TARGET_CHOICE.description": "Choose this enemy as the activation target.",
++  "GU_ZHEN_REN_CARD_ENEMY_TARGET_CHOICE.selectionScreenPrompt": "Choose an enemy for {SourceCard}.",
++  "GU_ZHEN_REN_CARD_SPEND_GUANG_HUI_CHOICE.title": "Spend Brilliance",
++  "GU_ZHEN_REN_CARD_SPEND_GUANG_HUI_CHOICE.description": "Pay Brilliance to empower this activation.",
++  "GU_ZHEN_REN_CARD_SPEND_GUANG_HUI_CHOICE.selectionScreenPrompt": "Spend {Amount} Brilliance on {SourceCard}?",
++  "GU_ZHEN_REN_CARD_SAVE_GUANG_HUI_CHOICE.title": "Save Brilliance",
++  "GU_ZHEN_REN_CARD_SAVE_GUANG_HUI_CHOICE.description": "Keep the Brilliance for a later card."
+ }
+diff --git a/GuZhenRen/localization/zhs/LocalizationCompatibilityPatch.localization.json b/GuZhenRen/localization/zhs/LocalizationCompatibilityPatch.localization.json
+index b4aa181..89e00aa 100644
+--- a/GuZhenRen/localization/zhs/LocalizationCompatibilityPatch.localization.json
++++ b/GuZhenRen/localization/zhs/LocalizationCompatibilityPatch.localization.json
+@@ -76,7 +76,7 @@
+     {
+       "table": "static_hover_tips",
+       "key": "{GuCardPileId}.description",
+-      "text": "存放尚有可催动次数的蛊虫牌。剩余次数跨回合保留；耗尽后进入蛊恢复堆，每两回合恢复并返回。左键查看；右键花费1点能量开始杀招推演。成功时再支付材料有效元气消耗平均值的2倍（向上取整）；组成杀招的蛊虫材料直接消耗，不进入蛊存放牌堆或蛊恢复堆，杀招加入手牌且不属于蛊虫。"
++      "text": "存放尚有可催动次数的蛊虫牌。剩余次数跨回合保留；耗尽后进入蛊恢复堆，并在自身耗尽回合的两回合后恢复。左键查看；右键花费1点能量开始杀招推演。成功时再支付材料有效元气消耗平均值的2倍（向上取整）；组成杀招的蛊虫材料直接消耗，不进入蛊存放牌堆或蛊恢复堆，杀招加入手牌且不属于蛊虫。"
+     },
+     {
+       "table": "static_hover_tips",
+@@ -96,7 +96,7 @@
+     {
+       "table": "static_hover_tips",
+       "key": "{GuCardRecoveryPileId}.description",
+-      "text": "存放可催动次数已耗尽的蛊虫。每两回合，堆内蛊虫重新充满催动次数并返回蛊存放牌堆。"
++      "text": "存放可催动次数已耗尽的蛊虫。每张蛊虫在自身耗尽回合的两回合后重新充满催动次数并返回蛊存放牌堆。"
+     },
+     {
+       "table": "static_hover_tips",
+diff --git a/GuZhenRen/localization/zhs/cards.json b/GuZhenRen/localization/zhs/cards.json
+index e7b86b2..cfa31e2 100644
+--- a/GuZhenRen/localization/zhs/cards.json
++++ b/GuZhenRen/localization/zhs/cards.json
+@@ -4,7 +4,7 @@
+   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.title": "防御",
+   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.description": "获得 {Block:diff()} 点格挡。",
+   "GU_ZHEN_REN_CARD_CHUI_DONG.title": "催动",
+-  "GU_ZHEN_REN_CARD_CHUI_DONG.description": "从蛊存放牌堆中选择并打出一张蛊虫牌。",
++  "GU_ZHEN_REN_CARD_CHUI_DONG.description": "从蛊存放牌堆中选择并打出一张蛊虫牌；攻击型蛊虫由你选择目标。",
+   "GU_ZHEN_REN_CARD_CHUI_DONG.selectionScreenPrompt": "选择要催动的蛊虫牌。",
+   "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.title": "青提仙元",
+   "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description": "作为仙元保留在手中。可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
+@@ -15,17 +15,25 @@
+   "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.title": "黄杏仙元",
+   "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description": "作为仙元保留在手中。等于两张白荔仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
+   "GU_ZHEN_REN_CARD_YUE_GUANG_GU.title": "月光蛊",
+-  "GU_ZHEN_REN_CARD_YUE_GUANG_GU.description": "可催动{RemainingUses}/{MaxUses}次。造成{Damage:diff()}点伤害。若有至少2点[gold]光辉[/gold]，消耗2点光辉，使伤害提高{BonusDamage}点并施加{ZhaoPoPower:diff()}层[gold]照破[/gold]。{Rank:cond:>=6? NL [gold]六转：[/gold]重放1次。|}",
++  "GU_ZHEN_REN_CARD_YUE_GUANG_GU.description": "可催动{RemainingUses}/{MaxUses}次。造成{Damage:diff()}点伤害。你可以消耗2点[gold]光辉[/gold]，使伤害提高{BonusDamage}点并施加{ZhaoPoPower:diff()}层[gold]照破[/gold]。{Rank:cond:>=6? NL [gold]六转：[/gold]重放1次；光辉只在首段支付。|}",
+   "GU_ZHEN_REN_CARD_XIAO_GUANG_GU.title": "小光蛊",
+-  "GU_ZHEN_REN_CARD_XIAO_GUANG_GU.description": "可催动{RemainingUses}/{MaxUses}次。施加{WeakPower:diff()}层[gold]虚弱[/gold]和{VulnerablePower:diff()}层[gold]易伤[/gold]。{Rank:cond:>=6? NL [gold]六转：[/gold]将敌人现有的照破层数翻倍。|}",
++  "GU_ZHEN_REN_CARD_XIAO_GUANG_GU.description": "可催动{RemainingUses}/{MaxUses}次。施加{WeakPower:diff()}层[gold]虚弱[/gold]和{VulnerablePower:diff()}层[gold]易伤[/gold]。{Rank:cond:>=6? NL [gold]六转及以上：[/gold]若目标已有照破，额外增加固定层数，而非翻倍。|}",
+   "GU_ZHEN_REN_CARD_YU_PI_GU.title": "玉皮蛊",
+   "GU_ZHEN_REN_CARD_YU_PI_GU.description": "可催动{RemainingUses}/{MaxUses}次。将一张比本牌高1转的[gold]玄玉掌[/gold]加入手牌，并获得{DexterityPower:diff()}层[gold]敏捷[/gold]。{Block:cond:>0? NL 获得{Block:diff()}点格挡。|}",
+   "GU_ZHEN_REN_CARD_YUE_MANG_GU.title": "月芒蛊",
+-  "GU_ZHEN_REN_CARD_YUE_MANG_GU.description": "可催动{RemainingUses}/{MaxUses}次。造成{Damage:diff()}点伤害{Hits}次。若有至少{GuangHuiCost}点[gold]光辉[/gold]，消耗该光辉，每段伤害提高{BonusDamage}点并施加{ZhaoPoPower:diff()}层[gold]照破[/gold]。{Rank:cond:>=6? NL [gold]六转：[/gold]敌人有照破时，每段攻击均可触发照破。|}",
++  "GU_ZHEN_REN_CARD_YUE_MANG_GU.description": "可催动{RemainingUses}/{MaxUses}次。造成{Damage:diff()}点伤害{Hits}次。你可以消耗{GuangHuiCost}点[gold]光辉[/gold]，使每段伤害提高{BonusDamage}点并施加{ZhaoPoPower:diff()}层[gold]照破[/gold]。{Rank:cond:>=6? NL [gold]六转：[/gold]敌人有照破时，每段攻击均可触发照破；光辉只在首段支付。|}",
+   "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.title": "玄玉掌",
+-  "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.description": "造成{Damage:diff()}点伤害。获得{Block:diff()}点格挡。{Rank:cond:>=6? NL [gold]六转：[/gold]能量消耗减少1，重放1次。|}",
++  "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.description": "造成{Damage:diff()}点伤害。获得{Block:diff()}点格挡。{Rank:cond:>=7? NL [gold]七转：[/gold]能量消耗减少1。|}{Rank:cond:>=8? NL [gold]八转：[/gold]重放1次。|}{Rank:cond:>=9? NL [gold]九转：[/gold]总计减少2点能量并重放2次。|}",
+   "GU_ZHEN_REN_CARD_XUE_QI_GU.title": "血气蛊",
+-  "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "可催动{RemainingUses}/{MaxUses}次。失去{HpLoss:diff()}点生命，获得{XueYuanPower:diff()}点[gold]血元[/gold]。下回合回复{Heal:diff()}点生命。 NL 本蛊最高五转，不会成为仙蛊。",
++  "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "可催动{RemainingUses}/{MaxUses}次。失去{HpLoss:diff()}点生命，获得{XueYuanPower:diff()}点[gold]血元[/gold]。下回合回复{Heal:diff()}点生命。失去与回复量始终相等。 NL 本蛊最高五转，不会成为仙蛊。",
+   "GU_ZHEN_REN_CARD_XUE_YUE_GU.title": "血月蛊",
+-  "GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "可催动{RemainingUses}/{MaxUses}次。对所有敌人造成{Damage:diff()}点伤害并施加{LiuXuePower:diff()}层[gold]流血[/gold]。每有{BloodThreshold}点[gold]血元[/gold]，消耗对应血元并对所有敌人施加1层[gold]血印[/gold]。{Rank:cond:>=7? NL [gold]七转：[/gold]重放1次。|} NL 本蛊最高七转。"
++  "GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "可催动{RemainingUses}/{MaxUses}次。对所有敌人造成{Damage:diff()}点伤害并施加{LiuXuePower:diff()}层[gold]流血[/gold]。每有{BloodThreshold}点[gold]血元[/gold]，首段消耗对应血元并对所有敌人施加1层[gold]血印[/gold]。{Rank:cond:>=7? NL [gold]七转：[/gold]重放1次；Replay不重复支付血元或施加血印。|} NL 本蛊最高七转。",
++  "GU_ZHEN_REN_CARD_ENEMY_TARGET_CHOICE.title": "选择目标",
++  "GU_ZHEN_REN_CARD_ENEMY_TARGET_CHOICE.description": "选择此敌人作为催动目标。",
++  "GU_ZHEN_REN_CARD_ENEMY_TARGET_CHOICE.selectionScreenPrompt": "为{SourceCard}选择一个敌人。",
++  "GU_ZHEN_REN_CARD_SPEND_GUANG_HUI_CHOICE.title": "消耗光辉",
++  "GU_ZHEN_REN_CARD_SPEND_GUANG_HUI_CHOICE.description": "支付光辉并获得本次耀化效果。",
++  "GU_ZHEN_REN_CARD_SPEND_GUANG_HUI_CHOICE.selectionScreenPrompt": "是否为{SourceCard}消耗{Amount}点光辉？",
++  "GU_ZHEN_REN_CARD_SAVE_GUANG_HUI_CHOICE.title": "保留光辉",
++  "GU_ZHEN_REN_CARD_SAVE_GUANG_HUI_CHOICE.description": "不支付光辉，保留资源用于之后的卡牌。"
+ }
+diff --git a/GuZhenRenCode/Aperture/ApertureProgression.cs b/GuZhenRenCode/Aperture/ApertureProgression.cs
+index e97b05b..b1a5c7a 100644
+--- a/GuZhenRenCode/Aperture/ApertureProgression.cs
++++ b/GuZhenRenCode/Aperture/ApertureProgression.cs
+@@ -49,6 +49,18 @@ public static class ApertureProgression
+             : 0;
+     }
+ 
++    public static int GetMaxHpAward(int rank)
++    {
++        return rank switch
++        {
++            6 => 2,
++            7 => 2,
++            8 => 3,
++            9 => 3,
++            _ => 0,
++        };
++    }
++
+     public static int GetYuanQiCapacity(int rank)
+     {
+         int normalizedRank = Math.Max(MinimumRank, rank);
+diff --git a/GuZhenRenCode/Aperture/ApertureSystem.cs b/GuZhenRenCode/Aperture/ApertureSystem.cs
+index 99ed32b..edd04f4 100644
+--- a/GuZhenRenCode/Aperture/ApertureSystem.cs
++++ b/GuZhenRenCode/Aperture/ApertureSystem.cs
+@@ -499,7 +499,7 @@ public static class ApertureSystem
+                 int awardRank = state.MaxHpAwardInProgressRank;
+                 int expectedMaxHp = checked(
+                     state.MaxHpBeforePendingAward +
+-                    awardRank
++                    ApertureProgression.GetMaxHpAward(awardRank)
+                 );
+                 decimal missingMaxHp = Math.Max(
+                     0m,
+diff --git a/GuZhenRenCode/Cards/Basic/ChuiDong.cs b/GuZhenRenCode/Cards/Basic/ChuiDong.cs
+index 3eab87c..ced5893 100644
+--- a/GuZhenRenCode/Cards/Basic/ChuiDong.cs
++++ b/GuZhenRenCode/Cards/Basic/ChuiDong.cs
+@@ -1,6 +1,5 @@
+ using GuZhenRen.Cards;
+ using GuZhenRen.Characters;
+-using GuZhenRen.Multiplayer;
+ using GuZhenRen.Patches;
+ 
+ using MegaCrit.Sts2.Core.CardSelection;
+@@ -100,11 +99,11 @@ public sealed class ChuiDong
+ 
+         if (selected.TargetType == TargetType.AnyEnemy)
+         {
+-            target =
+-                GuZhenRenDeterminism.OrderCreatures(
+-                    Owner.Creature.CombatState?.HittableEnemies ?? []
+-                )
+-                    .FirstOrDefault();
++            target = await GuTargetSelection.SelectEnemy(
++                choiceContext,
++                Owner,
++                selected
++            );
+ 
+             if (target == null)
+             {
+@@ -113,21 +112,31 @@ public sealed class ChuiDong
+         }
+ 
+         if (!await GuCardUsageRules
+-                .CommitActivationPayment(selected))
++                .PrepareActivationPayment(selected))
+         {
+             return;
+         }
+ 
+-        await CardCmd.AutoPlay(
+-            choiceContext,
+-            selected,
+-            target,
+-            skipCardPileVisuals: false
+-        );
++        try
++        {
++            await CardCmd.AutoPlay(
++                choiceContext,
++                selected,
++                target,
++                skipCardPileVisuals: false
++            );
++        }
++        finally
++        {
++            // 若 AutoPlay 在进入 BeforeCardPlayed 前被取消，不能让预付标记
++            // 泄漏到下一次催动并形成免费支付。
++            GuCardUsageRules.ClearPreparedActivationPayment(selected);
++        }
+     }
+ 
+     protected override void OnUpgrade()
+     {
+-        AddKeyword(CardKeyword.Ethereal);
++        // 升级应提高可用性，而不是通过“虚无”永久减少后续检索次数。
++        EnergyCost.UpgradeBy(-1);
+     }
+ }
+diff --git a/GuZhenRenCode/Cards/Basic/XiaoGuangGu.cs b/GuZhenRenCode/Cards/Basic/XiaoGuangGu.cs
+index 463604a..4b3297e 100644
+--- a/GuZhenRenCode/Cards/Basic/XiaoGuangGu.cs
++++ b/GuZhenRenCode/Cards/Basic/XiaoGuangGu.cs
+@@ -76,10 +76,11 @@ public sealed class XiaoGuangGu : AbstractGuWormCard
+             target.GetPower<ZhaoPoPower>() is
+                 { Amount: > 0 } zhaoPo)
+         {
++            // 仙蛊只提供固定增量，避免每次催动把照破指数翻倍。
+             await PowerCmd.ModifyAmount(
+                 choiceContext,
+                 zhaoPo,
+-                zhaoPo.Amount,
++                GuRank - 5,
+                 Owner.Creature,
+                 this
+             );
+@@ -94,10 +95,9 @@ public sealed class XiaoGuangGu : AbstractGuWormCard
+ 
+     private void RefreshRankValues()
+     {
+-        int amount = 1 + Math.Max(
+-            0,
+-            (Math.Min(GuRank, 5) - 1) / 2
+-        );
++        int amount = GuRank >= 6
++            ? GuRank - 2
++            : 1 + Math.Max(0, (GuRank - 1) / 2);
+         DynamicVars.Weak.BaseValue = amount;
+         DynamicVars.Vulnerable.BaseValue = amount;
+     }
+diff --git a/GuZhenRenCode/Cards/Basic/XuanYuZhang.cs b/GuZhenRenCode/Cards/Basic/XuanYuZhang.cs
+index 4953393..002d1de 100644
+--- a/GuZhenRenCode/Cards/Basic/XuanYuZhang.cs
++++ b/GuZhenRenCode/Cards/Basic/XuanYuZhang.cs
+@@ -95,20 +95,30 @@ public sealed class XuanYuZhang
+             0,
+             Math.Min(GuRank, 5) - 1
+         );
+-        DynamicVars.Damage.BaseValue = 8 + preImmortalIncrease;
+-        DynamicVars.Block.BaseValue = 5 + preImmortalIncrease * 2;
+-        // 规范卡牌模型在 ModelDb 启动期间不可写。奖励牌、
+-        // 生成牌和读档卡均会在可变实例上重新调用本方法。
++        int immortalIncrease = Math.Max(0, GuRank - 5);
++        DynamicVars.Damage.BaseValue =
++            8 + preImmortalIncrease + immortalIncrease * 2;
++        DynamicVars.Block.BaseValue =
++            5 + preImmortalIncrease * 2 + immortalIncrease * 2;
++
++        // 五转玉皮蛊生成的六转玄玉掌只获得数值成长，不再同时取得
++        // 降费和 Replay。高阶特性从七转起逐级开放。
+         if (IsMutable)
+         {
+-            BaseReplayCount = GuRank >= 6 ? 1 : 0;
+-        }
+-
+-        if (GuRank >= 6)
+-        {
++            BaseReplayCount = GuRank >= 9
++                ? 2
++                : GuRank >= 8
++                    ? 1
++                    : 0;
++
++            int rankDiscount = GuRank >= 9
++                ? 2
++                : GuRank >= 7
++                    ? 1
++                    : 0;
+             int rankAdjustedCost = Math.Max(
+                 0,
+-                2 - (IsUpgraded ? 1 : 0) - 1
++                2 - (IsUpgraded ? 1 : 0) - rankDiscount
+             );
+             EnergyCost.SetThisCombat(rankAdjustedCost);
+         }
+diff --git a/GuZhenRenCode/Cards/Basic/YuPiGu.cs b/GuZhenRenCode/Cards/Basic/YuPiGu.cs
+index c7f0bb8..ab99449 100644
+--- a/GuZhenRenCode/Cards/Basic/YuPiGu.cs
++++ b/GuZhenRenCode/Cards/Basic/YuPiGu.cs
+@@ -125,8 +125,9 @@ public sealed class YuPiGu
+ 
+     private void RefreshRankValues()
+     {
+-        DynamicVars.Dexterity.BaseValue =
+-            1 + Math.Max(0, (GuRank - 1) / 2);
++        DynamicVars.Dexterity.BaseValue = GuRank >= 6
++            ? GuRank - 2
++            : 1 + Math.Max(0, (GuRank - 1) / 2);
+         DynamicVars.Block.BaseValue = GuRank >= 6
+             ? 8 + (GuRank - 6) * 2
+             : 0;
+diff --git a/GuZhenRenCode/Cards/Basic/YueGuangGu.cs b/GuZhenRenCode/Cards/Basic/YueGuangGu.cs
+index 49a09bb..2b39940 100644
+--- a/GuZhenRenCode/Cards/Basic/YueGuangGu.cs
++++ b/GuZhenRenCode/Cards/Basic/YueGuangGu.cs
+@@ -61,7 +61,12 @@ public sealed class YueGuangGu : AbstractGuWormCard
+         }
+ 
+         bool empowered = await GuangDaoPowerSystem
+-            .TrySpendGuangHui(choiceContext, this, GuangHuiCost);
++            .TrySpendGuangHui(
++                choiceContext,
++                this,
++                cardPlay,
++                GuangHuiCost
++            );
+         decimal damage = DynamicVars.Damage.BaseValue;
+ 
+         if (empowered)
+@@ -99,7 +104,9 @@ public sealed class YueGuangGu : AbstractGuWormCard
+             0,
+             Math.Min(GuRank, 5) - 1
+         );
+-        DynamicVars.Damage.BaseValue = 6 + preImmortalIncrease;
++        DynamicVars.Damage.BaseValue =
++            6 + preImmortalIncrease +
++            Math.Max(0, GuRank - 5) * 2;
+         DynamicVars[typeof(ZhaoPoPower).Name].BaseValue =
+             1 + (GuRank >= 6 ? GuRank - 5 : 0);
+         // 规范模型构造期间不可写 BaseReplayCount；转数
+diff --git a/GuZhenRenCode/Cards/Core/GuCardUsageRules.cs b/GuZhenRenCode/Cards/Core/GuCardUsageRules.cs
+index 9ea992c..d281922 100644
+--- a/GuZhenRenCode/Cards/Core/GuCardUsageRules.cs
++++ b/GuZhenRenCode/Cards/Core/GuCardUsageRules.cs
+@@ -1,3 +1,5 @@
++using System.Runtime.CompilerServices;
++
+ using GuZhenRen.Cards.ImmortalEssence;
+ 
+ using MegaCrit.Sts2.Core.Models;
+@@ -8,17 +10,36 @@ using STS2RitsuLib.Utils;
+ namespace GuZhenRen.Cards;
+ 
+ /// <summary>
+-/// 蛊虫牌的持久催动次数规则。每次出牌序列只登记一次，Replay 不额外
+-/// 消耗次数；剩余次数跨回合保存，直到蛊虫进入恢复堆并完成恢复。
++/// 蛊虫牌的持久催动次数、资源支付和逐牌恢复规则。
++/// 每次出牌序列只登记一次，Replay 不额外消耗次数、元气或仙元。
+ /// </summary>
+ public static class GuCardUsageRules
+ {
++    private sealed class PreparedPaymentState
++    {
++        public int Count;
++    }
++
+     private static readonly SavedAttachedState<CardModel, int>
+         SpentActivationsState = new(
+             "gu_zhen_ren.gu_spent_activations",
+             () => 0
+         );
+ 
++    // 0 表示尚未进入恢复；其他值是可恢复的回合编号。
++    private static readonly SavedAttachedState<CardModel, int>
++        RecoveryReadyTurnState = new(
++            "gu_zhen_ren.gu_recovery_ready_turn",
++            () => 0
++        );
++
++    // 元气可能在 AutoPlay 创建 CardPlay 之前预付。该状态只在当前进程
++    // 的一次出牌链中使用，不写入存档；真正的资源数量仍由游戏同步。
++    private static readonly ConditionalWeakTable<
++        CardModel,
++        PreparedPaymentState
++    > PreparedPayments = new();
++
+     public static int GetRemainingUses(CardModel card)
+     {
+         ArgumentNullException.ThrowIfNull(card);
+@@ -49,6 +70,8 @@ public static class GuCardUsageRules
+         if (card is IGuWormCard)
+         {
+             SpentActivationsState[card] = 0;
++            RecoveryReadyTurnState[card] = 0;
++            PreparedPayments.Remove(card);
+         }
+     }
+ 
+@@ -56,18 +79,10 @@ public static class GuCardUsageRules
+     {
+         ArgumentNullException.ThrowIfNull(card);
+ 
+-        if (card is not IGuWormCard guCard)
+-        {
+-            return true;
+-        }
+-
+-        return GetRemainingUses(card, guCard) > 0;
++        return card is not IGuWormCard guCard ||
++            GetRemainingUses(card, guCard) > 0;
+     }
+ 
+-    /// <summary>
+-    /// 创建蛊虫本次催动的次级资源支付计划。催动始终支付实际费用；
+-    /// 提交后的计划会绑定到 AutoPlay 生成的 CardPlay。
+-    /// </summary>
+     internal static SecondaryResourcePaymentPlan
+         CreateActivationPaymentPlan(CardModel card)
+     {
+@@ -87,10 +102,110 @@ public static class GuCardUsageRules
+         return card is IGuWormCard &&
+                CanUse(card) &&
+                ImmortalEssenceSystem.CanPayForActivation(card) &&
+-               CreateActivationPaymentPlan(card).IsAffordable;
++               (
++                   HasPreparedActivationPayment(card) ||
++                   CreateActivationPaymentPlan(card).IsAffordable
++               );
++    }
++
++    /// <summary>
++    /// 在 AutoPlay 前预付元气，并登记为本次出牌序列已付款。
++    /// Replay 后续段不会再次调用本方法。
++    /// </summary>
++    public static bool HasPreparedActivationPayment(
++        CardModel card
++    )
++    {
++        ArgumentNullException.ThrowIfNull(card);
++        return PreparedPayments.TryGetValue(card, out var state) &&
++            state.Count > 0;
++    }
++
++    public static void ClearPreparedActivationPayment(
++        CardModel card
++    )
++    {
++        ArgumentNullException.ThrowIfNull(card);
++        PreparedPayments.Remove(card);
++    }
++
++    public static async Task<bool> PrepareActivationPayment(
++        CardModel card
++    )
++    {
++        if (!await CommitActivationPaymentCore(card))
++        {
++            return false;
++        }
++
++        PreparedPayments.GetValue(
++            card,
++            static _ => new PreparedPaymentState()
++        ).Count++;
++        return true;
++    }
++
++    /// <summary>
++    /// 在 BeforeCardPlayed 中保证元气恰好支付一次。常规“催动”已预付时
++    /// 消费预付标记；其他自动打出入口则在这里补付。
++    /// </summary>
++    internal static async Task<bool> EnsureActivationPayment(
++        CardModel card
++    )
++    {
++        ArgumentNullException.ThrowIfNull(card);
++
++        if (PreparedPayments.TryGetValue(card, out var state) &&
++            state.Count > 0)
++        {
++            state.Count--;
++            if (state.Count == 0)
++            {
++                PreparedPayments.Remove(card);
++            }
++            return true;
++        }
++
++        return await CommitActivationPaymentCore(card);
++    }
++
++    public static void ScheduleRecovery(
++        CardModel card,
++        int depletedOnTurn
++    )
++    {
++        ArgumentNullException.ThrowIfNull(card);
++        if (card is not IGuWormCard)
++        {
++            return;
++        }
++
++        int readyTurn = Math.Max(1, depletedOnTurn) + 2;
++        int existing = RecoveryReadyTurnState[card];
++        if (existing <= 0 || readyTurn < existing)
++        {
++            RecoveryReadyTurnState[card] = readyTurn;
++        }
++    }
++
++    public static bool HasRecoverySchedule(CardModel card) =>
++        card is IGuWormCard && RecoveryReadyTurnState[card] > 0;
++
++    public static bool IsRecoveryReady(
++        CardModel card,
++        int currentTurn
++    )
++    {
++        if (card is not IGuWormCard)
++        {
++            return false;
++        }
++
++        int readyTurn = RecoveryReadyTurnState[card];
++        return readyTurn > 0 && currentTurn >= readyTurn;
+     }
+ 
+-    public static async Task<bool> CommitActivationPayment(
++    private static async Task<bool> CommitActivationPaymentCore(
+         CardModel card
+     )
+     {
+diff --git a/GuZhenRenCode/Cards/Core/GuTargetSelection.cs b/GuZhenRenCode/Cards/Core/GuTargetSelection.cs
+new file mode 100644
+index 0000000..70c8a7a
+--- /dev/null
++++ b/GuZhenRenCode/Cards/Core/GuTargetSelection.cs
+@@ -0,0 +1,126 @@
++using GuZhenRen.Characters;
++using GuZhenRen.Multiplayer;
++
++using MegaCrit.Sts2.Core.CardSelection;
++using MegaCrit.Sts2.Core.Commands;
++using MegaCrit.Sts2.Core.Entities.Cards;
++using MegaCrit.Sts2.Core.Entities.Creatures;
++using MegaCrit.Sts2.Core.Entities.Players;
++using MegaCrit.Sts2.Core.GameActions.Multiplayer;
++using MegaCrit.Sts2.Core.Localization;
++using MegaCrit.Sts2.Core.Models;
++
++using STS2RitsuLib.Interop.AutoRegistration;
++using STS2RitsuLib.Scaffolding.Content;
++
++namespace GuZhenRen.Cards;
++
++internal static class GuTargetSelection
++{
++    public static async Task<Creature?> SelectEnemy(
++        PlayerChoiceContext choiceContext,
++        Player player,
++        CardModel sourceCard
++    )
++    {
++        Creature[] enemies = GuZhenRenDeterminism.OrderCreatures(
++            player.Creature.CombatState?.HittableEnemies ?? []
++        ).ToArray();
++
++        if (enemies.Length == 0)
++        {
++            return null;
++        }
++
++        if (enemies.Length == 1)
++        {
++            return enemies[0];
++        }
++
++        List<CardModel> choices = new(enemies.Length);
++        for (int index = 0; index < enemies.Length; index++)
++        {
++            EnemyTargetChoice choice =
++                (EnemyTargetChoice)ModelDb
++                    .Card<EnemyTargetChoice>()
++                    .ToMutable();
++            choice.Owner = player;
++            choice.TargetIndex = index;
++            choice.TargetName = enemies[index].Name;
++            choices.Add(choice);
++        }
++
++        LocString prompt = new(
++            "cards",
++            "GU_ZHEN_REN_CARD_ENEMY_TARGET_CHOICE.selectionScreenPrompt"
++        );
++        prompt.Add("SourceCard", sourceCard.Title);
++
++        CardSelectorPrefs prefs = new(prompt, 1, 1)
++        {
++            Cancelable = false,
++            PretendCardsCanBePlayed = true,
++        };
++
++        EnemyTargetChoice? selected =
++            (
++                await CardSelectCmd.FromSimpleGrid(
++                    choiceContext,
++                    choices,
++                    player,
++                    prefs
++                )
++            )
++            .OfType<EnemyTargetChoice>()
++            .FirstOrDefault();
++
++        return selected != null &&
++            selected.TargetIndex >= 0 &&
++            selected.TargetIndex < enemies.Length
++                ? enemies[selected.TargetIndex]
++                : null;
++    }
++}
++
++[RegisterCard(typeof(GuZhenRenCardPool))]
++public sealed class EnemyTargetChoice
++    : ModCardTemplate,
++      ICardRewardExcluded
++{
++    public int TargetIndex { get; set; } = -1;
++
++    public string TargetName { get; set; } = string.Empty;
++
++    public override string Title =>
++        string.IsNullOrWhiteSpace(TargetName)
++            ? base.Title
++            : TargetName;
++
++    public override CardPoolModel Pool =>
++        ModelDb.CardPool<GuZhenRenCardPool>();
++
++    public override CardAssetProfile AssetProfile =>
++        new(
++            PortraitPath:
++                $"{Entry.ResPath}/images/cards/ChuiDong.png"
++        );
++
++    public override bool CanBeGeneratedInCombat => false;
++
++    public EnemyTargetChoice()
++        : base(
++            baseCost: 0,
++            type: CardType.Skill,
++            rarity: CardRarity.Token,
++            target: TargetType.Self,
++            showInCardLibrary: false
++        )
++    {
++    }
++
++    protected override bool IsPlayable => false;
++
++    protected override void OnUpgrade()
++    {
++    }
++}
+diff --git a/GuZhenRenCode/Cards/Core/GuTargetSelection.cs.uid b/GuZhenRenCode/Cards/Core/GuTargetSelection.cs.uid
+new file mode 100644
+index 0000000..b777c6b
+--- /dev/null
++++ b/GuZhenRenCode/Cards/Core/GuTargetSelection.cs.uid
+@@ -0,0 +1 @@
++uid://d3q7h2m9x4b1c
+diff --git a/GuZhenRenCode/Cards/Core/GuZhenRenCardRules.cs b/GuZhenRenCode/Cards/Core/GuZhenRenCardRules.cs
+index 9eaaf33..d4ac2f5 100644
+--- a/GuZhenRenCode/Cards/Core/GuZhenRenCardRules.cs
++++ b/GuZhenRenCode/Cards/Core/GuZhenRenCardRules.cs
+@@ -26,6 +26,9 @@ public static class GuZhenRenCardRules
+ {
+     public const int XianGuRank = 6;
+ 
++    // 蛊虫不进入普通抽牌循环，因此以永久牌组容量承担构筑代价。
++    public const int GuWormDeckCapacity = 10;
++
+     private static readonly object XianGuMutationSync = new();
+ 
+     // 0 表示旧存档或尚未登记；其他值保存“首次成为仙蛊的楼层 + 1”。
+@@ -512,6 +515,25 @@ public static class GuZhenRenCardRules
+         ArgumentNullException.ThrowIfNull(receivingPlayer);
+         ArgumentNullException.ThrowIfNull(candidate);
+ 
++        if (receivingPlayer.Character is GuZhenRenCharacter &&
++            candidate is IGuWormCard)
++        {
++            int existingGuCount = receivingPlayer.Deck.Cards.Count(card =>
++                card is IGuWormCard &&
++                ignoredExistingCards?.Contains(card) != true
++            );
++            int plannedGuCount = plannedAdditions?.Count(item =>
++                ReferenceEquals(item.Player, receivingPlayer) &&
++                item.Card is IGuWormCard
++            ) ?? 0;
++
++            if (existingGuCount + plannedGuCount + 1 >
++                GuWormDeckCapacity)
++            {
++                return false;
++            }
++        }
++
+         CardUniqueScope scope = GetUniqueScope(candidate);
+ 
+         if (scope == CardUniqueScope.None)
+diff --git a/GuZhenRenCode/Cards/GuCardPileSystem.cs b/GuZhenRenCode/Cards/GuCardPileSystem.cs
+index c84c287..b2f9591 100644
+--- a/GuZhenRenCode/Cards/GuCardPileSystem.cs
++++ b/GuZhenRenCode/Cards/GuCardPileSystem.cs
+@@ -192,6 +192,15 @@ public static class GuCardPileSystem
+                 }
+                 else
+                 {
++                    if (!GuCardUsageRules.HasRecoverySchedule(card))
++                    {
++                        int currentTurn =
++                            owner.PlayerCombatState?.TurnNumber ?? 1;
++                        GuCardUsageRules.ScheduleRecovery(
++                            card,
++                            currentTurn
++                        );
++                    }
+                     recoveryPile.AddInternal(card, silent: true);
+                 }
+             }
+@@ -224,9 +233,15 @@ public static class GuCardPileSystem
+             GuCardUsageRules.GetRemainingUses(card) - 1
+         );
+ 
+-        return remainingUses == 0
+-            ? RecoveryPileType
+-            : PileType;
++        if (remainingUses == 0)
++        {
++            int currentTurn =
++                card.Owner.PlayerCombatState?.TurnNumber ?? 1;
++            GuCardUsageRules.ScheduleRecovery(card, currentTurn);
++            return RecoveryPileType;
++        }
++
++        return PileType;
+     }
+ 
+     /// <summary>
+@@ -256,6 +271,15 @@ public static class GuCardPileSystem
+             return;
+         }
+ 
++        int currentTurn = owner.PlayerCombatState?.TurnNumber ?? 1;
++        foreach (CardModel card in depletedCards)
++        {
++            if (!GuCardUsageRules.HasRecoverySchedule(card))
++            {
++                GuCardUsageRules.ScheduleRecovery(card, currentTurn);
++            }
++        }
++
+         await CardPileCmd.Add(
+             depletedCards,
+             RecoveryPileType,
+@@ -266,8 +290,8 @@ public static class GuCardPileSystem
+     }
+ 
+     /// <summary>
+-    /// 每经过两个完整回合，把恢复堆内的蛊虫重新充满并送回蛊存放牌堆。
+-    /// 第一批恢复发生在第 3 回合开始时。
++    /// 每张蛊虫从自身耗尽回合起独立计算两回合冷却。
++    /// 例如第 2 回合耗尽，会在第 4 回合开始时恢复，而不是被固定奇数回合刷新。
+     /// </summary>
+     public static async Task RestoreRecoveredGuCardsAsync(
+         Player owner,
+@@ -278,19 +302,34 @@ public static class GuCardPileSystem
+ 
+         EnsureInitialized();
+ 
+-        if (turnNumber <= 1 ||
+-            (turnNumber - 1) % 2 != 0)
+-        {
+-            return;
+-        }
+-
+-        CardModel[] recoveredCards =
++        CardModel[] allRecoveringCards =
+             RecoveryPileType
+                 .GetPile(owner)
+                 .Cards
+                 .Where(card => card is IGuWormCard)
+                 .ToArray();
+ 
++        if (allRecoveringCards.Length == 0)
++        {
++            return;
++        }
++
++        // 兼容旧存档：没有逐牌时间戳的恢复牌，从当前回合重新开始冷却，
++        // 避免在加载后被错误地立即刷新。
++        foreach (CardModel card in allRecoveringCards)
++        {
++            if (!GuCardUsageRules.HasRecoverySchedule(card))
++            {
++                GuCardUsageRules.ScheduleRecovery(card, turnNumber);
++            }
++        }
++
++        CardModel[] recoveredCards = allRecoveringCards
++            .Where(card =>
++                GuCardUsageRules.IsRecoveryReady(card, turnNumber)
++            )
++            .ToArray();
++
+         if (recoveredCards.Length == 0)
+         {
+             return;
+diff --git a/GuZhenRenCode/Cards/HeLian/XueYueGu.cs b/GuZhenRenCode/Cards/HeLian/XueYueGu.cs
+index 52f744e..3041ddd 100644
+--- a/GuZhenRenCode/Cards/HeLian/XueYueGu.cs
++++ b/GuZhenRenCode/Cards/HeLian/XueYueGu.cs
+@@ -81,6 +81,13 @@ public sealed class XueYueGu : AbstractHeLianGuCard
+             );
+         }
+ 
++        // 血元支付和血印结算只发生在出牌序列首段；Replay 只重放
++        // 伤害与流血，避免同一份血元在多个段落被重复消费或结算。
++        if (cardPlay.PlayIndex != 0)
++        {
++            return;
++        }
++
+         int threshold = DynamicVars[BloodThresholdVar].IntValue;
+         int marks = XueDaoPowerSystem.GetXueYuan(this) / threshold;
+         int cost = marks * threshold;
+diff --git a/GuZhenRenCode/Cards/HeLian/YueMangGu.cs b/GuZhenRenCode/Cards/HeLian/YueMangGu.cs
+index 85feac9..bc5c59f 100644
+--- a/GuZhenRenCode/Cards/HeLian/YueMangGu.cs
++++ b/GuZhenRenCode/Cards/HeLian/YueMangGu.cs
+@@ -25,7 +25,7 @@ public sealed class YueMangGu : AbstractHeLianGuCard
+ {
+     private const int GuangHuiCost = 2;
+ 
+-    public override int MaxUses => IsUpgraded ? 3 : 1;
++    public override int MaxUses => IsUpgraded ? 2 : 1;
+ 
+     protected override IEnumerable<DynamicVar> CanonicalVars =>
+     [
+@@ -74,7 +74,12 @@ public sealed class YueMangGu : AbstractHeLianGuCard
+         }
+ 
+         bool empowered = await GuangDaoPowerSystem
+-            .TrySpendGuangHui(choiceContext, this, GuangHuiCost);
++            .TrySpendGuangHui(
++                choiceContext,
++                this,
++                cardPlay,
++                GuangHuiCost
++            );
+         decimal damage = DynamicVars.Damage.BaseValue;
+ 
+         if (empowered)
+@@ -117,7 +122,8 @@ public sealed class YueMangGu : AbstractHeLianGuCard
+ 
+     private void RefreshRankValues()
+     {
+-        DynamicVars["Hits"].BaseValue =
+-            2 + Math.Max(0, (GuRank - 1) / 2);
++        DynamicVars["Hits"].BaseValue = GuRank >= 6
++            ? GuRank - 2
++            : 2 + Math.Max(0, (GuRank - 1) / 2);
+     }
+ }
+diff --git a/GuZhenRenCode/Cards/XueDao/XueQiGu.cs b/GuZhenRenCode/Cards/XueDao/XueQiGu.cs
+index bf42552..fecd57a 100644
+--- a/GuZhenRenCode/Cards/XueDao/XueQiGu.cs
++++ b/GuZhenRenCode/Cards/XueDao/XueQiGu.cs
+@@ -82,7 +82,9 @@ public sealed class XueQiGu : AbstractGuWormCard
+ 
+     private void RefreshRankValues()
+     {
+-        DynamicVars.Heal.BaseValue =
++        decimal recovery =
+             2 + Math.Max(0, (GuRank - 1) / 2);
++        DynamicVars.Heal.BaseValue = recovery;
++        DynamicVars.HpLoss.BaseValue = recovery;
+     }
+ }
+diff --git a/GuZhenRenCode/Patch/CardUniquenessPatch.cs b/GuZhenRenCode/Patch/CardUniquenessPatch.cs
+index 000160b..0d89067 100644
+--- a/GuZhenRenCode/Patch/CardUniquenessPatch.cs
++++ b/GuZhenRenCode/Patch/CardUniquenessPatch.cs
+@@ -3,6 +3,8 @@ using System.Threading;
+ 
+ using HarmonyLib;
+ 
++using GuZhenRen.Characters;
++
+ using MegaCrit.Sts2.Core.Commands;
+ using MegaCrit.Sts2.Core.Entities.Cards;
+ using MegaCrit.Sts2.Core.Entities.Players;
+@@ -260,13 +262,32 @@ internal static class CardUniquenessPatch
+         ref IEnumerable<CardModel> __result
+     )
+     {
+-        __result = __result.Where(card =>
+-            GuZhenRenCardRules.CanOfferToPlayer(
+-                runState,
+-                player,
+-                card
++        IEnumerable<CardModel> candidates = __result;
++        if (player.Character is GuZhenRenCharacter)
++        {
++            candidates = candidates.Concat(
++                ModelDb.CardPool<GuZhenRenGuCardPool>().AllCards
++            );
++        }
++
++        __result = candidates
++            .GroupBy(card => card.Id)
++            .Select(group => group.First())
++            .Where(card =>
++                player.Character is not GuZhenRenCharacter ||
++                GuZhenRenCardRules.CanAppearInCardReward(
++                    player,
++                    card
++                )
+             )
+-        ).ToArray();
++            .Where(card =>
++                GuZhenRenCardRules.CanOfferToPlayer(
++                    runState,
++                    player,
++                    card
++                )
++            )
++            .ToArray();
+     }
+ 
+     private static void RewardPoolPostfix(
+@@ -274,17 +295,33 @@ internal static class CardUniquenessPatch
+         ref IEnumerable<CardModel> __result
+     )
+     {
+-        __result = __result.Where(card =>
+-            GuZhenRenCardRules.CanAppearInCardReward(
+-                player,
+-                card
+-            ) &&
+-            GuZhenRenCardRules.CanOfferToPlayer(
+-                player.RunState,
+-                player,
+-                card
++        IEnumerable<CardModel> candidates = __result;
++
++        // 角色主池只装普通操作牌；真正蛊虫注册在独立蛊池。
++        // 奖励候选必须显式合并蛊池，否则再经过“只允许蛊虫”过滤后
++        // 会稳定得到空列表。
++        if (player.Character is GuZhenRenCharacter)
++        {
++            candidates = candidates.Concat(
++                ModelDb.CardPool<GuZhenRenGuCardPool>().AllCards
++            );
++        }
++
++        __result = candidates
++            .GroupBy(card => card.Id)
++            .Select(group => group.First())
++            .Where(card =>
++                GuZhenRenCardRules.CanAppearInCardReward(
++                    player,
++                    card
++                ) &&
++                GuZhenRenCardRules.CanOfferToPlayer(
++                    player.RunState,
++                    player,
++                    card
++                )
+             )
+-        ).ToArray();
++            .ToArray();
+     }
+ 
+     private static void RewardResultsPostfix(
+diff --git a/GuZhenRenCode/Powers/GuangDao/GuangDaoPowerSystem.cs b/GuZhenRenCode/Powers/GuangDao/GuangDaoPowerSystem.cs
+index f195aba..1c26dea 100644
+--- a/GuZhenRenCode/Powers/GuangDao/GuangDaoPowerSystem.cs
++++ b/GuZhenRenCode/Powers/GuangDao/GuangDaoPowerSystem.cs
+@@ -1,28 +1,44 @@
++using System.Runtime.CompilerServices;
++
+ using GuZhenRen.Cards;
++using GuZhenRen.Characters;
+ 
++using MegaCrit.Sts2.Core.CardSelection;
+ using MegaCrit.Sts2.Core.Commands;
++using MegaCrit.Sts2.Core.Entities.Cards;
+ using MegaCrit.Sts2.Core.Entities.Creatures;
+ using MegaCrit.Sts2.Core.Entities.Players;
+ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
++using MegaCrit.Sts2.Core.Localization;
+ using MegaCrit.Sts2.Core.Models;
+ 
++using STS2RitsuLib.Interop.AutoRegistration;
++using STS2RitsuLib.Scaffolding.Content;
++
+ namespace GuZhenRen.Powers.GuangDao;
+ 
+ /// <summary>
+ /// 光道 Power 的唯一公共调用入口。
+-/// 所有会获得、消耗光辉或施加照破的卡牌都必须带有 GuangDao 标签；
+-/// 非光道卡即使误调用也只会得到失败结果，不会改变战斗状态。
++/// 光辉支付由玩家决定，并且一次出牌序列只支付一次；Replay 沿用首段结果。
+ /// </summary>
+ public static class GuangDaoPowerSystem
+ {
++    private sealed class ActivationDecision
++    {
++        public bool Resolved;
++        public bool Empowered;
++    }
++
++    private static readonly ConditionalWeakTable<
++        CardModel,
++        ActivationDecision
++    > GuangHuiDecisions = new();
++
+     public static bool IsGuangDaoCard(CardModel? card)
+     {
+         return card?.Tags.Contains(GuZhenRenTags.GuangDao) == true;
+     }
+ 
+-    /// <summary>
+-    /// 由光道卡获得光辉；返回本次实际增加的层数。
+-    /// </summary>
+     public static async Task<int> GainGuangHui(
+         PlayerChoiceContext choiceContext,
+         CardModel sourceCard,
+@@ -60,11 +76,12 @@ public static class GuangDaoPowerSystem
+     }
+ 
+     /// <summary>
+-    /// 由光道卡支付光辉。资源不足或来源不是光道卡时不发生变化。
++    /// 首段询问是否支付光辉；Replay 后续段复用首段选择，不重复支付或弹窗。
+     /// </summary>
+     public static async Task<bool> TrySpendGuangHui(
+         PlayerChoiceContext choiceContext,
+         CardModel sourceCard,
++        CardPlay cardPlay,
+         int amount
+     )
+     {
+@@ -73,6 +90,20 @@ public static class GuangDaoPowerSystem
+             return true;
+         }
+ 
++        ActivationDecision decision =
++            GuangHuiDecisions.GetValue(
++                sourceCard,
++                static _ => new ActivationDecision()
++            );
++
++        if (cardPlay.PlayIndex > 0)
++        {
++            return decision.Resolved && decision.Empowered;
++        }
++
++        decision.Resolved = true;
++        decision.Empowered = false;
++
+         if (!IsGuangDaoCard(sourceCard) ||
+             sourceCard.IsCanonical ||
+             sourceCard.Owner.Creature.GetPower<GuangHuiPower>() is not
+@@ -82,6 +113,41 @@ public static class GuangDaoPowerSystem
+             return false;
+         }
+ 
++        CardModel spend = CreateChoiceCard<SpendGuangHuiChoice>(
++            sourceCard.Owner
++        );
++        CardModel save = CreateChoiceCard<SaveGuangHuiChoice>(
++            sourceCard.Owner
++        );
++
++        LocString prompt = new(
++            "cards",
++            "GU_ZHEN_REN_CARD_SPEND_GUANG_HUI_CHOICE.selectionScreenPrompt"
++        );
++        prompt.Add("Amount", amount);
++        prompt.Add("SourceCard", sourceCard.Title);
++
++        CardSelectorPrefs prefs = new(prompt, 1, 1)
++        {
++            Cancelable = false,
++            PretendCardsCanBePlayed = true,
++        };
++
++        CardModel? selected =
++            (
++                await CardSelectCmd.FromSimpleGrid(
++                    choiceContext,
++                    [spend, save],
++                    sourceCard.Owner,
++                    prefs
++                )
++            ).FirstOrDefault();
++
++        if (selected is not SpendGuangHuiChoice)
++        {
++            return false;
++        }
++
+         int before = power.Amount;
+         await PowerCmd.ModifyAmount(
+             choiceContext,
+@@ -93,12 +159,10 @@ public static class GuangDaoPowerSystem
+ 
+         int after = sourceCard.Owner.Creature
+             .GetPower<GuangHuiPower>()?.Amount ?? 0;
+-        return before - after == amount;
++        decision.Empowered = before - after == amount;
++        return decision.Empowered;
+     }
+ 
+-    /// <summary>
+-    /// 由光道卡向敌人施加照破；Artifact 等原生规则仍可阻止减益。
+-    /// </summary>
+     public static async Task<bool> ApplyZhaoPo(
+         PlayerChoiceContext choiceContext,
+         CardModel sourceCard,
+@@ -146,4 +210,73 @@ public static class GuangDaoPowerSystem
+             silent: true
+         );
+     }
++
++    private static CardModel CreateChoiceCard<T>(Player owner)
++        where T : CardModel
++    {
++        CardModel card = ModelDb.Card<T>().ToMutable();
++        card.Owner = owner;
++        return card;
++    }
++}
++
++public abstract class AbstractGuangHuiChoice
++    : ModCardTemplate,
++      ICardRewardExcluded
++{
++    public override CardPoolModel Pool =>
++        ModelDb.CardPool<GuZhenRenCardPool>();
++
++    public override bool CanBeGeneratedInCombat => false;
++
++    protected AbstractGuangHuiChoice()
++        : base(
++            baseCost: 0,
++            type: CardType.Skill,
++            rarity: CardRarity.Token,
++            target: TargetType.Self,
++            showInCardLibrary: false
++        )
++    {
++    }
++
++    public abstract override CardAssetProfile AssetProfile { get; }
++
++    protected override bool IsPlayable => false;
++
++    protected override void OnUpgrade()
++    {
++    }
++}
++
++[RegisterCard(typeof(GuZhenRenCardPool))]
++public sealed class SpendGuangHuiChoice
++    : AbstractGuangHuiChoice
++{
++    public override CardAssetProfile AssetProfile =>
++        new(
++            PortraitPath:
++                $"{Entry.ResPath}/images/cards/YueGuangGu.png"
++        );
++
++    public SpendGuangHuiChoice()
++        : base()
++    {
++    }
++}
++
++[RegisterCard(typeof(GuZhenRenCardPool))]
++public sealed class SaveGuangHuiChoice
++    : AbstractGuangHuiChoice
++{
++    public override CardAssetProfile AssetProfile =>
++        new(
++            PortraitPath:
++                $"{Entry.ResPath}/images/cards/ChuiDong.png"
++        );
++
++    public SaveGuangHuiChoice()
++        : base()
++    {
++    }
+ }
+diff --git a/GuZhenRenCode/Relics/KongQiaoRelic.cs b/GuZhenRenCode/Relics/KongQiaoRelic.cs
+index 7f952b8..a5a9cc2 100644
+--- a/GuZhenRenCode/Relics/KongQiaoRelic.cs
++++ b/GuZhenRenCode/Relics/KongQiaoRelic.cs
+@@ -15,6 +15,7 @@ using MegaCrit.Sts2.Core.Entities.Relics;
+ using MegaCrit.Sts2.Core.Entities.RestSite;
+ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+ using MegaCrit.Sts2.Core.Rooms;
++using MegaCrit.Sts2.Core.Rewards;
+ 
+ using STS2RitsuLib.Interop.AutoRegistration;
+ using STS2RitsuLib.Combat.SecondaryResources;
+@@ -226,8 +227,7 @@ public sealed class KongQiaoRelic
+             return allowedByBase;
+         }
+ 
+-        return GuCardUsageRules.CanUse(card) &&
+-               ImmortalEssenceSystem.CanPayForActivation(card);
++        return GuCardUsageRules.CanActivate(card);
+     }
+ 
+     /// <summary>
+@@ -244,6 +244,14 @@ public sealed class KongQiaoRelic
+             return;
+         }
+ 
++        if (!await GuCardUsageRules
++                .EnsureActivationPayment(cardPlay.Card))
++        {
++            throw new InvalidOperationException(
++                $"元气不足，无法催动 {cardPlay.Card.Id}。"
++            );
++        }
++
+         if (guCard.GuRank >= ApertureProgression.ImmortalRank)
+         {
+             bool paid = await ImmortalEssenceSystem
+@@ -329,6 +337,41 @@ public sealed class KongQiaoRelic
+         );
+     }
+ 
++
++    /// <summary>
++    /// 所有奖励完成 Populate 后移除空卡牌奖励，避免空列表进入奖励界面。
++    /// </summary>
++    public override bool TryModifyRewardsLate(
++        Player player,
++        List<Reward> rewards,
++        AbstractRoom? room
++    )
++    {
++        bool modified = base.TryModifyRewardsLate(
++            player,
++            rewards,
++            room
++        );
++
++        if (!ReferenceEquals(player, Owner))
++        {
++            return modified;
++        }
++
++        int removed = rewards.RemoveAll(reward =>
++            reward is CardReward && !reward.IsPopulated
++        );
++
++        if (removed > 0)
++        {
++            Entry.Logger.Info(
++                $"移除了 {removed} 个没有候选牌的空卡牌奖励。"
++            );
++        }
++
++        return modified || removed > 0;
++    }
++
+     public override Task AfterObtained()
+     {
+         RefreshVisualStateIfAvailable();
+diff --git a/GuZhenRenCode/RestSite/GuHeLianRestSiteOption.cs b/GuZhenRenCode/RestSite/GuHeLianRestSiteOption.cs
+index 356bada..4285c5a 100644
+--- a/GuZhenRenCode/RestSite/GuHeLianRestSiteOption.cs
++++ b/GuZhenRenCode/RestSite/GuHeLianRestSiteOption.cs
+@@ -420,10 +420,10 @@ public sealed class GuHeLianRestSiteOption
+             return false;
+         }
+ 
+-        // 杀招、虚影与专属合练结果不能再次作为源材料。
++        // 杀招与虚影不能作为源材料。专属合练结果不再一刀切排除：
++        // 只要其具体类型确实出现在配方中，就允许继续参与高阶合练。
+         if (card is AbstractShaZhaoCard ||
+-            card is AbstractXuYingCard ||
+-            card is AbstractHeLianGuCard)
++            card is AbstractXuYingCard)
+         {
+             return false;
+         }
+diff --git a/GuZhenRen_Card_Catalog.md b/GuZhenRen_Card_Catalog.md
+index 22b1337..1968b95 100644
+--- a/GuZhenRen_Card_Catalog.md
++++ b/GuZhenRen_Card_Catalog.md
+@@ -28,7 +28,7 @@
+ 
+ ## 2. 卡牌总览
+ 
+-当前源码共实现 **14张具体卡牌**，归入“起始牌、普通蛊、合练蛊、衍生牌、仙元牌”五类。血气蛊进入普通蛊卡池；血月蛊通过合练获得。
++当前源码共实现 **14张可游玩卡牌**，归入“起始牌、普通蛊、合练蛊、衍生牌、仙元牌”五类；另有3张仅供目标/资源选择界面使用的隐藏代理牌，不会进入奖励、商店或牌组。血气蛊进入普通蛊卡池；血月蛊通过合练获得。
+ 
+ | 分类 | 卡牌种类数 | 包含内容 |
+ |---|---:|---|
+@@ -102,7 +102,7 @@
+ | 稀有度 | 基础 |
+ | 费用 | 1能量 |
+ | 目标 | 自身 |
+-| 基础效果 | 从蛊存放牌堆中选择一张当前可以催动的蛊虫牌并自动打出。攻击型蛊虫默认以第一个有效敌人为目标。 |
++| 基础效果 | 从蛊存放牌堆中选择一张当前可以催动的蛊虫牌并自动打出。攻击型蛊虫由玩家从有效敌人中选择目标。 |
+ | 普通升级 | 获得“虚无”。若本回合结束时仍在手中，将其消耗。 |
+ | 升转效果 | 无。 |
+ | 起始牌组数量 | 4张 |
+@@ -131,7 +131,7 @@
+ 
+ ##### 耀化
+ 
+-当前实现中，拥有对应耀化效果的牌在光辉达到要求时会 **自动消耗光辉并强化效果**，而不是弹出选择让玩家决定是否支付。
++当前实现中，拥有对应耀化效果的牌在光辉达到要求时会弹出选择，由玩家决定是否支付光辉；Replay 不会重复支付。
+ 
+ ##### 照破
+ 
+@@ -243,7 +243,7 @@
+ | 合练配方 | 月光蛊×1＋小光蛊×2 |
+ | 合练转数 | 合练结果继承材料中的最高转数 |
+ | 基础催动次数 | 每场战斗1次 |
+-| 普通升级 | 每场战斗可催动次数由1次提高至3次 |
++| 普通升级 | 每场战斗可催动次数由1次提高至2次 |
+ | 基础机制 | 每段造成3点伤害。若至少有2点光辉，则消耗2点光辉，使每段伤害增加2点；所有攻击结束后施加1层照破。 |
+ | 一至五转限制 | 敌人已有照破时，只有第一段攻击可以触发照破。 |
+ | 六转机制 | 敌人已有照破时，每段攻击均可触发照破。 |
+@@ -325,7 +325,7 @@
+ | 本命蛊 | 已有抽象框架，未发现具体卡牌实现 |
+ | 杀招 | 已有合成与推演框架，未发现具体卡牌实现 |
+ | 虚影 | 已有抽象框架，未发现具体卡牌实现 |
+-| 其他合练蛊 | 当前仅实现月芒蛊 |
++| 其他合练蛊 | 当前实现月芒蛊与血月蛊 |
+ 
+ 
+ ## 7. 血道
+@@ -378,3 +378,15 @@
+ | 五转 | 3 | 4 | 0 | 0 |
+ | 六转 | 3 | 2 | 0 | 1 |
+ | 七转 | 4 | 2 | 1 | 2 |
++
++
++## 修复版规则补充（0.3.2）
++
++- 蛊虫永久牌组容量：10张。合练或转换会按替换后的实际数量检查容量。
++- 恢复：每张蛊虫在耗尽回合记录独立时间戳，于 `耗尽回合 + 2` 的回合开始恢复。
++- Replay：不额外扣催动次数、元气、仙元；月光蛊/月芒蛊的光辉选择与血月蛊的血元/血印只在首段结算。
++- 玄玉掌：六转仅提升伤害与格挡；七转降费1；八转Replay 1；九转总降费2且Replay 2。
++- 血气蛊：各转失血量与次回合回复量相等，不产生净治疗。
++- 小光蛊：六转以上只增加固定照破层数，不再翻倍。
++- 月芒蛊普通升级：最大催动次数1→2。
++- 仙道最大生命：六/七/八/九转分别+2/+2/+3/+3，总计+10。
+diff --git a/PATCH_NOTES_0.3.2.md b/PATCH_NOTES_0.3.2.md
+new file mode 100644
+index 0000000..09ef0ef
+--- /dev/null
++++ b/PATCH_NOTES_0.3.2.md
+@@ -0,0 +1,76 @@
++# GuZhenRen 0.3.2 修复说明
++
++本补丁基于上传的源码包制作，面向游戏 API 0.110.x 与 RitsuLib 0.5.4。
++
++## 严重问题
++
++1. **血月蛊配方不可完成**
++   - 合练材料不再一刀切排除所有合练结果牌。
++   - 月芒蛊只要被配方注册为材料，即可与血气蛊合练为血月蛊。
++
++2. **五转玉皮蛊生成六转玄玉掌时同时降费和 Replay**
++   - 六转玄玉掌只获得数值成长。
++   - 七转开始降 1 费，八转获得 Replay 1，九转总计降 2 费并 Replay 2。
++
++3. **血气蛊三至五转可重复净治疗**
++   - 失去生命与下回合治疗量统一为同一数值：2/3/4。
++   - 保留延迟治疗玩法，但不再产生净生命收益。
++
++4. **六转小光蛊无限翻倍照破**
++   - 六转以上改为追加固定层数，不再按已有层数翻倍。
++
++## 高优先级规则
++
++5. **Replay 支付规则统一**
++   - 每次出牌序列只扣一次元气、仙元和催动次数。
++   - 光辉与血元等卡内资源只在首段决定或支付；Replay 沿用首段结果。
++
++6. **蛊虫恢复改为逐牌两回合冷却**
++   - 每张牌在耗尽时记录 `当前回合 + 2`，到期后单独恢复。
++   - 不再按固定奇数回合统一刷新。
++
++7. **催动升级移除虚无**
++   - 升级改为费用 -1，不再永久减少后续检索次数。
++
++8. **月芒蛊升级次数修正**
++   - 最大催动次数由 1 提升到 2，而不是 3。
++
++9. **七至九转成长补齐**
++   - 月光蛊、小光蛊、玉皮蛊、月芒蛊、玄玉掌在仙蛊阶段继续获得数值或功能成长。
++
++## 中优先级规则
++
++10. **光辉支付改为玩家选择**
++    - 光辉足够时弹出“消耗 / 保留”选择。
++    - Replay 不重复弹窗或支付。
++
++11. **蛊虫永久牌组容量**
++    - 上限为 10 张。
++    - 奖励、商店、合练和转换均执行容量检查；等量替换按实际净变化计算。
++
++12. **催动攻击蛊目标选择**
++    - 多目标战斗中由玩家选择敌人，不再自动锁定第一个敌人。
++
++13. **仙道最大生命成长下调**
++    - 六至九转分别 +2、+2、+3、+3，总计 +10。
++    - 已在旧存档中获得的历史最大生命不会被追溯扣除。
++
++14. **文档同步**
++    - README 和卡牌目录加入血气蛊、血月蛊及上述规则。
++
++## 额外稳定性修复
++
++- 卡牌奖励候选现在会合并独立的蛊虫卡池。
++- 所有候选均被过滤时，会在打开界面前移除空卡牌奖励，避免 `ArgumentOutOfRangeException`。
++
++## 验证范围
++
++已完成：
++
++- 21 个 JSON 文件解析验证；
++- 91 个 C# 文件的括号、字符串和注释词法完整性检查；
++- 中英文卡牌本地化键一致性检查；
++- 新增隐藏选择卡的本地化键检查；
++- 关键修复入口与旧文档残留检查。
++
++当前执行环境没有 .NET 9 SDK、Godot 4.5.1 或游戏运行时，因此未在此环境完成 DLL/PCK 编译与进游戏回归测试。
+diff --git a/README.md b/README.md
+index 11809b0..dfeac2b 100644
+--- a/README.md
++++ b/README.md
+@@ -8,7 +8,7 @@
+ | --- | --- |
+ | Mod 名称 | 蛊真人 |
+ | Mod ID | GuZhenRen |
+-| Mod 版本 | 0.3.1 |
++| Mod 版本 | 0.3.2 |
+ | 目标游戏版本 | 0.110.0 |
+ | 运行库 | STS2-RitsuLib 0.5.4 或兼容版本 |
+ | 构建环境 | Godot 4.5.1 .NET / .NET 9 |
+@@ -46,15 +46,17 @@
+ 
+ 这使角色更像拥有一个可以主动检索的“蛊虫技能栏”，而不是完全依靠抽牌决定本回合能否使用关键能力。
+ 
++为了让“不进入抽牌循环”仍然保有构筑代价，蛊虫永久牌组容量为 **10 张**。奖励、商店、合炼与转换都会在加入新蛊虫前检查容量；等量替换不会额外占用容量。
++
+ ### 2. 蛊虫拥有使用次数与恢复周期
+ 
+ 蛊虫拥有独立的可催动次数。次数耗尽后不会进入普通弃牌堆，而是进入 **蛊恢复堆**。
+ 
+-当前实现中，蛊恢复发生在：
++当前实现中，每张蛊虫在耗尽时记录自己的恢复回合：
+ 
+-> **第 3、5、7……回合开始时。**
++> **耗尽回合 + 2。**
+ 
+-恢复时，蛊虫重新充满可催动次数并返回蛊存放牌堆。
++例如第2回合耗尽，会在第4回合开始时恢复；恢复后重新充满催动次数并返回蛊存放牌堆。
+ 
+ 因此蛊虫的循环更接近“带使用次数和冷却的技能”，而不是原版常规的“抽到 → 打出 → 弃置 → 洗牌”循环。
+ 
+@@ -98,12 +100,12 @@
+ 
+ 进入仙道后还会获得额外最大生命：
+ 
+-- 突破六转：+6 最大生命；
+-- 突破七转：+7 最大生命；
+-- 突破八转：+8 最大生命；
+-- 突破九转：+9 最大生命。
++- 突破六转：+2 最大生命；
++- 突破七转：+2 最大生命；
++- 突破八转：+3 最大生命；
++- 突破九转：+3 最大生命。
+ 
+-全部完成后共计增加 **30 点最大生命**。
++全部完成后共计增加 **10 点最大生命**。
+ 
+ 因此战斗胜利本身不再只是获得金币、卡牌或遗物的手段，同时也是角色长期修炼成长的一部分。
+ 
+@@ -158,6 +160,8 @@
+ 当前源码中已经完整落地的配方为：
+ 
+ > **月光蛊 + 小光蛊 + 小光蛊 → 月芒蛊**
++>
++> **月芒蛊 + 血气蛊 → 血月蛊**
+ 
+ 因此构筑时会出现原版较少见的取舍：某张低阶牌可能不只是当前战力，也可能是之后合炼高阶蛊虫的重要材料。
+ 
+@@ -183,7 +187,7 @@
+ 
+ #### 耀化
+ 
+-当前实现中，拥有对应耀化效果的牌在光辉达到要求时会 **自动消耗光辉并强化效果**，而不是弹出选择让玩家决定是否支付。
++当前实现中，耀化会弹出选择，由玩家决定是否支付光辉；同一次出牌序列的 Replay 沿用首段选择，不会重复支付。
+ 
+ #### 照破
+ 
+@@ -230,7 +234,7 @@
+ - 蛊虫牌拥有一至九转，并使用独立的蛊存放牌堆与蛊恢复堆，不参与普通抽牌/弃牌循环。
+ - 蛊虫通过“催动”等入口从蛊存放牌堆中主动选择并自动打出。
+ - 每张蛊虫牌拥有独立可催动次数；规则按一次出牌序列计数，不会因 Replay 重复结算而重复计数。
+-- 蛊牌剩余催动次数归零后进入蛊恢复堆，并在第 3、5、7……回合开始时统一恢复次数后返回蛊存放牌堆。
++- 蛊牌剩余催动次数归零后进入蛊恢复堆；每张牌从自身耗尽回合起独立冷却两回合。
+ - 蛊牌的奖励、商店、牌组唯一性和转换结果会统一检查，避免重复加入不允许的卡牌。
+ - 杀招牌与虚影牌只复用品阶和流派数据，不实现蛊虫接口；二者进入手牌并按普通手牌/弃牌堆规则流转，也不会成为仙蛊。
+ 
+@@ -259,7 +263,9 @@
+ 
+ - 升炼篝火可以选择符合条件的蛊虫牌，提高其转数；一次操作只执行一次，并支持多张牌选择。
+ - 合炼篝火根据代码中声明的配方消耗材料并生成结果牌，结果牌的转数由材料转数决定。
+-- 当前已经完整落地的合炼配方为：**月光蛊 + 小光蛊 + 小光蛊 → 月芒蛊**。
++- 当前已经完整落地的合炼配方：
++  - **月光蛊 + 小光蛊 + 小光蛊 → 月芒蛊**；
++  - **月芒蛊 + 血气蛊 → 血月蛊**。
+ - 战斗中右键蛊虫牌堆的杀招推演流程、材料选择、费用计算与失败处理框架已经存在。
+ - **当前源码包尚未提供可实际匹配成功的具体 `ShaZhaoRecipe` 杀招配方，因此杀招系统目前应视为机制框架，而不是完整可玩的成品流派。**
+ - 若后续加入杀招配方，成功生成的杀招会进入普通手牌/弃牌体系，不属于蛊虫，也不会进入仙蛊唯一判定。
+@@ -311,7 +317,7 @@
+ 
+ 耀化表示卡牌可以消耗光辉发动额外效果。
+ 
+-**当前版本的实际实现中，已落地的耀化效果会在光辉达到要求时自动支付并强化卡牌，并不会弹出“是否消耗光辉”的选择。** 后续若加入可选支付交互，应以届时源码行为为准。
++当光辉达到要求时，耀化牌会弹出“消耗光辉 / 保留光辉”的同步选择。选择保留时只结算基础效果；选择消耗时支付对应光辉并结算强化效果。Replay 会沿用首次选择，不会再次支付光辉。
+ 
+ ###### 照破
+ 
+@@ -385,7 +391,7 @@
+ 
+ 1. **战斗开始**：空窍系统按楼层标记开启新的战斗事务并重置仙元发放状态；重连或重复回调不会重复重置。
+ 2. **初始抽牌前**：六转至九转时，第一次初始抽牌前分别将对应的青提、红枣、白荔或黄杏仙元牌加入手牌；发放使用可重试事务，确保断线恢复不会重复发牌。
+-3. **回合开始**：第一回合保留 5 点初始元气；从第二回合开始回复 2 点元气，元气不会超过当前转数上限；同时重置折光的上一张牌类型和本回合获取计数。第 3、5、7……回合开始时，蛊恢复堆中的蛊虫统一恢复催动次数并返回蛊存放牌堆。
++3. **回合开始**：第一回合保留 5 点初始元气；从第二回合开始回复 2 点元气，元气不会超过当前转数上限；同时重置折光的上一张牌类型和本回合获取计数。达到各自的恢复回合时，蛊恢复堆中的蛊虫分别恢复催动次数并返回蛊存放牌堆。
+ 4. **尝试出牌**：系统先执行原版可出牌判定，再检查蛊虫牌剩余可催动次数和实际元气费用。超过牌面限制或元气不足时，蛊牌、自动打出和 Replay 链均会被阻止。
+ 5. **仙蛊支付**：六转及以上蛊虫在出牌序列第一段结算仙元。支付不足时出牌被拒绝；Replay 后续段不重复扣费。
+ 6. **效果结算**：卡牌效果、蛊牌堆自动打出、虚影触发、光辉/折光/照破和元气变化按游戏原有战斗队列执行；出牌完成后更新催动次数与蛊牌堆状态。
+@@ -398,7 +404,7 @@
+ 当前源码中已能确认的核心可玩内容包括：
+ 
+ - 基础牌：冲拳、防御、催动；
+-- 已实现蛊虫：小光蛊、月光蛊、玉皮蛊，以及可由合炼获得的月芒蛊；
++- 已实现蛊虫：小光蛊、月光蛊、玉皮蛊、血气蛊，以及可由合炼获得的月芒蛊、血月蛊；
+ - 生成牌：玄玉掌；
+ - 仙元牌：青提仙元、红枣仙元、白荔仙元、黄杏仙元；
+ - 核心系统：空窍修为、蛊虫转数、元气、仙元、光辉、折光、照破、升炼、合炼、仙蛊全队唯一。
+@@ -495,10 +501,23 @@ README/本地化或设计代码中还可以看到痕石蛊、白豕蛊、月霓
+ - 杀招推演框架已经存在，但当前没有可实际匹配成功的具体 `ShaZhaoRecipe` 杀招配方。
+ - 力道、兽力虚影、搏命以及部分 README/本地化中出现的蛊虫仍属于规划或未完整落地内容。
+ - 药水池已注册，但当前没有专属药水内容。
+-- 当前已落地的耀化效果为满足条件后自动支付光辉；README 不应将其理解为已经实现的可选支付交互。
++- 当前耀化效果由玩家选择是否支付光辉；Replay 不重复支付。
+ - 部分美术资源仍是占位或需要在实际游戏中确认显示效果。
+ - 项目能通过本地构建和 PCK 导出，但完整流程仍需在真实游戏环境中验证。
+ 
+ ## 免责声明
+ 
+ 本项目是非官方同人 Mod，与 Mega Crit 及相关作品权利方不存在隶属或授权关系。相关游戏、角色、名称和素材的权利归各自权利方所有。
++
++
++## 0.3.2 平衡与稳定性修复
++
++- 奖励候选正式合并独立蛊虫卡池；候选为空时移除空卡牌奖励，避免奖励界面越界。
++- 血月蛊配方允许月芒蛊作为明确登记的合练材料。
++- 五转玉皮蛊生成的六转玄玉掌不再同时获得降费和 Replay；玄玉掌高阶能力改为七至九转逐级开放。
++- 血气蛊失血与次回合回复始终相等，不能通过拖延战斗净治疗。
++- 六转小光蛊由照破翻倍改为固定增量。
++- 元气、仙元、光辉和血元按一次出牌序列结算；Replay 不重复付款。
++- 蛊虫恢复改为逐牌两回合冷却；催动升级改为 0 费；月芒蛊升级次数改为 2。
++- 光辉支付改为玩家选择，攻击型蛊虫催动时由玩家选择敌人。
++- 永久牌组最多容纳 10 张蛊虫；仙道最大生命总奖励从 30 调整为 10。
+diff --git a/STATIC_VALIDATION.txt b/STATIC_VALIDATION.txt
+new file mode 100644
+index 0000000..c48e230
+--- /dev/null
++++ b/STATIC_VALIDATION.txt
+@@ -0,0 +1,18 @@
++GuZhenRen 0.3.2 static validation
++=================================
++JSON files parsed: 21
++C# files lexically checked: 91
++English/Chinese cards localization key parity: PASS
++Hidden selection-card localization: PASS
++Reward Gu-pool merge: PASS
++Empty card-reward guard: PASS
++Per-card recovery timestamp: PASS
++Single-payment Replay path: PASS
++Gu worm deck capacity: PASS
++Player enemy-target selection: PASS
++Optional Brilliance payment: PASS
++Stale documentation pattern scan: PASS
++
++Result: STATIC VALIDATION PASSED
++
++Not executed here: dotnet build, Godot PCK export, in-game runtime tests.

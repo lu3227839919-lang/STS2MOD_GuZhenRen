@@ -76,10 +76,11 @@ public sealed class XiaoGuangGu : AbstractGuWormCard
             target.GetPower<ZhaoPoPower>() is
                 { Amount: > 0 } zhaoPo)
         {
+            // 仙蛊只提供固定增量，避免每次催动把照破指数翻倍。
             await PowerCmd.ModifyAmount(
                 choiceContext,
                 zhaoPo,
-                zhaoPo.Amount,
+                GuRank - 5,
                 Owner.Creature,
                 this
             );
@@ -94,10 +95,9 @@ public sealed class XiaoGuangGu : AbstractGuWormCard
 
     private void RefreshRankValues()
     {
-        int amount = 1 + Math.Max(
-            0,
-            (Math.Min(GuRank, 5) - 1) / 2
-        );
+        int amount = GuRank >= 6
+            ? GuRank - 2
+            : 1 + Math.Max(0, (GuRank - 1) / 2);
         DynamicVars.Weak.BaseValue = amount;
         DynamicVars.Vulnerable.BaseValue = amount;
     }
