@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cj5khk8fyda16"
-path="res://.godot/imported/ZhaoPoPower.png-5ddd8c12a07ffce8c5c80f79edc3d53e.ctex"
+uid="uid://du2s5f524sjkr"
+path="res://.godot/imported/ZhaoPoPower-256x256.png-41dce3df47f03b8ed8def2c153ab12fc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GuZhenRen/images/power/ZhaoPoPower.png"
-dest_files=["res://.godot/imported/ZhaoPoPower.png-5ddd8c12a07ffce8c5c80f79edc3d53e.ctex"]
+source_file="res://GuZhenRen/images/power/ZhaoPoPower-256x256.png"
+dest_files=["res://.godot/imported/ZhaoPoPower-256x256.png-41dce3df47f03b8ed8def2c153ab12fc.ctex"]
 
 [params]
 

@@ -28,6 +28,9 @@ public sealed class ZheGuangPower : ModPowerTemplate
 
     public override PowerStackType StackType => PowerStackType.Single;
 
+    // 内部光道状态：保留战斗钩子，但不产生任何 Power 展示。
+    protected override bool IsVisibleInternal => false;
+
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new DynamicVar(PreviousTypeKey, (int)CardType.None),

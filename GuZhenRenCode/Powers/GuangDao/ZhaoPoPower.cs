@@ -24,6 +24,11 @@ public sealed class ZhaoPoPower : ModPowerTemplate
 
     public override PowerStackType StackType => PowerStackType.Counter;
 
+    public override PowerAssetProfile AssetProfile => new(
+        IconPath: "res://GuZhenRen//images//power//ZhaoPoPower-64x64.png",
+        BigIconPath: "res://GuZhenRen/images/power/ZhaoPoPower-256x256.png"
+    );
+
     public override decimal ModifyDamageAdditive(
         Creature? target,
         decimal amount,

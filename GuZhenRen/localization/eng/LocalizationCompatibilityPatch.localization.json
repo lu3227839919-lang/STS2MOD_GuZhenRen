@@ -115,16 +115,6 @@
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_ZHE_GUANG_POWER.title",
-      "text": "Refraction"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_ZHE_GUANG_POWER.description",
-      "text": "When a card you play has a different type from the previous card, gain 1 Brilliance if the current card is a Light Path card. The previous card may be from any path. Gain at most 3 Brilliance from Refraction each turn."
-    },
-    {
-      "table": "powers",
       "key": "GU_ZHEN_REN_POWER_ZHAO_PO_POWER.title",
       "text": "Illumination Break"
     },

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b11ctne6cnqrl"
-path="res://.godot/imported/LiShiPower.png-fae2bf57ca9b5053909c867780e8d52c.ctex"
+uid="uid://cejd4a37sph3j"
+path="res://.godot/imported/ZhaoPoPower-64x64.png-31a15b8113b4944c605c54b15146f3d3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GuZhenRen/images/power/LiShiPower.png"
-dest_files=["res://.godot/imported/LiShiPower.png-fae2bf57ca9b5053909c867780e8d52c.ctex"]
+source_file="res://GuZhenRen/images/power/ZhaoPoPower-64x64.png"
+dest_files=["res://.godot/imported/ZhaoPoPower-64x64.png-31a15b8113b4944c605c54b15146f3d3.ctex"]
 
 [params]
 

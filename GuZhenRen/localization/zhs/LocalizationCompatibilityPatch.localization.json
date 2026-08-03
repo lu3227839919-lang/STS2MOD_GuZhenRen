@@ -115,16 +115,6 @@
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_ZHE_GUANG_POWER.title",
-      "text": "折光"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_ZHE_GUANG_POWER.description",
-      "text": "本回合打出的牌与上一张牌类型不同时，若当前牌是光道牌，获得1点光辉。上一张牌可来自任意流派；每回合最多通过折光获得3点光辉。"
-    },
-    {
-      "table": "powers",
       "key": "GU_ZHEN_REN_POWER_ZHAO_PO_POWER.title",
       "text": "照破"
     },

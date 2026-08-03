@@ -19,6 +19,11 @@ public sealed class GuangHuiPower : ModPowerTemplate
 
     public override PowerStackType StackType => PowerStackType.Counter;
 
+    public override PowerAssetProfile AssetProfile => new(
+        IconPath: "res://GuZhenRen//images//power//GuangHuiPower-64x64.png",
+        BigIconPath: "res://GuZhenRen/images/power/GuangHuiPower-256x256.png"
+    );
+    
     /// <summary>
     /// 已存在的光辉在收到后续正向叠加时再次执行硬上限检查。
     /// 初次施加的上限由空窍遗物和 GuangDaoPowerSystem 双重保证。

@@ -47,7 +47,6 @@ public partial class Entry
         new(nameof(StartingDeckGuRankPatch), StartingDeckGuRankPatch.Initialize, StartingDeckGuRankPatch.Uninitialize),
         new(nameof(NCardGuEnergyIconPatch), NCardGuEnergyIconPatch.Initialize, NCardGuEnergyIconPatch.Uninitialize),
         new(nameof(NCardXuYingEnergyIconPatch), NCardXuYingEnergyIconPatch.Initialize, NCardXuYingEnergyIconPatch.Uninitialize),
-        new(nameof(ZheGuangPowerVisibilityPatch), ZheGuangPowerVisibilityPatch.Initialize, ZheGuangPowerVisibilityPatch.Uninitialize),
         new(nameof(XuYingHiddenBehaviorPatch), XuYingHiddenBehaviorPatch.Initialize, XuYingHiddenBehaviorPatch.Uninitialize),
         new(nameof(GuRankRewardPatch), GuRankRewardPatch.Initialize, GuRankRewardPatch.Uninitialize),
         new(nameof(CardUniquenessPatch), CardUniquenessPatch.Initialize, CardUniquenessPatch.Uninitialize),
