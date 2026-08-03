@@ -1,9 +1,7 @@
-using GuZhenRen.Aperture;
 using GuZhenRen.Cards.ImmortalEssence;
 
 using MegaCrit.Sts2.Core.Models;
 
-using STS2RitsuLib.Cards.FreePlay;
 using STS2RitsuLib.Combat.SecondaryResources;
 using STS2RitsuLib.Utils;
 
@@ -21,32 +19,12 @@ public static class GuCardUsageRules
             () => 0
         );
 
-    public static int CountSpentActivations(CardModel card)
-    {
-        ArgumentNullException.ThrowIfNull(card);
-
-        if (card is not IGuWormCard guCard)
-        {
-            return 0;
-        }
-
-        return Math.Clamp(
-            SpentActivationsState[card],
-            0,
-            Math.Max(0, guCard.MaxUses)
-        );
-    }
-
     public static int GetRemainingUses(CardModel card)
     {
         ArgumentNullException.ThrowIfNull(card);
 
         return card is IGuWormCard guCard
-            ? Math.Max(
-                0,
-                guCard.MaxUses -
-                CountSpentActivations(card)
-            )
+            ? GetRemainingUses(card, guCard)
             : int.MaxValue;
     }
 
@@ -60,15 +38,18 @@ public static class GuCardUsageRules
         }
 
         SpentActivationsState[card] = Math.Min(
-            Math.Max(0, guCard.MaxUses),
-            CountSpentActivations(card) + 1
+            GetMaximumUses(guCard),
+            CountSpentActivations(card, guCard) + 1
         );
     }
 
     public static void ResetUses(CardModel card)
     {
         ArgumentNullException.ThrowIfNull(card);
-        SpentActivationsState[card] = 0;
+        if (card is IGuWormCard)
+        {
+            SpentActivationsState[card] = 0;
+        }
     }
 
     public static bool CanUse(CardModel card)
@@ -80,35 +61,21 @@ public static class GuCardUsageRules
             return true;
         }
 
-        return guCard.MaxUses > 0 &&
-               GetRemainingUses(card) > 0;
+        return GetRemainingUses(card, guCard) > 0;
     }
 
     /// <summary>
-    /// 判断下一次催动是否应免除基础费用。自动打出本身不在这里视为
-    /// 免费，因为催动牌只是承载蛊虫结算，元气仍应正常支付。
+    /// 创建蛊虫本次催动的次级资源支付计划。催动始终支付实际费用；
+    /// 提交后的计划会绑定到 AutoPlay 生成的 CardPlay。
     /// </summary>
-    public static bool IsActivationFree(CardModel card)
-    {
-        ArgumentNullException.ThrowIfNull(card);
-
-        return card is IGuWormCard &&
-            (ApertureSystem.IsNextGuActivationFree(card) ||
-             FreePlayBindingRegistry.IsCardFreeForUpcomingPlay(card));
-    }
-
-    /// <summary>
-    /// 创建蛊虫本次催动的次级资源支付计划。该计划随后会绑定到
-    /// AutoPlay 生成的 CardPlay，避免自动打出把固定元气费用误判为免费。
-    /// </summary>
-    public static SecondaryResourcePaymentPlan
+    internal static SecondaryResourcePaymentPlan
         CreateActivationPaymentPlan(CardModel card)
     {
         ArgumentNullException.ThrowIfNull(card);
 
         return SecondaryResourcePaymentResolver.Plan(
             card,
-            isFree: IsActivationFree(card),
+            isFree: false,
             source: card
         );
     }
@@ -137,14 +104,40 @@ public static class GuCardUsageRules
             return false;
         }
 
-        if (plan.HasLines)
-        {
-            await SecondaryResourcePaymentResolver.Commit(
-                plan,
-                source: card
-            );
-        }
+        await SecondaryResourcePaymentResolver.Commit(
+            plan,
+            source: card
+        );
 
         return true;
+    }
+
+    private static int CountSpentActivations(
+        CardModel card,
+        IGuWormCard guCard
+    )
+    {
+        return Math.Clamp(
+            SpentActivationsState[card],
+            0,
+            GetMaximumUses(guCard)
+        );
+    }
+
+    private static int GetRemainingUses(
+        CardModel card,
+        IGuWormCard guCard
+    )
+    {
+        return Math.Max(
+            0,
+            GetMaximumUses(guCard) -
+            CountSpentActivations(card, guCard)
+        );
+    }
+
+    private static int GetMaximumUses(IGuWormCard guCard)
+    {
+        return Math.Max(0, guCard.MaxUses);
     }
 }

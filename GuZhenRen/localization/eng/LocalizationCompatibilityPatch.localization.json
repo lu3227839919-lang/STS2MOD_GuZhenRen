@@ -71,7 +71,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.title",
-      "text": "Gu Village Pile"
+      "text": "Gu Storage Pile"
     },
     {
       "table": "static_hover_tips",
@@ -81,7 +81,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.empty",
-      "text": "There are no Gu Worms available in the Gu Village Pile."
+      "text": "There are no Gu Worms available in the Gu Storage Pile."
     },
     {
       "table": "static_hover_tips",
@@ -96,7 +96,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.description",
-      "text": "Stores Gu Worms with no activations remaining. Every two turns, Gu Worms here refill their activations and return to the Gu Village Pile."
+      "text": "Stores Gu Worms with no activations remaining. Every two turns, Gu Worms here refill their activations and return to the Gu Storage Pile."
     },
     {
       "table": "static_hover_tips",

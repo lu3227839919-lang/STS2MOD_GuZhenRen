@@ -24,11 +24,10 @@ namespace GuZhenRen.Cards;
 /// 4. 焚烧值；
 /// 5. 念值；
 /// 6. 仙蛊判定；
-/// 7. 空窍免费条件；
-/// 8. 自定义存档和复制所需的状态。
+/// 7. 自定义存档和复制所需的状态。
 ///
 /// 当前类刻意没有直接猜测尖塔2尚未确认的生命周期接口。
-/// 因此，战斗能力重算、正式存档、奖励过滤、免费使用等功能，
+/// 因此，战斗能力重算、正式存档、奖励过滤等功能，
 /// 目前通过独立方法和虚钩子提供接入点。
 /// </summary>
 public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider

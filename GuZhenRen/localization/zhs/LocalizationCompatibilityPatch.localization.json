@@ -71,17 +71,17 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.title",
-      "text": "蛊村牌堆"
+      "text": "蛊存放牌堆"
     },
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "存放尚有可催动次数的蛊虫牌。剩余次数跨回合保留；耗尽后进入蛊恢复堆，每两回合恢复并返回。左键查看；右键花费1点能量开始杀招推演。成功时再支付材料有效元气消耗平均值的2倍（向上取整）；组成杀招的蛊虫材料直接消耗，不进入蛊村牌堆或蛊恢复堆，杀招加入手牌且不属于蛊虫。"
+      "text": "存放尚有可催动次数的蛊虫牌。剩余次数跨回合保留；耗尽后进入蛊恢复堆，每两回合恢复并返回。左键查看；右键花费1点能量开始杀招推演。成功时再支付材料有效元气消耗平均值的2倍（向上取整）；组成杀招的蛊虫材料直接消耗，不进入蛊存放牌堆或蛊恢复堆，杀招加入手牌且不属于蛊虫。"
     },
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.empty",
-      "text": "蛊村牌堆中没有可催动的蛊虫。"
+      "text": "蛊存放牌堆中没有可催动的蛊虫。"
     },
     {
       "table": "static_hover_tips",
@@ -96,7 +96,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.description",
-      "text": "存放可催动次数已耗尽的蛊虫。每两回合，堆内蛊虫重新充满催动次数并返回蛊村牌堆。"
+      "text": "存放可催动次数已耗尽的蛊虫。每两回合，堆内蛊虫重新充满催动次数并返回蛊存放牌堆。"
     },
     {
       "table": "static_hover_tips",

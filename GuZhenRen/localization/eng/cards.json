@@ -4,7 +4,7 @@
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.title": "Defend",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.description": "Gain {Block:diff()} Block.",
   "GU_ZHEN_REN_CARD_CHUI_DONG.title": "Activate",
-  "GU_ZHEN_REN_CARD_CHUI_DONG.description": "Choose and play a Gu card from the Gu Village pile.",
+  "GU_ZHEN_REN_CARD_CHUI_DONG.description": "Choose and play a Gu card from the Gu Storage Pile.",
   "GU_ZHEN_REN_CARD_CHUI_DONG.selectionScreenPrompt": "Choose a Gu card to activate.",
   "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.title": "Green Grape Immortal Essence",
   "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description": "Retain as immortal essence. Provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",

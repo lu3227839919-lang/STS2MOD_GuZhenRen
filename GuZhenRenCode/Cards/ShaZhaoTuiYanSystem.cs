@@ -504,7 +504,6 @@ internal static class ShaZhaoTuiYanSystem
     private static bool IsEligibleMaterial(CardModel card)
     {
         return card is IGuWormCard &&
-            card is IGuRankProvider &&
             card.Pile?.Type == GuCardPileSystem.PileType &&
             GuCardUsageRules.CanUse(card) &&
             !card.Keywords.Contains(CardKeyword.Unplayable);

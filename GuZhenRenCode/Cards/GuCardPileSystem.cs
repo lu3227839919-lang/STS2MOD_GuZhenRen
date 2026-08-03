@@ -9,7 +9,7 @@ using STS2RitsuLib.CardPiles;
 namespace GuZhenRen.Cards;
 
 /// <summary>
-/// 蛊虫专用战斗牌堆。蛊虫只会存在于蛊村牌堆或蛊恢复堆，
+/// 蛊虫专用战斗牌堆。蛊虫只会存在于蛊存放牌堆或蛊恢复堆，
 /// 不会进入普通手牌。
 /// </summary>
 public static class GuCardPileSystem
@@ -266,7 +266,7 @@ public static class GuCardPileSystem
     }
 
     /// <summary>
-    /// 每经过两个完整回合，把恢复堆内的蛊虫重新充满并送回蛊村。
+    /// 每经过两个完整回合，把恢复堆内的蛊虫重新充满并送回蛊存放牌堆。
     /// 第一批恢复发生在第 3 回合开始时。
     /// </summary>
     public static async Task RestoreRecoveredGuCardsAsync(

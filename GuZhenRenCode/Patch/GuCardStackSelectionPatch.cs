@@ -343,7 +343,9 @@ internal static class GuCardStackSelectionPatch
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
             MouseFilter = Control.MouseFilterEnum.Ignore,
-            ZIndex = 100,
+            // Stay in the holder's normal canvas layer so cards brought to
+            // the front also cover badges belonging to cards behind them.
+            ZIndex = 0,
         };
 
         badge.AddThemeStyleboxOverride("normal", background);

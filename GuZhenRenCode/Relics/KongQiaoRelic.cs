@@ -200,8 +200,6 @@ public sealed class KongQiaoRelic
         CardPlay cardPlay
     )
     {
-        ApertureSystem.HandleCardPlayed(Owner, cardPlay);
-
         if (ReferenceEquals(cardPlay.Card.Owner, Owner) &&
             cardPlay.Card is IGuWormCard)
         {
@@ -344,20 +342,12 @@ public sealed class KongQiaoRelic
             : Task.CompletedTask;
     }
 
-    internal void RefreshApertureVisualState(
-        ApertureRunData data,
-        bool inCombat,
-        bool effectUsedThisCombat
-    )
+    internal void RefreshApertureVisualState(ApertureRunData data)
     {
         ArgumentNullException.ThrowIfNull(data);
         AssertMutable();
 
-        Status = inCombat &&
-                 data.Rank is > 1 and <= 5 &&
-                 !effectUsedThisCombat
-            ? RelicStatus.Active
-            : RelicStatus.Normal;
+        Status = RelicStatus.Normal;
 
         if (_lastVisualRank != data.Rank)
         {

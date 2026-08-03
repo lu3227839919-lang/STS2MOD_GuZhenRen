@@ -1,4 +1,5 @@
 using GuZhenRen.Cards.HeLian;
+using GuZhenRen.Characters;
 
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -99,15 +100,27 @@ public static class GuZhenRenCardRules
     }
 
     /// <summary>
-    /// 判断卡牌能否进入普通卡牌奖励。
+    /// 判断卡牌能否进入指定玩家的普通卡牌奖励。
+    ///
+    /// 蛊真人的所有卡牌奖励只允许真正实现 IGuWormCard 的蛊虫牌。
+    /// 该限制不影响其他角色的奖励，也不改变商店、合练、杀招推演、
+    /// 战斗生成或其他直接获得卡牌的流程。
     /// </summary>
     public static bool CanAppearInCardReward(
+        Player receivingPlayer,
         CardModel candidate
     )
     {
+        ArgumentNullException.ThrowIfNull(receivingPlayer);
         ArgumentNullException.ThrowIfNull(candidate);
 
         if (candidate is ICardRewardExcluded)
+        {
+            return false;
+        }
+
+        if (receivingPlayer.Character is GuZhenRenCharacter &&
+            candidate is not IGuWormCard)
         {
             return false;
         }

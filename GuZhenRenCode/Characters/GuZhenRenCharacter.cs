@@ -8,7 +8,7 @@ using STS2RitsuLib.Scaffolding.Godot;
 namespace GuZhenRen.Characters;
 
 [RegisterCharacter]
-public sealed class GuZhenRenCharacter : ModCharacterTemplate<GuZhenRenCardPool, GuZhenRenRelicPool, GuZhenRenPotionPool>
+public sealed class GuZhenRenCharacter : ModCharacterTemplate<GuZhenRenGuCardPool, GuZhenRenRelicPool, GuZhenRenPotionPool>
 {
     public static readonly Color ThemeColor = new(0.42f, 0.65f, 0.72f);
 

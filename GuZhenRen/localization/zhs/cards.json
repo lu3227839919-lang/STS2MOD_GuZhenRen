@@ -4,7 +4,7 @@
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.title": "防御",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.description": "获得 {Block:diff()} 点格挡。",
   "GU_ZHEN_REN_CARD_CHUI_DONG.title": "催动",
-  "GU_ZHEN_REN_CARD_CHUI_DONG.description": "从蛊村牌堆中选择并打出一张蛊虫牌。",
+  "GU_ZHEN_REN_CARD_CHUI_DONG.description": "从蛊存放牌堆中选择并打出一张蛊虫牌。",
   "GU_ZHEN_REN_CARD_CHUI_DONG.selectionScreenPrompt": "选择要催动的蛊虫牌。",
   "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.title": "青提仙元",
   "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description": "作为仙元保留在手中。可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",

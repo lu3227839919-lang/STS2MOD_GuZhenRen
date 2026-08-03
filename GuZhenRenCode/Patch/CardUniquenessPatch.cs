@@ -275,7 +275,10 @@ internal static class CardUniquenessPatch
     )
     {
         __result = __result.Where(card =>
-            GuZhenRenCardRules.CanAppearInCardReward(card) &&
+            GuZhenRenCardRules.CanAppearInCardReward(
+                player,
+                card
+            ) &&
             GuZhenRenCardRules.CanOfferToPlayer(
                 player.RunState,
                 player,
@@ -293,6 +296,7 @@ internal static class CardUniquenessPatch
     {
         int removed = cardRewardOptions.RemoveAll(result =>
             !GuZhenRenCardRules.CanAppearInCardReward(
+                player,
                 result.Card
             ) ||
             !GuZhenRenCardRules.CanOfferToPlayer(
@@ -317,8 +321,11 @@ internal static class CardUniquenessPatch
     {
         CardModel[] possibleCards = options
             .GetPossibleCards(player)
-            .Where(
-                GuZhenRenCardRules.CanAppearInCardReward
+            .Where(card =>
+                GuZhenRenCardRules.CanAppearInCardReward(
+                    player,
+                    card
+                )
             )
             .Where(card =>
                 options.RarityOdds != CardRarityOddsType.Uniform ||
@@ -334,7 +341,7 @@ internal static class CardUniquenessPatch
         if (possibleCards.Length == 0)
         {
             Entry.Logger.Info(
-                $"玩家 {player.NetId} 的卡牌奖励没有符合唯一规则的候选牌。"
+                $"玩家 {player.NetId} 的卡牌奖励没有符合奖励规则的候选牌。"
             );
             __result = Array.Empty<CardCreationResult>();
             return false;

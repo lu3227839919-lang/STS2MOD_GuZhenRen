@@ -12,7 +12,6 @@ using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Runs;
 
 using STS2RitsuLib;
-using STS2RitsuLib.Cards.FreePlay;
 using STS2RitsuLib.RunData;
 
 namespace GuZhenRen.Aperture;
@@ -24,9 +23,6 @@ namespace GuZhenRen.Aperture;
 public static class ApertureSystem
 {
     private const string SavedDataKey = "aperture";
-    private const string FreePlayBindingId =
-        Entry.ModId + ".ApertureFreePlay";
-
     private static readonly object SyncRoot = new();
     private static readonly ConcurrentDictionary<
         PlayerRunKey,
@@ -69,12 +65,6 @@ public static class ApertureSystem
                 }
             }
 
-            // 相同 binding ID 会替换旧检测器，初始化重试无需额外记账。
-            FreePlayBindingRegistry.Register(
-                FreePlayBindingId,
-                IsFreeByAperture
-            );
-
             _initialized = true;
             Entry.Logger.Info(
                 "空窍/仙窍运行时初始化完成（多人状态已接入运行快照）。"
@@ -110,7 +100,7 @@ public static class ApertureSystem
     }
 
     /// <summary>
-    /// 每场战斗开始时以一次原子修改重置免费次数和仙元事务。
+    /// 每场战斗开始时以一次原子修改重置仙元发放事务。
     /// </summary>
     internal static void HandleCombatStarting(Player player)
     {
@@ -131,20 +121,19 @@ public static class ApertureSystem
                 data.Normalize();
 
                 // BeforeCombatStart 可能在同一战斗的重连恢复中再次触发。
-                // 只有层数变化时才开始新的战斗事务，避免重置已经消费的效果。
+                // 只有层数变化时才开始新的战斗事务，避免重复发放仙元。
                 if (data.ActiveCombatFloor == currentFloor)
                 {
                     return;
                 }
 
                 data.ActiveCombatFloor = currentFloor;
-                data.EffectUsedThisCombat = false;
                 data.EssenceGrantState =
                     ApertureEssenceGrantState.NotStarted;
             }
         );
 
-        RefreshRelicVisualState(player, inCombatOverride: true);
+        RefreshRelicVisualState(player);
     }
 
     /// <summary>
@@ -356,62 +345,10 @@ public static class ApertureSystem
         // 即使这是重复胜利回调，也可能还有上次未完成的副作用需要恢复。
         await ResumePendingRankAdvanceAsync(player);
 
-        RefreshRelicVisualState(player, inCombatOverride: false);
+        RefreshRelicVisualState(player);
     }
 
-    internal static void HandleCardPlayed(
-        Player apertureOwner,
-        CardPlay cardPlay
-    )
-    {
-        ArgumentNullException.ThrowIfNull(apertureOwner);
-        ArgumentNullException.ThrowIfNull(cardPlay);
-        EnsureAvailable();
-
-        CardModel card = cardPlay.Card;
-        Player? player = card.Owner;
-
-        if (player == null ||
-            !ReferenceEquals(player, apertureOwner) ||
-            card is not IGuWormCard guCard ||
-            !HasAperture(player))
-        {
-            return;
-        }
-
-        bool consumed = false;
-
-        _savedData!.Modify(
-            player,
-            data =>
-            {
-                data.Normalize();
-                bool canConsume =
-                    !data.EffectUsedThisCombat &&
-                    data.Rank is > 1 and <= 5 &&
-                    guCard.GuRank >= 1 &&
-                    guCard.GuRank < data.Rank;
-
-                if (!canConsume)
-                {
-                    return;
-                }
-
-                data.EffectUsedThisCombat = true;
-                consumed = true;
-            }
-        );
-
-        if (consumed)
-        {
-            RefreshRelicVisualState(player, inCombatOverride: true);
-        }
-    }
-
-    internal static void RefreshRelicVisualState(
-        Player player,
-        bool? inCombatOverride = null
-    )
+    internal static void RefreshRelicVisualState(Player player)
     {
         KongQiaoRelic? relic = FindApertureRelic(player);
         if (relic == null || _savedData == null)
@@ -422,15 +359,7 @@ public static class ApertureSystem
         try
         {
             ApertureRunData data = GetState(player);
-            bool inCombat =
-                inCombatOverride ??
-                player.PlayerCombatState != null;
-
-            relic.RefreshApertureVisualState(
-                data,
-                inCombat,
-                data.EffectUsedThisCombat
-            );
+            relic.RefreshApertureVisualState(data);
         }
         catch (Exception exception)
         {
@@ -438,39 +367,6 @@ public static class ApertureSystem
                 $"刷新空窍遗物显示失败：{exception}"
             );
         }
-    }
-
-    internal static bool IsNextGuActivationFree(CardModel card)
-    {
-        ArgumentNullException.ThrowIfNull(card);
-
-        if (card.IsCanonical)
-        {
-            return false;
-        }
-
-        Player? player = card.Owner;
-
-        if (!_initialized ||
-            player == null ||
-            card is not IGuWormCard guCard ||
-            !HasAperture(player) ||
-            _savedData == null)
-        {
-            return false;
-        }
-
-        ApertureRunData data = GetState(player);
-
-        return !data.EffectUsedThisCombat &&
-               data.Rank is > 1 and <= 5 &&
-               guCard.GuRank >= 1 &&
-               guCard.GuRank < data.Rank;
-    }
-
-    private static bool IsFreeByAperture(CardPlay play)
-    {
-        return IsNextGuActivationFree(play.Card);
     }
 
     private static CardModel? CreateImmortalEssence(
@@ -773,9 +669,9 @@ public static class ApertureSystem
             );
         }
     }
+
     private readonly record struct PlayerRunKey(
         IRunState RunState,
         ulong PlayerNetId
     );
-
 }

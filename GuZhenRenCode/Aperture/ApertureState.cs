@@ -36,11 +36,6 @@ public sealed class ApertureRunData
     public int VictoryXpAppliedFloor { get; set; } = -1;
 
     /// <summary>
-    /// 当前战斗的低转蛊免费效果是否已经消耗。
-    /// </summary>
-    public bool EffectUsedThisCombat { get; set; }
-
-    /// <summary>
     /// 当前战斗仙元发放事务状态。
     /// </summary>
     public ApertureEssenceGrantState EssenceGrantState { get; set; }
