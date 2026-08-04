@@ -429,9 +429,7 @@ public sealed class GuHeLianRestSiteOption
         }
 
         return card.Pile?.Type == PileType.Deck &&
-            HeLianRecipeRegistry.IsRecipeMaterialType(
-                card.GetType()
-            );
+            HeLianRecipeRegistry.IsEligibleMaterialCard(card);
     }
 
     /// <summary>

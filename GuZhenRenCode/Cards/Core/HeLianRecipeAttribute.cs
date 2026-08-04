@@ -69,6 +69,11 @@ public sealed class HeLianRecipeAttribute : Attribute
     {
         get;
     }
+
+    /// <summary>
+    /// 参与该配方的每张材料蛊最低转数。默认一转。
+    /// </summary>
+    public int MinimumMaterialRank { get; set; } = 1;
 }
 
 /// <summary>

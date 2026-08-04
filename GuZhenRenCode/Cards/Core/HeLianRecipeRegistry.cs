@@ -18,7 +18,8 @@ public static class HeLianRecipeRegistry
 {
     private sealed record Recipe(
         Type ResultCardType,
-        IReadOnlyList<Type> MaterialCardTypes
+        IReadOnlyList<Type> MaterialCardTypes,
+        int MinimumMaterialRank
     );
 
     private static readonly Lazy<IReadOnlyList<Recipe>>
@@ -66,7 +67,11 @@ public static class HeLianRecipeRegistry
                 )
             );
 
-        if (recipe == null)
+        if (recipe == null ||
+            materials.Any(card =>
+                card is not IGuRankProvider provider ||
+                provider.GuRank < recipe.MinimumMaterialRank
+            ))
         {
             result = null;
             return false;
@@ -124,15 +129,14 @@ public static class HeLianRecipeRegistry
             availableMaterials
         );
 
-        Type[] availableTypes = availableMaterials
-            .Select(card => card.GetType())
-            .ToArray();
+        CardModel[] available = availableMaterials.ToArray();
 
         int[] craftableCounts = Recipes.Value
             .Where(recipe =>
                 ContainsRequiredMaterials(
-                    availableTypes,
-                    recipe.MaterialCardTypes
+                    available,
+                    recipe.MaterialCardTypes,
+                    recipe.MinimumMaterialRank
                 )
             )
             .Select(recipe =>
@@ -171,18 +175,30 @@ public static class HeLianRecipeRegistry
             );
         }
 
-        Type[] availableTypes = availableMaterials
-            .Select(card => card.GetType())
-            .ToArray();
+        CardModel[] available = availableMaterials.ToArray();
 
         return Recipes.Value.Any(recipe =>
-            recipe.MaterialCardTypes.Count ==
-                materialCount &&
+            recipe.MaterialCardTypes.Count == materialCount &&
             ContainsRequiredMaterials(
-                availableTypes,
-                recipe.MaterialCardTypes
+                available,
+                recipe.MaterialCardTypes,
+                recipe.MinimumMaterialRank
             )
         );
+    }
+
+    /// <summary>
+    /// 判断具体卡牌是否满足至少一条配方的材料类型与最低转数要求。
+    /// </summary>
+    public static bool IsEligibleMaterialCard(CardModel card)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+
+        return card is IGuRankProvider provider &&
+            Recipes.Value.Any(recipe =>
+                recipe.MaterialCardTypes.Contains(card.GetType()) &&
+                provider.GuRank >= recipe.MinimumMaterialRank
+            );
     }
 
     /// <summary>
@@ -302,10 +318,16 @@ public static class HeLianRecipeRegistry
                     );
                 }
 
+                int minimumMaterialRank = Math.Max(
+                    AbstractGuZhenRenCard.MinimumGuRank,
+                    attribute.MinimumMaterialRank
+                );
+
                 recipes.Add(
                     new Recipe(
                         resultType,
-                        Array.AsReadOnly(materials)
+                        Array.AsReadOnly(materials),
+                        minimumMaterialRank
                     )
                 );
             }
@@ -351,12 +373,21 @@ public static class HeLianRecipeRegistry
     }
 
     private static bool ContainsRequiredMaterials(
-        IReadOnlyList<Type> available,
-        IReadOnlyList<Type> required
+        IReadOnlyList<CardModel> available,
+        IReadOnlyList<Type> required,
+        int minimumMaterialRank
     )
     {
+        Type[] eligibleTypes = available
+            .Where(card =>
+                card is IGuRankProvider provider &&
+                provider.GuRank >= minimumMaterialRank
+            )
+            .Select(card => card.GetType())
+            .ToArray();
+
         Dictionary<Type, int> availableCounts =
-            CountTypes(available);
+            CountTypes(eligibleTypes);
 
         foreach (
             (Type type, int requiredCount)

@@ -1,5 +1,4 @@
 using GuZhenRen.Cards;
-using GuZhenRen.Cards.GuangDao;
 
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -15,11 +14,12 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace GuZhenRen.Powers.GuangDao;
 
 /// <summary>
-/// 聚光：下一张由持有者打出的光道攻击牌获得固定伤害加成，随后清空。
-/// 作为内部状态隐藏，具体数值通过微光、聚光和余辉牌展示。
+/// 定光：下一张由持有者打出的攻击牌，其第一段若命中带有照破的敌人，
+/// 获得固定伤害加成。无论是否满足条件，第一次攻击伤害结算后都会清空，
+/// 避免多段攻击把固定增益按段数放大。
 /// </summary>
 [RegisterPower]
-public sealed class JuGuangPower : ModPowerTemplate
+public sealed class DingGuangChargePower : ModPowerTemplate
 {
     public override PowerType Type => PowerType.Buff;
 
@@ -38,7 +38,8 @@ public sealed class JuGuangPower : ModPowerTemplate
     {
         return Amount > 0 &&
                ReferenceEquals(dealer, Owner) &&
-               CanEmpower(cardSource)
+               cardSource?.Type == CardType.Attack &&
+               target?.GetPower<ZhaoPoPower>() is { Amount: > 0 }
             ? Amount
             : 0;
     }
@@ -54,13 +55,11 @@ public sealed class JuGuangPower : ModPowerTemplate
     {
         if (Amount <= 0 ||
             !ReferenceEquals(dealer, Owner) ||
-            !CanEmpower(cardSource))
+            cardSource?.Type != CardType.Attack)
         {
             return;
         }
 
-        // 固定增伤只作用于下一张光道攻击牌的第一段伤害，
-        // 防止月芒等多段攻击按段数重复放大聚光收益。
         await PowerCmd.ModifyAmount(
             choiceContext,
             this,
@@ -69,10 +68,4 @@ public sealed class JuGuangPower : ModPowerTemplate
             cardSource
         );
     }
-    private static bool CanEmpower(CardModel? card)
-    {
-        return card?.Type == CardType.Attack &&
-               GuangDaoPowerSystem.IsGuangDaoCard(card);
-    }
-
 }

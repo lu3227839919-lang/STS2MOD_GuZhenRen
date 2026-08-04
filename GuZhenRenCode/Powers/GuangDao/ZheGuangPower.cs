@@ -38,6 +38,15 @@ public sealed class ZheGuangPower : ModPowerTemplate
         new DynamicVar(GainedThisTurnKey, 0),
     ];
 
+    public CardType PreviousCardType =>
+        (CardType)(int)DynamicVars[PreviousTypeKey].BaseValue;
+
+    public int GuangHuiGainedThisTurn =>
+        (int)DynamicVars[GainedThisTurnKey].BaseValue;
+
+    public bool PreviousCardWas(CardType type) =>
+        PreviousCardType == type;
+
     public override Task AfterEnergyReset(Player player)
     {
         if (ReferenceEquals(player, Owner.Player))

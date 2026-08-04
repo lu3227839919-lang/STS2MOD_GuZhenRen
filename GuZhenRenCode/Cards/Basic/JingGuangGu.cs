@@ -1,6 +1,5 @@
 using GuZhenRen.Characters;
 using GuZhenRen.Combat;
-using GuZhenRen.Cards.Interfaces;
 using GuZhenRen.Powers.GuangDao;
 
 using MegaCrit.Sts2.Core.Commands;
@@ -8,7 +7,6 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Nodes.CommonUi;
 using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib.Combat.SecondaryResources;
@@ -16,24 +14,22 @@ using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
 using STS2RitsuLib.Utils;
 
-namespace GuZhenRen.Cards.TuDao;
+namespace GuZhenRen.Cards.GuangDao;
 
 [RegisterCard(typeof(GuZhenRenGuCardPool))]
-[RegisterCharacterStarterCard(typeof(GuZhenRenCharacter), 1)]
-public sealed class YuPiGu
+public sealed class JingGuangGu
     : AbstractGuWormCard,
-      ICarouselCard,
       IGuRecoveryEffectSource
 {
     private static readonly SavedAttachedState<CardModel, bool>
         RecoveryHandledState = new(
-            Entry.ModId + ".yu_pi.recovery_handled",
+            Entry.ModId + ".jing_guang.recovery_handled",
             static () => false
         );
 
     private static readonly SavedAttachedState<CardModel, bool>
         PendingGenerationState = new(
-            Entry.ModId + ".yu_pi.pending_generation",
+            Entry.ModId + ".jing_guang.pending_generation",
             static () => false
         );
 
@@ -46,13 +42,11 @@ public sealed class YuPiGu
         _ => 4,
     };
 
-    protected override IEnumerable<CardTag> AdditionalCanonicalTags =>
-        GuRank >= 5
-            ? [GuZhenRenTags.GuangDao]
-            : [];
-
     protected override IEnumerable<DynamicVar> CanonicalVars =>
-        [new BlockVar(8m, ValueProp.Move)];
+    [
+        new BlockVar(8m, ValueProp.Move),
+        new DynamicVar("AttackSequenceBonus", 2m),
+    ];
 
     public override bool GainsBlock => true;
 
@@ -60,7 +54,7 @@ public sealed class YuPiGu
         PortraitPath: $"{Entry.ResPath}/images/cards/YuPiGu.png"
     );
 
-    public YuPiGu()
+    public JingGuangGu()
         : base(
             baseCost: 0,
             type: CardType.Skill,
@@ -68,7 +62,7 @@ public sealed class YuPiGu
             target: TargetType.Self
         )
     {
-        SetDao(Dao.TuDao);
+        SetDao(Dao.GuangDao);
         this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 1);
         RefreshRankValues();
     }
@@ -86,13 +80,21 @@ public sealed class YuPiGu
         CardPlay cardPlay
     )
     {
+        decimal block = DynamicVars.Block.BaseValue;
+        if (GuRank >= 2 &&
+            Owner.Creature.GetPower<ZheGuangPower>()?
+                .PreviousCardWas(CardType.Attack) == true)
+        {
+            block += DynamicVars["AttackSequenceBonus"].BaseValue;
+        }
+
         await CreatureCmd.GainBlock(
             Owner.Creature,
-            DynamicVars.Block,
+            block,
+            ValueProp.Move,
             cardPlay
         );
 
-        // 五转开始以玉面反光支持光道，但不提供永久敏捷。
         if (GuRank >= 5 && cardPlay.PlayIndex == 0)
         {
             await GuangDaoPowerSystem.GainGuangHui(
@@ -117,7 +119,6 @@ public sealed class YuPiGu
         }
 
         RecoveryHandledState[this] = true;
-
         if (GuRank < 3)
         {
             return;
@@ -125,9 +126,9 @@ public sealed class YuPiGu
 
         if (GuRank == 3)
         {
-            YuMo membrane = CreatePrimaryToken<YuMo>();
+            GuangJing token = CreateToken<GuangJing>();
             await GuCardPileSystem.AddGeneratedCardToDiscard(
-                membrane,
+                token,
                 Owner
             );
             return;
@@ -144,27 +145,14 @@ public sealed class YuPiGu
         }
 
         PendingGenerationState[this] = false;
-
-        AbstractGuZhenRenCard primary = GuRank switch
-        {
-            >= 9 => CreatePrimaryToken<LiuLiYuYi>(),
-            >= 6 => CreatePrimaryToken<YuGuangYi>(),
-            _ => CreatePrimaryToken<YuMo>(),
-        };
+        AbstractGuZhenRenCard token = GuRank >= 9
+            ? CreateToken<MingJing>()
+            : CreateToken<GuangJing>();
 
         await GuGeneratedCardFactory.AddToHandOrDiscard(
-            primary,
+            token,
             Owner
         );
-
-        if (GuRank >= 8)
-        {
-            ZheGuang reflected = CreatePrimaryToken<ZheGuang>();
-            await GuGeneratedCardFactory.AddToHandOrDiscard(
-                reflected,
-                Owner
-            );
-        }
     }
 
     public Task OnRecoveredAsync()
@@ -180,41 +168,12 @@ public sealed class YuPiGu
         RefreshRankValues();
     }
 
-    public IReadOnlyList<CardModel> GetCarouselCards()
-    {
-        if (GuRank < 3)
-        {
-            return [];
-        }
-
-        CardModel previewModel = GuRank switch
-        {
-            >= 9 => ModelDb.Card<LiuLiYuYi>().ToMutable(),
-            >= 6 => ModelDb.Card<YuGuangYi>().ToMutable(),
-            _ => ModelDb.Card<YuMo>().ToMutable(),
-        };
-
-        if (previewModel is not AbstractGuZhenRenCard preview)
-        {
-            return [];
-        }
-
-        preview.InitializeGuRankFromSource(GuRank);
-        if (IsUpgraded)
-        {
-            CardCmd.Upgrade(preview, CardPreviewStyle.None);
-        }
-
-        return [preview];
-    }
-
-    private T CreatePrimaryToken<T>()
-        where T : AbstractGuZhenRenCard
+    private T CreateToken<T>() where T : AbstractGuZhenRenCard
     {
         return GuGeneratedCardFactory.Create<T>(
             Owner,
             GuRank,
-            upgraded: IsUpgraded
+            upgraded: IsUpgraded || GuRank >= 6
         );
     }
 
@@ -223,14 +182,14 @@ public sealed class YuPiGu
         DynamicVars.Block.BaseValue = GuRank switch
         {
             1 => 8,
-            2 => 10,
-            3 => 11,
-            4 => 13,
-            5 => 15,
-            6 => 18,
-            7 => 21,
-            8 => 24,
-            _ => 28,
+            2 => 9,
+            3 => 10,
+            4 => 12,
+            5 => 14,
+            6 => 17,
+            7 => 19,
+            8 => 22,
+            _ => 26,
         };
     }
 }

@@ -20,7 +20,7 @@ using STS2RitsuLib.Utils;
 namespace GuZhenRen.Cards.GuangDao;
 
 [RegisterCard(typeof(GuZhenRenGuCardPool))]
-[RegisterCharacterStarterCard(typeof(GuZhenRenCharacter), 3)]
+[RegisterCharacterStarterCard(typeof(GuZhenRenCharacter), 2)]
 public sealed class XiaoGuangGu
     : AbstractGuWormCard,
       IGuRecoveryEffectSource

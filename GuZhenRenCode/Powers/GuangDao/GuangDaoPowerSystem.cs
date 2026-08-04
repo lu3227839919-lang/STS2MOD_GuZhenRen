@@ -75,6 +75,37 @@ public static class GuangDaoPowerSystem
         return Math.Max(0, after - before);
     }
 
+    internal static async Task<int> GainGuangHuiFromPower(
+        PlayerChoiceContext choiceContext,
+        Creature owner,
+        int amount
+    )
+    {
+        if (amount <= 0 || owner.CombatState == null)
+        {
+            return 0;
+        }
+
+        int before = owner.GetPower<GuangHuiPower>()?.Amount ?? 0;
+        int room = Math.Max(0, GuangHuiPower.MaximumAmount - before);
+        int requested = Math.Min(amount, room);
+        if (requested <= 0)
+        {
+            return 0;
+        }
+
+        await PowerCmd.Apply<GuangHuiPower>(
+            choiceContext,
+            owner,
+            requested,
+            owner,
+            cardSource: null
+        );
+
+        int after = owner.GetPower<GuangHuiPower>()?.Amount ?? 0;
+        return Math.Max(0, after - before);
+    }
+
     /// <summary>
     /// 首段询问是否支付光辉；Replay 后续段复用首段选择，不重复支付或弹窗。
     /// </summary>

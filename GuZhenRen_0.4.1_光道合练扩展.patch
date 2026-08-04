@@ -1,0 +1,2602 @@
+diff --git a/GuZhenRen.json b/GuZhenRen.json
+index 6b76e39..3492d5a 100644
+--- a/GuZhenRen.json
++++ b/GuZhenRen.json
+@@ -2,8 +2,8 @@
+   "id": "GuZhenRen",
+   "name": "蛊真人",
+   "author": "LU",
+-  "description": "《杀戮尖塔 2》蛊真人 Mod。0.4.0 重做初始蛊虫的分转机制、恢复期衍生牌与月霓裳杀招，并将蛊虫容量提升至15张。",
+-  "version": "0.4.0",
++  "description": "《杀戮尖塔 2》蛊真人 Mod。0.4.1 新增镜光蛊、定光蛊与镜辉蛊，重构月芒蛊合练、恢复期衍生牌和最低转数配方规则。",
++  "version": "0.4.1",
+   "has_pck": true,
+   "has_dll": true,
+   "affects_gameplay": true,
+diff --git a/GuZhenRen/localization/eng/cards.json b/GuZhenRen/localization/eng/cards.json
+index 1d3af4a..a6fbc3b 100644
+--- a/GuZhenRen/localization/eng/cards.json
++++ b/GuZhenRen/localization/eng/cards.json
+@@ -21,7 +21,7 @@
+   "GU_ZHEN_REN_CARD_YU_PI_GU.title": "Jade Skin Gu",
+   "GU_ZHEN_REN_CARD_YU_PI_GU.description": "Can be activated {RemainingUses}/{MaxUses} times, then recovers for {RecoveryTurns} turns. Gain {Block:diff()} Block. From rank 3, create [gold]Jade Membrane[/gold] while recovering; at rank 6 it becomes [gold]Jade Light Garment[/gold]; rank 8 also creates [gold]Refraction[/gold]; rank 9 creates [gold]Glazed Jade Garment[/gold]. From rank 5, gain 1 [gold]Brilliance[/gold] when activated.",
+   "GU_ZHEN_REN_CARD_YUE_MANG_GU.title": "Moonbeam Gu",
+-  "GU_ZHEN_REN_CARD_YUE_MANG_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Deal {Damage:diff()} damage {Hits} times. You may spend {GuangHuiCost} [gold]Brilliance[/gold] to deal {BonusDamage} more damage per hit and apply {ZhaoPoPower:diff()} [gold]Illumination[/gold].{Rank:cond:>=6? NL [gold]Rank 6:[/gold] Every hit can trigger Illumination; Brilliance is paid only on the first segment.|}",
++  "GU_ZHEN_REN_CARD_YUE_MANG_GU.description": "Fusion Gu. Can be activated {RemainingUses}/{MaxUses} times, then recovers for {RecoveryTurns} turns. Deal {Damage:diff()} damage {Hits} times. From rank 5, you may spend {GuangHuiCost} [gold]Brilliance[/gold] to attack {EmpoweredHits} additional times and apply {ZhaoPoPower:diff()} [gold]Illumination Break[/gold] after all hits. From rank 3, create Moonbeam derivatives while recovering.",
+   "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.title": "Mystic Jade Palm",
+   "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.description": "Deal {Damage:diff()} damage. On the first segment, gain {Block:diff()} Block.{Rank:cond:>=7? NL [gold]Rank 7:[/gold] Costs 1 less Energy.|}{Rank:cond:>=8? NL [gold]Rank 8+:[/gold] Replay once; Replay repeats only the damage.|}",
+   "GU_ZHEN_REN_CARD_XUE_QI_GU.title": "Blood Qi Gu",
+@@ -60,5 +60,39 @@
+   "GU_ZHEN_REN_CARD_LIU_LI_YU_YI.title": "Glazed Jade Garment",
+   "GU_ZHEN_REN_CARD_LIU_LI_YU_YI.description": "Gain {Block:diff()} Block and 2 [gold]Brilliance[/gold]. Retain. Exhaust. Final Generation.",
+   "GU_ZHEN_REN_CARD_YUE_NI_CHANG.title": "Moon Raiment",
+-  "GU_ZHEN_REN_CARD_YUE_NI_CHANG.description": "Gain {Block:diff()} Block and {GuangHui} [gold]Brilliance[/gold]. From rank 3, create a [gold]Moonblade[/gold]; from rank 6 it is Upgraded; at rank 9 create a [gold]Full Moon Blade[/gold] instead. Exhaust."
++  "GU_ZHEN_REN_CARD_YUE_NI_CHANG.description": "Gain {Block:diff()} Block and {GuangHui} [gold]Brilliance[/gold]. From rank 3, create a [gold]Moonblade[/gold]; from rank 6 it is Upgraded; at rank 9 create a [gold]Full Moon Blade[/gold] instead. Exhaust.",
++  "GU_ZHEN_REN_CARD_JING_GUANG_GU.title": "Mirror Light Gu",
++  "GU_ZHEN_REN_CARD_JING_GUANG_GU.description": "Can be activated {RemainingUses}/{MaxUses} times, then recovers for {RecoveryTurns} turns. Gain {Block:diff()} Block. From rank 2, if the previous valid card was an Attack, gain {AttackSequenceBonus} more Block. From rank 3, create [gold]Light Mirror[/gold] while recovering; from rank 6 create it upgraded; at rank 9 create [gold]Clear Mirror[/gold] instead. From rank 5, gain 1 [gold]Brilliance[/gold] when activated.",
++  "GU_ZHEN_REN_CARD_DING_GUANG_GU.title": "Fixed Light Gu",
++  "GU_ZHEN_REN_CARD_DING_GUANG_GU.description": "Can be activated {RemainingUses}/{MaxUses} times, then recovers for {RecoveryTurns} turns. Apply {ZhaoPoPower:diff()} [gold]Illumination Break[/gold] to an enemy. From rank 2, the next Attack deals {ExposeBonus} more on its first hit if the target already has Illumination Break. From rank 3, create a [gold]Fixed Light Talisman[/gold] while recovering; at rank 9 create [gold]Halo[/gold] instead.",
++  "GU_ZHEN_REN_CARD_GUANG_JING.title": "Light Mirror",
++  "GU_ZHEN_REN_CARD_GUANG_JING.description": "Gain {Block:diff()} Block. The next Light Path Attack deals {LightBonus} more damage. A rank-7 source also creates [gold]Reflection[/gold]. Exhaust.",
++  "GU_ZHEN_REN_CARD_FAN_ZHAO.title": "Reflection",
++  "GU_ZHEN_REN_CARD_FAN_ZHAO.description": "Deal damage equal to half your current Block, up to {MaxDamage}. Exhaust. Final Generation.",
++  "GU_ZHEN_REN_CARD_MING_JING.title": "Clear Mirror",
++  "GU_ZHEN_REN_CARD_MING_JING.description": "Gain {Block:diff()} Block and 2 [gold]Brilliance[/gold]. Exhaust. Final Generation.",
++  "GU_ZHEN_REN_CARD_DING_GUANG_FU.title": "Fixed Light Talisman",
++  "GU_ZHEN_REN_CARD_DING_GUANG_FU.description": "The first hit of your next Attack deals {BonusDamage} more if its target already has [gold]Illumination Break[/gold]. A rank-7 source also creates a [gold]Light Marker[/gold]. Exhaust.",
++  "GU_ZHEN_REN_CARD_GUANG_BIAO.title": "Light Marker",
++  "GU_ZHEN_REN_CARD_GUANG_BIAO.description": "The next Light Path Attack deals {LightBonus} more damage. Exhaust. Final Generation.",
++  "GU_ZHEN_REN_CARD_RI_YUN.title": "Halo",
++  "GU_ZHEN_REN_CARD_RI_YUN.description": "Gain a total pool of {TotalZhaoPo} [gold]Illumination Break[/gold]. The chosen enemy receives up to {TargetCap}; distribute the remainder among other living enemies in deterministic order. Exhaust. Final Generation.",
++  "GU_ZHEN_REN_CARD_YUE_MANG.title": "Moonbeam",
++  "GU_ZHEN_REN_CARD_YUE_MANG.description": "Deal {Damage:diff()} damage {Hits} times. If the previous valid card was a Skill, the final hit deals {RefractionBonus} more. Exhaust.",
++  "GU_ZHEN_REN_CARD_NING_YUE_MANG.title": "Condensed Moonbeam",
++  "GU_ZHEN_REN_CARD_NING_YUE_MANG.description": "Deal {Damage:diff()} damage {Hits} times. If the previous valid card was a Skill, attack once more. A rank-7 source creates [gold]Lingering Beam[/gold] after attacking a target that had Illumination Break. Exhaust.",
++  "GU_ZHEN_REN_CARD_CAN_MANG.title": "Lingering Beam",
++  "GU_ZHEN_REN_CARD_CAN_MANG.description": "Deal {Damage:diff()} damage. If Refraction gained Brilliance this turn, deal {RefractionDamage} instead. Exhaust. Final Generation.",
++  "GU_ZHEN_REN_CARD_TIAN_YUE_MANG.title": "Heavenly Moonbeam",
++  "GU_ZHEN_REN_CARD_TIAN_YUE_MANG.description": "Deal {Damage:diff()} damage {Hits} times. If Refraction triggered twice this turn, deal {DoubleRefractionBonus} additional damage and apply {ZhaoPoPower:diff()} [gold]Illumination Break[/gold]. Exhaust. Final Generation.",
++  "GU_ZHEN_REN_CARD_JING_HUI_GU.title": "Mirror Radiance Gu",
++  "GU_ZHEN_REN_CARD_JING_HUI_GU.description": "Fusion Gu. Can be activated {RemainingUses}/{MaxUses} times, then recovers for {RecoveryTurns} turns. Gain {Block:diff()} Block and apply {ZhaoPoPower:diff()} [gold]Illumination Break[/gold] to an enemy. From rank 5, gain 1 Brilliance if at least 5 Block remains at turn end; from rank 8, also gain 1 when your Block is first broken. Create Mirror Radiance derivatives while recovering.",
++  "GU_ZHEN_REN_CARD_JING_HUI.title": "Mirror Radiance",
++  "GU_ZHEN_REN_CARD_JING_HUI.description": "Gain {Block:diff()} Block. The first hit of your next Attack deals {ZhaoPoBonus} more if its target already has Illumination Break. Exhaust.",
++  "GU_ZHEN_REN_CARD_NING_JING_HUI.title": "Condensed Mirror Radiance",
++  "GU_ZHEN_REN_CARD_NING_JING_HUI.description": "Gain {Block:diff()} Block. The next Light Path Attack deals {LightBonus} more; its first hit deals another {ZhaoPoBonus} if the target already has Illumination Break. A rank-7 source also creates [gold]Returning Radiance[/gold]. Exhaust.",
++  "GU_ZHEN_REN_CARD_FAN_HUI.title": "Returning Radiance",
++  "GU_ZHEN_REN_CARD_FAN_HUI.description": "Gain 1 [gold]Brilliance[/gold]. The next Light Path Attack deals {LightBonus} more damage. Exhaust. Final Generation.",
++  "GU_ZHEN_REN_CARD_ZHOU_TIAN_JING_HUI.title": "Heaven-Circling Mirror Radiance",
++  "GU_ZHEN_REN_CARD_ZHOU_TIAN_JING_HUI.description": "Gain {Block:diff()} Block. Apply {ZhaoPoPower:diff()} Illumination Break to an enemy, and the next Light Path Attack deals {LightBonus} more damage. Exhaust. Final Generation."
+ }
+diff --git a/GuZhenRen/localization/zhs/cards.json b/GuZhenRen/localization/zhs/cards.json
+index 2d02752..22700a7 100644
+--- a/GuZhenRen/localization/zhs/cards.json
++++ b/GuZhenRen/localization/zhs/cards.json
+@@ -21,7 +21,7 @@
+   "GU_ZHEN_REN_CARD_YU_PI_GU.title": "玉皮蛊",
+   "GU_ZHEN_REN_CARD_YU_PI_GU.description": "可催动{RemainingUses}/{MaxUses}次，耗尽后恢复{RecoveryTurns}回合。获得{Block:diff()}点格挡。三转起在恢复期间生成[gold]玉膜[/gold]；六转起改为[gold]玉光衣[/gold]；八转额外生成[gold]折光[/gold]；九转改为[gold]琉璃玉衣[/gold]。五转起催动时获得1点[gold]光辉[/gold]。",
+   "GU_ZHEN_REN_CARD_YUE_MANG_GU.title": "月芒蛊",
+-  "GU_ZHEN_REN_CARD_YUE_MANG_GU.description": "可催动{RemainingUses}/{MaxUses}次。造成{Damage:diff()}点伤害{Hits}次。你可以消耗{GuangHuiCost}点[gold]光辉[/gold]，使每段伤害提高{BonusDamage}点并施加{ZhaoPoPower:diff()}层[gold]照破[/gold]。{Rank:cond:>=6? NL [gold]六转：[/gold]敌人有照破时，每段攻击均可触发照破；光辉只在首段支付。|}",
++  "GU_ZHEN_REN_CARD_YUE_MANG_GU.description": "合练蛊。可催动{RemainingUses}/{MaxUses}次，耗尽后恢复{RecoveryTurns}回合。造成{Damage:diff()}点伤害{Hits}次。五转起可消耗{GuangHuiCost}点[gold]光辉[/gold]，额外攻击{EmpoweredHits}次，并在全部攻击后施加{ZhaoPoPower:diff()}层[gold]照破[/gold]。三转起在恢复期间生成月芒衍生牌。",
+   "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.title": "玄玉掌",
+   "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.description": "造成{Damage:diff()}点伤害。首段获得{Block:diff()}点格挡。{Rank:cond:>=7? NL [gold]七转：[/gold]能量消耗减少1。|}{Rank:cond:>=8? NL [gold]八转及以上：[/gold]重放1次；Replay只重复伤害。|}",
+   "GU_ZHEN_REN_CARD_XUE_QI_GU.title": "血气蛊",
+@@ -60,5 +60,39 @@
+   "GU_ZHEN_REN_CARD_LIU_LI_YU_YI.title": "琉璃玉衣",
+   "GU_ZHEN_REN_CARD_LIU_LI_YU_YI.description": "获得{Block:diff()}点格挡和2点[gold]光辉[/gold]。保留。消耗。末代。",
+   "GU_ZHEN_REN_CARD_YUE_NI_CHANG.title": "月霓裳",
+-  "GU_ZHEN_REN_CARD_YUE_NI_CHANG.description": "获得{Block:diff()}点格挡和{GuangHui}点[gold]光辉[/gold]。三转起生成一张[gold]月刃[/gold]；六转起月刃获得升级；九转改为生成[gold]满月刃[/gold]。消耗。"
++  "GU_ZHEN_REN_CARD_YUE_NI_CHANG.description": "获得{Block:diff()}点格挡和{GuangHui}点[gold]光辉[/gold]。三转起生成一张[gold]月刃[/gold]；六转起月刃获得升级；九转改为生成[gold]满月刃[/gold]。消耗。",
++  "GU_ZHEN_REN_CARD_JING_GUANG_GU.title": "镜光蛊",
++  "GU_ZHEN_REN_CARD_JING_GUANG_GU.description": "可催动{RemainingUses}/{MaxUses}次，耗尽后恢复{RecoveryTurns}回合。获得{Block:diff()}点格挡。二转起，若上一张有效牌为攻击，额外获得{AttackSequenceBonus}点格挡。三转起在恢复期间生成[gold]光镜[/gold]；六转起生成升级光镜；九转改为[gold]明镜[/gold]。五转起催动时获得1点[gold]光辉[/gold]。",
++  "GU_ZHEN_REN_CARD_DING_GUANG_GU.title": "定光蛊",
++  "GU_ZHEN_REN_CARD_DING_GUANG_GU.description": "可催动{RemainingUses}/{MaxUses}次，耗尽后恢复{RecoveryTurns}回合。对一个敌人施加{ZhaoPoPower:diff()}层[gold]照破[/gold]。二转起使下一张攻击对已有照破的目标额外造成{ExposeBonus}点伤害。三转起在恢复期间生成[gold]定光符[/gold]；九转改为[gold]日晕[/gold]。",
++  "GU_ZHEN_REN_CARD_GUANG_JING.title": "光镜",
++  "GU_ZHEN_REN_CARD_GUANG_JING.description": "获得{Block:diff()}点格挡，使下一张光道攻击伤害提高{LightBonus}点。七转来源使用后生成一张[gold]返照[/gold]。消耗。",
++  "GU_ZHEN_REN_CARD_FAN_ZHAO.title": "返照",
++  "GU_ZHEN_REN_CARD_FAN_ZHAO.description": "造成等同于当前格挡一半的伤害，最多{MaxDamage}点。消耗。末代。",
++  "GU_ZHEN_REN_CARD_MING_JING.title": "明镜",
++  "GU_ZHEN_REN_CARD_MING_JING.description": "获得{Block:diff()}点格挡和2点[gold]光辉[/gold]。消耗。末代。",
++  "GU_ZHEN_REN_CARD_DING_GUANG_FU.title": "定光符",
++  "GU_ZHEN_REN_CARD_DING_GUANG_FU.description": "下一张攻击若命中已有[gold]照破[/gold]的敌人，其第一段额外造成{BonusDamage}点伤害。七转来源使用后生成一张[gold]光标[/gold]。消耗。",
++  "GU_ZHEN_REN_CARD_GUANG_BIAO.title": "光标",
++  "GU_ZHEN_REN_CARD_GUANG_BIAO.description": "使下一张光道攻击伤害提高{LightBonus}点。消耗。末代。",
++  "GU_ZHEN_REN_CARD_RI_YUN.title": "日晕",
++  "GU_ZHEN_REN_CARD_RI_YUN.description": "获得{TotalZhaoPo}层[gold]照破[/gold]总额度。选择的敌人最多获得{TargetCap}层，剩余额度按确定顺序分配给其他存活敌人。消耗。末代。",
++  "GU_ZHEN_REN_CARD_YUE_MANG.title": "月芒",
++  "GU_ZHEN_REN_CARD_YUE_MANG.description": "造成{Damage:diff()}点伤害{Hits}次。若上一张有效牌是技能，最后一段额外造成{RefractionBonus}点伤害。消耗。",
++  "GU_ZHEN_REN_CARD_NING_YUE_MANG.title": "凝月芒",
++  "GU_ZHEN_REN_CARD_NING_YUE_MANG.description": "造成{Damage:diff()}点伤害{Hits}次。若上一张有效牌是技能，额外攻击1次。七转来源攻击已有照破的目标后生成一张[gold]残芒[/gold]。消耗。",
++  "GU_ZHEN_REN_CARD_CAN_MANG.title": "残芒",
++  "GU_ZHEN_REN_CARD_CAN_MANG.description": "造成{Damage:diff()}点伤害。本回合已经通过折光获得光辉时，改为造成{RefractionDamage}点伤害。消耗。末代。",
++  "GU_ZHEN_REN_CARD_TIAN_YUE_MANG.title": "天月芒",
++  "GU_ZHEN_REN_CARD_TIAN_YUE_MANG.description": "造成{Damage:diff()}点伤害{Hits}次。本回合已经触发两次折光时，额外造成{DoubleRefractionBonus}点伤害并施加{ZhaoPoPower:diff()}层[gold]照破[/gold]。消耗。末代。",
++  "GU_ZHEN_REN_CARD_JING_HUI_GU.title": "镜辉蛊",
++  "GU_ZHEN_REN_CARD_JING_HUI_GU.description": "合练蛊。可催动{RemainingUses}/{MaxUses}次，耗尽后恢复{RecoveryTurns}回合。获得{Block:diff()}点格挡，并对一个敌人施加{ZhaoPoPower:diff()}层[gold]照破[/gold]。五转起若回合结束仍有至少5点格挡，获得1点光辉；八转起格挡首次被击破时也可获得1点光辉。恢复期间生成镜辉衍生牌。",
++  "GU_ZHEN_REN_CARD_JING_HUI.title": "镜辉",
++  "GU_ZHEN_REN_CARD_JING_HUI.description": "获得{Block:diff()}点格挡。下一张攻击若命中已有照破的敌人，其第一段额外造成{ZhaoPoBonus}点伤害。消耗。",
++  "GU_ZHEN_REN_CARD_NING_JING_HUI.title": "凝镜辉",
++  "GU_ZHEN_REN_CARD_NING_JING_HUI.description": "获得{Block:diff()}点格挡。下一张光道攻击伤害提高{LightBonus}点；若命中已有照破的敌人，第一段再额外造成{ZhaoPoBonus}点伤害。七转来源使用后生成一张[gold]返辉[/gold]。消耗。",
++  "GU_ZHEN_REN_CARD_FAN_HUI.title": "返辉",
++  "GU_ZHEN_REN_CARD_FAN_HUI.description": "获得1点[gold]光辉[/gold]，使下一张光道攻击伤害提高{LightBonus}点。消耗。末代。",
++  "GU_ZHEN_REN_CARD_ZHOU_TIAN_JING_HUI.title": "周天镜辉",
++  "GU_ZHEN_REN_CARD_ZHOU_TIAN_JING_HUI.description": "获得{Block:diff()}点格挡。对一个敌人施加{ZhaoPoPower:diff()}层照破，并使下一张光道攻击伤害提高{LightBonus}点。消耗。末代。"
+ }
+diff --git a/GuZhenRenCode/Cards/Basic/DingGuangGu.cs b/GuZhenRenCode/Cards/Basic/DingGuangGu.cs
+new file mode 100644
+index 0000000..f01cb27
+--- /dev/null
++++ b/GuZhenRenCode/Cards/Basic/DingGuangGu.cs
+@@ -0,0 +1,193 @@
++using GuZhenRen.Characters;
++using GuZhenRen.Combat;
++using GuZhenRen.Powers.GuangDao;
++
++using MegaCrit.Sts2.Core.Commands;
++using MegaCrit.Sts2.Core.Entities.Cards;
++using MegaCrit.Sts2.Core.Entities.Creatures;
++using MegaCrit.Sts2.Core.GameActions.Multiplayer;
++using MegaCrit.Sts2.Core.Localization.DynamicVars;
++using MegaCrit.Sts2.Core.Models;
++
++using STS2RitsuLib.Combat.SecondaryResources;
++using STS2RitsuLib.Interop.AutoRegistration;
++using STS2RitsuLib.Scaffolding.Content;
++using STS2RitsuLib.Utils;
++
++namespace GuZhenRen.Cards.GuangDao;
++
++[RegisterCard(typeof(GuZhenRenGuCardPool))]
++public sealed class DingGuangGu
++    : AbstractGuWormCard,
++      IGuRecoveryEffectSource
++{
++    private static readonly SavedAttachedState<CardModel, bool>
++        RecoveryHandledState = new(
++            Entry.ModId + ".ding_guang.recovery_handled",
++            static () => false
++        );
++
++    private static readonly SavedAttachedState<CardModel, bool>
++        PendingGenerationState = new(
++            Entry.ModId + ".ding_guang.pending_generation",
++            static () => false
++        );
++
++    public override int MaxUses => IsUpgraded ? 2 : 1;
++
++    public override int RecoveryDelayTurns => GuRank switch
++    {
++        <= 5 => 2,
++        <= 8 => 3,
++        _ => 4,
++    };
++
++    protected override IEnumerable<DynamicVar> CanonicalVars =>
++    [
++        new PowerVar<ZhaoPoPower>(1m),
++        new DynamicVar("ExposeBonus", 2m),
++    ];
++
++    public override CardAssetProfile AssetProfile => new(
++        PortraitPath: $"{Entry.ResPath}/images/cards/XiaoGuangGu.png"
++    );
++
++    public DingGuangGu()
++        : base(
++            baseCost: 0,
++            type: CardType.Skill,
++            rarity: CardRarity.Uncommon,
++            target: TargetType.AnyEnemy
++        )
++    {
++        SetDao(Dao.GuangDao);
++        this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 1);
++        RefreshRankValues();
++    }
++
++    protected override void AddExtraArgsToDescription(
++        MegaCrit.Sts2.Core.Localization.LocString description
++    )
++    {
++        base.AddExtraArgsToDescription(description);
++        description.Add("RecoveryTurns", RecoveryDelayTurns);
++    }
++
++    protected override async Task OnPlay(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay
++    )
++    {
++        Creature? target = cardPlay.Target;
++        if (target == null || !IsValidTarget(target))
++        {
++            return;
++        }
++
++        if (cardPlay.PlayIndex == 0)
++        {
++            await GuangDaoPowerSystem.ApplyZhaoPo(
++                choiceContext,
++                this,
++                target,
++                DynamicVars[typeof(ZhaoPoPower).Name].IntValue
++            );
++
++            if (GuRank >= 2)
++            {
++                await PowerCmd.Apply<DingGuangChargePower>(
++                    choiceContext,
++                    Owner.Creature,
++                    DynamicVars["ExposeBonus"].IntValue,
++                    Owner.Creature,
++                    this
++                );
++            }
++        }
++    }
++
++    public void ResetRecoveryEffectState()
++    {
++        RecoveryHandledState[this] = false;
++        PendingGenerationState[this] = false;
++    }
++
++    public async Task OnEnteredRecoveryAsync()
++    {
++        if (RecoveryHandledState[this])
++        {
++            return;
++        }
++
++        RecoveryHandledState[this] = true;
++        if (GuRank < 3)
++        {
++            return;
++        }
++
++        if (GuRank == 3)
++        {
++            DingGuangFu token = CreateToken<DingGuangFu>();
++            await GuCardPileSystem.AddGeneratedCardToDiscard(
++                token,
++                Owner
++            );
++            return;
++        }
++
++        PendingGenerationState[this] = true;
++    }
++
++    public async Task OnRecoveryTurnStartAsync(int turnNumber)
++    {
++        if (!PendingGenerationState[this])
++        {
++            return;
++        }
++
++        PendingGenerationState[this] = false;
++        AbstractGuZhenRenCard token = GuRank >= 9
++            ? CreateToken<RiYun>()
++            : CreateToken<DingGuangFu>();
++
++        await GuGeneratedCardFactory.AddToHandOrDiscard(
++            token,
++            Owner
++        );
++    }
++
++    public Task OnRecoveredAsync()
++    {
++        RecoveryHandledState[this] = false;
++        PendingGenerationState[this] = false;
++        return Task.CompletedTask;
++    }
++
++    protected override void OnGuRankChanged()
++    {
++        base.OnGuRankChanged();
++        RefreshRankValues();
++    }
++
++    private T CreateToken<T>() where T : AbstractGuZhenRenCard
++    {
++        return GuGeneratedCardFactory.Create<T>(
++            Owner,
++            GuRank,
++            upgraded: IsUpgraded || GuRank >= 6
++        );
++    }
++
++    private void RefreshRankValues()
++    {
++        DynamicVars[typeof(ZhaoPoPower).Name].BaseValue = GuRank switch
++        {
++            <= 3 => 1,
++            <= 5 => 2,
++            <= 7 => 3,
++            8 => 4,
++            _ => 5,
++        };
++        DynamicVars["ExposeBonus"].BaseValue = GuRank >= 6 ? 4 : 2;
++    }
++}
+diff --git a/GuZhenRenCode/Cards/Basic/GuangDaoExpansionTokens.cs b/GuZhenRenCode/Cards/Basic/GuangDaoExpansionTokens.cs
+new file mode 100644
+index 0000000..9940ef3
+--- /dev/null
++++ b/GuZhenRenCode/Cards/Basic/GuangDaoExpansionTokens.cs
+@@ -0,0 +1,338 @@
++using GuZhenRen.Characters;
++using GuZhenRen.Multiplayer;
++using GuZhenRen.Powers.GuangDao;
++
++using MegaCrit.Sts2.Core.Commands;
++using MegaCrit.Sts2.Core.Entities.Cards;
++using MegaCrit.Sts2.Core.Entities.Creatures;
++using MegaCrit.Sts2.Core.GameActions.Multiplayer;
++using MegaCrit.Sts2.Core.Localization.DynamicVars;
++using MegaCrit.Sts2.Core.Models;
++using MegaCrit.Sts2.Core.ValueProps;
++
++using STS2RitsuLib.Interop.AutoRegistration;
++using STS2RitsuLib.Scaffolding.Content;
++
++namespace GuZhenRen.Cards.GuangDao;
++
++public abstract class AbstractLightExpansionToken
++    : AbstractGuZhenRenCard,
++      ICardRewardExcluded
++{
++    public override CardPoolModel Pool =>
++        ModelDb.CardPool<GuZhenRenCardPool>();
++
++    public override bool CanBeGeneratedInCombat => false;
++
++    public override IEnumerable<CardKeyword> CanonicalKeywords =>
++        [CardKeyword.Exhaust];
++
++    protected AbstractLightExpansionToken(
++        int baseCost,
++        CardType type,
++        TargetType target
++    )
++        : base(
++            baseCost,
++            type,
++            CardRarity.Token,
++            target
++        )
++    {
++        SetDao(Dao.GuangDao);
++    }
++}
++
++[RegisterCard(typeof(GuZhenRenCardPool))]
++public sealed class GuangJing : AbstractLightExpansionToken
++{
++    protected override IEnumerable<DynamicVar> CanonicalVars =>
++    [
++        new BlockVar(9m, ValueProp.Move),
++        new DynamicVar("LightBonus", 3m),
++    ];
++
++    public override bool GainsBlock => true;
++
++    public override CardAssetProfile AssetProfile => new(
++        PortraitPath: $"{Entry.ResPath}/images/cards/YuPiGu.png"
++    );
++
++    public GuangJing() : base(1, CardType.Skill, TargetType.Self)
++    {
++    }
++
++    protected override async Task OnPlay(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay
++    )
++    {
++        await CreatureCmd.GainBlock(
++            Owner.Creature,
++            DynamicVars.Block,
++            cardPlay
++        );
++        await PowerCmd.Apply<JuGuangPower>(
++            choiceContext,
++            Owner.Creature,
++            DynamicVars["LightBonus"].IntValue,
++            Owner.Creature,
++            this
++        );
++
++        if (GuRank >= 7 && cardPlay.PlayIndex == 0)
++        {
++            FanZhao reflected = GuGeneratedCardFactory.Create<FanZhao>(
++                Owner,
++                GuRank
++            );
++            await GuGeneratedCardFactory.AddToHandOrDiscard(
++                reflected,
++                Owner
++            );
++        }
++    }
++
++    protected override void OnUpgrade()
++    {
++        DynamicVars.Block.UpgradeValueBy(3m);
++        DynamicVars["LightBonus"].UpgradeValueBy(2m);
++    }
++}
++
++[RegisterCard(typeof(GuZhenRenCardPool))]
++public sealed class FanZhao : AbstractLightExpansionToken
++{
++    protected override IEnumerable<DynamicVar> CanonicalVars =>
++        [new DynamicVar("MaxDamage", 15m)];
++
++    public override CardAssetProfile AssetProfile => new(
++        PortraitPath: $"{Entry.ResPath}/images/cards/YuPiGu.png"
++    );
++
++    public FanZhao() : base(1, CardType.Attack, TargetType.AnyEnemy)
++    {
++    }
++
++    protected override async Task OnPlay(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay
++    )
++    {
++        Creature? target = cardPlay.Target;
++        if (target == null || !IsValidTarget(target))
++        {
++            return;
++        }
++
++        decimal damage = Math.Min(
++            DynamicVars["MaxDamage"].BaseValue,
++            Owner.Creature.Block / 2m
++        );
++
++        await DamageCmd
++            .Attack(damage)
++            .FromCard(this, cardPlay)
++            .Targeting(target)
++            .WithHitFx("vfx/vfx_attack_slash")
++            .Execute(choiceContext);
++    }
++
++    protected override void OnUpgrade()
++    {
++        DynamicVars["MaxDamage"].UpgradeValueBy(5m);
++    }
++}
++
++[RegisterCard(typeof(GuZhenRenCardPool))]
++public sealed class MingJing : AbstractLightExpansionToken
++{
++    protected override IEnumerable<DynamicVar> CanonicalVars =>
++        [new BlockVar(20m, ValueProp.Move)];
++
++    public override bool GainsBlock => true;
++
++    public override CardAssetProfile AssetProfile => new(
++        PortraitPath: $"{Entry.ResPath}/images/cards/YuPiGu.png"
++    );
++
++    public MingJing() : base(2, CardType.Skill, TargetType.Self)
++    {
++    }
++
++    protected override async Task OnPlay(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay
++    )
++    {
++        await CreatureCmd.GainBlock(
++            Owner.Creature,
++            DynamicVars.Block,
++            cardPlay
++        );
++        await GuangDaoPowerSystem.GainGuangHui(
++            choiceContext,
++            this,
++            2
++        );
++    }
++
++    protected override void OnUpgrade()
++    {
++        EnergyCost.UpgradeBy(-1);
++        DynamicVars.Block.UpgradeValueBy(4m);
++    }
++}
++
++[RegisterCard(typeof(GuZhenRenCardPool))]
++public sealed class DingGuangFu : AbstractLightExpansionToken
++{
++    protected override IEnumerable<DynamicVar> CanonicalVars =>
++        [new DynamicVar("BonusDamage", 5m)];
++
++    public override CardAssetProfile AssetProfile => new(
++        PortraitPath: $"{Entry.ResPath}/images/cards/XiaoGuangGu.png"
++    );
++
++    public DingGuangFu() : base(0, CardType.Skill, TargetType.Self)
++    {
++    }
++
++    protected override async Task OnPlay(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay
++    )
++    {
++        await PowerCmd.Apply<DingGuangChargePower>(
++            choiceContext,
++            Owner.Creature,
++            DynamicVars["BonusDamage"].IntValue,
++            Owner.Creature,
++            this
++        );
++
++        if (GuRank >= 7 && cardPlay.PlayIndex == 0)
++        {
++            GuangBiao marker = GuGeneratedCardFactory.Create<GuangBiao>(
++                Owner,
++                GuRank
++            );
++            await GuGeneratedCardFactory.AddToHandOrDiscard(
++                marker,
++                Owner
++            );
++        }
++    }
++
++    protected override void OnUpgrade()
++    {
++        DynamicVars["BonusDamage"].UpgradeValueBy(3m);
++    }
++}
++
++[RegisterCard(typeof(GuZhenRenCardPool))]
++public sealed class GuangBiao : AbstractLightExpansionToken
++{
++    protected override IEnumerable<DynamicVar> CanonicalVars =>
++        [new DynamicVar("LightBonus", 4m)];
++
++    public override CardAssetProfile AssetProfile => new(
++        PortraitPath: $"{Entry.ResPath}/images/cards/XiaoGuangGu.png"
++    );
++
++    public GuangBiao() : base(0, CardType.Skill, TargetType.Self)
++    {
++    }
++
++    protected override async Task OnPlay(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay
++    )
++    {
++        await PowerCmd.Apply<JuGuangPower>(
++            choiceContext,
++            Owner.Creature,
++            DynamicVars["LightBonus"].IntValue,
++            Owner.Creature,
++            this
++        );
++    }
++
++    protected override void OnUpgrade()
++    {
++        DynamicVars["LightBonus"].UpgradeValueBy(2m);
++    }
++}
++
++[RegisterCard(typeof(GuZhenRenCardPool))]
++public sealed class RiYun : AbstractLightExpansionToken
++{
++    protected override IEnumerable<DynamicVar> CanonicalVars =>
++    [
++        new DynamicVar("TotalZhaoPo", 6m),
++        new DynamicVar("TargetCap", 4m),
++    ];
++
++    public override CardAssetProfile AssetProfile => new(
++        PortraitPath: $"{Entry.ResPath}/images/cards/XiaoGuangGu.png"
++    );
++
++    public RiYun() : base(2, CardType.Skill, TargetType.AnyEnemy)
++    {
++    }
++
++    protected override async Task OnPlay(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay
++    )
++    {
++        Creature? primary = cardPlay.Target;
++        if (primary == null || !IsValidTarget(primary) ||
++            Owner.Creature.CombatState is not { } combatState)
++        {
++            return;
++        }
++
++        Creature[] targets = GuZhenRenDeterminism
++            .OrderCreatures(combatState.HittableEnemies)
++            .Where(enemy => !enemy.IsDead)
++            .ToArray();
++
++        int remaining = DynamicVars["TotalZhaoPo"].IntValue;
++        int primaryAmount = Math.Min(
++            remaining,
++            DynamicVars["TargetCap"].IntValue
++        );
++        await GuangDaoPowerSystem.ApplyZhaoPo(
++            choiceContext,
++            this,
++            primary,
++            primaryAmount
++        );
++        remaining -= primaryAmount;
++
++        Creature[] secondaryTargets = targets
++            .Where(enemy => !ReferenceEquals(enemy, primary))
++            .ToArray();
++
++        // 剩余额度按确定性顺序轮流分配；只有一个目标时，
++        // 受单体上限约束而未使用的额度会自然舍弃。
++        for (int index = 0; remaining > 0 && secondaryTargets.Length > 0; index++)
++        {
++            Creature enemy = secondaryTargets[index % secondaryTargets.Length];
++            await GuangDaoPowerSystem.ApplyZhaoPo(
++                choiceContext,
++                this,
++                enemy,
++                1
++            );
++            remaining--;
++        }
++    }
++
++    protected override void OnUpgrade()
++    {
++        EnergyCost.UpgradeBy(-1);
++        DynamicVars["TotalZhaoPo"].UpgradeValueBy(2m);
++    }
++}
+diff --git a/GuZhenRenCode/Cards/Basic/JingGuangGu.cs b/GuZhenRenCode/Cards/Basic/JingGuangGu.cs
+new file mode 100644
+index 0000000..0082f2c
+--- /dev/null
++++ b/GuZhenRenCode/Cards/Basic/JingGuangGu.cs
+@@ -0,0 +1,195 @@
++using GuZhenRen.Characters;
++using GuZhenRen.Combat;
++using GuZhenRen.Powers.GuangDao;
++
++using MegaCrit.Sts2.Core.Commands;
++using MegaCrit.Sts2.Core.Entities.Cards;
++using MegaCrit.Sts2.Core.GameActions.Multiplayer;
++using MegaCrit.Sts2.Core.Localization.DynamicVars;
++using MegaCrit.Sts2.Core.Models;
++using MegaCrit.Sts2.Core.ValueProps;
++
++using STS2RitsuLib.Combat.SecondaryResources;
++using STS2RitsuLib.Interop.AutoRegistration;
++using STS2RitsuLib.Scaffolding.Content;
++using STS2RitsuLib.Utils;
++
++namespace GuZhenRen.Cards.GuangDao;
++
++[RegisterCard(typeof(GuZhenRenGuCardPool))]
++public sealed class JingGuangGu
++    : AbstractGuWormCard,
++      IGuRecoveryEffectSource
++{
++    private static readonly SavedAttachedState<CardModel, bool>
++        RecoveryHandledState = new(
++            Entry.ModId + ".jing_guang.recovery_handled",
++            static () => false
++        );
++
++    private static readonly SavedAttachedState<CardModel, bool>
++        PendingGenerationState = new(
++            Entry.ModId + ".jing_guang.pending_generation",
++            static () => false
++        );
++
++    public override int MaxUses => IsUpgraded ? 2 : 1;
++
++    public override int RecoveryDelayTurns => GuRank switch
++    {
++        <= 5 => 2,
++        <= 8 => 3,
++        _ => 4,
++    };
++
++    protected override IEnumerable<DynamicVar> CanonicalVars =>
++    [
++        new BlockVar(8m, ValueProp.Move),
++        new DynamicVar("AttackSequenceBonus", 2m),
++    ];
++
++    public override bool GainsBlock => true;
++
++    public override CardAssetProfile AssetProfile => new(
++        PortraitPath: $"{Entry.ResPath}/images/cards/YuPiGu.png"
++    );
++
++    public JingGuangGu()
++        : base(
++            baseCost: 0,
++            type: CardType.Skill,
++            rarity: CardRarity.Common,
++            target: TargetType.Self
++        )
++    {
++        SetDao(Dao.GuangDao);
++        this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 1);
++        RefreshRankValues();
++    }
++
++    protected override void AddExtraArgsToDescription(
++        MegaCrit.Sts2.Core.Localization.LocString description
++    )
++    {
++        base.AddExtraArgsToDescription(description);
++        description.Add("RecoveryTurns", RecoveryDelayTurns);
++    }
++
++    protected override async Task OnPlay(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay
++    )
++    {
++        decimal block = DynamicVars.Block.BaseValue;
++        if (GuRank >= 2 &&
++            Owner.Creature.GetPower<ZheGuangPower>()?
++                .PreviousCardWas(CardType.Attack) == true)
++        {
++            block += DynamicVars["AttackSequenceBonus"].BaseValue;
++        }
++
++        await CreatureCmd.GainBlock(
++            Owner.Creature,
++            block,
++            ValueProp.Move,
++            cardPlay
++        );
++
++        if (GuRank >= 5 && cardPlay.PlayIndex == 0)
++        {
++            await GuangDaoPowerSystem.GainGuangHui(
++                choiceContext,
++                this,
++                1
++            );
++        }
++    }
++
++    public void ResetRecoveryEffectState()
++    {
++        RecoveryHandledState[this] = false;
++        PendingGenerationState[this] = false;
++    }
++
++    public async Task OnEnteredRecoveryAsync()
++    {
++        if (RecoveryHandledState[this])
++        {
++            return;
++        }
++
++        RecoveryHandledState[this] = true;
++        if (GuRank < 3)
++        {
++            return;
++        }
++
++        if (GuRank == 3)
++        {
++            GuangJing token = CreateToken<GuangJing>();
++            await GuCardPileSystem.AddGeneratedCardToDiscard(
++                token,
++                Owner
++            );
++            return;
++        }
++
++        PendingGenerationState[this] = true;
++    }
++
++    public async Task OnRecoveryTurnStartAsync(int turnNumber)
++    {
++        if (!PendingGenerationState[this])
++        {
++            return;
++        }
++
++        PendingGenerationState[this] = false;
++        AbstractGuZhenRenCard token = GuRank >= 9
++            ? CreateToken<MingJing>()
++            : CreateToken<GuangJing>();
++
++        await GuGeneratedCardFactory.AddToHandOrDiscard(
++            token,
++            Owner
++        );
++    }
++
++    public Task OnRecoveredAsync()
++    {
++        RecoveryHandledState[this] = false;
++        PendingGenerationState[this] = false;
++        return Task.CompletedTask;
++    }
++
++    protected override void OnGuRankChanged()
++    {
++        base.OnGuRankChanged();
++        RefreshRankValues();
++    }
++
++    private T CreateToken<T>() where T : AbstractGuZhenRenCard
++    {
++        return GuGeneratedCardFactory.Create<T>(
++            Owner,
++            GuRank,
++            upgraded: IsUpgraded || GuRank >= 6
++        );
++    }
++
++    private void RefreshRankValues()
++    {
++        DynamicVars.Block.BaseValue = GuRank switch
++        {
++            1 => 8,
++            2 => 9,
++            3 => 10,
++            4 => 12,
++            5 => 14,
++            6 => 17,
++            7 => 19,
++            8 => 22,
++            _ => 26,
++        };
++    }
++}
+diff --git a/GuZhenRenCode/Cards/Core/AbstractGuZhenRenCard.cs b/GuZhenRenCode/Cards/Core/AbstractGuZhenRenCard.cs
+index 45c08a5..18cc900 100644
+--- a/GuZhenRenCode/Cards/Core/AbstractGuZhenRenCard.cs
++++ b/GuZhenRenCode/Cards/Core/AbstractGuZhenRenCard.cs
+@@ -661,7 +661,8 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
+     ///
+     /// 该入口位于公共蛊虫父类，因此声明配方的常规蛊虫牌
+     /// 也可以作为合练结果，而不要求继承专用合练牌父类。
+-    /// 结果转数严格等于全部材料中的最高转数。
++    /// 结果转数由 CalculateHeLianResultRank 决定；默认取最高转数，
++    /// 特定配方可以改为最低转数等策略。
+     /// </summary>
+     internal void InitializeFromHeLian(
+         IReadOnlyList<CardModel> materials
+@@ -677,20 +678,26 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
+             );
+         }
+ 
+-        int highestMaterialRank = materials
++        SetGuRank(CalculateHeLianResultRank(materials));
++
++        OnHeLianCompleted(materials);
++    }
++
++    /// <summary>
++    /// 计算合练结果转数。默认沿用旧规则，取全部材料最高转数；
++    /// 特定合练蛊可重写为最低转数等策略。
++    /// </summary>
++    protected virtual int CalculateHeLianResultRank(
++        IReadOnlyList<CardModel> materials
++    )
++    {
++        return materials
+             .OfType<IGuRankProvider>()
+             .Select(provider =>
+-                Math.Max(
+-                    MinimumGuRank,
+-                    provider.GuRank
+-                )
++                Math.Max(MinimumGuRank, provider.GuRank)
+             )
+             .DefaultIfEmpty(MinimumGuRank)
+             .Max();
+-
+-        SetGuRank(highestMaterialRank);
+-
+-        OnHeLianCompleted(materials);
+     }
+ 
+     /// <summary>
+diff --git a/GuZhenRenCode/Cards/Core/AbstractHeLianGuCard.cs b/GuZhenRenCode/Cards/Core/AbstractHeLianGuCard.cs
+index fe24d24..38dda9f 100644
+--- a/GuZhenRenCode/Cards/Core/AbstractHeLianGuCard.cs
++++ b/GuZhenRenCode/Cards/Core/AbstractHeLianGuCard.cs
+@@ -12,7 +12,7 @@ namespace GuZhenRen.Cards.HeLian;
+ /// 公共规则：
+ /// 1. 注册到角色普通卡池，不再使用独立合练卡池；
+ /// 2. 是否进入普通卡牌奖励由具体卡牌显式决定；
+-/// 3. 合练生成时的转数等于配方全部材料的最高转数；
++/// 3. 合练生成时默认取材料最高转数，具体结果牌可重写计算策略；
+ /// 4. 不允许被战斗内随机生成。
+ /// </summary>
+ [RegisterCard(
+diff --git a/GuZhenRenCode/Cards/Core/HeLianRecipeAttribute.cs b/GuZhenRenCode/Cards/Core/HeLianRecipeAttribute.cs
+index 9f988c5..ea638cb 100644
+--- a/GuZhenRenCode/Cards/Core/HeLianRecipeAttribute.cs
++++ b/GuZhenRenCode/Cards/Core/HeLianRecipeAttribute.cs
+@@ -69,6 +69,11 @@ public sealed class HeLianRecipeAttribute : Attribute
+     {
+         get;
+     }
++
++    /// <summary>
++    /// 参与该配方的每张材料蛊最低转数。默认一转。
++    /// </summary>
++    public int MinimumMaterialRank { get; set; } = 1;
+ }
+ 
+ /// <summary>
+diff --git a/GuZhenRenCode/Cards/Core/HeLianRecipeRegistry.cs b/GuZhenRenCode/Cards/Core/HeLianRecipeRegistry.cs
+index d3b5e05..ff7458d 100644
+--- a/GuZhenRenCode/Cards/Core/HeLianRecipeRegistry.cs
++++ b/GuZhenRenCode/Cards/Core/HeLianRecipeRegistry.cs
+@@ -18,7 +18,8 @@ public static class HeLianRecipeRegistry
+ {
+     private sealed record Recipe(
+         Type ResultCardType,
+-        IReadOnlyList<Type> MaterialCardTypes
++        IReadOnlyList<Type> MaterialCardTypes,
++        int MinimumMaterialRank
+     );
+ 
+     private static readonly Lazy<IReadOnlyList<Recipe>>
+@@ -66,7 +67,11 @@ public static class HeLianRecipeRegistry
+                 )
+             );
+ 
+-        if (recipe == null)
++        if (recipe == null ||
++            materials.Any(card =>
++                card is not IGuRankProvider provider ||
++                provider.GuRank < recipe.MinimumMaterialRank
++            ))
+         {
+             result = null;
+             return false;
+@@ -124,15 +129,14 @@ public static class HeLianRecipeRegistry
+             availableMaterials
+         );
+ 
+-        Type[] availableTypes = availableMaterials
+-            .Select(card => card.GetType())
+-            .ToArray();
++        CardModel[] available = availableMaterials.ToArray();
+ 
+         int[] craftableCounts = Recipes.Value
+             .Where(recipe =>
+                 ContainsRequiredMaterials(
+-                    availableTypes,
+-                    recipe.MaterialCardTypes
++                    available,
++                    recipe.MaterialCardTypes,
++                    recipe.MinimumMaterialRank
+                 )
+             )
+             .Select(recipe =>
+@@ -171,20 +175,32 @@ public static class HeLianRecipeRegistry
+             );
+         }
+ 
+-        Type[] availableTypes = availableMaterials
+-            .Select(card => card.GetType())
+-            .ToArray();
++        CardModel[] available = availableMaterials.ToArray();
+ 
+         return Recipes.Value.Any(recipe =>
+-            recipe.MaterialCardTypes.Count ==
+-                materialCount &&
++            recipe.MaterialCardTypes.Count == materialCount &&
+             ContainsRequiredMaterials(
+-                availableTypes,
+-                recipe.MaterialCardTypes
++                available,
++                recipe.MaterialCardTypes,
++                recipe.MinimumMaterialRank
+             )
+         );
+     }
+ 
++    /// <summary>
++    /// 判断具体卡牌是否满足至少一条配方的材料类型与最低转数要求。
++    /// </summary>
++    public static bool IsEligibleMaterialCard(CardModel card)
++    {
++        ArgumentNullException.ThrowIfNull(card);
++
++        return card is IGuRankProvider provider &&
++            Recipes.Value.Any(recipe =>
++                recipe.MaterialCardTypes.Contains(card.GetType()) &&
++                provider.GuRank >= recipe.MinimumMaterialRank
++            );
++    }
++
+     /// <summary>
+     /// 判断某张牌的具体类型是否出现在任意合练配方中。
+     /// </summary>
+@@ -302,10 +318,16 @@ public static class HeLianRecipeRegistry
+                     );
+                 }
+ 
++                int minimumMaterialRank = Math.Max(
++                    AbstractGuZhenRenCard.MinimumGuRank,
++                    attribute.MinimumMaterialRank
++                );
++
+                 recipes.Add(
+                     new Recipe(
+                         resultType,
+-                        Array.AsReadOnly(materials)
++                        Array.AsReadOnly(materials),
++                        minimumMaterialRank
+                     )
+                 );
+             }
+@@ -351,12 +373,21 @@ public static class HeLianRecipeRegistry
+     }
+ 
+     private static bool ContainsRequiredMaterials(
+-        IReadOnlyList<Type> available,
+-        IReadOnlyList<Type> required
++        IReadOnlyList<CardModel> available,
++        IReadOnlyList<Type> required,
++        int minimumMaterialRank
+     )
+     {
++        Type[] eligibleTypes = available
++            .Where(card =>
++                card is IGuRankProvider provider &&
++                provider.GuRank >= minimumMaterialRank
++            )
++            .Select(card => card.GetType())
++            .ToArray();
++
+         Dictionary<Type, int> availableCounts =
+-            CountTypes(available);
++            CountTypes(eligibleTypes);
+ 
+         foreach (
+             (Type type, int requiredCount)
+diff --git a/GuZhenRenCode/Cards/HeLian/JingHuiGu.cs b/GuZhenRenCode/Cards/HeLian/JingHuiGu.cs
+new file mode 100644
+index 0000000..83d3ea6
+--- /dev/null
++++ b/GuZhenRenCode/Cards/HeLian/JingHuiGu.cs
+@@ -0,0 +1,250 @@
++using GuZhenRen.Cards.GuangDao;
++using GuZhenRen.Characters;
++using GuZhenRen.Combat;
++using GuZhenRen.Powers.GuangDao;
++
++using MegaCrit.Sts2.Core.Commands;
++using MegaCrit.Sts2.Core.Entities.Cards;
++using MegaCrit.Sts2.Core.Entities.Creatures;
++using MegaCrit.Sts2.Core.GameActions.Multiplayer;
++using MegaCrit.Sts2.Core.Localization.DynamicVars;
++using MegaCrit.Sts2.Core.Models;
++using MegaCrit.Sts2.Core.ValueProps;
++
++using STS2RitsuLib.Combat.SecondaryResources;
++using STS2RitsuLib.Scaffolding.Content;
++using STS2RitsuLib.Utils;
++
++namespace GuZhenRen.Cards.HeLian;
++
++[HeLianRecipe(
++    typeof(JingGuangGu),
++    typeof(DingGuangGu),
++    MinimumMaterialRank = 3
++)]
++public sealed class JingHuiGu
++    : AbstractHeLianGuCard,
++      IGuRecoveryEffectSource
++{
++    private static readonly SavedAttachedState<CardModel, bool>
++        RecoveryHandledState = new(
++            Entry.ModId + ".jing_hui.recovery_handled",
++            static () => false
++        );
++
++    private static readonly SavedAttachedState<CardModel, bool>
++        PendingGenerationState = new(
++            Entry.ModId + ".jing_hui.pending_generation",
++            static () => false
++        );
++
++    public override int MaxUses => 1;
++
++    public override int RecoveryDelayTurns => GuRank switch
++    {
++        <= 5 => 2,
++        <= 8 => 3,
++        _ => 4,
++    };
++
++    protected override IEnumerable<DynamicVar> CanonicalVars =>
++    [
++        new BlockVar(11m, ValueProp.Move),
++        new PowerVar<ZhaoPoPower>(1m),
++    ];
++
++    public override bool GainsBlock => true;
++
++    public override CardAssetProfile AssetProfile => new(
++        PortraitPath: $"{Entry.ResPath}/images/cards/YuPiGu.png"
++    );
++
++    public JingHuiGu()
++        : base(
++            baseCost: 0,
++            type: CardType.Skill,
++            rarity: CardRarity.Rare,
++            target: TargetType.AnyEnemy
++        )
++    {
++        SetDao(Dao.GuangDao);
++        this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 2);
++        SetGuRank(3);
++        RefreshRankValues();
++    }
++
++    protected override void AddExtraArgsToDescription(
++        MegaCrit.Sts2.Core.Localization.LocString description
++    )
++    {
++        base.AddExtraArgsToDescription(description);
++        description.Add("RecoveryTurns", RecoveryDelayTurns);
++    }
++
++    protected override async Task OnPlay(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay
++    )
++    {
++        Creature? target = cardPlay.Target;
++        if (target == null || !IsValidTarget(target))
++        {
++            return;
++        }
++
++        await CreatureCmd.GainBlock(
++            Owner.Creature,
++            DynamicVars.Block,
++            cardPlay
++        );
++
++        if (cardPlay.PlayIndex == 0)
++        {
++            await GuangDaoPowerSystem.ApplyZhaoPo(
++                choiceContext,
++                this,
++                target,
++                DynamicVars[typeof(ZhaoPoPower).Name].IntValue
++            );
++
++            if (GuRank >= 5)
++            {
++                await PowerCmd.Apply<JingHuiReservePower>(
++                    choiceContext,
++                    Owner.Creature,
++                    1,
++                    Owner.Creature,
++                    this
++                );
++            }
++
++            if (GuRank >= 8)
++            {
++                await PowerCmd.Apply<JingHuiBreakPower>(
++                    choiceContext,
++                    Owner.Creature,
++                    1,
++                    Owner.Creature,
++                    this
++                );
++            }
++        }
++    }
++
++    public void ResetRecoveryEffectState()
++    {
++        RecoveryHandledState[this] = false;
++        PendingGenerationState[this] = false;
++    }
++
++    public async Task OnEnteredRecoveryAsync()
++    {
++        if (RecoveryHandledState[this])
++        {
++            return;
++        }
++
++        RecoveryHandledState[this] = true;
++        if (GuRank < 3)
++        {
++            return;
++        }
++
++        if (GuRank == 3)
++        {
++            JingHui token = CreatePrimaryToken<JingHui>();
++            await GuCardPileSystem.AddGeneratedCardToDiscard(
++                token,
++                Owner
++            );
++            return;
++        }
++
++        PendingGenerationState[this] = true;
++    }
++
++    public async Task OnRecoveryTurnStartAsync(int turnNumber)
++    {
++        if (!PendingGenerationState[this])
++        {
++            return;
++        }
++
++        PendingGenerationState[this] = false;
++        AbstractGuZhenRenCard primary = GuRank >= 9
++            ? CreatePrimaryToken<ZhouTianJingHui>()
++            : GuRank >= 6
++                ? CreatePrimaryToken<NingJingHui>()
++                : CreatePrimaryToken<JingHui>();
++
++        await GuGeneratedCardFactory.AddToHandOrDiscard(
++            primary,
++            Owner
++        );
++    }
++
++    public Task OnRecoveredAsync()
++    {
++        RecoveryHandledState[this] = false;
++        PendingGenerationState[this] = false;
++        return Task.CompletedTask;
++    }
++
++    protected override int CalculateHeLianResultRank(
++        IReadOnlyList<CardModel> materials
++    )
++    {
++        return materials
++            .OfType<IGuRankProvider>()
++            .Select(provider => provider.GuRank)
++            .DefaultIfEmpty(3)
++            .Min();
++    }
++
++    protected override void OnHeLianCompleted(
++        IReadOnlyList<CardModel> materials
++    )
++    {
++        if (materials.All(card => card.IsUpgraded) && !IsUpgraded)
++        {
++            CardCmd.Upgrade(this);
++        }
++    }
++
++    protected override void OnGuRankChanged()
++    {
++        base.OnGuRankChanged();
++        RefreshRankValues();
++    }
++
++    private T CreatePrimaryToken<T>()
++        where T : AbstractGuZhenRenCard
++    {
++        return GuGeneratedCardFactory.Create<T>(
++            Owner,
++            GuRank,
++            upgraded: IsUpgraded
++        );
++    }
++
++    private void RefreshRankValues()
++    {
++        DynamicVars.Block.BaseValue = GuRank switch
++        {
++            <= 3 => 11,
++            4 => 13,
++            5 => 15,
++            6 => 18,
++            7 => 20,
++            8 => 23,
++            _ => 27,
++        };
++        DynamicVars[typeof(ZhaoPoPower).Name].BaseValue = GuRank switch
++        {
++            <= 4 => 1,
++            <= 6 => 2,
++            <= 8 => 3,
++            _ => 4,
++        };
++    }
++}
+diff --git a/GuZhenRenCode/Cards/HeLian/JingHuiTokens.cs b/GuZhenRenCode/Cards/HeLian/JingHuiTokens.cs
+new file mode 100644
+index 0000000..2a3f8fb
+--- /dev/null
++++ b/GuZhenRenCode/Cards/HeLian/JingHuiTokens.cs
+@@ -0,0 +1,239 @@
++using GuZhenRen.Characters;
++using GuZhenRen.Powers.GuangDao;
++
++using MegaCrit.Sts2.Core.Commands;
++using MegaCrit.Sts2.Core.Entities.Cards;
++using MegaCrit.Sts2.Core.Entities.Creatures;
++using MegaCrit.Sts2.Core.GameActions.Multiplayer;
++using MegaCrit.Sts2.Core.Localization.DynamicVars;
++using MegaCrit.Sts2.Core.Models;
++using MegaCrit.Sts2.Core.ValueProps;
++
++using STS2RitsuLib.Interop.AutoRegistration;
++using STS2RitsuLib.Scaffolding.Content;
++
++namespace GuZhenRen.Cards.HeLian;
++
++public abstract class AbstractJingHuiToken
++    : AbstractGuZhenRenCard,
++      ICardRewardExcluded
++{
++    public override CardPoolModel Pool =>
++        ModelDb.CardPool<GuZhenRenCardPool>();
++
++    public override bool CanBeGeneratedInCombat => false;
++
++    public override IEnumerable<CardKeyword> CanonicalKeywords =>
++        [CardKeyword.Exhaust];
++
++    public override CardAssetProfile AssetProfile => new(
++        PortraitPath: $"{Entry.ResPath}/images/cards/YuPiGu.png"
++    );
++
++    protected AbstractJingHuiToken(
++        int cost,
++        TargetType target = TargetType.Self
++    )
++        : base(
++            cost,
++            CardType.Skill,
++            CardRarity.Token,
++            target
++        )
++    {
++        SetDao(Dao.GuangDao);
++    }
++}
++
++[RegisterCard(typeof(GuZhenRenCardPool))]
++public sealed class JingHui : AbstractJingHuiToken
++{
++    protected override IEnumerable<DynamicVar> CanonicalVars =>
++    [
++        new BlockVar(9m, ValueProp.Move),
++        new DynamicVar("ZhaoPoBonus", 5m),
++    ];
++
++    public override bool GainsBlock => true;
++
++    public JingHui() : base(1)
++    {
++    }
++
++    protected override async Task OnPlay(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay
++    )
++    {
++        await CreatureCmd.GainBlock(
++            Owner.Creature,
++            DynamicVars.Block,
++            cardPlay
++        );
++        await PowerCmd.Apply<DingGuangChargePower>(
++            choiceContext,
++            Owner.Creature,
++            DynamicVars["ZhaoPoBonus"].IntValue,
++            Owner.Creature,
++            this
++        );
++    }
++
++    protected override void OnUpgrade()
++    {
++        DynamicVars.Block.UpgradeValueBy(3m);
++        DynamicVars["ZhaoPoBonus"].UpgradeValueBy(2m);
++    }
++}
++
++[RegisterCard(typeof(GuZhenRenCardPool))]
++public sealed class NingJingHui : AbstractJingHuiToken
++{
++    protected override IEnumerable<DynamicVar> CanonicalVars =>
++    [
++        new BlockVar(14m, ValueProp.Move),
++        new DynamicVar("LightBonus", 5m),
++        new DynamicVar("ZhaoPoBonus", 6m),
++    ];
++
++    public override bool GainsBlock => true;
++
++    public NingJingHui() : base(1)
++    {
++    }
++
++    protected override async Task OnPlay(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay
++    )
++    {
++        await CreatureCmd.GainBlock(
++            Owner.Creature,
++            DynamicVars.Block,
++            cardPlay
++        );
++        await PowerCmd.Apply<JuGuangPower>(
++            choiceContext,
++            Owner.Creature,
++            DynamicVars["LightBonus"].IntValue,
++            Owner.Creature,
++            this
++        );
++        await PowerCmd.Apply<DingGuangChargePower>(
++            choiceContext,
++            Owner.Creature,
++            DynamicVars["ZhaoPoBonus"].IntValue,
++            Owner.Creature,
++            this
++        );
++
++        if (GuRank >= 7 && cardPlay.PlayIndex == 0)
++        {
++            FanHui returned = GuGeneratedCardFactory.Create<FanHui>(
++                Owner,
++                GuRank
++            );
++            await GuGeneratedCardFactory.AddToHandOrDiscard(
++                returned,
++                Owner
++            );
++        }
++    }
++
++    protected override void OnUpgrade()
++    {
++        DynamicVars.Block.UpgradeValueBy(3m);
++        DynamicVars["LightBonus"].UpgradeValueBy(2m);
++        DynamicVars["ZhaoPoBonus"].UpgradeValueBy(2m);
++    }
++}
++
++[RegisterCard(typeof(GuZhenRenCardPool))]
++public sealed class FanHui : AbstractJingHuiToken
++{
++    protected override IEnumerable<DynamicVar> CanonicalVars =>
++        [new DynamicVar("LightBonus", 4m)];
++
++    public FanHui() : base(0)
++    {
++    }
++
++    protected override async Task OnPlay(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay
++    )
++    {
++        await GuangDaoPowerSystem.GainGuangHui(
++            choiceContext,
++            this,
++            1
++        );
++        await PowerCmd.Apply<JuGuangPower>(
++            choiceContext,
++            Owner.Creature,
++            DynamicVars["LightBonus"].IntValue,
++            Owner.Creature,
++            this
++        );
++    }
++
++    protected override void OnUpgrade()
++    {
++        DynamicVars["LightBonus"].UpgradeValueBy(2m);
++    }
++}
++
++[RegisterCard(typeof(GuZhenRenCardPool))]
++public sealed class ZhouTianJingHui : AbstractJingHuiToken
++{
++    protected override IEnumerable<DynamicVar> CanonicalVars =>
++    [
++        new BlockVar(20m, ValueProp.Move),
++        new PowerVar<ZhaoPoPower>(3m),
++        new DynamicVar("LightBonus", 8m),
++    ];
++
++    public override bool GainsBlock => true;
++
++    public ZhouTianJingHui()
++        : base(2, TargetType.AnyEnemy)
++    {
++    }
++
++    protected override async Task OnPlay(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay
++    )
++    {
++        Creature? target = cardPlay.Target;
++        if (target == null || !IsValidTarget(target))
++        {
++            return;
++        }
++
++        await CreatureCmd.GainBlock(
++            Owner.Creature,
++            DynamicVars.Block,
++            cardPlay
++        );
++        await GuangDaoPowerSystem.ApplyZhaoPo(
++            choiceContext,
++            this,
++            target,
++            DynamicVars[typeof(ZhaoPoPower).Name].IntValue
++        );
++        await PowerCmd.Apply<JuGuangPower>(
++            choiceContext,
++            Owner.Creature,
++            DynamicVars["LightBonus"].IntValue,
++            Owner.Creature,
++            this
++        );
++    }
++
++    protected override void OnUpgrade()
++    {
++        EnergyCost.UpgradeBy(-1);
++        DynamicVars.Block.UpgradeValueBy(4m);
++    }
++}
+diff --git a/GuZhenRenCode/Cards/HeLian/YueMangGu.cs b/GuZhenRenCode/Cards/HeLian/YueMangGu.cs
+index bc5c59f..4b1df3d 100644
+--- a/GuZhenRenCode/Cards/HeLian/YueMangGu.cs
++++ b/GuZhenRenCode/Cards/HeLian/YueMangGu.cs
+@@ -7,39 +7,60 @@ using MegaCrit.Sts2.Core.Commands;
+ using MegaCrit.Sts2.Core.Entities.Cards;
+ using MegaCrit.Sts2.Core.Entities.Creatures;
+ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+-using MegaCrit.Sts2.Core.Localization;
+ using MegaCrit.Sts2.Core.Localization.DynamicVars;
++using MegaCrit.Sts2.Core.Models;
+ using MegaCrit.Sts2.Core.ValueProps;
+ 
+ using STS2RitsuLib.Combat.SecondaryResources;
+ using STS2RitsuLib.Scaffolding.Content;
++using STS2RitsuLib.Utils;
+ 
+ namespace GuZhenRen.Cards.HeLian;
+ 
+ [HeLianRecipe(
+     typeof(YueGuangGu),
+     typeof(XiaoGuangGu),
+-    typeof(XiaoGuangGu)
++    typeof(XiaoGuangGu),
++    MinimumMaterialRank = 3
+ )]
+-public sealed class YueMangGu : AbstractHeLianGuCard
++public sealed class YueMangGu
++    : AbstractHeLianGuCard,
++      IGuRecoveryEffectSource
+ {
+     private const int GuangHuiCost = 2;
+ 
+-    public override int MaxUses => IsUpgraded ? 2 : 1;
++    private static readonly SavedAttachedState<CardModel, bool>
++        RecoveryHandledState = new(
++            Entry.ModId + ".yue_mang.recovery_handled",
++            static () => false
++        );
++
++    private static readonly SavedAttachedState<CardModel, bool>
++        PendingGenerationState = new(
++            Entry.ModId + ".yue_mang.pending_generation",
++            static () => false
++        );
++
++    public override int MaxUses => 1;
++
++    public override int RecoveryDelayTurns => GuRank switch
++    {
++        <= 5 => 2,
++        <= 8 => 3,
++        _ => 4,
++    };
+ 
+     protected override IEnumerable<DynamicVar> CanonicalVars =>
+     [
+-        new DamageVar(3m, ValueProp.Move),
+-        new DynamicVar("BonusDamage", 2m),
++        new DamageVar(4m, ValueProp.Move),
+         new RepeatVar("Hits", 2),
++        new DynamicVar("EmpoweredHits", 1m),
+         new PowerVar<ZhaoPoPower>(1m),
+     ];
+ 
+-    public override CardAssetProfile AssetProfile =>
+-        new(
+-            PortraitPath:
+-                $"{Entry.ResPath}/images/cards/YueMangGu.png"
+-        );
++    public override CardAssetProfile AssetProfile => new(
++        PortraitPath: $"{Entry.ResPath}/images/cards/YueMangGu.png"
++    );
+ 
+     public YueMangGu()
+         : base(
+@@ -51,15 +72,17 @@ public sealed class YueMangGu : AbstractHeLianGuCard
+     {
+         SetDao(Dao.GuangDao);
+         this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 2);
++        SetGuRank(3);
+         RefreshRankValues();
+     }
+ 
+     protected override void AddExtraArgsToDescription(
+-        LocString description
++        MegaCrit.Sts2.Core.Localization.LocString description
+     )
+     {
+         base.AddExtraArgsToDescription(description);
+         description.Add("GuangHuiCost", GuangHuiCost);
++        description.Add("RecoveryTurns", RecoveryDelayTurns);
+     }
+ 
+     protected override async Task OnPlay(
+@@ -73,37 +96,35 @@ public sealed class YueMangGu : AbstractHeLianGuCard
+             return;
+         }
+ 
+-        bool empowered = await GuangDaoPowerSystem
+-            .TrySpendGuangHui(
++        bool empowered = GuRank >= 5 &&
++            await GuangDaoPowerSystem.TrySpendGuangHui(
+                 choiceContext,
+                 this,
+                 cardPlay,
+                 GuangHuiCost
+             );
+-        decimal damage = DynamicVars.Damage.BaseValue;
+ 
+-        if (empowered)
+-        {
+-            damage += DynamicVars["BonusDamage"].BaseValue;
+-        }
++        int hitCount = DynamicVars["Hits"].IntValue +
++            (empowered
++                ? DynamicVars["EmpoweredHits"].IntValue
++                : 0);
+ 
+-        int hitCount = DynamicVars["Hits"].IntValue;
+         for (int hit = 0; hit < hitCount; hit++)
+         {
+-            using IDisposable? suppression =
+-                GuRank < 6 && hit > 0
+-                    ? ZhaoPoTriggerScope.Suppress()
+-                    : null;
+-
+             await DamageCmd
+-                .Attack(damage)
++                .Attack(DynamicVars.Damage.BaseValue)
+                 .FromCard(this, cardPlay)
+                 .Targeting(target)
+                 .WithHitFx("vfx/vfx_attack_slash")
+                 .Execute(choiceContext);
++
++            if (target.IsDead)
++            {
++                break;
++            }
+         }
+ 
+-        if (empowered)
++        if (empowered && cardPlay.PlayIndex == 0 && !target.IsDead)
+         {
+             await GuangDaoPowerSystem.ApplyZhaoPo(
+                 choiceContext,
+@@ -114,16 +135,131 @@ public sealed class YueMangGu : AbstractHeLianGuCard
+         }
+     }
+ 
++    public void ResetRecoveryEffectState()
++    {
++        RecoveryHandledState[this] = false;
++        PendingGenerationState[this] = false;
++    }
++
++    public async Task OnEnteredRecoveryAsync()
++    {
++        if (RecoveryHandledState[this])
++        {
++            return;
++        }
++
++        RecoveryHandledState[this] = true;
++        if (GuRank < 3)
++        {
++            return;
++        }
++
++        if (GuRank == 3)
++        {
++            YueMang token = CreatePrimaryToken<YueMang>();
++            await GuCardPileSystem.AddGeneratedCardToDiscard(
++                token,
++                Owner
++            );
++            return;
++        }
++
++        PendingGenerationState[this] = true;
++    }
++
++    public async Task OnRecoveryTurnStartAsync(int turnNumber)
++    {
++        if (!PendingGenerationState[this])
++        {
++            return;
++        }
++
++        PendingGenerationState[this] = false;
++        AbstractGuZhenRenCard primary = GuRank >= 9
++            ? CreatePrimaryToken<TianYueMang>()
++            : GuRank >= 6
++                ? CreatePrimaryToken<NingYueMang>()
++                : CreatePrimaryToken<YueMang>();
++
++        await GuGeneratedCardFactory.AddToHandOrDiscard(
++            primary,
++            Owner
++        );
++
++        if (GuRank == 8)
++        {
++            NingYueMang second = CreatePrimaryToken<NingYueMang>();
++            await GuCardPileSystem.AddGeneratedCardToDiscard(
++                second,
++                Owner
++            );
++        }
++    }
++
++    public Task OnRecoveredAsync()
++    {
++        RecoveryHandledState[this] = false;
++        PendingGenerationState[this] = false;
++        return Task.CompletedTask;
++    }
++
++    protected override int CalculateHeLianResultRank(
++        IReadOnlyList<CardModel> materials
++    )
++    {
++        return materials
++            .OfType<IGuRankProvider>()
++            .Select(provider => provider.GuRank)
++            .DefaultIfEmpty(3)
++            .Min();
++    }
++
++    protected override void OnHeLianCompleted(
++        IReadOnlyList<CardModel> materials
++    )
++    {
++        if (materials.All(card => card.IsUpgraded) && !IsUpgraded)
++        {
++            CardCmd.Upgrade(this);
++        }
++    }
++
+     protected override void OnGuRankChanged()
+     {
+         base.OnGuRankChanged();
+         RefreshRankValues();
+     }
+ 
++    private T CreatePrimaryToken<T>()
++        where T : AbstractGuZhenRenCard
++    {
++        return GuGeneratedCardFactory.Create<T>(
++            Owner,
++            GuRank,
++            upgraded: IsUpgraded
++        );
++    }
++
+     private void RefreshRankValues()
+     {
+-        DynamicVars["Hits"].BaseValue = GuRank >= 6
+-            ? GuRank - 2
+-            : 2 + Math.Max(0, (GuRank - 1) / 2);
++        DynamicVars.Damage.BaseValue = GuRank switch
++        {
++            <= 3 => 4,
++            4 => 5,
++            5 => 5,
++            6 => 6,
++            7 => 7,
++            8 => 7,
++            _ => 8,
++        };
++        DynamicVars["Hits"].BaseValue = GuRank switch
++        {
++            <= 4 => 2,
++            <= 7 => 3,
++            _ => 4,
++        };
++        DynamicVars["EmpoweredHits"].BaseValue = GuRank >= 9
++            ? 2
++            : 1;
+     }
+ }
+diff --git a/GuZhenRenCode/Cards/HeLian/YueMangTokens.cs b/GuZhenRenCode/Cards/HeLian/YueMangTokens.cs
+new file mode 100644
+index 0000000..4783dca
+--- /dev/null
++++ b/GuZhenRenCode/Cards/HeLian/YueMangTokens.cs
+@@ -0,0 +1,281 @@
++using GuZhenRen.Characters;
++using GuZhenRen.Powers.GuangDao;
++
++using MegaCrit.Sts2.Core.Commands;
++using MegaCrit.Sts2.Core.Entities.Cards;
++using MegaCrit.Sts2.Core.Entities.Creatures;
++using MegaCrit.Sts2.Core.GameActions.Multiplayer;
++using MegaCrit.Sts2.Core.Localization.DynamicVars;
++using MegaCrit.Sts2.Core.Models;
++using MegaCrit.Sts2.Core.ValueProps;
++
++using STS2RitsuLib.Interop.AutoRegistration;
++using STS2RitsuLib.Scaffolding.Content;
++
++namespace GuZhenRen.Cards.HeLian;
++
++public abstract class AbstractYueMangToken
++    : AbstractGuZhenRenCard,
++      ICardRewardExcluded
++{
++    public override CardPoolModel Pool =>
++        ModelDb.CardPool<GuZhenRenCardPool>();
++
++    public override bool CanBeGeneratedInCombat => false;
++
++    public override IEnumerable<CardKeyword> CanonicalKeywords =>
++        [CardKeyword.Exhaust];
++
++    public override CardAssetProfile AssetProfile => new(
++        PortraitPath: $"{Entry.ResPath}/images/cards/YueMangGu.png"
++    );
++
++    protected AbstractYueMangToken(int cost)
++        : base(
++            cost,
++            CardType.Attack,
++            CardRarity.Token,
++            TargetType.AnyEnemy
++        )
++    {
++        SetDao(Dao.GuangDao);
++    }
++
++    protected async Task AttackMany(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay,
++        Creature target,
++        int hitCount,
++        decimal damage,
++        decimal finalHitBonus = 0
++    )
++    {
++        for (int hit = 0; hit < hitCount; hit++)
++        {
++            decimal currentDamage = damage;
++            if (hit == hitCount - 1)
++            {
++                currentDamage += finalHitBonus;
++            }
++
++            await DamageCmd
++                .Attack(currentDamage)
++                .FromCard(this, cardPlay)
++                .Targeting(target)
++                .WithHitFx("vfx/vfx_attack_slash")
++                .Execute(choiceContext);
++
++            if (target.IsDead)
++            {
++                break;
++            }
++        }
++    }
++}
++
++[RegisterCard(typeof(GuZhenRenCardPool))]
++public sealed class YueMang : AbstractYueMangToken
++{
++    protected override IEnumerable<DynamicVar> CanonicalVars =>
++    [
++        new DamageVar(4m, ValueProp.Move),
++        new RepeatVar("Hits", 2),
++        new DynamicVar("RefractionBonus", 4m),
++    ];
++
++    public YueMang() : base(1)
++    {
++    }
++
++    protected override async Task OnPlay(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay
++    )
++    {
++        Creature? target = cardPlay.Target;
++        if (target == null || !IsValidTarget(target))
++        {
++            return;
++        }
++
++        bool afterSkill = Owner.Creature.GetPower<ZheGuangPower>()?
++            .PreviousCardWas(CardType.Skill) == true;
++        await AttackMany(
++            choiceContext,
++            cardPlay,
++            target,
++            DynamicVars["Hits"].IntValue,
++            DynamicVars.Damage.BaseValue,
++            afterSkill
++                ? DynamicVars["RefractionBonus"].BaseValue
++                : 0
++        );
++    }
++
++    protected override void OnUpgrade()
++    {
++        DynamicVars.Damage.UpgradeValueBy(1m);
++        DynamicVars["RefractionBonus"].UpgradeValueBy(2m);
++    }
++}
++
++[RegisterCard(typeof(GuZhenRenCardPool))]
++public sealed class NingYueMang : AbstractYueMangToken
++{
++    protected override IEnumerable<DynamicVar> CanonicalVars =>
++    [
++        new DamageVar(6m, ValueProp.Move),
++        new RepeatVar("Hits", 2),
++    ];
++
++    public NingYueMang() : base(1)
++    {
++    }
++
++    protected override async Task OnPlay(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay
++    )
++    {
++        Creature? target = cardPlay.Target;
++        if (target == null || !IsValidTarget(target))
++        {
++            return;
++        }
++
++        bool afterSkill = Owner.Creature.GetPower<ZheGuangPower>()?
++            .PreviousCardWas(CardType.Skill) == true;
++        bool hadZhaoPo = target.GetPower<ZhaoPoPower>() is { Amount: > 0 };
++
++        await AttackMany(
++            choiceContext,
++            cardPlay,
++            target,
++            DynamicVars["Hits"].IntValue + (afterSkill ? 1 : 0),
++            DynamicVars.Damage.BaseValue
++        );
++
++        if (GuRank >= 7 && hadZhaoPo && cardPlay.PlayIndex == 0)
++        {
++            CanMang remnant = GuGeneratedCardFactory.Create<CanMang>(
++                Owner,
++                GuRank
++            );
++            await GuGeneratedCardFactory.AddToHandOrDiscard(
++                remnant,
++                Owner
++            );
++        }
++    }
++
++    protected override void OnUpgrade()
++    {
++        DynamicVars.Damage.UpgradeValueBy(2m);
++    }
++}
++
++[RegisterCard(typeof(GuZhenRenCardPool))]
++public sealed class CanMang : AbstractYueMangToken
++{
++    protected override IEnumerable<DynamicVar> CanonicalVars =>
++    [
++        new DamageVar(7m, ValueProp.Move),
++        new DynamicVar("RefractionDamage", 10m),
++    ];
++
++    public CanMang() : base(0)
++    {
++    }
++
++    protected override async Task OnPlay(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay
++    )
++    {
++        Creature? target = cardPlay.Target;
++        if (target == null || !IsValidTarget(target))
++        {
++            return;
++        }
++
++        bool refracted = Owner.Creature.GetPower<ZheGuangPower>()?
++            .GuangHuiGainedThisTurn > 0;
++        decimal damage = refracted
++            ? DynamicVars["RefractionDamage"].BaseValue
++            : DynamicVars.Damage.BaseValue;
++
++        await DamageCmd
++            .Attack(damage)
++            .FromCard(this, cardPlay)
++            .Targeting(target)
++            .WithHitFx("vfx/vfx_attack_slash")
++            .Execute(choiceContext);
++    }
++
++    protected override void OnUpgrade()
++    {
++        DynamicVars.Damage.UpgradeValueBy(2m);
++        DynamicVars["RefractionDamage"].UpgradeValueBy(2m);
++    }
++}
++
++[RegisterCard(typeof(GuZhenRenCardPool))]
++public sealed class TianYueMang : AbstractYueMangToken
++{
++    protected override IEnumerable<DynamicVar> CanonicalVars =>
++    [
++        new DamageVar(8m, ValueProp.Move),
++        new RepeatVar("Hits", 4),
++        new DynamicVar("DoubleRefractionBonus", 12m),
++        new PowerVar<ZhaoPoPower>(2m),
++    ];
++
++    public TianYueMang() : base(2)
++    {
++    }
++
++    protected override async Task OnPlay(
++        PlayerChoiceContext choiceContext,
++        CardPlay cardPlay
++    )
++    {
++        Creature? target = cardPlay.Target;
++        if (target == null || !IsValidTarget(target))
++        {
++            return;
++        }
++
++        bool doubleRefraction = Owner.Creature.GetPower<ZheGuangPower>()?
++            .GuangHuiGainedThisTurn >= 2;
++        await AttackMany(
++            choiceContext,
++            cardPlay,
++            target,
++            DynamicVars["Hits"].IntValue,
++            DynamicVars.Damage.BaseValue
++        );
++
++        if (doubleRefraction && !target.IsDead)
++        {
++            await DamageCmd
++                .Attack(DynamicVars["DoubleRefractionBonus"].BaseValue)
++                .FromCard(this, cardPlay)
++                .Targeting(target)
++                .WithHitFx("vfx/vfx_attack_slash")
++                .Execute(choiceContext);
++
++            await GuangDaoPowerSystem.ApplyZhaoPo(
++                choiceContext,
++                this,
++                target,
++                DynamicVars[typeof(ZhaoPoPower).Name].IntValue
++            );
++        }
++    }
++
++    protected override void OnUpgrade()
++    {
++        EnergyCost.UpgradeBy(-1);
++        DynamicVars.Damage.UpgradeValueBy(1m);
++    }
++}
+diff --git a/GuZhenRenCode/Powers/GuangDao/DingGuangChargePower.cs b/GuZhenRenCode/Powers/GuangDao/DingGuangChargePower.cs
+new file mode 100644
+index 0000000..fb02379
+--- /dev/null
++++ b/GuZhenRenCode/Powers/GuangDao/DingGuangChargePower.cs
+@@ -0,0 +1,71 @@
++using GuZhenRen.Cards;
++
++using MegaCrit.Sts2.Core.Commands;
++using MegaCrit.Sts2.Core.Entities.Cards;
++using MegaCrit.Sts2.Core.Entities.Creatures;
++using MegaCrit.Sts2.Core.Entities.Powers;
++using MegaCrit.Sts2.Core.GameActions.Multiplayer;
++using MegaCrit.Sts2.Core.Models;
++using MegaCrit.Sts2.Core.ValueProps;
++
++using STS2RitsuLib.Interop.AutoRegistration;
++using STS2RitsuLib.Scaffolding.Content;
++
++namespace GuZhenRen.Powers.GuangDao;
++
++/// <summary>
++/// 定光：下一张由持有者打出的攻击牌，其第一段若命中带有照破的敌人，
++/// 获得固定伤害加成。无论是否满足条件，第一次攻击伤害结算后都会清空，
++/// 避免多段攻击把固定增益按段数放大。
++/// </summary>
++[RegisterPower]
++public sealed class DingGuangChargePower : ModPowerTemplate
++{
++    public override PowerType Type => PowerType.Buff;
++
++    public override PowerStackType StackType => PowerStackType.Counter;
++
++    protected override bool IsVisibleInternal => false;
++
++    public override decimal ModifyDamageAdditive(
++        Creature? target,
++        decimal amount,
++        ValueProp props,
++        Creature? dealer,
++        CardModel? cardSource,
++        CardPlay? cardPlay
++    )
++    {
++        return Amount > 0 &&
++               ReferenceEquals(dealer, Owner) &&
++               cardSource?.Type == CardType.Attack &&
++               target?.GetPower<ZhaoPoPower>() is { Amount: > 0 }
++            ? Amount
++            : 0;
++    }
++
++    public override async Task AfterDamageReceived(
++        PlayerChoiceContext choiceContext,
++        Creature target,
++        DamageResult result,
++        ValueProp props,
++        Creature? dealer,
++        CardModel? cardSource
++    )
++    {
++        if (Amount <= 0 ||
++            !ReferenceEquals(dealer, Owner) ||
++            cardSource?.Type != CardType.Attack)
++        {
++            return;
++        }
++
++        await PowerCmd.ModifyAmount(
++            choiceContext,
++            this,
++            -Amount,
++            Owner,
++            cardSource
++        );
++    }
++}
+diff --git a/GuZhenRenCode/Powers/GuangDao/GuangDaoPowerSystem.cs b/GuZhenRenCode/Powers/GuangDao/GuangDaoPowerSystem.cs
+index 1c26dea..a7c5fa9 100644
+--- a/GuZhenRenCode/Powers/GuangDao/GuangDaoPowerSystem.cs
++++ b/GuZhenRenCode/Powers/GuangDao/GuangDaoPowerSystem.cs
+@@ -75,6 +75,37 @@ public static class GuangDaoPowerSystem
+         return Math.Max(0, after - before);
+     }
+ 
++    internal static async Task<int> GainGuangHuiFromPower(
++        PlayerChoiceContext choiceContext,
++        Creature owner,
++        int amount
++    )
++    {
++        if (amount <= 0 || owner.CombatState == null)
++        {
++            return 0;
++        }
++
++        int before = owner.GetPower<GuangHuiPower>()?.Amount ?? 0;
++        int room = Math.Max(0, GuangHuiPower.MaximumAmount - before);
++        int requested = Math.Min(amount, room);
++        if (requested <= 0)
++        {
++            return 0;
++        }
++
++        await PowerCmd.Apply<GuangHuiPower>(
++            choiceContext,
++            owner,
++            requested,
++            owner,
++            cardSource: null
++        );
++
++        int after = owner.GetPower<GuangHuiPower>()?.Amount ?? 0;
++        return Math.Max(0, after - before);
++    }
++
+     /// <summary>
+     /// 首段询问是否支付光辉；Replay 后续段复用首段选择，不重复支付或弹窗。
+     /// </summary>
+diff --git a/GuZhenRenCode/Powers/GuangDao/JingHuiTimingPowers.cs b/GuZhenRenCode/Powers/GuangDao/JingHuiTimingPowers.cs
+new file mode 100644
+index 0000000..4609f2c
+--- /dev/null
++++ b/GuZhenRenCode/Powers/GuangDao/JingHuiTimingPowers.cs
+@@ -0,0 +1,93 @@
++using MegaCrit.Sts2.Core.Combat;
++using MegaCrit.Sts2.Core.Commands;
++using MegaCrit.Sts2.Core.Entities.Creatures;
++using MegaCrit.Sts2.Core.Entities.Powers;
++using MegaCrit.Sts2.Core.GameActions.Multiplayer;
++using MegaCrit.Sts2.Core.Models;
++
++using STS2RitsuLib.Interop.AutoRegistration;
++using STS2RitsuLib.Scaffolding.Content;
++
++namespace GuZhenRen.Powers.GuangDao;
++
++/// <summary>
++/// 留光：本回合结束时仍有至少5点格挡，获得1点光辉，然后清除。
++/// </summary>
++[RegisterPower]
++public sealed class JingHuiReservePower : ModPowerTemplate
++{
++    public override PowerType Type => PowerType.Buff;
++
++    public override PowerStackType StackType => PowerStackType.Single;
++
++    protected override bool IsVisibleInternal => false;
++
++    public override async Task AfterSideTurnEnd(
++        PlayerChoiceContext choiceContext,
++        CombatSide side,
++        IEnumerable<Creature> participants
++    )
++    {
++        if (Amount <= 0 ||
++            side != Owner.Side ||
++            !participants.Contains(Owner))
++        {
++            return;
++        }
++
++        if (Owner.Block >= 5)
++        {
++            await GuangDaoPowerSystem.GainGuangHuiFromPower(
++                choiceContext,
++                Owner,
++                1
++            );
++        }
++
++        await PowerCmd.ModifyAmount(
++            choiceContext,
++            this,
++            -Amount,
++            Owner,
++            cardSource: null
++        );
++    }
++}
++
++/// <summary>
++/// 破镜：本次镜辉提供的防御窗口中，玩家格挡首次被完全击破时获得1光辉。
++/// </summary>
++[RegisterPower]
++public sealed class JingHuiBreakPower : ModPowerTemplate
++{
++    public override PowerType Type => PowerType.Buff;
++
++    public override PowerStackType StackType => PowerStackType.Single;
++
++    protected override bool IsVisibleInternal => false;
++
++    public override async Task AfterBlockBroken(
++        PlayerChoiceContext choiceContext,
++        Creature target,
++        Creature? breaker
++    )
++    {
++        if (Amount <= 0 || !ReferenceEquals(target, Owner))
++        {
++            return;
++        }
++
++        await GuangDaoPowerSystem.GainGuangHuiFromPower(
++            choiceContext,
++            Owner,
++            1
++        );
++        await PowerCmd.ModifyAmount(
++            choiceContext,
++            this,
++            -Amount,
++            Owner,
++            cardSource: null
++        );
++    }
++}
+diff --git a/GuZhenRenCode/Powers/GuangDao/JuGuangPower.cs b/GuZhenRenCode/Powers/GuangDao/JuGuangPower.cs
+index 53fc1c6..6a59bf2 100644
+--- a/GuZhenRenCode/Powers/GuangDao/JuGuangPower.cs
++++ b/GuZhenRenCode/Powers/GuangDao/JuGuangPower.cs
+@@ -43,30 +43,36 @@ public sealed class JuGuangPower : ModPowerTemplate
+             : 0;
+     }
+ 
+-    public override async Task AfterCardPlayed(
++    public override async Task AfterDamageReceived(
+         PlayerChoiceContext choiceContext,
+-        CardPlay cardPlay
++        Creature target,
++        DamageResult result,
++        ValueProp props,
++        Creature? dealer,
++        CardModel? cardSource
+     )
+     {
+         if (Amount <= 0 ||
+-            cardPlay.PlayIndex != 0 ||
+-            !ReferenceEquals(cardPlay.Card.Owner, Owner.Player) ||
+-            !CanEmpower(cardPlay.Card))
++            !ReferenceEquals(dealer, Owner) ||
++            !CanEmpower(cardSource))
+         {
+             return;
+         }
+ 
++        // 固定增伤只作用于下一张光道攻击牌的第一段伤害，
++        // 防止月芒等多段攻击按段数重复放大聚光收益。
+         await PowerCmd.ModifyAmount(
+             choiceContext,
+             this,
+             -Amount,
+             Owner,
+-            cardPlay.Card
++            cardSource
+         );
+     }
+     private static bool CanEmpower(CardModel? card)
+     {
+-        return card is YueGuangGu or YueRen or CanYue or ManYueRen;
++        return card?.Type == CardType.Attack &&
++               GuangDaoPowerSystem.IsGuangDaoCard(card);
+     }
+ 
+ }
+diff --git a/GuZhenRenCode/Powers/GuangDao/ZheGuangPower.cs b/GuZhenRenCode/Powers/GuangDao/ZheGuangPower.cs
+index 67bb502..18bdc9f 100644
+--- a/GuZhenRenCode/Powers/GuangDao/ZheGuangPower.cs
++++ b/GuZhenRenCode/Powers/GuangDao/ZheGuangPower.cs
+@@ -38,6 +38,15 @@ public sealed class ZheGuangPower : ModPowerTemplate
+         new DynamicVar(GainedThisTurnKey, 0),
+     ];
+ 
++    public CardType PreviousCardType =>
++        (CardType)(int)DynamicVars[PreviousTypeKey].BaseValue;
++
++    public int GuangHuiGainedThisTurn =>
++        (int)DynamicVars[GainedThisTurnKey].BaseValue;
++
++    public bool PreviousCardWas(CardType type) =>
++        PreviousCardType == type;
++
+     public override Task AfterEnergyReset(Player player)
+     {
+         if (ReferenceEquals(player, Owner.Player))
+diff --git a/GuZhenRenCode/RestSite/GuHeLianRestSiteOption.cs b/GuZhenRenCode/RestSite/GuHeLianRestSiteOption.cs
+index 4285c5a..eb8a72f 100644
+--- a/GuZhenRenCode/RestSite/GuHeLianRestSiteOption.cs
++++ b/GuZhenRenCode/RestSite/GuHeLianRestSiteOption.cs
+@@ -429,9 +429,7 @@ public sealed class GuHeLianRestSiteOption
+         }
+ 
+         return card.Pile?.Type == PileType.Deck &&
+-            HeLianRecipeRegistry.IsRecipeMaterialType(
+-                card.GetType()
+-            );
++            HeLianRecipeRegistry.IsEligibleMaterialCard(card);
+     }
+ 
+     /// <summary>
+diff --git a/GuZhenRen_Card_Catalog.md b/GuZhenRen_Card_Catalog.md
+index 2863b79..295766c 100644
+--- a/GuZhenRen_Card_Catalog.md
++++ b/GuZhenRen_Card_Catalog.md
+@@ -1,5 +1,8 @@
+ # 《蛊真人》模组卡牌、战斗机制与平衡评估
+ 
++> **0.4.1 提示：** 新增镜光蛊、定光蛊与镜辉蛊，并重构月芒蛊。两条光道合练配方要求材料至少三转，结果取材料最低转数；详细规则以 `PATCH_NOTES_0.4.1.md` 与源码为准。
++
++
+ > **0.4.0 提示：** 本文主体仍是 0.3.2 的历史评估。0.4.0 已将蛊虫容量改为15张，重做小光蛊、月光蛊与玉皮蛊的分转机制和恢复期衍生牌，并将月霓裳实现为杀招。请以 `PATCH_NOTES_0.4.0.md` 与源码为准。
+ 
+ > 文档版本：0.3.2  
+diff --git a/PATCH_NOTES_0.4.1.md b/PATCH_NOTES_0.4.1.md
+new file mode 100644
+index 0000000..475e6a1
+--- /dev/null
++++ b/PATCH_NOTES_0.4.1.md
+@@ -0,0 +1,39 @@
++# GuZhenRen 0.4.1 光道合练扩展
++
++## 新增蛊虫
++
++- 镜光蛊：光道防御蛊，三转后在恢复期间生成光镜体系普通牌。
++- 定光蛊：照破辅助蛊，三转后在恢复期间生成定光符体系普通牌。
++- 镜辉蛊：镜光蛊与定光蛊的合练结果，建立格挡与照破的攻防准备回合。
++
++## 月芒蛊重构
++
++- 配方仍为月光蛊×1＋小光蛊×2。
++- 三张材料均需至少三转。
++- 结果转数改为材料最低转数。
++- 五转起可支付光辉增加攻击段数，并在攻击后施加照破。
++- 三转以后按转数生成月芒、凝月芒、残芒与天月芒。
++- 普通升级不再增加催动次数，而是升级生成的衍生牌。
++
++## 镜辉蛊配方
++
++```text
++三转以上镜光蛊 ×1
++＋三转以上定光蛊 ×1
++＝镜辉蛊
++```
++
++结果转数取两张材料的最低转数；仅当全部材料都完成普通升级时，结果继承普通升级。
++
++## RitsuLib 使用
++
++- 所有新卡牌继续使用 `RegisterCard` 自动注册。
++- 蛊虫继承现有 RitsuLib `ModCardTemplate` 体系。
++- 恢复阶段状态使用 `SavedAttachedState` 保存。
++- 元气继续使用 RitsuLib 次级资源接口。
++- 蛊存放牌堆和恢复牌堆继续使用 RitsuLib 自定义牌堆。
++
++## 兼容性说明
++
++- 未移除月芒蛊的稳定模型类型，旧存档中的月芒蛊仍可解析，但其数值与机制会按0.4.1代码重新计算。
++- 新增配方最低转数检查后，低于三转的月光蛊、小光蛊、镜光蛊和定光蛊不会出现在对应合练材料选择中。
+diff --git a/README.md b/README.md
+index 8ea8db5..40adcf0 100644
+--- a/README.md
++++ b/README.md
+@@ -8,7 +8,7 @@
+ | --- | --- |
+ | Mod 名称 | 蛊真人 |
+ | Mod ID | GuZhenRen |
+-| Mod 版本 | 0.4.0 |
++| Mod 版本 | 0.4.1 |
+ | 目标游戏版本 | 0.110.0 |
+ | 运行库 | STS2-RitsuLib 0.5.4 或兼容版本 |
+ | 构建环境 | Godot 4.5.1 .NET / .NET 9 |
+@@ -155,11 +155,13 @@
+ 
+ #### 合炼
+ 
+-按照已实现配方消耗指定蛊虫，炼制新的蛊虫。结果蛊的转数取材料中的最高转数。
++按照已实现配方消耗指定蛊虫，炼制新的蛊虫。大部分旧配方仍默认取材料最高转数；0.4.1 的两条光道合练配方要求所有材料至少三转，并以材料最低转数作为结果转数。
+ 
+ 当前源码中已经完整落地的配方为：
+ 
+-> **月光蛊 + 小光蛊 + 小光蛊 → 月芒蛊**
++> **三转以上月光蛊 + 三转以上小光蛊 + 三转以上小光蛊 → 月芒蛊**
++>
++> **三转以上镜光蛊 + 三转以上定光蛊 → 镜辉蛊**
+ >
+ > **月芒蛊 + 血气蛊 → 血月蛊**
+ 
+@@ -200,13 +202,14 @@
+ 
+ 因此照破天然适合与多段攻击配合，形成“先叠照破，再使用高段数攻击集中爆发”的战斗思路。
+ 
+-### 9. 玉皮蛊提供“生成临时强牌”的玩法
+-
+-玉皮蛊本身更偏向资源与牌生成。
++### 9. 光道新增合练与恢复期衍生牌
+ 
+-催动后会生成一张比玉皮蛊自身 **高 1 转** 的“玄玉掌”进入手牌。每张玉皮蛊在每场战斗中仅第一次催动获得敏捷；后续催动仍会生成玄玉掌，并在六转以上获得格挡。
++0.4.1 新增镜光蛊、定光蛊和镜辉蛊，并重构月芒蛊。低转蛊虫保持基础攻防或照破功能；三转后才开始在恢复期间生成普通牌，六转后生成升级衍生牌，七转以后才出现有限的末代衍生链。
+ 
+-玄玉掌同时造成伤害并获得格挡，使用后消耗。八、九转拥有 Replay 1，但 Replay 只重复伤害，格挡只在首段结算；九转未升级1费、升级后0费。
++- 月芒蛊融合月光蛊与小光蛊，侧重多段攻击、折光和月芒衍生牌；
++- 镜辉蛊融合镜光蛊与定光蛊，侧重格挡、照破和下一次光道攻击的准备；
++- 合练结果普通升级仅在全部材料都已升级时继承；
++- 月芒蛊与镜辉蛊的普通升级不增加催动次数，而是升级其恢复期间生成的普通牌。
+ 
+ ### 10. 整体玩法差异
+ 
+@@ -404,8 +407,8 @@
+ 当前源码中已能确认的核心可玩内容包括：
+ 
+ - 基础牌：冲拳、防御、催动；
+-- 已实现蛊虫：小光蛊、月光蛊、玉皮蛊、血气蛊，以及可由合炼获得的月芒蛊、血月蛊；
+-- 生成牌：玄玉掌；
++- 已实现蛊虫：小光蛊、月光蛊、玉皮蛊、血气蛊、镜光蛊、定光蛊，以及可由合炼获得的月芒蛊、镜辉蛊、血月蛊；
++- 光道衍生牌：微光、聚光、余辉、极光、月刃、残月、满月刃、玉膜、玉光衣、折光、琉璃玉衣、光镜、返照、明镜、定光符、光标、日晕、月芒、凝月芒、残芒、天月芒、镜辉、凝镜辉、返辉、周天镜辉；
+ - 仙元牌：青提仙元、红枣仙元、白荔仙元、黄杏仙元；
+ - 核心系统：空窍修为、蛊虫转数、元气、仙元、光辉、折光、照破、升炼、合炼、仙蛊全队唯一。
+ 
+@@ -510,6 +513,15 @@ README/本地化或设计代码中还可以看到痕石蛊、白豕蛊、飞熊
+ 本项目是非官方同人 Mod，与 Mega Crit 及相关作品权利方不存在隶属或授权关系。相关游戏、角色、名称和素材的权利归各自权利方所有。
+ 
+ 
++## 0.4.1 光道合练扩展
++
++- 新增普通光道蛊镜光蛊、定光蛊，并加入普通蛊虫奖励池。
++- 重构月芒蛊：配方材料均需至少三转，结果转数取材料最低转数。
++- 新增镜辉蛊：三转以上镜光蛊＋定光蛊合练获得，结果转数取材料最低转数。
++- 新增月芒、凝月芒、残芒、天月芒、光镜、返照、明镜、定光符、光标、日晕、镜辉、凝镜辉、返辉与周天镜辉。
++- 新光道内容继续使用 RitsuLib 的自动注册、卡牌模板、附加状态、次级资源和自定义牌堆接口。
++- 合练材料选择现在会同时检查材料类型和配方最低转数。
++
+ ## 0.4.0 初始蛊虫成长与恢复联动
+ 
+ - 蛊虫永久牌组容量提升至15张；满容量获得新蛊时选择一张旧蛊替换。
+diff --git a/STATIC_VALIDATION_0.4.1.txt b/STATIC_VALIDATION_0.4.1.txt
+new file mode 100644
+index 0000000..86949c6
+--- /dev/null
++++ b/STATIC_VALIDATION_0.4.1.txt
+@@ -0,0 +1,16 @@
++GuZhenRen 0.4.1 light-fusion static validation
++=======================================================
++PASS: JSON parse: 21 files
++PASS: Required new source files: 9
++PASS: C# delimiter scan: 106 files
++PASS: New card localization: 18 classes × 2 languages × title/description
++PASS: RitsuLib RegisterCard annotation scan
++PASS: Fusion recipe/minimum rank declarations
++PASS: RitsuLib SavedAttachedState / secondary resource / registration usage
++PASS: Uploaded game-source API signature checks: 5
++PASS: git diff --check
++PASS: no duplicate unordered recipe detected by source inspection
++NOT RUN: dotnet build (.NET SDK is not installed in this environment)
++NOT RUN: Godot/game runtime regression
++
++RESULT: static validation passed; runtime compilation remains required.

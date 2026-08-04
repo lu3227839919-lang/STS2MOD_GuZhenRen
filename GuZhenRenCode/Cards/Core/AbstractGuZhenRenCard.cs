@@ -661,7 +661,8 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
     ///
     /// 该入口位于公共蛊虫父类，因此声明配方的常规蛊虫牌
     /// 也可以作为合练结果，而不要求继承专用合练牌父类。
-    /// 结果转数严格等于全部材料中的最高转数。
+    /// 结果转数由 CalculateHeLianResultRank 决定；默认取最高转数，
+    /// 特定配方可以改为最低转数等策略。
     /// </summary>
     internal void InitializeFromHeLian(
         IReadOnlyList<CardModel> materials
@@ -677,20 +678,26 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
             );
         }
 
-        int highestMaterialRank = materials
+        SetGuRank(CalculateHeLianResultRank(materials));
+
+        OnHeLianCompleted(materials);
+    }
+
+    /// <summary>
+    /// 计算合练结果转数。默认沿用旧规则，取全部材料最高转数；
+    /// 特定合练蛊可重写为最低转数等策略。
+    /// </summary>
+    protected virtual int CalculateHeLianResultRank(
+        IReadOnlyList<CardModel> materials
+    )
+    {
+        return materials
             .OfType<IGuRankProvider>()
             .Select(provider =>
-                Math.Max(
-                    MinimumGuRank,
-                    provider.GuRank
-                )
+                Math.Max(MinimumGuRank, provider.GuRank)
             )
             .DefaultIfEmpty(MinimumGuRank)
             .Max();
-
-        SetGuRank(highestMaterialRank);
-
-        OnHeLianCompleted(materials);
     }
 
     /// <summary>

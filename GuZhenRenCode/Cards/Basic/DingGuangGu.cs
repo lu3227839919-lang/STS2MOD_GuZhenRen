@@ -1,4 +1,3 @@
-using GuZhenRen.Cards.GuangDao;
 using GuZhenRen.Characters;
 using GuZhenRen.Combat;
 using GuZhenRen.Powers.GuangDao;
@@ -9,39 +8,32 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib.Combat.SecondaryResources;
+using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
 using STS2RitsuLib.Utils;
 
-namespace GuZhenRen.Cards.HeLian;
+namespace GuZhenRen.Cards.GuangDao;
 
-[HeLianRecipe(
-    typeof(YueGuangGu),
-    typeof(XiaoGuangGu),
-    typeof(XiaoGuangGu),
-    MinimumMaterialRank = 3
-)]
-public sealed class YueMangGu
-    : AbstractHeLianGuCard,
+[RegisterCard(typeof(GuZhenRenGuCardPool))]
+public sealed class DingGuangGu
+    : AbstractGuWormCard,
       IGuRecoveryEffectSource
 {
-    private const int GuangHuiCost = 2;
-
     private static readonly SavedAttachedState<CardModel, bool>
         RecoveryHandledState = new(
-            Entry.ModId + ".yue_mang.recovery_handled",
+            Entry.ModId + ".ding_guang.recovery_handled",
             static () => false
         );
 
     private static readonly SavedAttachedState<CardModel, bool>
         PendingGenerationState = new(
-            Entry.ModId + ".yue_mang.pending_generation",
+            Entry.ModId + ".ding_guang.pending_generation",
             static () => false
         );
 
-    public override int MaxUses => 1;
+    public override int MaxUses => IsUpgraded ? 2 : 1;
 
     public override int RecoveryDelayTurns => GuRank switch
     {
@@ -52,27 +44,24 @@ public sealed class YueMangGu
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(4m, ValueProp.Move),
-        new RepeatVar("Hits", 2),
-        new DynamicVar("EmpoweredHits", 1m),
         new PowerVar<ZhaoPoPower>(1m),
+        new DynamicVar("ExposeBonus", 2m),
     ];
 
     public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/YueMangGu.png"
+        PortraitPath: $"{Entry.ResPath}/images/cards/XiaoGuangGu.png"
     );
 
-    public YueMangGu()
+    public DingGuangGu()
         : base(
             baseCost: 0,
-            type: CardType.Attack,
+            type: CardType.Skill,
             rarity: CardRarity.Uncommon,
             target: TargetType.AnyEnemy
         )
     {
         SetDao(Dao.GuangDao);
-        this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 2);
-        SetGuRank(3);
+        this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 1);
         RefreshRankValues();
     }
 
@@ -81,7 +70,6 @@ public sealed class YueMangGu
     )
     {
         base.AddExtraArgsToDescription(description);
-        description.Add("GuangHuiCost", GuangHuiCost);
         description.Add("RecoveryTurns", RecoveryDelayTurns);
     }
 
@@ -96,35 +84,7 @@ public sealed class YueMangGu
             return;
         }
 
-        bool empowered = GuRank >= 5 &&
-            await GuangDaoPowerSystem.TrySpendGuangHui(
-                choiceContext,
-                this,
-                cardPlay,
-                GuangHuiCost
-            );
-
-        int hitCount = DynamicVars["Hits"].IntValue +
-            (empowered
-                ? DynamicVars["EmpoweredHits"].IntValue
-                : 0);
-
-        for (int hit = 0; hit < hitCount; hit++)
-        {
-            await DamageCmd
-                .Attack(DynamicVars.Damage.BaseValue)
-                .FromCard(this, cardPlay)
-                .Targeting(target)
-                .WithHitFx("vfx/vfx_attack_slash")
-                .Execute(choiceContext);
-
-            if (target.IsDead)
-            {
-                break;
-            }
-        }
-
-        if (empowered && cardPlay.PlayIndex == 0 && !target.IsDead)
+        if (cardPlay.PlayIndex == 0)
         {
             await GuangDaoPowerSystem.ApplyZhaoPo(
                 choiceContext,
@@ -132,6 +92,17 @@ public sealed class YueMangGu
                 target,
                 DynamicVars[typeof(ZhaoPoPower).Name].IntValue
             );
+
+            if (GuRank >= 2)
+            {
+                await PowerCmd.Apply<DingGuangChargePower>(
+                    choiceContext,
+                    Owner.Creature,
+                    DynamicVars["ExposeBonus"].IntValue,
+                    Owner.Creature,
+                    this
+                );
+            }
         }
     }
 
@@ -156,7 +127,7 @@ public sealed class YueMangGu
 
         if (GuRank == 3)
         {
-            YueMang token = CreatePrimaryToken<YueMang>();
+            DingGuangFu token = CreateToken<DingGuangFu>();
             await GuCardPileSystem.AddGeneratedCardToDiscard(
                 token,
                 Owner
@@ -175,25 +146,14 @@ public sealed class YueMangGu
         }
 
         PendingGenerationState[this] = false;
-        AbstractGuZhenRenCard primary = GuRank >= 9
-            ? CreatePrimaryToken<TianYueMang>()
-            : GuRank >= 6
-                ? CreatePrimaryToken<NingYueMang>()
-                : CreatePrimaryToken<YueMang>();
+        AbstractGuZhenRenCard token = GuRank >= 9
+            ? CreateToken<RiYun>()
+            : CreateToken<DingGuangFu>();
 
         await GuGeneratedCardFactory.AddToHandOrDiscard(
-            primary,
+            token,
             Owner
         );
-
-        if (GuRank == 8)
-        {
-            NingYueMang second = CreatePrimaryToken<NingYueMang>();
-            await GuCardPileSystem.AddGeneratedCardToDiscard(
-                second,
-                Owner
-            );
-        }
     }
 
     public Task OnRecoveredAsync()
@@ -203,63 +163,31 @@ public sealed class YueMangGu
         return Task.CompletedTask;
     }
 
-    protected override int CalculateHeLianResultRank(
-        IReadOnlyList<CardModel> materials
-    )
-    {
-        return materials
-            .OfType<IGuRankProvider>()
-            .Select(provider => provider.GuRank)
-            .DefaultIfEmpty(3)
-            .Min();
-    }
-
-    protected override void OnHeLianCompleted(
-        IReadOnlyList<CardModel> materials
-    )
-    {
-        if (materials.All(card => card.IsUpgraded) && !IsUpgraded)
-        {
-            CardCmd.Upgrade(this);
-        }
-    }
-
     protected override void OnGuRankChanged()
     {
         base.OnGuRankChanged();
         RefreshRankValues();
     }
 
-    private T CreatePrimaryToken<T>()
-        where T : AbstractGuZhenRenCard
+    private T CreateToken<T>() where T : AbstractGuZhenRenCard
     {
         return GuGeneratedCardFactory.Create<T>(
             Owner,
             GuRank,
-            upgraded: IsUpgraded
+            upgraded: IsUpgraded || GuRank >= 6
         );
     }
 
     private void RefreshRankValues()
     {
-        DynamicVars.Damage.BaseValue = GuRank switch
+        DynamicVars[typeof(ZhaoPoPower).Name].BaseValue = GuRank switch
         {
-            <= 3 => 4,
-            4 => 5,
-            5 => 5,
-            6 => 6,
-            7 => 7,
-            8 => 7,
-            _ => 8,
-        };
-        DynamicVars["Hits"].BaseValue = GuRank switch
-        {
-            <= 4 => 2,
+            <= 3 => 1,
+            <= 5 => 2,
             <= 7 => 3,
-            _ => 4,
+            8 => 4,
+            _ => 5,
         };
-        DynamicVars["EmpoweredHits"].BaseValue = GuRank >= 9
-            ? 2
-            : 1;
+        DynamicVars["ExposeBonus"].BaseValue = GuRank >= 6 ? 4 : 2;
     }
 }
