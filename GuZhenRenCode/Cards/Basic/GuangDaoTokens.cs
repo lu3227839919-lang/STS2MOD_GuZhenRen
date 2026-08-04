@@ -58,9 +58,8 @@ public abstract class AbstractGuangDaoToken
 [RegisterCard(typeof(GuZhenRenCardPool))]
 public sealed class WeiGuang : AbstractGuangDaoToken
 {
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/XiaoGuangGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public WeiGuang() : base(0, CardType.Skill)
     {
@@ -79,9 +78,8 @@ public sealed class WeiGuang : AbstractGuangDaoToken
 [RegisterCard(typeof(GuZhenRenCardPool))]
 public sealed class JuGuang : AbstractGuangDaoToken
 {
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/XiaoGuangGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public JuGuang() : base(0, CardType.Skill)
     {
@@ -119,9 +117,8 @@ public sealed class JuGuang : AbstractGuangDaoToken
 [RegisterCard(typeof(GuZhenRenCardPool))]
 public sealed class YuHui : AbstractGuangDaoToken
 {
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/XiaoGuangGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public YuHui() : base(0, CardType.Skill)
     {
@@ -140,9 +137,8 @@ public sealed class YuHui : AbstractGuangDaoToken
 [RegisterCard(typeof(GuZhenRenCardPool))]
 public sealed class JiGuang : AbstractGuangDaoToken
 {
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/XiaoGuangGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public JiGuang() : base(1, CardType.Skill)
     {

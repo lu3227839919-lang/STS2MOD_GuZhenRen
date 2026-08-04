@@ -24,10 +24,7 @@ public sealed class GuZhenRenStrike
         [new DamageVar(6m, ValueProp.Move)];
 
     public override CardAssetProfile AssetProfile =>
-        new(
-            PortraitPath:
-                $"{Entry.ResPath}/images/cards/ChongQian.png"
-        );
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public GuZhenRenStrike()
         : base(

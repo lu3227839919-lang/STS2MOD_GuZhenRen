@@ -33,6 +33,12 @@ namespace GuZhenRen.Cards;
 public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
 {
     /// <summary>
+    /// 默认使用与具体运行时卡牌类型同名的 PNG。
+    /// </summary>
+    public override CardAssetProfile AssetProfile =>
+        CardImageCatalog.Create(GetType());
+
+    /// <summary>
     /// 普通蛊虫每次恢复后默认可催动一次。
     /// </summary>
     public virtual int MaxUses => 1;

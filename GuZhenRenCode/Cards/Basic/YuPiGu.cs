@@ -56,9 +56,8 @@ public sealed class YuPiGu
 
     public override bool GainsBlock => true;
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/YuPiGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public YuPiGu()
         : base(

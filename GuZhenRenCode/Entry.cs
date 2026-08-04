@@ -110,6 +110,10 @@ public partial class Entry
             Logger
         );
 
+        // 所有卡牌统一使用 GuZhenRen/images/cards 下的同名 PNG。
+        // 缺失文件只记录明确警告，不静默复用其他卡图。
+        CardImageCatalog.ValidateAssembly(assembly);
+
         _contentRegistered = true;
     }
 

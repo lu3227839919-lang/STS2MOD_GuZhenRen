@@ -33,9 +33,8 @@ public sealed class YueRen
     public override CardPoolModel Pool =>
         ModelDb.CardPool<GuZhenRenCardPool>();
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/YueGuangGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public YueRen()
         : base(
@@ -136,9 +135,8 @@ public sealed class CanYue
     public override CardPoolModel Pool =>
         ModelDb.CardPool<GuZhenRenCardPool>();
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/YueGuangGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public CanYue()
         : base(
@@ -196,9 +194,8 @@ public sealed class ManYueRen
     public override CardPoolModel Pool =>
         ModelDb.CardPool<GuZhenRenCardPool>();
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/YueGuangGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public ManYueRen()
         : base(

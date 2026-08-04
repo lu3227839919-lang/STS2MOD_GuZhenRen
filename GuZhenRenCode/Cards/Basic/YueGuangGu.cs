@@ -60,9 +60,8 @@ public sealed class YueGuangGu
         new PowerVar<ZhaoPoPower>(1m),
     ];
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/YueGuangGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public YueGuangGu()
         : base(

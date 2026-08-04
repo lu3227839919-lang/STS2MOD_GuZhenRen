@@ -100,10 +100,7 @@ public sealed class EnemyTargetChoice
         ModelDb.CardPool<GuZhenRenCardPool>();
 
     public override CardAssetProfile AssetProfile =>
-        new(
-            PortraitPath:
-                $"{Entry.ResPath}/images/cards/ChuiDong.png"
-        );
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public override bool CanBeGeneratedInCombat => false;
 

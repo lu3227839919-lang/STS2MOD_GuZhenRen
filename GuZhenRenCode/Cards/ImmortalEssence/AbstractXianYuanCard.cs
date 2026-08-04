@@ -42,7 +42,8 @@ public abstract class AbstractXianYuanCard
     /// 每张具体仙元牌必须声明非空的静态图片路径。
     /// 这样 RitsuLib 分析器和运行时才能在资源缺失时给出诊断。
     /// </summary>
-    public abstract override CardAssetProfile AssetProfile { get; }
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     protected AbstractXianYuanCard()
         : base(

@@ -25,10 +25,7 @@ public sealed class GuZhenRenDefend
     public override bool GainsBlock => true;
 
     public override CardAssetProfile AssetProfile =>
-        new(
-            PortraitPath:
-                $"{Entry.ResPath}/images/cards/GeDang.png"
-        );
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public GuZhenRenDefend()
         : base(

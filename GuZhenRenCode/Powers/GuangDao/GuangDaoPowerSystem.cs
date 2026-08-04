@@ -271,7 +271,8 @@ public abstract class AbstractGuangHuiChoice
     {
     }
 
-    public abstract override CardAssetProfile AssetProfile { get; }
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     protected override bool IsPlayable => false;
 
@@ -285,10 +286,7 @@ public sealed class SpendGuangHuiChoice
     : AbstractGuangHuiChoice
 {
     public override CardAssetProfile AssetProfile =>
-        new(
-            PortraitPath:
-                $"{Entry.ResPath}/images/cards/YueGuangGu.png"
-        );
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public SpendGuangHuiChoice()
         : base()
@@ -301,10 +299,7 @@ public sealed class SaveGuangHuiChoice
     : AbstractGuangHuiChoice
 {
     public override CardAssetProfile AssetProfile =>
-        new(
-            PortraitPath:
-                $"{Entry.ResPath}/images/cards/ChuiDong.png"
-        );
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public SaveGuangHuiChoice()
         : base()

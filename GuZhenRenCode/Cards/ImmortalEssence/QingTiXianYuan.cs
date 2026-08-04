@@ -7,7 +7,6 @@ public sealed class QingTiXianYuan : AbstractXianYuanCard
 {
     public override int ActivationUnits => 2;
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: "res://GuZhenRen/images/cards/QingTiXianYuan.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 }

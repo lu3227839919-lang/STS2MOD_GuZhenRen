@@ -54,9 +54,8 @@ public sealed class GuangJing : AbstractLightExpansionToken
 
     public override bool GainsBlock => true;
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/YuPiGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public GuangJing() : base(1, CardType.Skill, TargetType.Self)
     {
@@ -106,9 +105,8 @@ public sealed class FanZhao : AbstractLightExpansionToken
     protected override IEnumerable<DynamicVar> CanonicalVars =>
         [new DynamicVar("MaxDamage", 15m)];
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/YuPiGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public FanZhao() : base(1, CardType.Attack, TargetType.AnyEnemy)
     {
@@ -152,9 +150,8 @@ public sealed class MingJing : AbstractLightExpansionToken
 
     public override bool GainsBlock => true;
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/YuPiGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public MingJing() : base(2, CardType.Skill, TargetType.Self)
     {
@@ -190,9 +187,8 @@ public sealed class DingGuangFu : AbstractLightExpansionToken
     protected override IEnumerable<DynamicVar> CanonicalVars =>
         [new DynamicVar("BonusDamage", 5m)];
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/XiaoGuangGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public DingGuangFu() : base(0, CardType.Skill, TargetType.Self)
     {
@@ -236,9 +232,8 @@ public sealed class GuangBiao : AbstractLightExpansionToken
     protected override IEnumerable<DynamicVar> CanonicalVars =>
         [new DynamicVar("LightBonus", 4m)];
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/XiaoGuangGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public GuangBiao() : base(0, CardType.Skill, TargetType.Self)
     {
@@ -273,9 +268,8 @@ public sealed class RiYun : AbstractLightExpansionToken
         new DynamicVar("TargetCap", 4m),
     ];
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/XiaoGuangGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public RiYun() : base(2, CardType.Skill, TargetType.AnyEnemy)
     {

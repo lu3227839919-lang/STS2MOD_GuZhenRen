@@ -12,7 +12,6 @@ public sealed class BaiLiXianYuan : AbstractXianYuanCard
     protected override CardModel ReferencedCard =>
         ModelDb.Card<HongZaoXianYuan>();
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: "res://GuZhenRen/images/cards/BaiLiXianYuan.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 }

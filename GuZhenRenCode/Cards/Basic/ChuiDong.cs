@@ -21,10 +21,7 @@ public sealed class ChuiDong
     : ModCardTemplate, ICardRewardExcluded
 {
     public override CardAssetProfile AssetProfile =>
-        new(
-            PortraitPath:
-                $"{Entry.ResPath}/images/cards/ChuiDong.png"
-        );
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public ChuiDong()
         : base(

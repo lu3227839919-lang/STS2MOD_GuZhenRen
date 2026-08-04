@@ -94,5 +94,17 @@
   "GU_ZHEN_REN_CARD_FAN_HUI.title": "Returning Radiance",
   "GU_ZHEN_REN_CARD_FAN_HUI.description": "Gain 1 [gold]Brilliance[/gold]. The next Light Path Attack deals {LightBonus} more damage. Exhaust. Final Generation.",
   "GU_ZHEN_REN_CARD_ZHOU_TIAN_JING_HUI.title": "Heaven-Circling Mirror Radiance",
-  "GU_ZHEN_REN_CARD_ZHOU_TIAN_JING_HUI.description": "Gain {Block:diff()} Block. Apply {ZhaoPoPower:diff()} Illumination Break to an enemy, and the next Light Path Attack deals {LightBonus} more damage. Exhaust. Final Generation."
+  "GU_ZHEN_REN_CARD_ZHOU_TIAN_JING_HUI.description": "Gain {Block:diff()} Block. Apply {ZhaoPoPower:diff()} Illumination Break to an enemy, and the next Light Path Attack deals {LightBonus} more damage. Exhaust. Final Generation.",
+  "GU_ZHEN_REN_CARD_LIU_GUANG_GU.title": "Flowing Light Gu",
+  "GU_ZHEN_REN_CARD_LIU_GUANG_GU.description": "Can be activated {RemainingUses}/{MaxUses} times, then recovers for {RecoveryTurns} turns. Deal {Damage:diff()} damage. From rank 2, if Refraction has triggered this turn, deal {RefractionBonus} more. From rank 3, create [gold]Flowing Light[/gold] while recovering; at rank 8 also place a second copy into the discard pile; at rank 9 create [gold]White Rainbow[/gold] instead.",
+  "GU_ZHEN_REN_CARD_LIU_GUANG.title": "Flowing Light",
+  "GU_ZHEN_REN_CARD_LIU_GUANG.description": "Deal {Damage:diff()} damage. If the previous valid card was a Skill, deal {RefractionBonus} more. A rank-7 source creates [gold]Streaming Radiance[/gold] after attacking a target that had [gold]Illumination Break[/gold]. Exhaust.",
+  "GU_ZHEN_REN_CARD_LIU_HUI.title": "Streaming Radiance",
+  "GU_ZHEN_REN_CARD_LIU_HUI.description": "Deal {Damage:diff()} damage. Exhaust. Final Generation.",
+  "GU_ZHEN_REN_CARD_BAI_HONG.title": "White Rainbow",
+  "GU_ZHEN_REN_CARD_BAI_HONG.description": "Deal {Damage:diff()} damage. If Refraction triggered twice this turn, deal {DoubleRefractionBonus} more and apply {ZhaoPoPower:diff()} [gold]Illumination Break[/gold]. Exhaust. Final Generation.",
+  "GU_ZHEN_REN_CARD_BAI_HONG_GUAN_RI.title": "White Rainbow Pierces the Sun",
+  "GU_ZHEN_REN_CARD_BAI_HONG_GUAN_RI.description": "Consume up to {MaxZhaoPoConsumed} [gold]Illumination Break[/gold] from the target. Deal {Damage:diff()} damage, plus {DamagePerZhaoPo} for each stack consumed. You may spend {GuangHuiCost} [gold]Brilliance[/gold] to ignore up to {PierceCap} Block. Exhaust.",
+  "GU_ZHEN_REN_CARD_JING_YUE_FAN_ZHAO.title": "Mirror Moon Reflection",
+  "GU_ZHEN_REN_CARD_JING_YUE_FAN_ZHAO.description": "Gain {Block:diff()} Block and deal {Damage:diff()} damage to an enemy. From rank 7, gain {GuangHui} [gold]Brilliance[/gold]. Exhaust."
 }

@@ -48,9 +48,8 @@ public sealed class DingGuangGu
         new DynamicVar("ExposeBonus", 2m),
     ];
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/XiaoGuangGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public DingGuangGu()
         : base(

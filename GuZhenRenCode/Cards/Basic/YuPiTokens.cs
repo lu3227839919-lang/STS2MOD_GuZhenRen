@@ -50,9 +50,8 @@ public sealed class YuMo : AbstractYuPiToken
     protected override IEnumerable<DynamicVar> CanonicalVars =>
         [new BlockVar(8m, ValueProp.Move)];
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/YuPiGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public YuMo() : base(1)
     {
@@ -96,9 +95,8 @@ public sealed class YuGuangYi : AbstractYuPiToken
     protected override IEnumerable<DynamicVar> CanonicalVars =>
         [new BlockVar(12m, ValueProp.Move)];
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/YuPiGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public YuGuangYi() : base(1)
     {
@@ -155,9 +153,8 @@ public sealed class ZheGuang : AbstractYuPiToken
     protected override IEnumerable<DynamicVar> CanonicalVars =>
         [new BlockVar(4m, ValueProp.Move)];
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/YuPiGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public ZheGuang() : base(0)
     {
@@ -195,9 +192,8 @@ public sealed class LiuLiYuYi : AbstractYuPiToken
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         [CardKeyword.Exhaust, CardKeyword.Retain];
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/YuPiGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public LiuLiYuYi() : base(2)
     {

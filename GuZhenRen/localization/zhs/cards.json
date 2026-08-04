@@ -94,5 +94,17 @@
   "GU_ZHEN_REN_CARD_FAN_HUI.title": "返辉",
   "GU_ZHEN_REN_CARD_FAN_HUI.description": "获得1点[gold]光辉[/gold]，使下一张光道攻击伤害提高{LightBonus}点。消耗。末代。",
   "GU_ZHEN_REN_CARD_ZHOU_TIAN_JING_HUI.title": "周天镜辉",
-  "GU_ZHEN_REN_CARD_ZHOU_TIAN_JING_HUI.description": "获得{Block:diff()}点格挡。对一个敌人施加{ZhaoPoPower:diff()}层照破，并使下一张光道攻击伤害提高{LightBonus}点。消耗。末代。"
+  "GU_ZHEN_REN_CARD_ZHOU_TIAN_JING_HUI.description": "获得{Block:diff()}点格挡。对一个敌人施加{ZhaoPoPower:diff()}层照破，并使下一张光道攻击伤害提高{LightBonus}点。消耗。末代。",
+  "GU_ZHEN_REN_CARD_LIU_GUANG_GU.title": "流光蛊",
+  "GU_ZHEN_REN_CARD_LIU_GUANG_GU.description": "可催动{RemainingUses}/{MaxUses}次，耗尽后恢复{RecoveryTurns}回合。造成{Damage:diff()}点伤害。二转起，若本回合已经触发折光，额外造成{RefractionBonus}点伤害。三转起在恢复期间生成[gold]流光[/gold]；八转额外将第二张流光置入弃牌堆；九转改为生成[gold]白虹[/gold]。",
+  "GU_ZHEN_REN_CARD_LIU_GUANG.title": "流光",
+  "GU_ZHEN_REN_CARD_LIU_GUANG.description": "造成{Damage:diff()}点伤害。若上一张有效牌是技能，额外造成{RefractionBonus}点伤害。七转来源攻击已有[gold]照破[/gold]的目标后生成一张[gold]流辉[/gold]。消耗。",
+  "GU_ZHEN_REN_CARD_LIU_HUI.title": "流辉",
+  "GU_ZHEN_REN_CARD_LIU_HUI.description": "造成{Damage:diff()}点伤害。消耗。末代。",
+  "GU_ZHEN_REN_CARD_BAI_HONG.title": "白虹",
+  "GU_ZHEN_REN_CARD_BAI_HONG.description": "造成{Damage:diff()}点伤害。本回合已经触发两次折光时，额外造成{DoubleRefractionBonus}点伤害并施加{ZhaoPoPower:diff()}层[gold]照破[/gold]。消耗。末代。",
+  "GU_ZHEN_REN_CARD_BAI_HONG_GUAN_RI.title": "白虹贯日",
+  "GU_ZHEN_REN_CARD_BAI_HONG_GUAN_RI.description": "消耗目标至多{MaxZhaoPoConsumed}层[gold]照破[/gold]。造成{Damage:diff()}点伤害，每消耗1层额外造成{DamagePerZhaoPo}点伤害。可消耗{GuangHuiCost}点[gold]光辉[/gold]，使本次攻击无视至多{PierceCap}点格挡。消耗。",
+  "GU_ZHEN_REN_CARD_JING_YUE_FAN_ZHAO.title": "镜月返照",
+  "GU_ZHEN_REN_CARD_JING_YUE_FAN_ZHAO.description": "获得{Block:diff()}点格挡，并对一个敌人造成{Damage:diff()}点伤害。七转起获得{GuangHui}点[gold]光辉[/gold]。消耗。"
 }

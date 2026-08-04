@@ -12,7 +12,6 @@ public sealed class HongZaoXianYuan : AbstractXianYuanCard
     protected override CardModel ReferencedCard =>
         ModelDb.Card<QingTiXianYuan>();
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: "res://GuZhenRen/images/cards/HongZaoXianYuan.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 }

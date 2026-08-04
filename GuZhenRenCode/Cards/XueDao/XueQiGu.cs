@@ -29,10 +29,7 @@ public sealed class XueQiGu : AbstractGuWormCard
     ];
 
     public override CardAssetProfile AssetProfile =>
-        new(
-            PortraitPath:
-                $"{Entry.ResPath}/images/cards/XueQiGu.png"
-        );
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public XueQiGu()
         : base(

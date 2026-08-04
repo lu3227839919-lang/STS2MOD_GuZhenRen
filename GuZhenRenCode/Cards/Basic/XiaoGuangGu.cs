@@ -64,9 +64,8 @@ public sealed class XiaoGuangGu
         new DynamicVar("FocusBonus", 1m),
     ];
 
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/XiaoGuangGu.png"
-    );
+    public override CardAssetProfile AssetProfile =>
+        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 
     public XiaoGuangGu()
         : base(
