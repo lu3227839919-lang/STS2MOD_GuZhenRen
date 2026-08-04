@@ -202,10 +202,13 @@ public sealed class KongQiaoRelic
     )
     {
         if (ReferenceEquals(cardPlay.Card.Owner, Owner) &&
-            cardPlay.Card is IGuWormCard)
+            cardPlay.Card is IGuWormCard &&
+            cardPlay.PlayIndex == 0)
         {
             await GuCardPileSystem
                 .MoveDepletedGuCardsToRecoveryAsync(Owner);
+            await GuRecoveryEffectSystem
+                .HandleEnteredRecoveryAsync(cardPlay.Card);
         }
     }
 

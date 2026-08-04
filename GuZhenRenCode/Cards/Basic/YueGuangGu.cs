@@ -8,33 +8,61 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.ValueProps;
+using MegaCrit.Sts2.Core.Models;
 
 using STS2RitsuLib.Combat.SecondaryResources;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
+using STS2RitsuLib.Utils;
 
 namespace GuZhenRen.Cards.GuangDao;
 
 [RegisterCard(typeof(GuZhenRenGuCardPool))]
 [RegisterCharacterStarterCard(typeof(GuZhenRenCharacter), 2)]
-public sealed class YueGuangGu : AbstractGuWormCard
+public sealed class YueGuangGu
+    : AbstractGuWormCard,
+      IGuRecoveryEffectSource
 {
     private const int GuangHuiCost = 2;
 
+    private static readonly SavedAttachedState<CardModel, bool>
+        RecoveryHandledState = new(
+            Entry.ModId + ".yue_guang.recovery_handled",
+            static () => false
+        );
+
+    private static readonly SavedAttachedState<CardModel, bool>
+        PendingGenerationState = new(
+            Entry.ModId + ".yue_guang.pending_generation",
+            static () => false
+        );
+
+    private static readonly SavedAttachedState<CardModel, bool>
+        LastActivationEmpoweredState = new(
+            Entry.ModId + ".yue_guang.last_empowered",
+            static () => false
+        );
+
     public override int MaxUses => IsUpgraded ? 2 : 1;
+
+    public override int RecoveryDelayTurns => GuRank switch
+    {
+        <= 5 => 2,
+        <= 8 => 3,
+        _ => 4,
+    };
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(6m, ValueProp.Move),
-        new DynamicVar("BonusDamage", 3m),
+        new DamageVar(8m, ValueProp.Move),
+        new DynamicVar("BonusDamage", 4m),
+        new DynamicVar("ZhaoPoConditionBonus", 2m),
         new PowerVar<ZhaoPoPower>(1m),
     ];
 
-    public override CardAssetProfile AssetProfile =>
-        new(
-            PortraitPath:
-                $"{Entry.ResPath}/images/cards/YueGuangGu.png"
-        );
+    public override CardAssetProfile AssetProfile => new(
+        PortraitPath: $"{Entry.ResPath}/images/cards/YueGuangGu.png"
+    );
 
     public YueGuangGu()
         : base(
@@ -49,6 +77,15 @@ public sealed class YueGuangGu : AbstractGuWormCard
         RefreshRankValues();
     }
 
+    protected override void AddExtraArgsToDescription(
+        MegaCrit.Sts2.Core.Localization.LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add("GuangHuiCost", GuangHuiCost);
+        description.Add("RecoveryTurns", RecoveryDelayTurns);
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay
@@ -60,14 +97,32 @@ public sealed class YueGuangGu : AbstractGuWormCard
             return;
         }
 
-        bool empowered = await GuangDaoPowerSystem
-            .TrySpendGuangHui(
+        bool empowered = GuRank >= 5 &&
+            await GuangDaoPowerSystem.TrySpendGuangHui(
                 choiceContext,
                 this,
                 cardPlay,
                 GuangHuiCost
             );
+
+        if (cardPlay.PlayIndex == 0)
+        {
+            LastActivationEmpoweredState[this] = empowered;
+        }
+        else if (GuRank >= 6 && !empowered)
+        {
+            // 六转以上仅耀化时才让 Replay 段生效。
+            return;
+        }
+
+        bool targetHadZhaoPo = target.GetPower<ZhaoPoPower>() is
+            { Amount: > 0 };
         decimal damage = DynamicVars.Damage.BaseValue;
+
+        if (GuRank >= 2 && targetHadZhaoPo)
+        {
+            damage += DynamicVars["ZhaoPoConditionBonus"].BaseValue;
+        }
 
         if (empowered)
         {
@@ -83,7 +138,6 @@ public sealed class YueGuangGu : AbstractGuWormCard
 
         if (empowered && cardPlay.PlayIndex == 0)
         {
-            // Replay 只重复伤害，不重复施加照破。
             await GuangDaoPowerSystem.ApplyZhaoPo(
                 choiceContext,
                 this,
@@ -93,26 +147,112 @@ public sealed class YueGuangGu : AbstractGuWormCard
         }
     }
 
+    public void ResetRecoveryEffectState()
+    {
+        RecoveryHandledState[this] = false;
+        PendingGenerationState[this] = false;
+        LastActivationEmpoweredState[this] = false;
+    }
+
+    public async Task OnEnteredRecoveryAsync()
+    {
+        if (RecoveryHandledState[this])
+        {
+            return;
+        }
+
+        RecoveryHandledState[this] = true;
+
+        if (GuRank < 3)
+        {
+            return;
+        }
+
+        if (GuRank == 3)
+        {
+            YueRen moonblade = CreateYueRen();
+            await GuCardPileSystem.AddGeneratedCardToDiscard(
+                moonblade,
+                Owner
+            );
+            return;
+        }
+
+        PendingGenerationState[this] = true;
+    }
+
+    public async Task OnRecoveryTurnStartAsync(int turnNumber)
+    {
+        if (!PendingGenerationState[this])
+        {
+            return;
+        }
+
+        PendingGenerationState[this] = false;
+
+        AbstractGuZhenRenCard generated =
+            GuRank >= 9 && LastActivationEmpoweredState[this]
+                ? GuGeneratedCardFactory.Create<ManYueRen>(
+                    Owner,
+                    GuRank,
+                    upgraded: IsUpgraded
+                )
+                : CreateYueRen();
+
+        await GuGeneratedCardFactory.AddToHandOrDiscard(
+            generated,
+            Owner
+        );
+    }
+
+    public Task OnRecoveredAsync()
+    {
+        RecoveryHandledState[this] = false;
+        PendingGenerationState[this] = false;
+        LastActivationEmpoweredState[this] = false;
+        return Task.CompletedTask;
+    }
+
     protected override void OnGuRankChanged()
     {
         base.OnGuRankChanged();
         RefreshRankValues();
     }
 
+    private YueRen CreateYueRen()
+    {
+        bool upgraded = IsUpgraded ||
+            (GuRank >= 5 && LastActivationEmpoweredState[this]);
+
+        return GuGeneratedCardFactory.Create<YueRen>(
+            Owner,
+            GuRank,
+            upgraded
+        );
+    }
+
     private void RefreshRankValues()
     {
         DynamicVars.Damage.BaseValue = GuRank switch
         {
-            <= 5 => 5 + GuRank,
-            6 => 11,
-            7 => 12,
-            8 => 13,
-            _ => 14,
+            1 => 8,
+            2 => 9,
+            3 => 10,
+            4 => 12,
+            5 => 14,
+            6 => 16,
+            7 => 18,
+            8 => 21,
+            _ => 24,
         };
+
+        DynamicVars["BonusDamage"].BaseValue = GuRank >= 9
+            ? 4
+            : 4;
+        DynamicVars["ZhaoPoConditionBonus"].BaseValue = 2;
         DynamicVars[typeof(ZhaoPoPower).Name].BaseValue =
-            1 + (GuRank >= 6 ? GuRank - 5 : 0);
-        // 规范模型构造期间不可写 BaseReplayCount；转数
-        // 赋值、读档和升转会在可变卡牌实例上刷新。
+            GuRank >= 8 ? 2 : 1;
+
         if (IsMutable)
         {
             BaseReplayCount = GuRank >= 6 ? 1 : 0;

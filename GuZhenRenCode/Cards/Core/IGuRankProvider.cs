@@ -31,4 +31,11 @@ public interface IGuWormCard : IGuRankProvider
     /// 剩余次数跨回合保留；耗尽后进入蛊恢复堆，恢复时重新充满。
     /// </summary>
     int MaxUses => 1;
+
+    /// <summary>
+    /// 催动次数耗尽后需要等待的回合数。
+    /// 例如耗尽回合为 2、RecoveryDelayTurns 为 2 时，
+    /// 会在第 4 回合开始恢复。具体蛊虫可以按转数重写。
+    /// </summary>
+    int RecoveryDelayTurns => 2;
 }

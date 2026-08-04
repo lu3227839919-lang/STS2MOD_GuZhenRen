@@ -12,7 +12,7 @@ namespace GuZhenRen.Cards;
 /// <summary>
 /// 蛊虫牌的持久催动次数、资源支付和逐牌恢复规则。
 /// 每次出牌序列只登记一次，Replay 不额外消耗次数、元气或仙元。
-/// 恢复回合为耗尽回合 + 2，即中间完整隔一个回合。
+/// 恢复回合由每张蛊虫的 RecoveryDelayTurns 决定。
 /// </summary>
 public static class GuCardUsageRules
 {
@@ -73,6 +73,11 @@ public static class GuCardUsageRules
             SpentActivationsState[card] = 0;
             RecoveryReadyTurnState[card] = 0;
             PreparedPayments.Remove(card);
+
+            if (card is IGuRecoveryEffectSource recoverySource)
+            {
+                recoverySource.ResetRecoveryEffectState();
+            }
         }
     }
 
@@ -181,7 +186,10 @@ public static class GuCardUsageRules
             return;
         }
 
-        int readyTurn = Math.Max(1, depletedOnTurn) + 2;
+        int delay = card is IGuWormCard guCard
+            ? Math.Max(1, guCard.RecoveryDelayTurns)
+            : 2;
+        int readyTurn = Math.Max(1, depletedOnTurn) + delay;
         int existing = RecoveryReadyTurnState[card];
         if (existing <= 0 || readyTurn < existing)
         {

@@ -67,7 +67,7 @@ public sealed class XueYueGu : AbstractHeLianGuCard
         await DamageCmd
             .Attack(DynamicVars.Damage.BaseValue)
             .FromCard(this, cardPlay)
-            .TargetingAllOpponents(CombatState)
+            .TargetingAllOpponents(combatState)
             .WithHitFx("vfx/vfx_attack_slash")
             .Execute(choiceContext);
 
@@ -80,7 +80,7 @@ public sealed class XueYueGu : AbstractHeLianGuCard
 
         IReadOnlyList<Creature> survivingEnemies =
             GuZhenRenDeterminism.OrderCreatures(
-                Owner.Creature.CombatState?.HittableEnemies ?? []
+                combatState.HittableEnemies
             )
             .Where(enemy => !enemy.IsDead)
             .ToList();

@@ -17,6 +17,11 @@ public abstract class AbstractGuWormCard
     public override bool CanBeGeneratedInCombat => false;
 
     /// <summary>
+    /// 默认在耗尽后的第2个回合开始恢复；具体蛊虫可以按转数重写。
+    /// </summary>
+    public virtual int RecoveryDelayTurns => 2;
+
+    /// <summary>
     /// 蛊虫左上角展示元气图标，而不是角色的原生能量图标。
     /// </summary>
     public override string? CustomEnergyIconPath =>

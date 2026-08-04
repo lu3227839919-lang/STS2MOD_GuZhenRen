@@ -290,8 +290,8 @@ public static class GuCardPileSystem
     }
 
     /// <summary>
-    /// 每张蛊虫独立记录恢复回合：耗尽回合 + 2。
-    /// 这表示中间完整隔一个回合；例如第 2 回合耗尽，第 4 回合开始恢复。
+    /// 每张蛊虫按照 IGuWormCard.RecoveryDelayTurns 独立记录恢复回合。
+    /// 低转辅助蛊可以较快恢复，高转仙蛊则可以用更长恢复换取更强效果。
     /// </summary>
     public static async Task RestoreRecoveredGuCardsAsync(
         Player owner,
@@ -322,6 +322,9 @@ public static class GuCardPileSystem
             {
                 GuCardUsageRules.ScheduleRecovery(card, turnNumber);
             }
+
+            await GuRecoveryEffectSystem
+                .HandleRecoveryTurnStartAsync(card, turnNumber);
         }
 
         CardModel[] recoveredCards = allRecoveringCards
@@ -347,6 +350,11 @@ public static class GuCardPileSystem
             clonedBy: null,
             skipVisuals: false
         );
+
+        foreach (CardModel card in recoveredCards)
+        {
+            await GuRecoveryEffectSystem.HandleRecoveredAsync(card);
+        }
     }
 
     /// <summary>
@@ -366,6 +374,24 @@ public static class GuCardPileSystem
             await CardPileCmd.AddGeneratedCardToCombat(
                 card,
                 PileType.Hand,
+                owner
+            );
+
+        return result.success;
+    }
+
+    public static async Task<bool> AddGeneratedCardToDiscard(
+        CardModel card,
+        Player owner
+    )
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        ArgumentNullException.ThrowIfNull(owner);
+
+        CardPileAddResult result =
+            await CardPileCmd.AddGeneratedCardToCombat(
+                card,
+                PileType.Discard,
                 owner
             );
 

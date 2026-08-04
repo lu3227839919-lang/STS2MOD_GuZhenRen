@@ -76,7 +76,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "Stores Gu Worms with activations remaining. Remaining activations persist across turns; after depletion, a Gu Worm enters the Recovery Pile and returns at the start of depletion turn + 2, after one full intervening turn. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move. On success, also pay twice the average effective Primeval Essence cost of all materials, rounded up. The Gu materials are Exhausted directly and enter neither custom Gu pile; the Killer Move enters your hand and is not a Gu Worm."
+      "text": "Stores Gu Worms with activations remaining. Depleted Gu enter the Recovery Pile and use an independent recovery time based on type and rank; some higher-rank Gu create normal derivative cards during recovery. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move. On success, also pay twice the average effective Primeval Essence cost of all materials, rounded up. Materials are Exhausted, and the Killer Move enters your hand without counting as a Gu Worm."
     },
     {
       "table": "static_hover_tips",
@@ -96,7 +96,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.description",
-      "text": "Stores Gu Worms with no activations remaining. Each Gu Worm refills and returns to the Gu Storage Pile at the start of depletion turn + 2, after one full intervening turn."
+      "text": "Stores depleted Gu Worms. Each Gu Worm recovers independently according to its type and rank; some rank-3 or higher Gu create normal derivative cards when entering or progressing through recovery."
     },
     {
       "table": "static_hover_tips",

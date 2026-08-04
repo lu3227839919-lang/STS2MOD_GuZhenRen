@@ -1,22 +1,20 @@
-using System.Runtime.CompilerServices;
-
 using GuZhenRen.Characters;
 using GuZhenRen.Combat;
 using GuZhenRen.Cards.Interfaces;
+using GuZhenRen.Powers.GuangDao;
 
-using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.Nodes.CommonUi;
 using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib.Combat.SecondaryResources;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
+using STS2RitsuLib.Utils;
 
 namespace GuZhenRen.Cards.TuDao;
 
@@ -24,35 +22,43 @@ namespace GuZhenRen.Cards.TuDao;
 [RegisterCharacterStarterCard(typeof(GuZhenRenCharacter), 2)]
 public sealed class YuPiGu
     : AbstractGuWormCard,
-      ICarouselCard
+      ICarouselCard,
+      IGuRecoveryEffectSource
 {
-    private sealed class DexterityActivationState
-    {
-        public ICombatState? CombatState;
-        public bool Granted;
-    }
+    private static readonly SavedAttachedState<CardModel, bool>
+        RecoveryHandledState = new(
+            Entry.ModId + ".yu_pi.recovery_handled",
+            static () => false
+        );
 
-    private static readonly ConditionalWeakTable<
-        YuPiGu,
-        DexterityActivationState
-    > DexterityActivations = new();
+    private static readonly SavedAttachedState<CardModel, bool>
+        PendingGenerationState = new(
+            Entry.ModId + ".yu_pi.pending_generation",
+            static () => false
+        );
 
     public override int MaxUses => IsUpgraded ? 2 : 1;
 
+    public override int RecoveryDelayTurns => GuRank switch
+    {
+        <= 5 => 2,
+        <= 8 => 3,
+        _ => 4,
+    };
+
+    protected override IEnumerable<CardTag> AdditionalCanonicalTags =>
+        GuRank >= 5
+            ? [GuZhenRenTags.GuangDao]
+            : [];
+
     protected override IEnumerable<DynamicVar> CanonicalVars =>
-    [
-        new PowerVar<DexterityPower>(1m),
-        new BlockVar(0m, ValueProp.Move),
-    ];
+        [new BlockVar(8m, ValueProp.Move)];
 
-    public override bool GainsBlock =>
-        DynamicVars.Block.BaseValue > 0;
+    public override bool GainsBlock => true;
 
-    public override CardAssetProfile AssetProfile =>
-        new(
-            PortraitPath:
-                $"{Entry.ResPath}/images/cards/YuPiGu.png"
-        );
+    public override CardAssetProfile AssetProfile => new(
+        PortraitPath: $"{Entry.ResPath}/images/cards/YuPiGu.png"
+    );
 
     public YuPiGu()
         : base(
@@ -67,56 +73,105 @@ public sealed class YuPiGu
         RefreshRankValues();
     }
 
+    protected override void AddExtraArgsToDescription(
+        MegaCrit.Sts2.Core.Localization.LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add("RecoveryTurns", RecoveryDelayTurns);
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay
     )
     {
-        if (Owner.Creature.CombatState is not { } combatState)
+        await CreatureCmd.GainBlock(
+            Owner.Creature,
+            DynamicVars.Block,
+            cardPlay
+        );
+
+        // 五转开始以玉面反光支持光道，但不提供永久敏捷。
+        if (GuRank >= 5 && cardPlay.PlayIndex == 0)
+        {
+            await GuangDaoPowerSystem.GainGuangHui(
+                choiceContext,
+                this,
+                1
+            );
+        }
+    }
+
+    public void ResetRecoveryEffectState()
+    {
+        RecoveryHandledState[this] = false;
+        PendingGenerationState[this] = false;
+    }
+
+    public async Task OnEnteredRecoveryAsync()
+    {
+        if (RecoveryHandledState[this])
         {
             return;
         }
 
-        XuanYuZhang generated =
-            (XuanYuZhang)combatState.CreateCard(
-                ModelDb.Card<XuanYuZhang>(),
-                Owner
-            );
+        RecoveryHandledState[this] = true;
 
-        if (IsUpgraded)
+        if (GuRank < 3)
         {
-            CardCmd.Upgrade(generated);
+            return;
         }
 
-        generated.InitializeGuRankFromSource(
-            Math.Min(9, GuRank + 1)
-        );
-        await GuCardPileSystem.AddGeneratedCardToHand(
-            generated,
+        if (GuRank == 3)
+        {
+            YuMo membrane = CreatePrimaryToken<YuMo>();
+            await GuCardPileSystem.AddGeneratedCardToDiscard(
+                membrane,
+                Owner
+            );
+            return;
+        }
+
+        PendingGenerationState[this] = true;
+    }
+
+    public async Task OnRecoveryTurnStartAsync(int turnNumber)
+    {
+        if (!PendingGenerationState[this])
+        {
+            return;
+        }
+
+        PendingGenerationState[this] = false;
+
+        AbstractGuZhenRenCard primary = GuRank switch
+        {
+            >= 9 => CreatePrimaryToken<LiuLiYuYi>(),
+            >= 6 => CreatePrimaryToken<YuGuangYi>(),
+            _ => CreatePrimaryToken<YuMo>(),
+        };
+
+        await GuGeneratedCardFactory.AddToHandOrDiscard(
+            primary,
             Owner
         );
 
-        if (cardPlay.PlayIndex == 0 &&
-            TryClaimFirstDexterity(combatState) &&
-            DynamicVars.Dexterity.IntValue > 0)
+        if (GuRank >= 8)
         {
-            await PowerCmd.Apply<DexterityPower>(
-                choiceContext,
-                Owner.Creature,
-                DynamicVars.Dexterity.IntValue,
-                Owner.Creature,
-                this
+            ZheGuang reflected = CreatePrimaryToken<ZheGuang>();
+            await GuGeneratedCardFactory.AddToHandOrDiscard(
+                reflected,
+                Owner
             );
         }
+    }
 
-        if (DynamicVars.Block.BaseValue > 0)
-        {
-            await CreatureCmd.GainBlock(
-                Owner.Creature,
-                DynamicVars.Block,
-                cardPlay
-            );
-        }
+    public Task OnRecoveredAsync()
+    {
+        RecoveryHandledState[this] = false;
+        PendingGenerationState[this] = false;
+        return Task.CompletedTask;
     }
 
     protected override void OnGuRankChanged()
@@ -127,62 +182,55 @@ public sealed class YuPiGu
 
     public IReadOnlyList<CardModel> GetCarouselCards()
     {
-        XuanYuZhang preview =
-            (XuanYuZhang)ModelDb.Card<XuanYuZhang>().ToMutable();
+        if (GuRank < 3)
+        {
+            return [];
+        }
 
+        CardModel previewModel = GuRank switch
+        {
+            >= 9 => ModelDb.Card<LiuLiYuYi>().ToMutable(),
+            >= 6 => ModelDb.Card<YuGuangYi>().ToMutable(),
+            _ => ModelDb.Card<YuMo>().ToMutable(),
+        };
+
+        if (previewModel is not AbstractGuZhenRenCard preview)
+        {
+            return [];
+        }
+
+        preview.InitializeGuRankFromSource(GuRank);
         if (IsUpgraded)
         {
             CardCmd.Upgrade(preview, CardPreviewStyle.None);
         }
 
-        preview.InitializeGuRankFromSource(
-            Math.Min(9, GuRank + 1)
-        );
-
         return [preview];
     }
 
-    private bool TryClaimFirstDexterity(
-        ICombatState combatState
-    )
+    private T CreatePrimaryToken<T>()
+        where T : AbstractGuZhenRenCard
     {
-        DexterityActivationState state =
-            DexterityActivations.GetValue(
-                this,
-                static _ => new DexterityActivationState()
-            );
-
-        if (!ReferenceEquals(state.CombatState, combatState))
-        {
-            state.CombatState = combatState;
-            state.Granted = false;
-        }
-
-        if (state.Granted)
-        {
-            return false;
-        }
-
-        state.Granted = true;
-        return true;
+        return GuGeneratedCardFactory.Create<T>(
+            Owner,
+            GuRank,
+            upgraded: IsUpgraded
+        );
     }
 
     private void RefreshRankValues()
     {
-        DynamicVars.Dexterity.BaseValue = GuRank switch
-        {
-            <= 2 => 0,
-            <= 6 => 1,
-            <= 8 => 2,
-            _ => 3,
-        };
         DynamicVars.Block.BaseValue = GuRank switch
         {
-            6 => 6,
-            7 => 8,
-            8 => 10,
-            >= 9 => 12,
-            _ => 0,
+            1 => 8,
+            2 => 10,
+            3 => 11,
+            4 => 13,
+            5 => 15,
+            6 => 18,
+            7 => 21,
+            8 => 24,
+            _ => 28,
         };
     }
 }
