@@ -216,6 +216,53 @@ public sealed class JingHuiGu
         RefreshRankValues();
     }
 
+    public override IReadOnlyList<CardModel> GetCarouselCards()
+    {
+        if (GuRank < 3)
+        {
+            return [];
+        }
+
+        if (GuRank >= 9)
+        {
+            return
+            [
+                GuCardReferenceFactory.Create<ZhouTianJingHui>(
+                    this,
+                    IsUpgraded
+                ),
+            ];
+        }
+
+        if (GuRank >= 6)
+        {
+            List<CardModel> cards =
+            [
+                GuCardReferenceFactory.Create<NingJingHui>(
+                    this,
+                    IsUpgraded
+                ),
+            ];
+
+            if (GuRank >= 7)
+            {
+                cards.Add(
+                    GuCardReferenceFactory.Create<FanHui>(this)
+                );
+            }
+
+            return cards;
+        }
+
+        return
+        [
+            GuCardReferenceFactory.Create<JingHui>(
+                this,
+                IsUpgraded
+            ),
+        ];
+    }
+
     private T CreatePrimaryToken<T>()
         where T : AbstractGuZhenRenCard
     {

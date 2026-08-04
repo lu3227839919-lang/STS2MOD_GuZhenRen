@@ -1,7 +1,7 @@
 {
-  "GU_ZHEN_REN_CARDPILE_GU_CARDS.title": "蛊存放牌堆",
-  "GU_ZHEN_REN_CARDPILE_GU_CARDS.description": "存放尚有催动次数的蛊虫；剩余次数跨回合保留。",
-  "GU_ZHEN_REN_CARDPILE_GU_CARDS.empty": "蛊存放牌堆为空。",
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.title": "蛊手牌",
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.description": "以额外手牌形式显示尚有催动次数的蛊虫。打出【催动】后才能选择蛊牌；目标选择取消时仍停留在催动模式。",
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.empty": "蛊手牌为空。",
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.title": "蛊恢复堆",
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.description": "存放催动次数已耗尽的蛊虫。每张蛊虫按照自身类型与转数记录独立恢复时间；部分三转以上蛊虫会在进入恢复堆或恢复期间生成普通衍生牌。",
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.empty": "蛊恢复堆为空。"

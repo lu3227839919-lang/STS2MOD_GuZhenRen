@@ -1,7 +1,7 @@
 {
-  "GU_ZHEN_REN_CARDPILE_GU_CARDS.title": "Gu Storage Pile",
-  "GU_ZHEN_REN_CARDPILE_GU_CARDS.description": "Stores Gu Worms with activations remaining; remaining activations persist across turns.",
-  "GU_ZHEN_REN_CARDPILE_GU_CARDS.empty": "The Gu Storage Pile is empty.",
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.title": "Gu Hand",
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.description": "Displays Gu Worms with activations remaining as an extra hand. Play Activate before choosing a Gu card; canceling target selection keeps activation mode active.",
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.empty": "The Gu Hand is empty.",
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.title": "Gu Recovery Pile",
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.description": "Stores depleted Gu Worms. Each Gu Worm has an independent recovery time based on its type and rank; some rank-3 or higher Gu create normal derivative cards when entering or progressing through recovery.",
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.empty": "The Gu Recovery Pile is empty."

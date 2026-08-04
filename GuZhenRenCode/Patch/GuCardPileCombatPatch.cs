@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Random;
 
 namespace GuZhenRen.Patches;
@@ -64,6 +65,14 @@ internal static class GuCardPileCombatPatch
             );
         }
 
+        if (drawInternal.ReturnType !=
+            typeof(Task<IEnumerable<CardModel>>))
+        {
+            throw new MissingMethodException(
+                "CardPileCmd.DrawInternal has an unexpected return type."
+            );
+        }
+
         Harmony harmony = new(HarmonyId);
         harmony.Patch(
             populateCombatState,
@@ -78,6 +87,10 @@ internal static class GuCardPileCombatPatch
             prefix: new HarmonyMethod(
                 typeof(GuCardPileCombatPatch),
                 nameof(DrawInternalPrefix)
+            ),
+            postfix: new HarmonyMethod(
+                typeof(GuCardPileCombatPatch),
+                nameof(DrawInternalPostfix)
             )
         );
 
@@ -103,8 +116,39 @@ internal static class GuCardPileCombatPatch
         GuCardPileSystem.InitializeGuCardsForCombat(__instance);
     }
 
-    private static void DrawInternalPrefix(Player player)
+    private static void DrawInternalPrefix(
+        Player player,
+        bool fromHandDraw,
+        out Task? __state
+    )
     {
         GuCardPileSystem.MoveStrayGuCardsToVillage(player);
+        __state = GuCardPileSystem.BeginOpeningGuEntry(
+            player,
+            fromHandDraw
+        );
+    }
+
+    private static void DrawInternalPostfix(
+        Task? __state,
+        ref Task<IEnumerable<CardModel>> __result
+    )
+    {
+        if (__state == null)
+        {
+            return;
+        }
+
+        __result = AwaitDrawAndGuEntryAsync(__result, __state);
+    }
+
+    private static async Task<IEnumerable<CardModel>>
+        AwaitDrawAndGuEntryAsync(
+            Task<IEnumerable<CardModel>> drawTask,
+            Task guEntryTask
+        )
+    {
+        await Task.WhenAll(drawTask, guEntryTask);
+        return await drawTask;
     }
 }

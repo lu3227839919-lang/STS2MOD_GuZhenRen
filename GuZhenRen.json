@@ -2,8 +2,8 @@
   "id": "GuZhenRen",
   "name": "蛊真人",
   "author": "LU",
-  "description": "《杀戮尖塔 2》蛊真人 Mod。0.4.3 新增流光蛊、白虹贯日与镜月返照，并保留同名卡图路径与缺图警告。",
-  "version": "0.4.3",
+  "description": "《杀戮尖塔 2》蛊真人 Mod。0.4.11 为蛊手牌增加与首轮抽牌同步的恢复堆入场动画，并修复元气不足与旧目标牌存档问题。",
+  "version": "0.4.11",
   "has_pck": true,
   "has_dll": true,
   "affects_gameplay": true,
@@ -11,7 +11,7 @@
   "dependencies": [
     {
       "id": "STS2-RitsuLib",
-      "min_version": "0.5.4"
+      "min_version": "0.5.10"
     }
   ]
 }

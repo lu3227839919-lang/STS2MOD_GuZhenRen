@@ -247,12 +247,24 @@ public sealed class KongQiaoRelic
             return;
         }
 
-        if (!await GuCardUsageRules
+        int yuanQiCost = Math.Max(0, guCard.YuanQiCost);
+        bool paidByNativePipeline =
+            yuanQiCost == 0 ||
+            (
+                cardPlay.TryGetSecondaryResources(out var ledger) &&
+                ledger.Spent(YuanQiSystem.ResourceId) >= yuanQiCost
+            );
+
+        // ExtraHand 手动出牌会由 RitsuLib 的次级资源管线自动支付元气。
+        // 只有没有支付记录的旧 AutoPlay/脚本入口才由模组补付，避免双重扣费。
+        if (!paidByNativePipeline &&
+            !await GuCardUsageRules
                 .EnsureActivationPayment(cardPlay.Card))
         {
-            throw new InvalidOperationException(
-                $"元气不足，无法催动 {cardPlay.Card.Id}。"
-            );
+            string message =
+                $"元气不足，无法催动 {cardPlay.Card.Id}。";
+            GuActivationModeSystem.Cancel(message);
+            throw new InvalidOperationException(message);
         }
 
         if (guCard.GuRank >= ApertureProgression.ImmortalRank)
@@ -262,13 +274,15 @@ public sealed class KongQiaoRelic
 
             if (!paid)
             {
-                throw new InvalidOperationException(
-                    $"仙元不足，无法催动 {cardPlay.Card.Id}。"
-                );
+                string message =
+                    $"仙元不足，无法催动 {cardPlay.Card.Id}。";
+                GuActivationModeSystem.Cancel(message);
+                throw new InvalidOperationException(message);
             }
         }
 
         GuCardUsageRules.RegisterActivation(cardPlay.Card);
+        GuActivationModeSystem.CompleteActivation(cardPlay.Card);
     }
 
     /// <summary>

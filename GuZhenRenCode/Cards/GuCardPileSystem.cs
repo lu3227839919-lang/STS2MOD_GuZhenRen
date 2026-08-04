@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -9,8 +11,8 @@ using STS2RitsuLib.CardPiles;
 namespace GuZhenRen.Cards;
 
 /// <summary>
-/// 蛊虫专用战斗牌堆。蛊虫只会存在于蛊存放牌堆或蛊恢复堆，
-/// 不会进入普通手牌。
+/// 蛊虫专用战斗区域。可用蛊虫显示在 RitsuLib ExtraHand 蛊手牌中，
+/// 耗尽的蛊虫进入蛊恢复堆；它们不会长期进入原版普通手牌。
 /// </summary>
 public static class GuCardPileSystem
 {
@@ -36,61 +38,78 @@ public static class GuCardPileSystem
     public static PileType DiscardPileType => RecoveryPileType;
 
     private static readonly object SyncRoot = new();
+
+    private sealed class OpeningEntryState
+    {
+        public CardModel[] Cards { get; set; } = [];
+
+        public bool Started { get; set; }
+
+        public bool Completed { get; set; }
+
+        public Task? AnimationTask { get; set; }
+    }
+
+    private static readonly ConditionalWeakTable<
+        Player,
+        OpeningEntryState
+    > OpeningEntryStates = new();
+
     private static bool _initialized;
 
     public static void Initialize()
-{
-    lock (SyncRoot)
     {
-        if (_initialized)
+        lock (SyncRoot)
         {
-            return;
+            if (_initialized)
+            {
+                return;
+            }
+
+            ModCardPileRegistry registry =
+                ModCardPileRegistry.For(Entry.ModId);
+
+            // 蛊存放堆以 RitsuLib ExtraHand 形式常驻显示。卡牌节点始终可见，
+            // 但只有“催动模式”开启时才允许开始原生出牌/目标选择流程。
+            ModCardPileDefinition definition =
+                registry.RegisterOwned(
+                    LocalId,
+                    new ModCardPileSpec
+                    {
+                        Scope = ModCardPileScope.CombatOnly,
+                        Style = ModCardPileUiStyle.ExtraHand,
+                        CardShouldBeVisible = true,
+                        ExtraHand = new ModCardPileExtraHandSpec
+                        {
+                            AllowCardPlay = true,
+                            ShowPlayableGlow = true,
+                        },
+                    }
+                );
+
+            // 恢复堆仍放在原版弃牌堆左侧。
+            ModCardPileDefinition recoveryDefinition =
+                registry.RegisterOwned(
+                    RecoveryLocalId,
+                    new ModCardPileSpec
+                    {
+                        Scope = ModCardPileScope.CombatOnly,
+                        Style = ModCardPileUiStyle.BottomLeft,
+                        IconPath =
+                            "res://GuZhenRen/images/ui/QiPaiDui.png",
+
+                        Anchor = new ModCardPileAnchor(
+                            ModCardPileAnchorKind.BottomLeftSecondary,
+                            new Vector2(-200f, 0f)
+                        ),
+                    }
+                );
+
+            PileType = definition.PileType;
+            RecoveryPileType = recoveryDefinition.PileType;
+            _initialized = true;
         }
-
-        ModCardPileRegistry registry =
-            ModCardPileRegistry.For(Entry.ModId);
-
-        // 放在原版抽牌堆右侧
-        ModCardPileDefinition definition =
-            registry.RegisterOwned(
-                LocalId,
-                new ModCardPileSpec
-                {
-                    Scope = ModCardPileScope.CombatOnly,
-                    Style = ModCardPileUiStyle.BottomLeft,
-                    IconPath =
-                        "res://GuZhenRen/images/ui/GuPaiDui.png",
-
-                    Anchor = new ModCardPileAnchor(
-                        ModCardPileAnchorKind.BottomLeftPrimary,
-                        Vector2.Zero
-                    ),
-                }
-            );
-
-        // 放在原版弃牌堆左侧
-        ModCardPileDefinition recoveryDefinition =
-            registry.RegisterOwned(
-                RecoveryLocalId,
-                new ModCardPileSpec
-                {
-                    Scope = ModCardPileScope.CombatOnly,
-                    Style = ModCardPileUiStyle.BottomLeft,
-                    IconPath =
-                        "res://GuZhenRen/images/ui/QiPaiDui.png",
-
-                    Anchor = new ModCardPileAnchor(
-                        ModCardPileAnchorKind.BottomLeftSecondary,
-                        new Vector2(-200f, 0f)
-                    ),
-                }
-            );
-
-        PileType = definition.PileType;
-        RecoveryPileType = recoveryDefinition.PileType;
-        _initialized = true;
     }
-}
 
 
     public static void Uninitialize()
@@ -127,10 +146,9 @@ public static class GuCardPileSystem
     }
 
     /// <summary>
-    /// Moves Gu cards cloned into a combat draw pile into this pile before the
-    /// opening hand is drawn.  The operation is synchronous because it runs as
-    /// a postfix of <c>Player.PopulateCombatState</c>, before combat actions
-    /// begin.
+    /// 战斗初始化时先把蛊牌暂存到恢复堆。第一轮原版抽牌开始时，
+    /// <see cref="BeginOpeningGuEntry"/> 会把它们以 RitsuLib 牌堆飞行动画
+    /// 送入 ExtraHand，使蛊牌入场与普通起手抽牌并行播放。
     /// </summary>
     internal static void InitializeGuCardsForCombat(Player owner)
     {
@@ -138,23 +156,171 @@ public static class GuCardPileSystem
 
         EnsureInitialized();
 
-        foreach (CardPile pile in new[]
-        {
+        CardPile recoveryPile = RecoveryPileType.GetPile(owner);
+        CardPile[] combatPiles =
+        [
             PileType.Draw.GetPile(owner),
             PileType.Discard.GetPile(owner),
             PileType.Hand.GetPile(owner),
-        })
+            PileType.GetPile(owner),
+            recoveryPile,
+        ];
+
+        CardModel[] guCards = combatPiles
+            .SelectMany(static pile => pile.Cards)
+            .Where(static card => card is IGuWormCard)
+            .Distinct()
+            .ToArray();
+
+        HashSet<CardPile> changedPiles = [];
+        foreach (CardModel card in guCards)
         {
-            foreach (CardModel card in pile.Cards)
+            GuCardUsageRules.ResetUses(card);
+
+            CardPile? sourcePile = card.Pile;
+            if (sourcePile != null &&
+                !ReferenceEquals(sourcePile, recoveryPile))
             {
-                if (card is IGuWormCard)
-                {
-                    GuCardUsageRules.ResetUses(card);
-                }
+                sourcePile.RemoveInternal(card, silent: true);
+                changedPiles.Add(sourcePile);
+                recoveryPile.AddInternal(card, silent: true);
+                changedPiles.Add(recoveryPile);
             }
         }
 
-        MoveStrayGuCardsToVillage(owner);
+        foreach (CardPile changedPile in changedPiles)
+        {
+            changedPile.InvokeContentsChanged();
+        }
+
+        OpeningEntryStates.Remove(owner);
+        OpeningEntryState state = OpeningEntryStates.GetValue(
+            owner,
+            static _ => new OpeningEntryState()
+        );
+        state.Cards = guCards;
+        state.Started = false;
+        state.Completed = guCards.Length == 0;
+        state.AnimationTask = null;
+
+        if (guCards.Length > 0)
+        {
+            Entry.Logger.Info(
+                $"[蛊牌入场] 已将 {guCards.Length} 张蛊牌暂存至恢复堆，等待首轮抽牌。"
+            );
+        }
+    }
+
+    /// <summary>
+    /// 在首轮 <c>CardPileCmd.DrawInternal</c> 开始前启动蛊牌入场。
+    /// 返回的任务会与原版抽牌任务并行运行，并由 Harmony 后置包装共同等待。
+    /// </summary>
+    internal static Task? BeginOpeningGuEntry(
+        Player owner,
+        bool fromHandDraw
+    )
+    {
+        ArgumentNullException.ThrowIfNull(owner);
+
+        if (!fromHandDraw ||
+            owner.PlayerCombatState?.TurnNumber != 1 ||
+            !OpeningEntryStates.TryGetValue(owner, out var state))
+        {
+            return null;
+        }
+
+        lock (state)
+        {
+            if (state.Started || state.Completed)
+            {
+                return null;
+            }
+
+            state.Started = true;
+            state.AnimationTask = RunOpeningGuEntryAsync(owner, state);
+            return state.AnimationTask;
+        }
+    }
+
+    private static async Task RunOpeningGuEntryAsync(
+        Player owner,
+        OpeningEntryState state
+    )
+    {
+        CardPile recoveryPile = RecoveryPileType.GetPile(owner);
+        CardModel[] cards = state.Cards
+            .Where(card =>
+                card is IGuWormCard &&
+                ReferenceEquals(card.Pile, recoveryPile)
+            )
+            .ToArray();
+
+        try
+        {
+            if (cards.Length == 0)
+            {
+                return;
+            }
+
+            Entry.Logger.Info(
+                $"[蛊牌入场] 与首轮抽牌同步播放 {cards.Length} 张蛊牌的恢复堆入场动画。"
+            );
+
+            await CardPileCmd.Add(
+                cards,
+                PileType,
+                CardPilePosition.Bottom,
+                clonedBy: null,
+                skipVisuals: false
+            );
+        }
+        catch (Exception exception)
+        {
+            Entry.Logger.Error(
+                $"[蛊牌入场] 动画执行失败，已回退为无动画入场：{exception}"
+            );
+
+            CardPile guPile = PileType.GetPile(owner);
+            foreach (CardModel card in cards)
+            {
+                if (!ReferenceEquals(card.Pile, recoveryPile))
+                {
+                    continue;
+                }
+
+                recoveryPile.RemoveInternal(card, silent: true);
+                guPile.AddInternal(card, silent: true);
+            }
+
+            recoveryPile.InvokeContentsChanged();
+            guPile.InvokeContentsChanged();
+        }
+        finally
+        {
+            lock (state)
+            {
+                state.Completed = true;
+                state.Cards = [];
+                state.AnimationTask = null;
+            }
+        }
+    }
+
+    private static bool IsOpeningEntryPending(
+        Player owner,
+        CardModel card
+    )
+    {
+        if (!OpeningEntryStates.TryGetValue(owner, out var state) ||
+            state.Completed)
+        {
+            return false;
+        }
+
+        lock (state)
+        {
+            return !state.Completed && state.Cards.Contains(card);
+        }
     }
 
     internal static void MoveStrayGuCardsToVillage(Player owner)
@@ -306,7 +472,10 @@ public static class GuCardPileSystem
             RecoveryPileType
                 .GetPile(owner)
                 .Cards
-                .Where(card => card is IGuWormCard)
+                .Where(card =>
+                    card is IGuWormCard &&
+                    !IsOpeningEntryPending(owner, card)
+                )
                 .ToArray();
 
         if (allRecoveringCards.Length == 0)

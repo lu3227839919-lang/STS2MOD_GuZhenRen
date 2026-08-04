@@ -96,7 +96,7 @@ public sealed class YueMangGu
         }
 
         bool empowered = GuRank >= 5 &&
-            await GuangDaoPowerSystem.TrySpendGuangHui(
+            await GuangDaoPowerSystem.TryAutoSpendGuangHui(
                 choiceContext,
                 this,
                 cardPlay,
@@ -123,7 +123,7 @@ public sealed class YueMangGu
             }
         }
 
-        if (empowered && cardPlay.PlayIndex == 0 && !target.IsDead)
+        if (empowered && cardPlay.IsFirstInSeries && !target.IsDead)
         {
             await GuangDaoPowerSystem.ApplyZhaoPo(
                 choiceContext,
@@ -227,6 +227,53 @@ public sealed class YueMangGu
     {
         base.OnGuRankChanged();
         RefreshRankValues();
+    }
+
+    public override IReadOnlyList<CardModel> GetCarouselCards()
+    {
+        if (GuRank < 3)
+        {
+            return [];
+        }
+
+        if (GuRank >= 9)
+        {
+            return
+            [
+                GuCardReferenceFactory.Create<TianYueMang>(
+                    this,
+                    IsUpgraded
+                ),
+            ];
+        }
+
+        if (GuRank >= 6)
+        {
+            List<CardModel> cards =
+            [
+                GuCardReferenceFactory.Create<NingYueMang>(
+                    this,
+                    IsUpgraded
+                ),
+            ];
+
+            if (GuRank >= 7)
+            {
+                cards.Add(
+                    GuCardReferenceFactory.Create<CanMang>(this)
+                );
+            }
+
+            return cards;
+        }
+
+        return
+        [
+            GuCardReferenceFactory.Create<YueMang>(
+                this,
+                IsUpgraded
+            ),
+        ];
     }
 
     private T CreatePrimaryToken<T>()

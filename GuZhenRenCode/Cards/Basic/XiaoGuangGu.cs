@@ -198,6 +198,43 @@ public sealed class XiaoGuangGu
         RefreshRankValues();
     }
 
+    public override IReadOnlyList<CardModel> GetCarouselCards()
+    {
+        return GuRank switch
+        {
+            < 3 => [],
+            <= 5 =>
+            [
+                GuCardReferenceFactory.Create<WeiGuang>(
+                    this,
+                    IsUpgraded
+                ),
+            ],
+            <= 7 =>
+            [
+                GuCardReferenceFactory.Create<JuGuang>(
+                    this,
+                    IsUpgraded
+                ),
+            ],
+            8 =>
+            [
+                GuCardReferenceFactory.Create<JuGuang>(
+                    this,
+                    IsUpgraded
+                ),
+                GuCardReferenceFactory.Create<YuHui>(this),
+            ],
+            _ =>
+            [
+                GuCardReferenceFactory.Create<JiGuang>(
+                    this,
+                    IsUpgraded
+                ),
+            ],
+        };
+    }
+
     private T CreateRecoveryCard<T>()
         where T : AbstractGuZhenRenCard
     {

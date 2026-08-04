@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 
 using GuZhenRen.Cards.ImmortalEssence;
+using GuZhenRen.Combat;
 
 using MegaCrit.Sts2.Core.Models;
 
@@ -105,13 +106,28 @@ public static class GuCardUsageRules
     {
         ArgumentNullException.ThrowIfNull(card);
 
-        return card is IGuWormCard &&
+        return card is IGuWormCard guCard &&
                CanUse(card) &&
+               HasEnoughYuanQi(card, guCard) &&
                ImmortalEssenceSystem.CanPayForActivation(card) &&
                (
                    HasPreparedActivationPayment(card) ||
                    CreateActivationPaymentPlan(card).IsAffordable
                );
+    }
+
+
+    private static bool HasEnoughYuanQi(
+        CardModel card,
+        IGuWormCard guCard
+    )
+    {
+        int cost = Math.Max(0, guCard.YuanQiCost);
+        return cost == 0 ||
+            SecondaryResourceCmd.Get(
+                card.Owner,
+                YuanQiSystem.ResourceId
+            ) >= cost;
     }
 
     /// <summary>

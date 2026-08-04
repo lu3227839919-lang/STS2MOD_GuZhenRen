@@ -16,7 +16,7 @@ namespace GuZhenRen.Cards.ShaZhao;
 
 /// <summary>
 /// 白虹贯日由月光蛊与流光蛊推演而成。
-/// 消耗目标已有照破提高伤害；支付光辉后，无视目标至多固定数值的格挡。
+/// 消耗目标已有照破提高伤害；光辉足够时自动支付，并无视目标至多固定数值的格挡。
 /// </summary>
 [RegisterCard(typeof(GuZhenRenShaZhaoCardPool))]
 [ShaZhaoRecipe(typeof(YueGuangGu), typeof(LiuGuangGu))]
@@ -89,7 +89,7 @@ public sealed class BaiHongGuanRi : AbstractShaZhaoCard
         decimal damage = DynamicVars.Damage.BaseValue +
             consumed * DynamicVars["DamagePerZhaoPo"].BaseValue;
 
-        bool empowered = await GuangDaoPowerSystem.TrySpendGuangHui(
+        bool empowered = await GuangDaoPowerSystem.TryAutoSpendGuangHui(
             choiceContext,
             this,
             cardPlay,

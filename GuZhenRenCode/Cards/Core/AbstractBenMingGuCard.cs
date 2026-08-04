@@ -59,7 +59,7 @@ public abstract class AbstractBenMingGuCard : ModCardTemplate, IGuWormCard
     public virtual int MaxUses => 1;
 
     protected override bool IsPlayable =>
-        GuCardUsageRules.CanUse(this);
+        GuActivationModeSystem.CanPlay(this);
 
     public override bool ShouldPlay(
         CardModel card,

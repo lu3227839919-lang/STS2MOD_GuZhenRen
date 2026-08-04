@@ -96,15 +96,16 @@ public sealed class YueGuangGu
             return;
         }
 
-        bool empowered = GuRank >= 5 &&
-            await GuangDaoPowerSystem.TrySpendGuangHui(
+        // 月光蛊从一转起即可耀化。五转不再是耀化解锁门槛，
+        // 只保留“耀化使恢复生成牌升级”的额外成长。
+        bool empowered = await GuangDaoPowerSystem.TryAutoSpendGuangHui(
                 choiceContext,
                 this,
                 cardPlay,
                 GuangHuiCost
             );
 
-        if (cardPlay.PlayIndex == 0)
+        if (cardPlay.IsFirstInSeries)
         {
             LastActivationEmpoweredState[this] = empowered;
         }
@@ -135,7 +136,7 @@ public sealed class YueGuangGu
             .WithHitFx("vfx/vfx_attack_slash")
             .Execute(choiceContext);
 
-        if (empowered && cardPlay.PlayIndex == 0)
+        if (empowered && cardPlay.IsFirstInSeries)
         {
             await GuangDaoPowerSystem.ApplyZhaoPo(
                 choiceContext,
@@ -216,6 +217,50 @@ public sealed class YueGuangGu
     {
         base.OnGuRankChanged();
         RefreshRankValues();
+    }
+
+    public override IReadOnlyList<CardModel> GetCarouselCards()
+    {
+        if (GuRank < 3)
+        {
+            return [];
+        }
+
+        bool moonbladeUpgraded = IsUpgraded ||
+            (GuRank >= 5 && LastActivationEmpoweredState[this]);
+
+        if (GuRank >= 9)
+        {
+            return
+            [
+                GuCardReferenceFactory.Create<YueRen>(
+                    this,
+                    moonbladeUpgraded
+                ),
+                GuCardReferenceFactory.Create<CanYue>(this),
+                GuCardReferenceFactory.Create<ManYueRen>(
+                    this,
+                    IsUpgraded
+                ),
+            ];
+        }
+
+        List<CardModel> cards =
+        [
+            GuCardReferenceFactory.Create<YueRen>(
+                this,
+                moonbladeUpgraded
+            ),
+        ];
+
+        if (GuRank >= 7)
+        {
+            cards.Add(
+                GuCardReferenceFactory.Create<CanYue>(this)
+            );
+        }
+
+        return cards;
     }
 
     private YueRen CreateYueRen()

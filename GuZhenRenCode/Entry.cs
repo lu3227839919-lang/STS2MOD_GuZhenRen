@@ -32,6 +32,7 @@ public partial class Entry
     [
         new(nameof(GuCardPileSystem), GuCardPileSystem.Initialize, GuCardPileSystem.Uninitialize),
         new(nameof(GuCardPileCombatPatch), GuCardPileCombatPatch.Initialize, GuCardPileCombatPatch.Uninitialize),
+        new(nameof(GuActivationModePatch), GuActivationModePatch.Initialize, GuActivationModePatch.Uninitialize),
         new(nameof(YuanQiSystem), YuanQiSystem.Initialize, YuanQiSystem.Uninitialize),
         new(nameof(ApertureSystem), ApertureSystem.Initialize, ApertureSystem.Uninitialize),
         // 按当前游戏语言延迟加载外部 zhs/eng JSON。
@@ -42,7 +43,6 @@ public partial class Entry
         ),
         new(nameof(GuRestSiteChoicePatch), GuRestSiteChoicePatch.Initialize, GuRestSiteChoicePatch.Uninitialize),
         new(nameof(CardCarouselPreviewPatch), CardCarouselPreviewPatch.Initialize, CardCarouselPreviewPatch.Uninitialize),
-        new(nameof(GuCardStackSelectionPatch), GuCardStackSelectionPatch.Initialize, GuCardStackSelectionPatch.Uninitialize),
         new(nameof(DeckCardSelectionManualConfirmationPatch), DeckCardSelectionManualConfirmationPatch.Initialize, DeckCardSelectionManualConfirmationPatch.Uninitialize),
         new(nameof(StartingDeckGuRankPatch), StartingDeckGuRankPatch.Initialize, StartingDeckGuRankPatch.Uninitialize),
         new(nameof(NCardGuEnergyIconPatch), NCardGuEnergyIconPatch.Initialize, NCardGuEnergyIconPatch.Uninitialize),

@@ -22,6 +22,8 @@ namespace GuZhenRen.Cards.HeLian;
 public abstract class AbstractHeLianGuCard
     : AbstractGuWormCard
 {
+    public override int YuanQiCost => 2;
+
     protected AbstractHeLianGuCard(
         int baseCost,
         CardType type,

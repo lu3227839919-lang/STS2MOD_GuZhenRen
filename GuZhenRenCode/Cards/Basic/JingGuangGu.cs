@@ -167,6 +167,43 @@ public sealed class JingGuangGu
         RefreshRankValues();
     }
 
+    public override IReadOnlyList<CardModel> GetCarouselCards()
+    {
+        if (GuRank < 3)
+        {
+            return [];
+        }
+
+        bool upgraded = IsUpgraded || GuRank >= 6;
+        if (GuRank >= 9)
+        {
+            return
+            [
+                GuCardReferenceFactory.Create<MingJing>(
+                    this,
+                    upgraded
+                ),
+            ];
+        }
+
+        List<CardModel> cards =
+        [
+            GuCardReferenceFactory.Create<GuangJing>(
+                this,
+                upgraded
+            ),
+        ];
+
+        if (GuRank >= 7)
+        {
+            cards.Add(
+                GuCardReferenceFactory.Create<FanZhao>(this)
+            );
+        }
+
+        return cards;
+    }
+
     private T CreateToken<T>() where T : AbstractGuZhenRenCard
     {
         return GuGeneratedCardFactory.Create<T>(

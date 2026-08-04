@@ -1,6 +1,5 @@
 using GuZhenRen.Characters;
 using GuZhenRen.Combat;
-using GuZhenRen.Cards.Interfaces;
 using GuZhenRen.Powers.GuangDao;
 
 using MegaCrit.Sts2.Core.Commands;
@@ -8,7 +7,6 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Nodes.CommonUi;
 using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib.Combat.SecondaryResources;
@@ -22,7 +20,6 @@ namespace GuZhenRen.Cards.TuDao;
 [RegisterCharacterStarterCard(typeof(GuZhenRenCharacter), 1)]
 public sealed class YuPiGu
     : AbstractGuWormCard,
-      ICarouselCard,
       IGuRecoveryEffectSource
 {
     private static readonly SavedAttachedState<CardModel, bool>
@@ -179,32 +176,43 @@ public sealed class YuPiGu
         RefreshRankValues();
     }
 
-    public IReadOnlyList<CardModel> GetCarouselCards()
+    public override IReadOnlyList<CardModel> GetCarouselCards()
     {
         if (GuRank < 3)
         {
             return [];
         }
 
-        CardModel previewModel = GuRank switch
-        {
-            >= 9 => ModelDb.Card<LiuLiYuYi>().ToMutable(),
-            >= 6 => ModelDb.Card<YuGuangYi>().ToMutable(),
-            _ => ModelDb.Card<YuMo>().ToMutable(),
-        };
+        List<CardModel> cards =
+        [
+            GuRank switch
+            {
+                >= 9 => GuCardReferenceFactory.Create<LiuLiYuYi>(
+                    this,
+                    IsUpgraded
+                ),
+                >= 6 => GuCardReferenceFactory.Create<YuGuangYi>(
+                    this,
+                    IsUpgraded
+                ),
+                _ => GuCardReferenceFactory.Create<YuMo>(
+                    this,
+                    IsUpgraded
+                ),
+            },
+        ];
 
-        if (previewModel is not AbstractGuZhenRenCard preview)
+        if (GuRank >= 8)
         {
-            return [];
+            cards.Add(
+                GuCardReferenceFactory.Create<ZheGuang>(
+                    this,
+                    IsUpgraded
+                )
+            );
         }
 
-        preview.InitializeGuRankFromSource(GuRank);
-        if (IsUpgraded)
-        {
-            CardCmd.Upgrade(preview, CardPreviewStyle.None);
-        }
-
-        return [preview];
+        return cards;
     }
 
     private T CreatePrimaryToken<T>()

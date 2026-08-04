@@ -27,6 +27,12 @@ public interface IGuRankProvider
 public interface IGuWormCard : IGuRankProvider
 {
     /// <summary>
+    /// 催动该蛊虫需要支付的元气。普通蛊默认 1，合练蛊通常为 2。
+    /// 该值用于蛊手牌阶段的即时可用性检查，避免选中目标后才因元气不足抛错。
+    /// </summary>
+    int YuanQiCost => 1;
+
+    /// <summary>
     /// 同一张蛊虫在进入蛊存放牌堆后总共可催动的次数。
     /// 剩余次数跨回合保留；耗尽后进入蛊恢复堆，恢复时重新充满。
     /// </summary>

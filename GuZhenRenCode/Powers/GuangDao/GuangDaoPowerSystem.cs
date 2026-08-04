@@ -1,25 +1,18 @@
 using System.Runtime.CompilerServices;
-
 using GuZhenRen.Cards;
-using GuZhenRen.Characters;
 
-using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
-
-using STS2RitsuLib.Interop.AutoRegistration;
-using STS2RitsuLib.Scaffolding.Content;
 
 namespace GuZhenRen.Powers.GuangDao;
 
 /// <summary>
 /// 光道 Power 的唯一公共调用入口。
-/// 光辉支付由玩家决定，并且一次出牌序列只支付一次；Replay 沿用首段结果。
+/// 满足光辉条件时自动支付；一次出牌序列只支付一次，Replay 沿用首段结果。
 /// </summary>
 public static class GuangDaoPowerSystem
 {
@@ -107,9 +100,9 @@ public static class GuangDaoPowerSystem
     }
 
     /// <summary>
-    /// 首段询问是否支付光辉；Replay 后续段复用首段选择，不重复支付或弹窗。
+    /// 首段检测光辉并自动支付；Replay 后续段复用首段结果，不重复支付。
     /// </summary>
-    public static async Task<bool> TrySpendGuangHui(
+    public static async Task<bool> TryAutoSpendGuangHui(
         PlayerChoiceContext choiceContext,
         CardModel sourceCard,
         CardPlay cardPlay,
@@ -127,7 +120,7 @@ public static class GuangDaoPowerSystem
                 static _ => new ActivationDecision()
             );
 
-        if (cardPlay.PlayIndex > 0)
+        if (!cardPlay.IsFirstInSeries)
         {
             return decision.Resolved && decision.Empowered;
         }
@@ -135,46 +128,26 @@ public static class GuangDaoPowerSystem
         decision.Resolved = true;
         decision.Empowered = false;
 
-        if (!IsGuangDaoCard(sourceCard) ||
-            sourceCard.IsCanonical ||
-            sourceCard.Owner.Creature.GetPower<GuangHuiPower>() is not
-                { } power ||
-            power.Amount < amount)
+        if (!IsGuangDaoCard(sourceCard) || sourceCard.IsCanonical)
         {
             return false;
         }
 
-        CardModel spend = CreateChoiceCard<SpendGuangHuiChoice>(
-            sourceCard.Owner
-        );
-        CardModel save = CreateChoiceCard<SaveGuangHuiChoice>(
-            sourceCard.Owner
-        );
-
-        LocString prompt = new(
-            "cards",
-            "GU_ZHEN_REN_CARD_SPEND_GUANG_HUI_CHOICE.selectionScreenPrompt"
-        );
-        prompt.Add("Amount", amount);
-        prompt.Add("SourceCard", sourceCard.Title);
-
-        CardSelectorPrefs prefs = new(prompt, 1, 1)
+        // 折光原本在 AfterCardPlayed 才发放光辉，导致本张牌触发
+        // 折光后刚好达到阈值时无法立即耀化。自动支付前先提前
+        // 结算当前牌的折光，并由 ZheGuangPower 防止出牌后重复发放。
+        if (sourceCard.Owner.Creature.GetPower<ZheGuangPower>() is
+            { } zheGuang)
         {
-            Cancelable = false,
-            PretendCardsCanBePlayed = true,
-        };
+            await zheGuang.ResolveBeforeAutoSpend(
+                choiceContext,
+                cardPlay
+            );
+        }
 
-        CardModel? selected =
-            (
-                await CardSelectCmd.FromSimpleGrid(
-                    choiceContext,
-                    [spend, save],
-                    sourceCard.Owner,
-                    prefs
-                )
-            ).FirstOrDefault();
-
-        if (selected is not SpendGuangHuiChoice)
+        if (sourceCard.Owner.Creature.GetPower<GuangHuiPower>() is not
+                { } power ||
+            power.Amount < amount)
         {
             return false;
         }
@@ -191,6 +164,20 @@ public static class GuangDaoPowerSystem
         int after = sourceCard.Owner.Creature
             .GetPower<GuangHuiPower>()?.Amount ?? 0;
         decision.Empowered = before - after == amount;
+
+        if (decision.Empowered)
+        {
+            Entry.Logger.Info(
+                $"[光辉自动支付] {sourceCard.Id} 自动消耗 {amount} 点光辉：{before} -> {after}。"
+            );
+        }
+        else
+        {
+            Entry.Logger.Warn(
+                $"[光辉自动支付] {sourceCard.Id} 请求消耗 {amount} 点光辉，但结算后数量为 {before} -> {after}。"
+            );
+        }
+
         return decision.Empowered;
     }
 
@@ -242,67 +229,4 @@ public static class GuangDaoPowerSystem
         );
     }
 
-    private static CardModel CreateChoiceCard<T>(Player owner)
-        where T : CardModel
-    {
-        CardModel card = ModelDb.Card<T>().ToMutable();
-        card.Owner = owner;
-        return card;
-    }
-}
-
-public abstract class AbstractGuangHuiChoice
-    : ModCardTemplate,
-      ICardRewardExcluded
-{
-    public override CardPoolModel Pool =>
-        ModelDb.CardPool<GuZhenRenCardPool>();
-
-    public override bool CanBeGeneratedInCombat => false;
-
-    protected AbstractGuangHuiChoice()
-        : base(
-            baseCost: 0,
-            type: CardType.Skill,
-            rarity: CardRarity.Token,
-            target: TargetType.Self,
-            showInCardLibrary: false
-        )
-    {
-    }
-
-    public override CardAssetProfile AssetProfile =>
-        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
-
-    protected override bool IsPlayable => false;
-
-    protected override void OnUpgrade()
-    {
-    }
-}
-
-[RegisterCard(typeof(GuZhenRenCardPool))]
-public sealed class SpendGuangHuiChoice
-    : AbstractGuangHuiChoice
-{
-    public override CardAssetProfile AssetProfile =>
-        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
-
-    public SpendGuangHuiChoice()
-        : base()
-    {
-    }
-}
-
-[RegisterCard(typeof(GuZhenRenCardPool))]
-public sealed class SaveGuangHuiChoice
-    : AbstractGuangHuiChoice
-{
-    public override CardAssetProfile AssetProfile =>
-        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
-
-    public SaveGuangHuiChoice()
-        : base()
-    {
-    }
 }

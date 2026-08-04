@@ -189,6 +189,46 @@ public sealed class LiuGuangGu
         RefreshRankValues();
     }
 
+    public override IReadOnlyList<CardModel> GetCarouselCards()
+    {
+        if (GuRank < 3)
+        {
+            return [];
+        }
+
+        bool upgraded = IsUpgraded ||
+            GuRank >= 6 ||
+            EmpoweredTokenState[this];
+
+        if (GuRank >= 9)
+        {
+            return
+            [
+                GuCardReferenceFactory.Create<BaiHong>(
+                    this,
+                    upgraded
+                ),
+            ];
+        }
+
+        List<CardModel> cards =
+        [
+            GuCardReferenceFactory.Create<LiuGuang>(
+                this,
+                upgraded
+            ),
+        ];
+
+        if (GuRank >= 7)
+        {
+            cards.Add(
+                GuCardReferenceFactory.Create<LiuHui>(this)
+            );
+        }
+
+        return cards;
+    }
+
     private T CreatePrimaryToken<T>()
         where T : AbstractGuZhenRenCard
     {

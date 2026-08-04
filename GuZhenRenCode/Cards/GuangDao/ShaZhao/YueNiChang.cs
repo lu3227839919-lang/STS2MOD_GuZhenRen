@@ -1,4 +1,5 @@
 using GuZhenRen.Cards.GuangDao;
+using GuZhenRen.Cards.Interfaces;
 using GuZhenRen.Cards.TuDao;
 using GuZhenRen.Characters;
 using GuZhenRen.Powers.GuangDao;
@@ -7,6 +8,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib.Interop.AutoRegistration;
@@ -21,7 +23,9 @@ namespace GuZhenRen.Cards.ShaZhao;
 [RegisterCard(typeof(GuZhenRenShaZhaoCardPool))]
 [ShaZhaoRecipe(typeof(YueGuangGu), typeof(YuPiGu))]
 [ShaZhaoRecipe(typeof(YuPiGu), typeof(YueGuangGu))]
-public sealed class YueNiChang : AbstractShaZhaoCard
+public sealed class YueNiChang
+    : AbstractShaZhaoCard,
+      ICarouselCard
 {
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
@@ -86,6 +90,42 @@ public sealed class YueNiChang : AbstractShaZhaoCard
             generated,
             Owner
         );
+    }
+
+    public IReadOnlyList<CardModel> GetCarouselCards()
+    {
+        if (GuRank < 3)
+        {
+            return [];
+        }
+
+        if (GuRank >= 9)
+        {
+            return
+            [
+                GuCardReferenceFactory.Create<ManYueRen>(
+                    this,
+                    IsUpgraded
+                ),
+            ];
+        }
+
+        List<CardModel> cards =
+        [
+            GuCardReferenceFactory.Create<YueRen>(
+                this,
+                IsUpgraded || GuRank >= 6
+            ),
+        ];
+
+        if (GuRank >= 7)
+        {
+            cards.Add(
+                GuCardReferenceFactory.Create<CanYue>(this)
+            );
+        }
+
+        return cards;
     }
 
     protected override void OnUpgrade()

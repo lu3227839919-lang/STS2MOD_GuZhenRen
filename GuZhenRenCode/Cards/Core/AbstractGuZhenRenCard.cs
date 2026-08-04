@@ -44,7 +44,9 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
     public virtual int MaxUses => 1;
 
     protected override bool IsPlayable =>
-        GuCardUsageRules.CanUse(this);
+        this is not IGuWormCard
+            ? GuCardUsageRules.CanUse(this)
+            : GuActivationModeSystem.CanPlay(this);
 
     public override bool ShouldPlay(
         CardModel card,
@@ -95,6 +97,16 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
     {
         base.AddExtraArgsToDescription(description);
         description.Add("Rank", GuRank);
+
+        // 本地化文本使用这些布尔参数按当前转数显示已解锁机制，
+        // 避免低转卡牌提前展示所有高转说明。
+        for (int rank = 1; rank <= 9; rank++)
+        {
+            description.Add(
+                $"Rank{rank}Exact",
+                GuRank == rank ? 1 : 0
+            );
+        }
 
         if (this is IGuWormCard)
         {
