@@ -27,7 +27,7 @@
   "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "可催动{RemainingUses}/{MaxUses}次。失去{HpLoss:diff()}点生命，获得{XueYuanPower:diff()}点[gold]血元[/gold]；下回合回复{Heal:diff()}点生命。失去与回复量相等。 NL 本蛊最高五转。",
   "GU_ZHEN_REN_CARD_XUE_YUE_GU.title": "血月蛊",
   "GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "可催动{RemainingUses}/{MaxUses}次。对所有敌人造成{Damage:diff()}点伤害。首段施加{LiuXuePower:diff()}层[gold]流血[/gold]；每有{BloodThreshold}点[gold]血元[/gold]获得1个血印总额度，并按固定顺序尽量均分。{Rank7Exact:cond:>0?重放1次；重放只重复伤害。|} NL 本蛊最高七转。",
-  "GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "蛊虫容量已达15张。选择一张现有蛊虫替换，以获得[gold]{NewCard}[/gold]。",
+  "GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "蛊虫容量已达10张。选择一张现有蛊虫替换，以获得[gold]{NewCard}[/gold]。",
   "GU_ZHEN_REN_CARD_WEI_GUANG.title": "微光",
   "GU_ZHEN_REN_CARD_WEI_GUANG.description": "下一张光道攻击造成的伤害提高3点。消耗。",
   "GU_ZHEN_REN_CARD_JU_GUANG.title": "聚光",

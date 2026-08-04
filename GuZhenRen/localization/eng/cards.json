@@ -27,7 +27,7 @@
   "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Lose {HpLoss:diff()} HP and gain {XueYuanPower:diff()} [gold]Blood Essence[/gold]; next turn heal {Heal:diff()} HP. HP lost and healed are equal. NL This Gu is capped at rank 5.",
   "GU_ZHEN_REN_CARD_XUE_YUE_GU.title": "Blood Moon Gu",
   "GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "Can be activated {RemainingUses}/{MaxUses} times. Deal {Damage:diff()} damage to ALL enemies. On the first segment, apply {LiuXuePower:diff()} [gold]Bleed[/gold]; for every {BloodThreshold} [gold]Blood Essence[/gold], gain 1 total Blood Mark allocation and distribute it as evenly as possible in fixed order.{Rank7Exact:cond:>0? Replay once; Replay repeats only the damage.|} NL This Gu is capped at rank 7.",
-  "GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "Your 15-card Gu capacity is full. Choose an existing Gu Worm to replace to obtain [gold]{NewCard}[/gold].",
+  "GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "Your 10-card Gu capacity is full. Choose an existing Gu Worm to replace to obtain [gold]{NewCard}[/gold].",
   "GU_ZHEN_REN_CARD_WEI_GUANG.title": "Glimmer",
   "GU_ZHEN_REN_CARD_WEI_GUANG.description": "The next Light Path Attack deals 3 more damage. Exhaust.",
   "GU_ZHEN_REN_CARD_JU_GUANG.title": "Focused Light",

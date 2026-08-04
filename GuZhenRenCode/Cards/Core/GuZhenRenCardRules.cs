@@ -27,7 +27,7 @@ public static class GuZhenRenCardRules
     public const int XianGuRank = 6;
 
     // 蛊虫不进入普通抽牌循环，因此以永久牌组容量承担构筑代价。
-    public const int GuWormDeckCapacity = 15;
+    public const int GuWormDeckCapacity = 10;
 
     private static readonly object XianGuMutationSync = new();
 
