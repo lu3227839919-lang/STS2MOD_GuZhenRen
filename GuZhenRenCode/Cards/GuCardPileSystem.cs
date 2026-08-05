@@ -567,6 +567,74 @@ public static class GuCardPileSystem
         return result.success;
     }
 
+    /// <summary>
+    /// 将控制台或其他开发入口直接给予的卡牌按游戏规则自动放置。
+    ///
+    /// 战斗中，蛊虫进入蛊恢复堆并从当前回合开始计算恢复；
+    /// 其他卡牌进入普通手牌。非战斗场景统一进入永久牌组。
+    /// 调用方不需要、也不应再自行指定目标牌堆。
+    /// </summary>
+    public static PileType PlaceGrantedCardByRule(
+        CardModel card,
+        Player owner
+    )
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        ArgumentNullException.ThrowIfNull(owner);
+
+        if (!ReferenceEquals(card.Owner, owner))
+        {
+            throw new InvalidOperationException(
+                "不能把其他玩家拥有的卡牌放入当前玩家牌堆。"
+            );
+        }
+
+        if (owner.PlayerCombatState == null)
+        {
+            MoveCardWithoutAnimation(card, owner.Deck);
+            return PileType.Deck;
+        }
+
+        if (card is IGuWormCard)
+        {
+            EnsureInitialized();
+
+            GuCardUsageRules.ResetUses(card);
+            GuCardUsageRules.ScheduleRecovery(
+                card,
+                Math.Max(1, owner.PlayerCombatState.TurnNumber)
+            );
+
+            MoveCardWithoutAnimation(
+                card,
+                RecoveryPileType.GetPile(owner)
+            );
+            return RecoveryPileType;
+        }
+
+        CardPile hand = PileType.Hand.GetPile(owner);
+        MoveCardWithoutAnimation(card, hand);
+        return PileType.Hand;
+    }
+
+    private static void MoveCardWithoutAnimation(
+        CardModel card,
+        CardPile targetPile
+    )
+    {
+        CardPile? sourcePile = card.Pile;
+        if (ReferenceEquals(sourcePile, targetPile))
+        {
+            return;
+        }
+
+        sourcePile?.RemoveInternal(card, silent: true);
+        targetPile.AddInternal(card, silent: true);
+
+        sourcePile?.InvokeContentsChanged();
+        targetPile.InvokeContentsChanged();
+    }
+
     private static void EnsureInitialized()
     {
         if (!_initialized)

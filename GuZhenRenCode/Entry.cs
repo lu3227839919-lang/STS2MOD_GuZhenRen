@@ -31,6 +31,7 @@ public partial class Entry
     private static readonly PatchLifecycle[] Lifecycles =
     [
         new(nameof(GuCardPileSystem), GuCardPileSystem.Initialize, GuCardPileSystem.Uninitialize),
+        new(nameof(GuCardConsoleCommandPatch), GuCardConsoleCommandPatch.Initialize, GuCardConsoleCommandPatch.Uninitialize),
         new(nameof(GuCardPileCombatPatch), GuCardPileCombatPatch.Initialize, GuCardPileCombatPatch.Uninitialize),
         new(nameof(GuActivationModePatch), GuActivationModePatch.Initialize, GuActivationModePatch.Uninitialize),
         new(nameof(YuanQiSystem), YuanQiSystem.Initialize, YuanQiSystem.Uninitialize),
