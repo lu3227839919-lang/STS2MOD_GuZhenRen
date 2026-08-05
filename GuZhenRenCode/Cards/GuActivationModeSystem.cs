@@ -5,10 +5,14 @@ using Godot;
 
 using HarmonyLib;
 
+using GuZhenRen.Cards.Basic;
+
 using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes.Cards.Holders;
 using MegaCrit.Sts2.Core.Nodes.Combat;
@@ -19,11 +23,11 @@ using STS2RitsuLib.CardPiles.Nodes;
 namespace GuZhenRen.Cards;
 
 /// <summary>
-/// 管理“催动”开启的蛊手牌选择模式。
+/// 管理蛊手牌的直接催动流程。
 ///
-/// 催动牌结算后，普通手牌暂时禁用，玩家只能从 RitsuLib ExtraHand
-/// 显示的蛊手牌中选择一张。选择蛊牌后由原生打牌流程负责目标选择；
-/// 目标取消时继续停留在蛊手牌模式，成功入队后恢复普通手牌。
+/// 玩家手牌中存在一张可支付费用的“催动”时，可以直接从 RitsuLib
+/// ExtraHand 选择蛊牌并使用原生目标选择。目标确认后，系统自动打出
+/// 预留的“催动”；没有可用催动时，蛊牌保持不可用。
 /// </summary>
 public static class GuActivationModeSystem
 {
@@ -76,6 +80,14 @@ public static class GuActivationModeSystem
     // 仍然通过 CardModel.CanPlay() 检查。
     private static CardModel? _pendingCard;
 
+    // 直接点击蛊牌时，预留手牌中将被自动打出的“催动”。
+    // 预留只跨越原生目标选择窗口，不写入存档。
+    private static ChuiDong? _pendingActivator;
+
+    // “催动”改为只能由蛊牌流程自动打出。这个标记仅在
+    // CardCmd.AutoPlay 的同步调用链中开放其 IsPlayable。
+    private static CardModel? _autoPlayingActivator;
+
     public static bool IsActive
     {
         get
@@ -97,7 +109,8 @@ public static class GuActivationModeSystem
     }
 
     /// <summary>
-    /// 只有本地玩家、当前蛊手牌中的可支付蛊虫，才能在催动模式中被点击。
+    /// 只有本地玩家、资源可支付且手牌中存在可用催动时，
+    /// 当前蛊手牌中的蛊虫才能被点击。
     /// </summary>
     public static bool CanSelect(CardModel? card)
     {
@@ -115,37 +128,219 @@ public static class GuActivationModeSystem
         if (card == null ||
             card is not IGuWormCard ||
             !LocalContext.IsMine(card) ||
-            !IsActiveFor(card.Owner) ||
             !GuCardUsageRules.CanActivate(card))
         {
             return false;
         }
 
+        Player owner = card.Owner;
+
+        // 蛊手牌中的牌只有在普通手牌里存在一张当前可支付费用的
+        // “催动”时才显示为可用。玩家直接点击蛊牌，不再先进入模式。
         if (card.Pile?.Type == GuCardPileSystem.PileType)
         {
-            return true;
+            return FindAvailableActivator(owner) != null;
         }
 
+        // RitsuLib 开始原生目标选择时会把被点击的蛊牌临时移入 Hand。
+        // 这段窗口只允许刚刚从蛊手牌选中的实例继续通过 CanPlay。
+        ChuiDong? reservedActivator;
         lock (SyncRoot)
         {
-            return ReferenceEquals(_pendingCard, card) &&
-                card.Pile?.Type == PileType.Hand;
+            if (!ReferenceEquals(_pendingCard, card) ||
+                card.Pile?.Type != PileType.Hand)
+            {
+                return false;
+            }
+
+            reservedActivator = _pendingActivator;
         }
+
+        return IsActivatorAvailable(reservedActivator, owner) ||
+            FindAvailableActivator(owner) != null;
     }
 
     internal static void PrepareTargeting(CardModel card)
     {
         ArgumentNullException.ThrowIfNull(card);
 
+        ChuiDong? activator = FindAvailableActivator(card.Owner);
+
         lock (SyncRoot)
         {
-            if (ReferenceEquals(_activePlayer, card.Owner))
+            _pendingCard = card;
+            _pendingActivator = activator;
+        }
+
+        Entry.Logger.Info(
+            $"[蛊牌催动] 已选择蛊牌 {card.Id}，等待目标确认；" +
+            $"预留催动={activator?.Id.ToString() ?? "无"}。"
+        );
+    }
+
+    /// <summary>
+    /// 蛊牌正式开始结算时，自动支付并打出目标选择前预留的“催动”。
+    /// 非玩家从蛊手牌直接选择的脚本 AutoPlay 不消费催动牌。
+    /// </summary>
+    internal static async Task<bool>
+        TryAutoPlayReservedActivatorAsync(CardModel guCard)
+    {
+        ArgumentNullException.ThrowIfNull(guCard);
+
+        ChuiDong? activator;
+        lock (SyncRoot)
+        {
+            // 没有经过 ExtraHand 直接选择的脚本入口沿用原有行为。
+            if (!ReferenceEquals(_pendingCard, guCard))
             {
-                _pendingCard = card;
-                Entry.Logger.Info(
-                    $"[催动模式] 已选择蛊牌 {card.Id}，等待其目标确认。"
-                );
+                return true;
             }
+
+            activator = _pendingActivator;
+        }
+
+        Player owner = guCard.Owner;
+        if (!IsActivatorAvailable(activator, owner))
+        {
+            activator = FindAvailableActivator(owner);
+        }
+
+        if (activator == null ||
+            owner.PlayerCombatState == null)
+        {
+            ClearPendingActivation(guCard);
+            return false;
+        }
+
+        int energyCost = GetActivatorEnergyCost(activator);
+        if (owner.PlayerCombatState.Energy < energyCost)
+        {
+            ClearPendingActivation(guCard);
+            return false;
+        }
+
+        if (energyCost > 0)
+        {
+            await activator.SpendEnergy(energyCost);
+        }
+
+        lock (SyncRoot)
+        {
+            _autoPlayingActivator = activator;
+        }
+
+        try
+        {
+            await CardCmd.AutoPlay(
+                new BlockingPlayerChoiceContext(),
+                activator,
+                owner.Creature,
+                skipXCapture: false
+            );
+
+            Entry.Logger.Info(
+                $"[蛊牌催动] 打出 {guCard.Id} 时已自动打出 " +
+                $"{activator.Id}，能量费用={energyCost}。"
+            );
+            return true;
+        }
+        finally
+        {
+            lock (SyncRoot)
+            {
+                if (ReferenceEquals(
+                        _autoPlayingActivator,
+                        activator
+                    ))
+                {
+                    _autoPlayingActivator = null;
+                }
+            }
+
+            ClearPendingActivation(guCard);
+        }
+    }
+
+    internal static bool IsAutoPlayingActivator(CardModel? card)
+    {
+        lock (SyncRoot)
+        {
+            return card != null &&
+                ReferenceEquals(_autoPlayingActivator, card);
+        }
+    }
+
+    /// <summary>
+    /// ShouldPlay 阶段再次确认目标选择前预留的催动仍然可用。
+    /// 脚本 AutoPlay 没有 pending 记录，继续沿用原有入口。
+    /// </summary>
+    internal static bool CanResolvePendingActivation(CardModel card)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+
+        ChuiDong? activator;
+        lock (SyncRoot)
+        {
+            if (!ReferenceEquals(_pendingCard, card))
+            {
+                return true;
+            }
+
+            activator = _pendingActivator;
+        }
+
+        return IsActivatorAvailable(activator, card.Owner) ||
+            FindAvailableActivator(card.Owner) != null;
+    }
+
+    private static ChuiDong? FindAvailableActivator(Player owner)
+    {
+        return owner.PlayerCombatState?.Hand.Cards
+            .OfType<ChuiDong>()
+            .Where(card => IsActivatorAvailable(card, owner))
+            .OrderBy(GetActivatorEnergyCost)
+            .FirstOrDefault();
+    }
+
+    private static bool IsActivatorAvailable(
+        ChuiDong? activator,
+        Player owner
+    )
+    {
+        return activator != null &&
+            !activator.IsCanonical &&
+            ReferenceEquals(activator.Owner, owner) &&
+            activator.Pile?.Type == PileType.Hand &&
+            owner.PlayerCombatState != null &&
+            owner.PlayerCombatState.Energy >=
+                GetActivatorEnergyCost(activator);
+    }
+
+    private static int GetActivatorEnergyCost(
+        ChuiDong activator
+    )
+    {
+        return activator.EnergyCost.CostsX
+            ? 0
+            : Math.Max(
+                0,
+                activator.EnergyCost.GetWithModifiers(
+                    CostModifiers.All
+                )
+            );
+    }
+
+    private static void ClearPendingActivation(CardModel card)
+    {
+        lock (SyncRoot)
+        {
+            if (!ReferenceEquals(_pendingCard, card))
+            {
+                return;
+            }
+
+            _pendingCard = null;
+            _pendingActivator = null;
         }
     }
 
@@ -172,6 +367,7 @@ public static class GuActivationModeSystem
 
             _activePlayer = player;
             _pendingCard = null;
+            _pendingActivator = null;
         }
 
         Entry.Logger.Info(
@@ -191,24 +387,43 @@ public static class GuActivationModeSystem
     {
         ArgumentNullException.ThrowIfNull(card);
 
-        if (!IsActiveFor(card.Owner))
-        {
-            return;
-        }
+        ClearPendingActivation(card);
 
-        End(
-            "[催动模式] 已选择蛊牌并确认目标，恢复普通手牌。"
-        );
+        if (IsActiveFor(card.Owner))
+        {
+            End(
+                "[催动模式] 已选择蛊牌并确认目标，恢复普通手牌。"
+            );
+        }
     }
 
     public static void Cancel(string reason)
     {
-        if (!IsActive)
+        bool hadActiveMode;
+        bool hadPendingActivation;
+
+        lock (SyncRoot)
+        {
+            hadActiveMode = _activePlayer != null;
+            hadPendingActivation = _pendingCard != null;
+
+            _activePlayer = null;
+            _pendingCard = null;
+            _pendingActivator = null;
+            _autoPlayingActivator = null;
+        }
+
+        if (!hadActiveMode && !hadPendingActivation)
         {
             return;
         }
 
-        End($"[催动模式] 已取消：{reason}");
+        Entry.Logger.Info($"[蛊牌催动] 已取消：{reason}");
+
+        if (hadActiveMode)
+        {
+            RestoreNormalHandUi();
+        }
     }
 
     public static void ResetWithoutUi()
@@ -217,6 +432,8 @@ public static class GuActivationModeSystem
         {
             _activePlayer = null;
             _pendingCard = null;
+            _pendingActivator = null;
+            _autoPlayingActivator = null;
         }
     }
 
@@ -306,8 +523,7 @@ public static class GuActivationModeSystem
 
     internal static void CancelIfPlayerActionsDisabled()
     {
-        if (IsActive &&
-            CombatManager.Instance.PlayerActionsDisabled)
+        if (CombatManager.Instance.PlayerActionsDisabled)
         {
             Cancel("玩家操作阶段已经结束。");
         }
@@ -322,6 +538,8 @@ public static class GuActivationModeSystem
         {
             _activePlayer = null;
             _pendingCard = null;
+            _pendingActivator = null;
+            _autoPlayingActivator = null;
         }
 
         Entry.Logger.Info(logMessage);

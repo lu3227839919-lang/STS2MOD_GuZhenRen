@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
 
@@ -17,11 +18,24 @@ namespace GuZhenRen.Cards.HeLian;
 [HeLianRecipe(
     typeof(XueQiGu),
     typeof(XueYueGu),
-    MinimumMaterialRank = 3
+    MinimumMaterialRank = 4
 )]
 public sealed class XueTaiGu : AbstractHeLianGuCard
 {
     public override int MaxUses => IsUpgraded ? 2 : 1;
+
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        base.CanonicalKeywords.Concat(
+        [
+            GuZhenRenKeywords.XueYuan,
+            GuZhenRenKeywords.XueJi,
+            GuZhenRenKeywords.XueTai,
+            GuZhenRenKeywords.TaiDong,
+            GuZhenRenKeywords.TunJi,
+            GuZhenRenKeywords.PoTai,
+            GuZhenRenKeywords.FuHua,
+            GuZhenRenKeywords.ZongEDu,
+        ]).Distinct();
 
     public override int RecoveryDelayTurns => GuRank >= 7 ? 4 : 3;
 
@@ -35,6 +49,13 @@ public sealed class XueTaiGu : AbstractHeLianGuCard
     {
         SetDao(Dao.XueDao);
         this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 2);
+    }
+
+
+    protected override void AddExtraArgsToDescription(LocString description)
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add("RecoveryTurns", RecoveryDelayTurns);
     }
 
     protected override async Task OnPlay(
@@ -51,7 +72,7 @@ public sealed class XueTaiGu : AbstractHeLianGuCard
             },
             card => XueDaoParasiteSystem.CanAttach(
                 card,
-                allowBloodQiReplacement: true
+                XueDaoParasiteSystem.ParasiteKind.BloodFetus
             ),
             this
         )).FirstOrDefault();
@@ -120,7 +141,7 @@ public sealed class XueTaiGu : AbstractHeLianGuCard
         Owner.PlayerCombatState?.Hand.Cards.Any(card =>
             XueDaoParasiteSystem.CanAttach(
                 card,
-                allowBloodQiReplacement: true
+                XueDaoParasiteSystem.ParasiteKind.BloodFetus
             )
         ) == true;
 

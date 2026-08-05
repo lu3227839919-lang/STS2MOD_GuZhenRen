@@ -519,7 +519,7 @@ internal static class ShaZhaoTuiYanSystem
         {
             foreach (CardModel material in selectedCards)
             {
-                await CardCmd.Exhaust(
+                await CardExhaustCompat.ExhaustAsync(
                     choiceContext,
                     material
                 );

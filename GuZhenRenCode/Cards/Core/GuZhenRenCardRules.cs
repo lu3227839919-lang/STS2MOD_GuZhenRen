@@ -143,29 +143,40 @@ public static class GuZhenRenCardRules
         // 容量已满时至少要存在一张合法替换对象，避免奖励或商店
         // 展示一张最终无法获得的蛊虫。
         return receivingPlayer.Deck.Cards.Any(existing =>
-            CanReplaceGuWorm(existing, candidate)
+            CanReplaceGuWorm(
+                receivingPlayer,
+                existing,
+                candidate
+            )
         );
     }
 
     internal static bool CanReplaceGuWorm(
+        Player receivingPlayer,
         CardModel existing,
         CardModel candidate
     )
     {
+        ArgumentNullException.ThrowIfNull(receivingPlayer);
         ArgumentNullException.ThrowIfNull(existing);
         ArgumentNullException.ThrowIfNull(candidate);
 
+        /*
+         * 奖励候选通常是 ModelDb 的 canonical model，读取 candidate.Owner
+         * 会触发 AssertMutable。接收玩家已经由调用上下文明确提供，唯一性
+         * 与容量检查都应使用 receivingPlayer，而不是候选牌的 Owner。
+         */
         if (existing is not IGuWormCard ||
             candidate is not IGuWormCard ||
             existing.Pile?.Type != PileType.Deck ||
-            !ReferenceEquals(existing.Owner, candidate.Owner))
+            !ReferenceEquals(existing.Owner, receivingPlayer))
         {
             return false;
         }
 
         return CanEnterPermanentDeck(
-            candidate.Owner.RunState,
-            candidate.Owner,
+            receivingPlayer.RunState,
+            receivingPlayer,
             candidate,
             ignoredExistingCards:
                 new HashSet<CardModel> { existing },

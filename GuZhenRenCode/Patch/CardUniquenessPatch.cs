@@ -4,6 +4,7 @@ using System.Threading;
 using HarmonyLib;
 
 using GuZhenRen.Characters;
+using GuZhenRen.Cards.XueDao;
 
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -25,6 +26,9 @@ internal static class CardUniquenessPatch
 
     private static readonly AsyncLocal<TransformationPlan?>
         ActiveTransformationPlan = new();
+
+    private static readonly AsyncLocal<int>
+        RewardCandidateQueryDepth = new();
 
     private static bool _initialized;
 
@@ -91,8 +95,7 @@ internal static class CardUniquenessPatch
             postfix: nameof(RewardResultsPostfix)
         );
 
-        Patch(
-            harmony,
+        MethodInfo? createForReward =
             AccessTools.Method(
                 typeof(CardFactory),
                 nameof(CardFactory.CreateForReward),
@@ -101,8 +104,28 @@ internal static class CardUniquenessPatch
                     typeof(int),
                     typeof(CardCreationOptions),
                 ]
+            );
+        if (createForReward == null)
+        {
+            throw new MissingMethodException(
+                "唯一规则所需的卡牌奖励生成方法不存在。"
+            );
+        }
+
+        harmony.Patch(
+            createForReward,
+            prefix: new HarmonyMethod(
+                typeof(CardUniquenessPatch),
+                nameof(CreateForRewardPrefix)
             ),
-            prefix: nameof(CreateForRewardPrefix)
+            postfix: new HarmonyMethod(
+                typeof(CardUniquenessPatch),
+                nameof(CreateForRewardPostfix)
+            ),
+            finalizer: new HarmonyMethod(
+                typeof(CardUniquenessPatch),
+                nameof(CreateForRewardFinalizer)
+            )
         );
 
         Patch(
@@ -164,6 +187,7 @@ internal static class CardUniquenessPatch
         finally
         {
             ActiveTransformationPlan.Value = null;
+            RewardCandidateQueryDepth.Value = 0;
             _initialized = false;
         }
     }
@@ -296,6 +320,13 @@ internal static class CardUniquenessPatch
         ref IEnumerable<CardModel> __result
     )
     {
+        // GetPossibleCards 也被攻击药水、转换和其他战斗生成使用。
+        // 只有 CardFactory.CreateForReward 的调用链才应用“奖励只出蛊虫”规则。
+        if (RewardCandidateQueryDepth.Value <= 0)
+        {
+            return;
+        }
+
         IEnumerable<CardModel> candidates = __result;
 
         // 角色主池只装普通操作牌；真正蛊虫注册在独立蛊池。
@@ -354,9 +385,15 @@ internal static class CardUniquenessPatch
         Player player,
         ref int cardCount,
         CardCreationOptions options,
-        ref IEnumerable<CardCreationResult> __result
+        ref IEnumerable<CardCreationResult> __result,
+        out RewardQueryScope __state
     )
     {
+        __state = new RewardQueryScope(
+            RewardCandidateQueryDepth.Value
+        );
+        RewardCandidateQueryDepth.Value++;
+
         CardModel[] possibleCards = options
             .GetPossibleCards(player)
             .Where(card =>
@@ -387,6 +424,22 @@ internal static class CardUniquenessPatch
 
         cardCount = Math.Min(cardCount, possibleCards.Length);
         return true;
+    }
+
+    private static void CreateForRewardPostfix(
+        RewardQueryScope __state
+    )
+    {
+        __state.Restore();
+    }
+
+    private static Exception? CreateForRewardFinalizer(
+        Exception? __exception,
+        RewardQueryScope __state
+    )
+    {
+        __state.Restore();
+        return __exception;
     }
 
     private static void TransformationOptionsPostfix(
@@ -741,6 +794,34 @@ internal static class CardUniquenessPatch
         keywords.Remove(
             GuZhenRenKeywords.XianGu
         );
+        if (XueDaoParasiteSystem.HasParasite(__instance))
+        {
+            keywords.Add(GuZhenRenKeywords.XueJi);
+            keywords.Add(GuZhenRenKeywords.PoTai);
+            keywords.Add(GuZhenRenKeywords.FuHua);
+
+            switch (XueDaoParasiteSystem.GetKind(__instance))
+            {
+                case XueDaoParasiteSystem.ParasiteKind.BloodQi:
+                    keywords.Add(GuZhenRenKeywords.XueQi);
+                    break;
+                case XueDaoParasiteSystem.ParasiteKind.CrescentMoon:
+                case XueDaoParasiteSystem.ParasiteKind.BloodMoon:
+                    keywords.Add(GuZhenRenKeywords.YueXiang);
+                    keywords.Add(XueDaoParasiteSystem.GetStage(__instance) switch
+                    {
+                        <= 0 => GuZhenRenKeywords.CanYue,
+                        1 => GuZhenRenKeywords.YingYue,
+                        _ => GuZhenRenKeywords.ManYue,
+                    });
+                    break;
+                case XueDaoParasiteSystem.ParasiteKind.BloodFetus:
+                    keywords.Add(GuZhenRenKeywords.XueTai);
+                    keywords.Add(GuZhenRenKeywords.TaiDong);
+                    keywords.Add(GuZhenRenKeywords.TunJi);
+                    break;
+            }
+        }
 
         bool isXianGu =
             GuZhenRenCardRules.IsXianGu(__instance);
@@ -771,6 +852,27 @@ internal static class CardUniquenessPatch
         }
 
         __result = keywords;
+    }
+
+    private sealed class RewardQueryScope
+    {
+        private readonly int _previousDepth;
+        private int _restored;
+
+        internal RewardQueryScope(int previousDepth)
+        {
+            _previousDepth = previousDepth;
+        }
+
+        internal void Restore()
+        {
+            if (Interlocked.Exchange(ref _restored, 1) != 0)
+            {
+                return;
+            }
+
+            RewardCandidateQueryDepth.Value = _previousDepth;
+        }
     }
 
     private readonly record struct GeneratedReplacement(

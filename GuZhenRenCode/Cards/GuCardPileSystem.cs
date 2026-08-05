@@ -70,7 +70,7 @@ public static class GuCardPileSystem
                 ModCardPileRegistry.For(Entry.ModId);
 
             // 蛊存放堆以 RitsuLib ExtraHand 形式常驻显示。卡牌节点始终可见，
-            // 但只有“催动模式”开启时才允许开始原生出牌/目标选择流程。
+            // 但只有普通手牌中存在可用“催动”时才能开始原生出牌/目标选择。
             ModCardPileDefinition definition =
                 registry.RegisterOwned(
                     LocalId,

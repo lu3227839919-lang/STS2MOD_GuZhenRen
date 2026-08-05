@@ -1,0 +1,814 @@
+--- a/GuZhenRen.json
++++ b/GuZhenRen.json
+@@ -2,8 +2,8 @@
+   "id": "GuZhenRen",
+   "name": "蛊真人",
+   "author": "LU",
+-  "description": "《杀戮尖塔 2》蛊真人 Mod。0.6.1 为全部蛊虫补充 RitsuLib 关键词悬浮提示，并兼容游戏 0.110.1 的卡牌消耗 API。",
+-  "version": "0.6.1",
++  "description": "《杀戮尖塔 2》蛊真人 Mod。0.6.2 将自定义关键词提示限制在牌堆查看界面，并修复仙元战斗实例、临时卡牌生成与满容量奖励兼容问题。",
++  "version": "0.6.2",
+   "has_pck": true,
+   "has_dll": true,
+   "affects_gameplay": true,
+--- a/GuZhenRenCode/Aperture/ApertureSystem.cs
++++ b/GuZhenRenCode/Aperture/ApertureSystem.cs
+@@ -374,21 +374,29 @@
+         Player owner
+     )
+     {
+-        CardModel? card = rank switch
+-        {
+-            6 => ModelDb.Card<QingTiXianYuan>().ToMutable(),
+-            7 => ModelDb.Card<HongZaoXianYuan>().ToMutable(),
+-            8 => ModelDb.Card<BaiLiXianYuan>().ToMutable(),
+-            9 => ModelDb.Card<HuangXingXianYuan>().ToMutable(),
++        if (owner.Creature.CombatState is not { } combatState)
++        {
++            return null;
++        }
++
++        CardModel? canonical = rank switch
++        {
++            6 => ModelDb.Card<QingTiXianYuan>(),
++            7 => ModelDb.Card<HongZaoXianYuan>(),
++            8 => ModelDb.Card<BaiLiXianYuan>(),
++            9 => ModelDb.Card<HuangXingXianYuan>(),
+             _ => null,
+         };
+ 
+-        if (card != null)
+-        {
+-            card.Owner = owner;
+-        }
+-
+-        return card;
++        /*
++         * 战斗卡必须由当前 CombatState 创建。仅 ToMutable 并设置 Owner
++         * 虽然能暂时进入手牌，却不会登记进 CombatState.AllCards；余额
++         * 归零后 CardCmd.Exhaust 会因此抛出“must be added to a
++         * CombatState”。
++         */
++        return canonical == null
++            ? null
++            : combatState.CreateCard(canonical, owner);
+     }
+ 
+     private static int GetVictoryXp(CombatRoom room)
+--- a/GuZhenRenCode/Cards/Core/GuZhenRenCardRules.cs
++++ b/GuZhenRenCode/Cards/Core/GuZhenRenCardRules.cs
+@@ -143,29 +143,40 @@
+         // 容量已满时至少要存在一张合法替换对象，避免奖励或商店
+         // 展示一张最终无法获得的蛊虫。
+         return receivingPlayer.Deck.Cards.Any(existing =>
+-            CanReplaceGuWorm(existing, candidate)
++            CanReplaceGuWorm(
++                receivingPlayer,
++                existing,
++                candidate
++            )
+         );
+     }
+ 
+     internal static bool CanReplaceGuWorm(
++        Player receivingPlayer,
+         CardModel existing,
+         CardModel candidate
+     )
+     {
++        ArgumentNullException.ThrowIfNull(receivingPlayer);
+         ArgumentNullException.ThrowIfNull(existing);
+         ArgumentNullException.ThrowIfNull(candidate);
+ 
++        /*
++         * 奖励候选通常是 ModelDb 的 canonical model，读取 candidate.Owner
++         * 会触发 AssertMutable。接收玩家已经由调用上下文明确提供，唯一性
++         * 与容量检查都应使用 receivingPlayer，而不是候选牌的 Owner。
++         */
+         if (existing is not IGuWormCard ||
+             candidate is not IGuWormCard ||
+             existing.Pile?.Type != PileType.Deck ||
+-            !ReferenceEquals(existing.Owner, candidate.Owner))
++            !ReferenceEquals(existing.Owner, receivingPlayer))
+         {
+             return false;
+         }
+ 
+         return CanEnterPermanentDeck(
+-            candidate.Owner.RunState,
+-            candidate.Owner,
++            receivingPlayer.RunState,
++            receivingPlayer,
+             candidate,
+             ignoredExistingCards:
+                 new HashSet<CardModel> { existing },
+--- a/GuZhenRenCode/Cards/Core/GuZhenRenKeywords.cs
++++ b/GuZhenRenCode/Cards/Core/GuZhenRenKeywords.cs
+@@ -121,6 +121,23 @@
+             XueTai, TaiDong, PoTai, FuHua, TunJi,
+         };
+ 
++    /// <summary>
++    /// 本模组注册的全部自定义关键词。
++    /// UI 可见性补丁只过滤这个集合，不影响游戏本体的消耗、保留等提示。
++    /// </summary>
++    public static IReadOnlySet<CardKeyword> OwnedKeywords { get; } =
++        new HashSet<CardKeyword>
++        {
++            XuYing, Unique, XianGu, GuChong, CuiDong, HuiFu,
++            HeLian, YuanQi, XianYuan, GuangHui, ZheGuang,
++            ZhaoPo, JuGuang, DingGuang, YaoHua, LiuGuang,
++            PoJing, XueYuan, XueJi, XueQi, YueXiang, CanYue,
++            YingYue, ManYue, XueTai, TaiDong, PoTai, FuHua,
++            TunJi, ZongEDu, YiHai, XueLu, LiuXue, XueYin,
++            YiChu, ZhuiJi, XueHe, Rank1, Rank2, Rank3, Rank4,
++            Rank5, Rank6, Rank7, Rank8, Rank9,
++        };
++
+     public static CardKeyword GetRankKeyword(int rank) => rank switch
+     {
+         1 => Rank1,
+--- a/GuZhenRenCode/Cards/ImmortalEssence/ImmortalEssenceSystem.cs
++++ b/GuZhenRenCode/Cards/ImmortalEssence/ImmortalEssenceSystem.cs
+@@ -195,6 +195,19 @@
+                 continue;
+             }
+ 
++            if (depleted.CombatState == null)
++            {
++                // 兼容由旧版本创建、未登记进 CombatState 的战斗实例。
++                // 不再调用必然抛错的 CardCmd.Exhaust；本场结束后该临时牌
++                // 会随战斗状态清理。新生成的仙元已经统一由 CombatState
++                // 创建，因此正常流程不会进入此分支。
++                Entry.Logger.Warn(
++                    $"[仙元] 跳过未登记战斗状态的耗尽牌 {depleted.Id}；" +
++                    "请在下一场战斗使用重新生成的仙元实例。"
++                );
++                continue;
++            }
++
+             await CardExhaustCompat.ExhaustAsync(
+                 new BlockingPlayerChoiceContext(),
+                 depleted
+--- a/GuZhenRenCode/Entry.cs
++++ b/GuZhenRenCode/Entry.cs
+@@ -51,6 +51,7 @@
+         new(nameof(XuYingHiddenBehaviorPatch), XuYingHiddenBehaviorPatch.Initialize, XuYingHiddenBehaviorPatch.Uninitialize),
+         new(nameof(GuRankRewardPatch), GuRankRewardPatch.Initialize, GuRankRewardPatch.Uninitialize),
+         new(nameof(CardUniquenessPatch), CardUniquenessPatch.Initialize, CardUniquenessPatch.Uninitialize),
++        new(nameof(GuKeywordHoverVisibilityPatch), GuKeywordHoverVisibilityPatch.Initialize, GuKeywordHoverVisibilityPatch.Uninitialize),
+         new(nameof(XueDaoParasiteExhaustPatch), XueDaoParasiteExhaustPatch.Initialize, XueDaoParasiteExhaustPatch.Uninitialize),
+         new(nameof(GuDeckCapacityReplacementPatch), GuDeckCapacityReplacementPatch.Initialize, GuDeckCapacityReplacementPatch.Uninitialize),
+         new(nameof(MerchantInventoryCompatibilityPatch), MerchantInventoryCompatibilityPatch.Initialize, MerchantInventoryCompatibilityPatch.Uninitialize),
+--- a/GuZhenRenCode/Patch/CardUniquenessPatch.cs
++++ b/GuZhenRenCode/Patch/CardUniquenessPatch.cs
+@@ -26,6 +26,9 @@
+ 
+     private static readonly AsyncLocal<TransformationPlan?>
+         ActiveTransformationPlan = new();
++
++    private static readonly AsyncLocal<int>
++        RewardCandidateQueryDepth = new();
+ 
+     private static bool _initialized;
+ 
+@@ -92,8 +95,7 @@
+             postfix: nameof(RewardResultsPostfix)
+         );
+ 
+-        Patch(
+-            harmony,
++        MethodInfo? createForReward =
+             AccessTools.Method(
+                 typeof(CardFactory),
+                 nameof(CardFactory.CreateForReward),
+@@ -102,8 +104,28 @@
+                     typeof(int),
+                     typeof(CardCreationOptions),
+                 ]
+-            ),
+-            prefix: nameof(CreateForRewardPrefix)
++            );
++        if (createForReward == null)
++        {
++            throw new MissingMethodException(
++                "唯一规则所需的卡牌奖励生成方法不存在。"
++            );
++        }
++
++        harmony.Patch(
++            createForReward,
++            prefix: new HarmonyMethod(
++                typeof(CardUniquenessPatch),
++                nameof(CreateForRewardPrefix)
++            ),
++            postfix: new HarmonyMethod(
++                typeof(CardUniquenessPatch),
++                nameof(CreateForRewardPostfix)
++            ),
++            finalizer: new HarmonyMethod(
++                typeof(CardUniquenessPatch),
++                nameof(CreateForRewardFinalizer)
++            )
+         );
+ 
+         Patch(
+@@ -165,6 +187,7 @@
+         finally
+         {
+             ActiveTransformationPlan.Value = null;
++            RewardCandidateQueryDepth.Value = 0;
+             _initialized = false;
+         }
+     }
+@@ -297,6 +320,13 @@
+         ref IEnumerable<CardModel> __result
+     )
+     {
++        // GetPossibleCards 也被攻击药水、转换和其他战斗生成使用。
++        // 只有 CardFactory.CreateForReward 的调用链才应用“奖励只出蛊虫”规则。
++        if (RewardCandidateQueryDepth.Value <= 0)
++        {
++            return;
++        }
++
+         IEnumerable<CardModel> candidates = __result;
+ 
+         // 角色主池只装普通操作牌；真正蛊虫注册在独立蛊池。
+@@ -355,9 +385,15 @@
+         Player player,
+         ref int cardCount,
+         CardCreationOptions options,
+-        ref IEnumerable<CardCreationResult> __result
+-    )
+-    {
++        ref IEnumerable<CardCreationResult> __result,
++        out RewardQueryScope __state
++    )
++    {
++        __state = new RewardQueryScope(
++            RewardCandidateQueryDepth.Value
++        );
++        RewardCandidateQueryDepth.Value++;
++
+         CardModel[] possibleCards = options
+             .GetPossibleCards(player)
+             .Where(card =>
+@@ -388,6 +424,22 @@
+ 
+         cardCount = Math.Min(cardCount, possibleCards.Length);
+         return true;
++    }
++
++    private static void CreateForRewardPostfix(
++        RewardQueryScope __state
++    )
++    {
++        __state.Restore();
++    }
++
++    private static Exception? CreateForRewardFinalizer(
++        Exception? __exception,
++        RewardQueryScope __state
++    )
++    {
++        __state.Restore();
++        return __exception;
+     }
+ 
+     private static void TransformationOptionsPostfix(
+@@ -802,6 +854,27 @@
+         __result = keywords;
+     }
+ 
++    private sealed class RewardQueryScope
++    {
++        private readonly int _previousDepth;
++        private int _restored;
++
++        internal RewardQueryScope(int previousDepth)
++        {
++            _previousDepth = previousDepth;
++        }
++
++        internal void Restore()
++        {
++            if (Interlocked.Exchange(ref _restored, 1) != 0)
++            {
++                return;
++            }
++
++            RewardCandidateQueryDepth.Value = _previousDepth;
++        }
++    }
++
+     private readonly record struct GeneratedReplacement(
+         CardModel Original,
+         CardModel Replacement
+--- a/GuZhenRenCode/Patch/GuDeckCapacityReplacementPatch.cs
++++ b/GuZhenRenCode/Patch/GuDeckCapacityReplacementPatch.cs
+@@ -138,6 +138,7 @@
+             player.Deck.Cards
+                 .Where(existing =>
+                     GuZhenRenCardRules.CanReplaceGuWorm(
++                        player,
+                         existing,
+                         card
+                     )
+--- a/GuZhenRenCode/Patch/GuKeywordHoverVisibilityPatch.cs
++++ b/GuZhenRenCode/Patch/GuKeywordHoverVisibilityPatch.cs
+@@ -0,0 +1,482 @@
++using System.Reflection;
++
++using Godot;
++
++using HarmonyLib;
++
++using MegaCrit.Sts2.Core.Entities.Cards;
++using MegaCrit.Sts2.Core.HoverTips;
++using MegaCrit.Sts2.Core.Models;
++using MegaCrit.Sts2.Core.Nodes.Cards;
++using MegaCrit.Sts2.Core.Nodes.HoverTips;
++
++namespace GuZhenRen.Patches;
++
++/// <summary>
++/// 将蛊真人自定义关键词的悬浮说明限制在牌堆查看界面。
++///
++/// 关键词本身始终保留在 CardModel 上，因此规则判断、存档和多人同步
++/// 不受影响；这里只在本地 UI 创建悬浮提示时隐藏模组自有关键词。
++/// 游戏本体的消耗、保留、虚无等提示不会被过滤。
++/// </summary>
++internal static class GuKeywordHoverVisibilityPatch
++{
++    private const string HarmonyId =
++        Entry.ModId + ".GuKeywordHoverVisibility";
++
++    private static readonly string[] PileInspectionMarkers =
++    [
++        "CardPileScreen",
++        "NCardPileScreen",
++        "MasterDeckScreen",
++        "DeckScreen",
++        "DeckViewScreen",
++    ];
++
++    [ThreadStatic]
++    private static int _cardHoverScopeDepth;
++
++    [ThreadStatic]
++    private static bool _showOwnedKeywordsInCurrentScope;
++
++    private static bool _initialized;
++
++    internal static void Initialize()
++    {
++        if (_initialized)
++        {
++            return;
++        }
++
++        MethodInfo? keywordMethod =
++            AccessTools.Method(
++                typeof(CardModel),
++                nameof(CardModel.GetKeywordsWithSources),
++                [typeof(KeywordSources)]
++            );
++        MethodInfo? hoverTipSetInit =
++            AccessTools.DeclaredMethod(
++                typeof(NHoverTipSet),
++                "Init",
++                [
++                    typeof(Control),
++                    typeof(IEnumerable<IHoverTip>),
++                ]
++            );
++
++        if (keywordMethod == null || hoverTipSetInit == null)
++        {
++            Entry.Logger.Warn(
++                "[关键词视野] 当前游戏缺少卡牌关键词或悬浮提示接口；" +
++                "跳过 UI 过滤，但不阻止模组初始化。"
++            );
++            _initialized = true;
++            return;
++        }
++
++        Harmony harmony = new(HarmonyId);
++
++        try
++        {
++            harmony.Patch(
++                keywordMethod,
++                postfix: new HarmonyMethod(
++                    typeof(GuKeywordHoverVisibilityPatch),
++                    nameof(KeywordsPostfix)
++                )
++                {
++                    priority = Priority.Last,
++                    after = [Entry.ModId + ".CardUniqueness"],
++                }
++            );
++
++            harmony.Patch(
++                hoverTipSetInit,
++                prefix: new HarmonyMethod(
++                    typeof(GuKeywordHoverVisibilityPatch),
++                    nameof(HoverTipSetInitPrefix)
++                )
++                {
++                    priority = Priority.First,
++                }
++            );
++
++            IReadOnlyList<MethodInfo> providers =
++                FindCardHoverProviderMethods();
++
++            HarmonyMethod scopePrefix = new(
++                typeof(GuKeywordHoverVisibilityPatch),
++                nameof(CardHoverProviderPrefix)
++            );
++            HarmonyMethod scopeFinalizer = new(
++                typeof(GuKeywordHoverVisibilityPatch),
++                nameof(CardHoverProviderFinalizer)
++            );
++
++            int patchedProviderCount = 0;
++            foreach (MethodInfo provider in providers)
++            {
++                try
++                {
++                    harmony.Patch(
++                        provider,
++                        prefix: scopePrefix,
++                        finalizer: scopeFinalizer
++                    );
++                    patchedProviderCount++;
++                }
++                catch (Exception exception)
++                {
++                    Entry.Logger.Warn(
++                        "[关键词视野] 跳过无法挂载的悬浮入口 " +
++                        $"{provider.DeclaringType?.FullName}.{provider.Name}：" +
++                        exception.Message
++                    );
++                }
++            }
++
++            if (patchedProviderCount == 0)
++            {
++                Entry.Logger.Warn(
++                    "[关键词视野] 未发现 NCard 的悬浮提示提供方法；" +
++                    "将仅使用 NHoverTipSet.Init 的后备过滤。"
++                );
++            }
++            else
++            {
++                Entry.Logger.Info(
++                    $"[关键词视野] 已挂载 {patchedProviderCount} 个卡牌悬浮上下文入口；" +
++                    "自定义关键词仅在牌堆查看界面显示。"
++                );
++            }
++
++            _initialized = true;
++        }
++        catch (Exception exception)
++        {
++            harmony.UnpatchAll(HarmonyId);
++            ResetScope();
++            Entry.Logger.Warn(
++                "[关键词视野] UI 过滤初始化失败，已安全跳过；" +
++                "不会阻止模组加载。" + exception
++            );
++            _initialized = true;
++        }
++    }
++
++    internal static void Uninitialize()
++    {
++        try
++        {
++            new Harmony(HarmonyId).UnpatchAll(HarmonyId);
++        }
++        finally
++        {
++            ResetScope();
++            _initialized = false;
++        }
++    }
++
++    private static IReadOnlyList<MethodInfo>
++        FindCardHoverProviderMethods()
++    {
++        return typeof(NCard)
++            .GetMethods(
++                BindingFlags.Instance |
++                BindingFlags.Public |
++                BindingFlags.NonPublic
++            )
++            .Where(method =>
++                !method.IsAbstract &&
++                !method.ContainsGenericParameters &&
++                HasManagedBody(method) &&
++                !typeof(Task).IsAssignableFrom(method.ReturnType) &&
++                LooksLikeHoverProvider(method)
++            )
++            .GroupBy(method =>
++                (method.Module, method.MetadataToken)
++            )
++            .Select(group => group.First())
++            .ToArray();
++    }
++
++    private static bool HasManagedBody(MethodInfo method)
++    {
++        try
++        {
++            return method.GetMethodBody() != null;
++        }
++        catch
++        {
++            return false;
++        }
++    }
++
++    private static bool LooksLikeHoverProvider(MethodInfo method)
++    {
++        if (method.Name.Contains(
++                "HoverTip",
++                StringComparison.OrdinalIgnoreCase
++            ))
++        {
++            return true;
++        }
++
++        Type returnType = method.ReturnType;
++        if (typeof(IEnumerable<IHoverTip>)
++            .IsAssignableFrom(returnType))
++        {
++            return true;
++        }
++
++        return returnType
++            .GetInterfaces()
++            .Any(@interface =>
++                @interface.IsGenericType &&
++                @interface.GetGenericTypeDefinition() ==
++                typeof(IEnumerable<>) &&
++                typeof(IHoverTip).IsAssignableFrom(
++                    @interface.GetGenericArguments()[0]
++                )
++            );
++    }
++
++    private static void CardHoverProviderPrefix(
++        object __instance,
++        out HoverScopeState __state
++    )
++    {
++        __state = new HoverScopeState(
++            _cardHoverScopeDepth,
++            _showOwnedKeywordsInCurrentScope
++        );
++
++        bool isPileInspection =
++            __instance is Node node &&
++            IsPileInspection(node);
++
++        _showOwnedKeywordsInCurrentScope =
++            _cardHoverScopeDepth > 0
++                ? _showOwnedKeywordsInCurrentScope ||
++                  isPileInspection
++                : isPileInspection;
++        _cardHoverScopeDepth++;
++    }
++
++    private static Exception? CardHoverProviderFinalizer(
++        Exception? __exception,
++        HoverScopeState __state
++    )
++    {
++        _cardHoverScopeDepth = __state.Depth;
++        _showOwnedKeywordsInCurrentScope =
++            __state.ShowOwnedKeywords;
++        return __exception;
++    }
++
++    [HarmonyPriority(Priority.Last)]
++    [HarmonyAfter(Entry.ModId + ".CardUniqueness")]
++    private static void KeywordsPostfix(
++        KeywordSources sources,
++        ref IReadOnlySet<CardKeyword> __result
++    )
++    {
++        if (_cardHoverScopeDepth <= 0 ||
++            _showOwnedKeywordsInCurrentScope ||
++            !sources.HasFlag(KeywordSources.Local))
++        {
++            return;
++        }
++
++        HashSet<CardKeyword> filtered =
++            __result
++                .Where(keyword =>
++                    !GuZhenRenKeywords.OwnedKeywords.Contains(keyword)
++                )
++                .ToHashSet();
++
++        if (filtered.Count != __result.Count)
++        {
++            __result = filtered;
++        }
++    }
++
++    /// <summary>
++    /// 后备过滤：即使某个游戏版本绕过 NCard 的常规悬浮入口，
++    /// 仍会在 NHoverTipSet.Init 时移除能反射识别出的本模组关键词提示。
++    /// </summary>
++    private static void HoverTipSetInitPrefix(
++        Control owner,
++        ref IEnumerable<IHoverTip> hoverTips
++    )
++    {
++        if (IsPileInspection(owner))
++        {
++            return;
++        }
++
++        try
++        {
++            IHoverTip[] source = hoverTips?.ToArray() ?? [];
++            IHoverTip[] filtered = source
++                .Where(tip => !LooksLikeOwnedKeywordTip(tip))
++                .ToArray();
++
++            if (filtered.Length != source.Length)
++            {
++                hoverTips = filtered;
++            }
++        }
++        catch
++        {
++            // 悬浮提示属于纯本地 UI；过滤失败时保留原提示，绝不影响游戏流程。
++        }
++    }
++
++    private static bool LooksLikeOwnedKeywordTip(IHoverTip tip)
++    {
++        return ContainsOwnedKeywordMarker(
++            tip,
++            depth: 0,
++            new HashSet<object>(
++                ReferenceEqualityComparer.Instance
++            )
++        );
++    }
++
++    private static bool ContainsOwnedKeywordMarker(
++        object? value,
++        int depth,
++        HashSet<object> visited
++    )
++    {
++        if (value == null || depth > 2)
++        {
++            return false;
++        }
++
++        if (value is CardKeyword keyword)
++        {
++            return GuZhenRenKeywords.OwnedKeywords.Contains(keyword);
++        }
++
++        if (value is string text)
++        {
++            return text.Contains(
++                "GU_ZHEN_REN_KEYWORD_",
++                StringComparison.OrdinalIgnoreCase
++            );
++        }
++
++        Type type = value.GetType();
++        if (type.IsPrimitive || type.IsEnum ||
++            type == typeof(decimal))
++        {
++            return false;
++        }
++
++        if (!type.IsValueType && !visited.Add(value))
++        {
++            return false;
++        }
++
++        const BindingFlags flags =
++            BindingFlags.Instance |
++            BindingFlags.Public |
++            BindingFlags.NonPublic;
++
++        foreach (FieldInfo field in type.GetFields(flags))
++        {
++            object? fieldValue;
++            try
++            {
++                fieldValue = field.GetValue(value);
++            }
++            catch
++            {
++                continue;
++            }
++
++            if (ContainsOwnedKeywordMarker(
++                    fieldValue,
++                    depth + 1,
++                    visited
++                ))
++            {
++                return true;
++            }
++        }
++
++        foreach (PropertyInfo property in type.GetProperties(flags))
++        {
++            if (property.GetIndexParameters().Length > 0 ||
++                property.GetMethod == null)
++            {
++                continue;
++            }
++
++            object? propertyValue;
++            try
++            {
++                propertyValue = property.GetValue(value);
++            }
++            catch
++            {
++                continue;
++            }
++
++            if (ContainsOwnedKeywordMarker(
++                    propertyValue,
++                    depth + 1,
++                    visited
++                ))
++            {
++                return true;
++            }
++        }
++
++        return false;
++    }
++
++    private static bool IsPileInspection(Node? node)
++    {
++        Node? current = node;
++
++        for (int depth = 0;
++             current != null && depth < 24;
++             depth++, current = current.GetParent())
++        {
++            string typeName =
++                current.GetType().FullName ??
++                current.GetType().Name;
++            string nodeName = current.Name.ToString();
++
++            if (PileInspectionMarkers.Any(marker =>
++                    typeName.Contains(
++                        marker,
++                        StringComparison.OrdinalIgnoreCase
++                    ) ||
++                    nodeName.Contains(
++                        marker,
++                        StringComparison.OrdinalIgnoreCase
++                    )
++                ))
++            {
++                return true;
++            }
++        }
++
++        return false;
++    }
++
++    private static void ResetScope()
++    {
++        _cardHoverScopeDepth = 0;
++        _showOwnedKeywordsInCurrentScope = false;
++    }
++
++    private readonly record struct HoverScopeState(
++        int Depth,
++        bool ShowOwnedKeywords
++    );
++}
+--- a/update_note/PATCH_NOTES_0.6.2_UI_AND_REGRESSION_FIXES.md
++++ b/update_note/PATCH_NOTES_0.6.2_UI_AND_REGRESSION_FIXES.md
+@@ -0,0 +1,9 @@
++# 0.6.2：关键词视野与历史错误修复
++
++- 自定义关键词说明仅在牌堆/永久牌组查看界面显示。
++- 卡面描述继续使用 `ModKeywordCardDescriptionPlacement.None`。
++- 游戏本体的消耗、保留等提示不受过滤。
++- 仙元牌改为由当前 `CombatState.CreateCard` 创建，修复余额归零时无法进入消耗堆。
++- 奖励满容量检查不再读取 canonical 候选牌的 `Owner`。
++- `GetPossibleCards` 的蛊虫奖励过滤只在真正的卡牌奖励生成中启用，不再影响攻击药水等临时生成。
++- 0.110.1 的 `CardCmd.Exhaust` 继续通过动态兼容层调用，找不到重载时不会阻止 DLL 初始化。

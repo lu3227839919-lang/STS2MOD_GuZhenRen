@@ -138,6 +138,7 @@ internal static class GuDeckCapacityReplacementPatch
             player.Deck.Cards
                 .Where(existing =>
                     GuZhenRenCardRules.CanReplaceGuWorm(
+                        player,
                         existing,
                         card
                     )

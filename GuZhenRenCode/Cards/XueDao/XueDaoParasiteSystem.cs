@@ -1,3 +1,5 @@
+using System.Reflection;
+
 using GuZhenRen.Multiplayer;
 using GuZhenRen.Powers.XueDao;
 
@@ -14,8 +16,8 @@ using STS2RitsuLib.Utils;
 namespace GuZhenRen.Cards.XueDao;
 
 /// <summary>
-/// 血道寄生的卡牌附加状态与统一结算入口。
-/// 寄生只改造已有普通牌，不生成衍生牌；打出宿主后寄生消失。
+/// “血寄胎变”统一系统。寄生跟随宿主跨牌堆存在；完整 CardPlay 系列
+/// （含 Replay）结束后只推进一次。最终阶段孵化，未完成却进入消耗堆时破胎。
 /// </summary>
 public static class XueDaoParasiteSystem
 {
@@ -23,28 +25,40 @@ public static class XueDaoParasiteSystem
     {
         None = 0,
         BloodQi = 1,
-        CrescentMoon = 2,
+        CrescentMoon = 2, // 兼容旧战斗快照；按月相残月处理。
         BloodMoon = 3,
         BloodFetus = 4,
     }
 
-    private static readonly SavedAttachedState<CardModel, int>
-        KindState = new(
-            "gu_zhen_ren.xue_dao.parasite_kind",
-            static () => 0
-        );
+    public readonly record struct BloodMoonPhaseValues(
+        int BaseDamage,
+        int EnergyScale,
+        int TotalBleed,
+        int TotalMarks
+    );
 
-    private static readonly SavedAttachedState<CardModel, int>
-        RankState = new(
-            "gu_zhen_ren.xue_dao.parasite_rank",
-            static () => 0
-        );
+    private static readonly SavedAttachedState<CardModel, int> KindState =
+        new("gu_zhen_ren.xue_dao.parasite_kind", static () => 0);
+    private static readonly SavedAttachedState<CardModel, int> RankState =
+        new("gu_zhen_ren.xue_dao.parasite_rank", static () => 0);
+    private static readonly SavedAttachedState<CardModel, bool> UpgradedState =
+        new("gu_zhen_ren.xue_dao.parasite_upgraded", static () => false);
+    private static readonly SavedAttachedState<CardModel, int> StageState =
+        new("gu_zhen_ren.xue_dao.parasite_stage", static () => 0);
+    private static readonly SavedAttachedState<CardModel, int> TriggersRemainingState =
+        new("gu_zhen_ren.xue_dao.parasite_triggers_remaining", static () => 0);
+    private static readonly SavedAttachedState<CardModel, int> TriggersCompletedState =
+        new("gu_zhen_ren.xue_dao.parasite_triggers_completed", static () => 0);
+    private static readonly SavedAttachedState<CardModel, bool> ResolvingState =
+        new("gu_zhen_ren.xue_dao.parasite_resolving", static () => false);
 
-    private static readonly SavedAttachedState<CardModel, bool>
-        UpgradedState = new(
-            "gu_zhen_ren.xue_dao.parasite_upgraded",
-            static () => false
-        );
+    private static readonly MethodInfo? DrawInternalMethod = typeof(CardPileCmd).GetMethod(
+        "DrawInternal",
+        BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic,
+        binder: null,
+        types: [typeof(PlayerChoiceContext), typeof(decimal), typeof(Player), typeof(bool)],
+        modifiers: null
+    );
 
     public static bool HasParasite(CardModel? card) =>
         card != null && GetKind(card) != ParasiteKind.None;
@@ -57,33 +71,135 @@ public static class XueDaoParasiteSystem
             : ParasiteKind.None;
     }
 
-    public static int GetRank(CardModel card) =>
-        Math.Max(0, RankState[card]);
+    public static int GetRank(CardModel card) => Math.Max(0, RankState[card]);
+    public static int GetStage(CardModel card) => Math.Max(0, StageState[card]);
+    public static int GetTriggersRemaining(CardModel card) => Math.Max(0, TriggersRemainingState[card]);
 
-    public static bool IsEligibleHost(CardModel card)
+    internal static void MarkResolving(CardModel card, bool resolving) =>
+        ResolvingState[card] = resolving;
+
+    internal static bool IsResolving(CardModel card) => ResolvingState[card];
+
+    internal static async Task BreakIfExhaustedAsync(
+        PlayerChoiceContext choiceContext,
+        CardModel host,
+        CardModel? source = null
+    )
     {
-        return !card.IsCanonical &&
-            card.CanBeGeneratedInCombat &&
-            card is not IGuWormCard &&
-            card is not AbstractShaZhaoCard &&
-            card is not AbstractXueDaoToken &&
-            card.Type is CardType.Attack or CardType.Skill or CardType.Power;
+        if (!HasParasite(host) ||
+            IsResolving(host) ||
+            host.Pile?.Type != PileType.Exhaust)
+        {
+            return;
+        }
+
+        await BreakFetusAsync(choiceContext, host, source ?? host);
     }
 
-    public static bool CanAttach(
-        CardModel card,
-        bool allowBloodQiReplacement
-    )
+    public static int GetBloodQiCost(int rank) => rank switch
+    {
+        <= 3 => 1,
+        <= 6 => 2,
+        _ => 3,
+    };
+
+    public static int GetBloodQiBaseValue(int rank) => rank switch
+    {
+        <= 1 => 6,
+        2 => 8,
+        3 => 10,
+        4 => 12,
+        5 => 15,
+        6 => 18,
+        7 => 21,
+        8 => 25,
+        _ => 30,
+    };
+
+    public static int GetBloodQiBleed(int rank) => rank switch
+    {
+        <= 2 => 1,
+        <= 4 => 2,
+        <= 6 => 3,
+        <= 8 => 4,
+        _ => 5,
+    };
+
+    public static int[] GetBloodQiTriggerPercentages(int rank) => rank switch
+    {
+        <= 3 => [100],
+        4 or 5 => [100, 50],
+        6 => [100, 75],
+        7 => [100, 100],
+        8 => [100, 75, 50],
+        _ => [100, 100, 75],
+    };
+
+    public static BloodMoonPhaseValues GetBloodMoonPhaseValues(int rank, int phase)
+    {
+        rank = Math.Clamp(rank, 4, 9);
+        phase = Math.Clamp(phase, 0, 2);
+        return (rank, phase) switch
+        {
+            (4, 0) => new(8, 2, 1, 0),
+            (4, 1) => new(12, 3, 2, 0),
+            (4, 2) => new(18, 4, 2, 1),
+            (5, 0) => new(10, 2, 1, 0),
+            (5, 1) => new(14, 3, 2, 1),
+            (5, 2) => new(22, 4, 3, 1),
+            (6, 0) => new(12, 3, 1, 0),
+            (6, 1) => new(17, 4, 2, 1),
+            (6, 2) => new(27, 5, 3, 2),
+            (7, 0) => new(14, 3, 2, 0),
+            (7, 1) => new(20, 4, 3, 1),
+            (7, 2) => new(32, 5, 4, 2),
+            (8, 0) => new(16, 4, 2, 0),
+            (8, 1) => new(24, 5, 3, 2),
+            (8, 2) => new(38, 6, 4, 3),
+            (9, 0) => new(19, 4, 3, 1),
+            (9, 1) => new(29, 5, 4, 2),
+            _ => new(46, 7, 5, 3),
+        };
+    }
+
+    public static bool IsEligibleHost(CardModel card) =>
+        !card.IsCanonical &&
+        card.CanBeGeneratedInCombat &&
+        card is not IGuWormCard &&
+        card is not AbstractShaZhaoCard &&
+        card is not AbstractXueDaoToken &&
+        card.Type is CardType.Attack or CardType.Skill or CardType.Power;
+
+    public static bool CanAttach(CardModel card, ParasiteKind incomingKind)
     {
         if (!IsEligibleHost(card))
         {
             return false;
         }
 
-        ParasiteKind current = GetKind(card);
-        return current == ParasiteKind.None ||
-            (allowBloodQiReplacement && current == ParasiteKind.BloodQi);
+        ParasiteKind current = NormalizeLegacyKind(GetKind(card));
+        if (current == ParasiteKind.None)
+        {
+            return true;
+        }
+
+        return incomingKind switch
+        {
+            ParasiteKind.BloodQi => false,
+            ParasiteKind.BloodMoon => current == ParasiteKind.BloodQi,
+            ParasiteKind.BloodFetus =>
+                current == ParasiteKind.BloodQi ||
+                (current == ParasiteKind.BloodMoon && GetStage(card) < 2),
+            _ => false,
+        };
     }
+
+    // 保留旧调用接口，兼容其他分支代码。
+    public static bool CanAttach(CardModel card, bool allowBloodQiReplacement) =>
+        CanAttach(
+            card,
+            allowBloodQiReplacement ? ParasiteKind.BloodMoon : ParasiteKind.BloodQi
+        );
 
     public static async Task AttachAsync(
         PlayerChoiceContext choiceContext,
@@ -94,11 +210,46 @@ public static class XueDaoParasiteSystem
         CardModel sourceCard
     )
     {
-        bool alreadyHadParasite = HasParasite(host);
+        ParasiteKind previous = NormalizeLegacyKind(GetKind(host));
+        int previousStage = GetStage(host);
+        bool alreadyHadParasite = previous != ParasiteKind.None;
+
+        int stage = 0;
+        int remaining;
+
+        switch (kind)
+        {
+            case ParasiteKind.BloodQi:
+                remaining = GetBloodQiTriggerPercentages(rank).Length;
+                break;
+
+            case ParasiteKind.BloodMoon:
+                // 吞入血气后从盈月开始。
+                stage = previous == ParasiteKind.BloodQi ? 1 : 0;
+                remaining = 3 - stage;
+                break;
+
+            case ParasiteKind.BloodFetus:
+                stage = previous switch
+                {
+                    ParasiteKind.BloodQi => 1,
+                    ParasiteKind.BloodMoon => Math.Clamp(previousStage + 1, 1, 2),
+                    _ => 0,
+                };
+                remaining = 3 - stage;
+                break;
+
+            default:
+                remaining = 0;
+                break;
+        }
 
         KindState[host] = (int)kind;
         RankState[host] = Math.Max(1, rank);
         UpgradedState[host] = upgraded;
+        StageState[host] = stage;
+        TriggersCompletedState[host] = stage;
+        TriggersRemainingState[host] = Math.Max(0, remaining);
 
         if (!alreadyHadParasite)
         {
@@ -111,9 +262,7 @@ public static class XueDaoParasiteSystem
             );
         }
 
-        Entry.Logger.Info(
-            $"[血寄] {host.Id} 获得 {kind}，来源转数 {rank}。"
-        );
+        Entry.Logger.Info($"[血寄] {host.Id} 获得 {kind}，来源转数 {rank}，阶段 {stage}。");
     }
 
     public static async Task TriggerFromCardPlayAsync(
@@ -138,18 +287,13 @@ public static class XueDaoParasiteSystem
         );
     }
 
-    /// <summary>
-    /// 供血月祭等效果直接剥离并触发寄生。单体攻击寄生没有玩家选定
-    /// 目标时，按确定性顺序选择当前生命最低的存活敌人。
-    /// </summary>
     public static async Task TriggerDetachedAsync(
         PlayerChoiceContext choiceContext,
         CardModel host,
         CardModel triggerSource
     )
     {
-        if (!HasParasite(host) ||
-            host.Owner.Creature.CombatState is not { } combatState)
+        if (!HasParasite(host) || host.Owner.Creature.CombatState is not { } combatState)
         {
             return;
         }
@@ -167,16 +311,11 @@ public static class XueDaoParasiteSystem
             .ThenBy(enemy => enemy.CombatId)
             .FirstOrDefault();
 
-        int energyValue = Math.Max(
-            0,
-            host.EnergyCost.GetAmountToSpend()
-        );
-
         await TriggerCoreAsync(
             choiceContext,
             host,
             target,
-            energyValue,
+            Math.Max(0, host.EnergyCost.GetAmountToSpend()),
             null,
             aliveBefore,
             triggerSource
@@ -193,191 +332,106 @@ public static class XueDaoParasiteSystem
         CardModel? triggerSource = null
     )
     {
-        ParasiteKind kind = GetKind(host);
+        ParasiteKind kind = NormalizeLegacyKind(GetKind(host));
         int rank = GetRank(host);
         bool upgraded = UpgradedState[host];
+        int stage = GetStage(host);
         CardModel effectSource = triggerSource ?? host;
+        bool completed = false;
 
         switch (kind)
         {
             case ParasiteKind.BloodQi:
-                await TriggerBloodQiAsync(
-                    choiceContext,
-                    host,
-                    effectSource,
-                    target,
-                    rank,
-                    upgraded,
-                    cardPlay
+                completed = await TriggerBloodQiAsync(
+                    choiceContext, host, effectSource, target, rank, upgraded, stage, cardPlay
                 );
                 break;
 
-            case ParasiteKind.CrescentMoon:
             case ParasiteKind.BloodMoon:
-                await TriggerBloodMoonAsync(
-                    choiceContext,
-                    host,
-                    effectSource,
-                    rank,
-                    energyValue,
-                    kind == ParasiteKind.BloodMoon,
-                    cardPlay
+                completed = await TriggerBloodMoonAsync(
+                    choiceContext, host, effectSource, rank, upgraded, stage, energyValue, cardPlay
                 );
                 break;
 
             case ParasiteKind.BloodFetus:
-                await TriggerBloodFetusAsync(
-                    choiceContext,
-                    host,
-                    effectSource,
-                    target,
-                    rank,
-                    energyValue,
-                    cardPlay
+                completed = await TriggerBloodFetusAsync(
+                    choiceContext, host, effectSource, target, rank, energyValue, cardPlay
                 );
                 break;
         }
 
-        await CreateRemainsForNewDeaths(
-            host.Owner,
-            enemiesAliveBefore
-        );
+        await CreateRemainsForNewDeaths(host.Owner, enemiesAliveBefore);
 
-        await ClearAsync(choiceContext, host, effectSource);
+        if (completed)
+        {
+            await HatchAsync(choiceContext, host, effectSource, kind, rank);
+            return;
+        }
+
+        // 消耗宿主在本次出牌后仍有未成熟寄生：触发一次后破胎。
+        if (host.Pile?.Type == PileType.Exhaust)
+        {
+            await BreakFetusAsync(choiceContext, host, effectSource);
+        }
     }
 
-    private static async Task TriggerBloodQiAsync(
+    private static async Task<bool> TriggerBloodQiAsync(
         PlayerChoiceContext choiceContext,
         CardModel host,
         CardModel effectSource,
         Creature? target,
         int rank,
         bool upgraded,
+        int stage,
         CardPlay? cardPlay
     )
     {
+        int[] rates = GetBloodQiTriggerPercentages(rank);
+        int rate = rates[Math.Clamp(stage, 0, rates.Length - 1)];
         int skull = XueDaoPowerSystem.GetXueLu(host.Owner.Creature);
-        int value = rank switch
-        {
-            <= 1 => 6,
-            2 => 8,
-            3 => 11,
-            4 => 15,
-            _ => 20,
-        } + skull * 2 + (upgraded ? 2 : 0);
+        int value = ScaleCeiling(GetBloodQiBaseValue(rank) + skull * 2 + (upgraded ? 2 : 0), rate);
+        int bleed = ScaleCeiling(GetBloodQiBleed(rank), rate);
 
-        int bleed = rank switch
-        {
-            <= 2 => 1,
-            <= 4 => 2,
-            _ => 3,
-        };
+        await TriggerHostAdaptationAsync(
+            choiceContext, host, effectSource, target, value, bleed,
+            GetBloodQiPowerGain(rank), cardPlay
+        );
 
-        switch (host.Type)
-        {
-            case CardType.Attack when host.TargetType == TargetType.AllEnemies:
-                // 群体攻击宿主仍使用“全场总额度”，避免寄生收益随敌人数
-                // 复制；伤害和流血按确定性顺序分配。
-                await DistributeDamage(
-                    choiceContext,
-                    effectSource,
-                    cardPlay,
-                    value
-                );
-                await DistributeDebuffs(
-                    choiceContext,
-                    effectSource,
-                    bleed,
-                    totalMarks: 0
-                );
-                break;
-
-            case CardType.Attack when target is { IsAlive: true }:
-                await DealAttack(
-                    choiceContext,
-                    effectSource,
-                    cardPlay,
-                    target,
-                    value
-                );
-                if (target.IsAlive)
-                {
-                    await XueDaoPowerSystem.ApplyLiuXue(
-                        choiceContext,
-                        effectSource,
-                        target,
-                        bleed
-                    );
-                }
-                break;
-
-            case CardType.Skill:
-                await CreatureCmd.GainBlock(
-                    host.Owner.Creature,
-                    value,
-                    ValueProp.Unpowered | ValueProp.Move,
-                    cardPlay
-                );
-                await XueDaoPowerSystem.GainXueYuanFromCardEffect(
-                    choiceContext,
-                    effectSource,
-                    1
-                );
-                break;
-
-            case CardType.Power:
-                await XueDaoPowerSystem.GainXueYuanFromCardEffect(
-                    choiceContext,
-                    effectSource,
-                    2
-                );
-                break;
-        }
+        return Advance(host, rates.Length);
     }
 
-    private static async Task TriggerBloodMoonAsync(
+    private static async Task<bool> TriggerBloodMoonAsync(
         PlayerChoiceContext choiceContext,
         CardModel host,
         CardModel effectSource,
         int rank,
+        bool upgraded,
+        int phase,
         int energyValue,
-        bool full,
         CardPlay? cardPlay
     )
     {
+        phase = Math.Clamp(phase, 0, 2);
+        BloodMoonPhaseValues values = GetBloodMoonPhaseValues(rank, phase);
         int skull = XueDaoPowerSystem.GetXueLu(host.Owner.Creature);
-        int totalDamage = full
-            ? GetFullMoonBase(rank) + energyValue * GetFullMoonScale(rank) + skull * 4
-            : GetCrescentBase(rank) + energyValue * GetCrescentScale(rank) + skull * 3;
+        int skullBonus = phase switch { 0 => 3, 1 => 4, _ => 5 };
+        int totalDamage = values.BaseDamage +
+            values.EnergyScale * energyValue +
+            skull * skullBonus +
+            (upgraded ? 3 : 0);
 
-        int totalBleed = full
-            ? GetFullMoonBleed(rank) + Math.Min(energyValue, 4)
-            : GetCrescentBleed(rank);
-
-        int totalMarks = full
-            ? rank switch
-            {
-                <= 2 => 0,
-                <= 4 => 1,
-                _ => Math.Min(energyValue, 4),
-            }
-            : 0;
-
-        await DistributeDamage(
-            choiceContext,
-            effectSource,
-            cardPlay,
-            totalDamage
-        );
+        await DistributeDamage(choiceContext, effectSource, cardPlay, totalDamage);
         await DistributeDebuffs(
             choiceContext,
             effectSource,
-            totalBleed,
-            totalMarks
+            values.TotalBleed,
+            values.TotalMarks
         );
+
+        return Advance(host, 3);
     }
 
-    private static async Task TriggerBloodFetusAsync(
+    private static async Task<bool> TriggerBloodFetusAsync(
         PlayerChoiceContext choiceContext,
         CardModel host,
         CardModel effectSource,
@@ -389,78 +443,157 @@ public static class XueDaoParasiteSystem
     {
         int skull = XueDaoPowerSystem.GetXueLu(host.Owner.Creature);
         int singleValue = 8 + rank * 3 + skull * 2;
+        int hostBleed = Math.Max(1, rank / 2);
 
-        if (host.Type == CardType.Attack &&
-            host.TargetType == TargetType.AllEnemies)
+        await TriggerHostAdaptationAsync(
+            choiceContext, host, effectSource, target, singleValue, hostBleed,
+            powerBloodGain: 2, cardPlay
+        );
+
+        bool completed = Advance(host, 3);
+        if (!completed)
         {
-            await DistributeDamage(
-                choiceContext,
-                effectSource,
-                cardPlay,
-                singleValue
-            );
-            await DistributeDebuffs(
-                choiceContext,
-                effectSource,
-                Math.Max(1, rank / 2),
-                totalMarks: 0
-            );
-        }
-        else if (host.Type == CardType.Attack &&
-                 target is { IsAlive: true })
-        {
-            await DealAttack(
-                choiceContext,
-                effectSource,
-                cardPlay,
-                target,
-                singleValue
-            );
-            if (target.IsAlive)
-            {
-                await XueDaoPowerSystem.ApplyLiuXue(
-                    choiceContext,
-                    effectSource,
-                    target,
-                    Math.Max(1, rank / 2)
-                );
-            }
-        }
-        else if (host.Type == CardType.Skill)
-        {
-            await CreatureCmd.GainBlock(
-                host.Owner.Creature,
-                singleValue,
-                ValueProp.Unpowered | ValueProp.Move,
-                cardPlay
-            );
-        }
-        else if (host.Type == CardType.Power)
-        {
-            await XueDaoPowerSystem.GainXueYuanFromCardEffect(
-                choiceContext,
-                effectSource,
-                2
-            );
+            return false;
         }
 
         int totalDamage = 16 + rank * 4 + energyValue * 6 + skull * 4;
         int bleed = 1 + Math.Max(1, rank / 3);
         int marks = rank >= 6 ? Math.Min(2, Math.Max(1, energyValue)) : 0;
-
-        await DistributeDamage(
-            choiceContext,
-            effectSource,
-            cardPlay,
-            totalDamage
-        );
-        await DistributeDebuffs(
-            choiceContext,
-            effectSource,
-            bleed,
-            marks
-        );
+        await DistributeDamage(choiceContext, effectSource, cardPlay, totalDamage);
+        await DistributeDebuffs(choiceContext, effectSource, bleed, marks);
+        return true;
     }
+
+    private static async Task TriggerHostAdaptationAsync(
+        PlayerChoiceContext choiceContext,
+        CardModel host,
+        CardModel effectSource,
+        Creature? target,
+        int value,
+        int bleed,
+        int powerBloodGain,
+        CardPlay? cardPlay
+    )
+    {
+        switch (host.Type)
+        {
+            case CardType.Attack when host.TargetType == TargetType.AllEnemies:
+                await DistributeDamage(choiceContext, effectSource, cardPlay, value);
+                await DistributeDebuffs(choiceContext, effectSource, bleed, 0);
+                break;
+
+            case CardType.Attack when target is { IsAlive: true }:
+                await DealAttack(choiceContext, effectSource, cardPlay, target, value);
+                if (target.IsAlive)
+                {
+                    await XueDaoPowerSystem.ApplyLiuXue(choiceContext, effectSource, target, bleed);
+                }
+                break;
+
+            case CardType.Skill:
+                await CreatureCmd.GainBlock(
+                    host.Owner.Creature,
+                    value,
+                    ValueProp.Unpowered | ValueProp.Move,
+                    cardPlay
+                );
+                await XueDaoPowerSystem.GainXueYuanFromCardEffect(choiceContext, effectSource, 1);
+                break;
+
+            case CardType.Power:
+                await XueDaoPowerSystem.GainXueYuanFromCardEffect(
+                    choiceContext, effectSource, powerBloodGain
+                );
+                break;
+        }
+    }
+
+    private static bool Advance(CardModel host, int totalStages)
+    {
+        int completed = Math.Min(totalStages, TriggersCompletedState[host] + 1);
+        TriggersCompletedState[host] = completed;
+        StageState[host] = completed;
+        TriggersRemainingState[host] = Math.Max(0, totalStages - completed);
+        return completed >= totalStages;
+    }
+
+    private static async Task HatchAsync(
+        PlayerChoiceContext choiceContext,
+        CardModel host,
+        CardModel source,
+        ParasiteKind kind,
+        int rank
+    )
+    {
+        int bloodGain = kind switch
+        {
+            ParasiteKind.BloodQi when rank >= 9 => 2,
+            ParasiteKind.BloodQi when rank >= 6 => 1,
+            ParasiteKind.BloodMoon when rank >= 9 => 2,
+            ParasiteKind.BloodMoon when rank >= 6 => 1,
+            _ => 0,
+        };
+
+        if (bloodGain > 0)
+        {
+            await XueDaoPowerSystem.GainXueYuanFromCardEffect(
+                choiceContext, source, bloodGain
+            );
+        }
+
+        if (rank >= 9 && kind == ParasiteKind.BloodMoon)
+        {
+            await DrawOneAsync(choiceContext, host.Owner);
+        }
+
+        await ClearAsync(choiceContext, host, source);
+    }
+
+    private static async Task BreakFetusAsync(
+        PlayerChoiceContext choiceContext,
+        CardModel host,
+        CardModel source
+    )
+    {
+        await XueDaoPowerSystem.GainXueYuanFromCardEffect(choiceContext, source, 1);
+        await ClearAsync(choiceContext, host, source);
+    }
+
+    private static async Task DrawOneAsync(PlayerChoiceContext choiceContext, Player player)
+    {
+        try
+        {
+            if (DrawInternalMethod?.Invoke(
+                    null,
+                    new object?[] { choiceContext, 1m, player, true }
+                ) is Task<IEnumerable<CardModel>> drawTask)
+            {
+                await drawTask;
+                return;
+            }
+
+            Entry.Logger.Warn("[血寄] 未找到 CardPileCmd.DrawInternal，九转孵化跳过抽牌。");
+        }
+        catch (Exception exception)
+        {
+            Entry.Logger.Warn(
+                $"[血寄] 九转月相孵化抽牌失败，已跳过：{exception.GetBaseException().Message}"
+            );
+        }
+    }
+
+    private static int GetBloodQiPowerGain(int rank) => rank switch
+    {
+        <= 5 => 2,
+        <= 8 => 3,
+        _ => 4,
+    };
+
+    private static int ScaleCeiling(int value, int percent) =>
+        Math.Max(1, (value * percent + 99) / 100);
+
+    private static ParasiteKind NormalizeLegacyKind(ParasiteKind kind) =>
+        kind == ParasiteKind.CrescentMoon ? ParasiteKind.BloodMoon : kind;
 
     private static async Task DealAttack(
         PlayerChoiceContext choiceContext,
@@ -475,8 +608,7 @@ public static class XueDaoParasiteSystem
             return;
         }
 
-        await DamageCmd
-            .Attack(amount)
+        await DamageCmd.Attack(amount)
             .FromCard(source, cardPlay)
             .Targeting(target)
             .WithHitFx("vfx/vfx_attack_slash")
@@ -507,16 +639,14 @@ public static class XueDaoParasiteSystem
 
         int perEnemy = totalDamage / enemies.Length;
         int remainder = totalDamage % enemies.Length;
-
         for (int index = 0; index < enemies.Length; index++)
         {
-            int damage = perEnemy + (index < remainder ? 1 : 0);
             await DealAttack(
                 choiceContext,
                 source,
                 cardPlay,
                 enemies[index],
-                damage
+                perEnemy + (index < remainder ? 1 : 0)
             );
         }
     }
@@ -545,29 +675,15 @@ public static class XueDaoParasiteSystem
 
         for (int index = 0; index < enemies.Length; index++)
         {
-            int bleed = totalBleed / enemies.Length +
-                (index < totalBleed % enemies.Length ? 1 : 0);
-            int marks = totalMarks / enemies.Length +
-                (index < totalMarks % enemies.Length ? 1 : 0);
-
+            int bleed = totalBleed / enemies.Length + (index < totalBleed % enemies.Length ? 1 : 0);
+            int marks = totalMarks / enemies.Length + (index < totalMarks % enemies.Length ? 1 : 0);
             if (bleed > 0)
             {
-                await XueDaoPowerSystem.ApplyLiuXue(
-                    choiceContext,
-                    source,
-                    enemies[index],
-                    bleed
-                );
+                await XueDaoPowerSystem.ApplyLiuXue(choiceContext, source, enemies[index], bleed);
             }
-
             if (marks > 0)
             {
-                await XueDaoPowerSystem.ApplyXueYin(
-                    choiceContext,
-                    source,
-                    enemies[index],
-                    marks
-                );
+                await XueDaoPowerSystem.ApplyXueYin(choiceContext, source, enemies[index], marks);
             }
         }
     }
@@ -603,6 +719,10 @@ public static class XueDaoParasiteSystem
         KindState[host] = (int)ParasiteKind.None;
         RankState[host] = 0;
         UpgradedState[host] = false;
+        StageState[host] = 0;
+        TriggersRemainingState[host] = 0;
+        TriggersCompletedState[host] = 0;
+        ResolvingState[host] = false;
 
         if (host.Owner.Creature.GetPower<XueJiPower>() is { } power)
         {
@@ -615,57 +735,4 @@ public static class XueDaoParasiteSystem
             );
         }
     }
-
-    private static int GetCrescentBase(int rank) => rank switch
-    {
-        <= 1 => 8,
-        2 => 10,
-        3 => 12,
-        4 => 15,
-        5 => 18,
-        6 => 22,
-        _ => 26,
-    };
-
-    private static int GetCrescentScale(int rank) => rank switch
-    {
-        <= 2 => 3,
-        <= 4 => 4,
-        <= 6 => 5,
-        _ => 6,
-    };
-
-    private static int GetCrescentBleed(int rank) => rank switch
-    {
-        <= 3 => 1,
-        <= 6 => 2,
-        _ => 3,
-    };
-
-    private static int GetFullMoonBase(int rank) => rank switch
-    {
-        <= 1 => 14,
-        2 => 17,
-        3 => 20,
-        4 => 24,
-        5 => 28,
-        6 => 32,
-        _ => 36,
-    };
-
-    private static int GetFullMoonScale(int rank) => rank switch
-    {
-        <= 2 => 5,
-        <= 4 => 6,
-        <= 6 => 7,
-        _ => 8,
-    };
-
-    private static int GetFullMoonBleed(int rank) => rank switch
-    {
-        <= 2 => 2,
-        <= 4 => 3,
-        <= 6 => 4,
-        _ => 5,
-    };
 }

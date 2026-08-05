@@ -17,8 +17,9 @@ using STS2RitsuLib.CardPiles.Nodes;
 namespace GuZhenRen.Patches;
 
 /// <summary>
-/// 把 RitsuLib ExtraHand 限制为“催动模式专用”，并在模式期间阻止
-/// 原版普通手牌出牌。目标选择仍完全使用原生 NCardPlay 流程。
+/// 限制 RitsuLib ExtraHand 中的蛊牌：只有普通手牌中存在可用“催动”
+/// 时才允许开始原生 NCardPlay/目标选择流程。旧催动模式的 UI 清理
+/// 补丁保留为兼容入口，但正常流程不再禁用普通手牌。
 /// </summary>
 internal static class GuActivationModePatch
 {

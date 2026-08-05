@@ -45,6 +45,142 @@
     "Rank9": {
       "title": "Rank 9",
       "description": "This is a rank 9 Gu card."
+    },
+    "CuiDong": {
+      "title": "Activation",
+      "description": "A Gu card requires an available Activation card in hand. Confirming the Gu automatically pays for and plays one Activation."
+    },
+    "HuiFu": {
+      "title": "Recovery",
+      "description": "After all activations are spent, the Gu enters recovery and returns to the Gu pile after the listed number of turns."
+    },
+    "HeLian": {
+      "title": "Fusion",
+      "description": "Consumes the specified Gu materials to refine a new Gu. Its rank follows the recipe and it is normally excluded from rewards."
+    },
+    "XueYuan": {
+      "title": "Blood Essence",
+      "description": "A Blood Path combat resource capped at 12 and cleared after combat."
+    },
+    "XueJi": {
+      "title": "Blood Parasite",
+      "description": "A parasite attached to a normal Attack, Skill, or Power. It follows its host through hand, draw, and discard piles."
+    },
+    "XueQi": {
+      "title": "Blood Qi",
+      "description": "Adapts to the host: damage and Bleed, Block and Blood Essence, or direct Blood Essence. Higher ranks trigger multiple times."
+    },
+    "YueXiang": {
+      "title": "Moon Phase",
+      "description": "Blood Moon advances Crescent → Waxing → Full. Each complete host resolution advances one phase."
+    },
+    "XueTai": {
+      "title": "Blood Fetus",
+      "description": "A compound parasite. Each trigger adapts to the host and gains Fetal Movement; it hatches at 3."
+    },
+    "TaiDong": {
+      "title": "Fetal Movement",
+      "description": "Blood Fetus maturity. It hatches at 3; devouring another parasite can inherit 1–2 progress."
+    },
+    "PoTai": {
+      "title": "Rupture",
+      "description": "If an immature parasitized host enters Exhaust, remove the parasite and gain 1 Blood Essence without resolving remaining effects."
+    },
+    "FuHua": {
+      "title": "Hatch",
+      "description": "The final resolution after a parasite completes its last trigger, after which it is removed."
+    },
+    "TunJi": {
+      "title": "Devour Parasite",
+      "description": "Blood Fetus replaces Blood Qi or a non-Full Moon parasite and inherits 1–2 Fetal Movement."
+    },
+    "ZongEDu": {
+      "title": "Shared Pool",
+      "description": "AoE damage, Bleed, or Blood Marks are shared totals divided among living enemies, not copied per enemy."
+    },
+    "YiHai": {
+      "title": "Remains",
+      "description": "A 0-cost Status created by parasitic kills. It can grant Blood Essence or be consumed by Blood Skull and Blood Bat effects."
+    },
+    "XueLu": {
+      "title": "Blood Skull",
+      "description": "Up to 3. Strengthens parasites, defenses, and Blood Bats; absorbing Remains at cap heals instead."
+    },
+    "LiuXue": {
+      "title": "Bleed",
+      "description": "At the end of the target turn, remove 1, deal 3 damage, and grant the applier 1 Blood Essence."
+    },
+    "XueYin": {
+      "title": "Blood Mark",
+      "description": "After Blood Path attack damage from the applier, consume 1 and lose 3 HP. A card play refunds at most 1 Blood Essence globally."
+    },
+    "CanYue": {
+      "title": "Crescent",
+      "description": "Moon Phase stage 1. Resolve the lower shared damage and Bleed pool, then advance to Waxing."
+    },
+    "YingYue": {
+      "title": "Waxing",
+      "description": "Moon Phase stage 2. Resolve the middle shared pool and possible Blood Marks, then advance to Full."
+    },
+    "ManYue": {
+      "title": "Full Moon",
+      "description": "Final Moon Phase. Resolve the largest shared pool and hatch; rank 6+ refunds Blood Essence and rank 9 also draws."
+    },
+    "GuChong": {
+      "title": "Gu Worm",
+      "description": "Stored in the dedicated Gu pile and used through an Activation card in hand. It does not enter the normal draw cycle."
+    },
+    "YuanQi": {
+      "title": "Primeval Essence",
+      "description": "The combat resource used to activate Gu worms. The icon in the Gu card's cost position shows this resource rather than normal Energy."
+    },
+    "XianYuan": {
+      "title": "Immortal Essence",
+      "description": "An additional activation resource for Rank 6 or higher Immortal Gu. A depleted essence card is Exhausted after the entire Gu play sequence finishes."
+    },
+    "GuangHui": {
+      "title": "Radiance",
+      "description": "A Light-path combat resource with a maximum of 9. It persists during combat and can pay for Illumination effects."
+    },
+    "ZheGuang": {
+      "title": "Refraction",
+      "description": "Alternating between different Light-path Attack, Skill, or Power types grants Radiance, up to a per-turn limit."
+    },
+    "ZhaoPo": {
+      "title": "Exposure",
+      "description": "The next hit from an Attack card deals bonus damage per stack and removes 1 stack. Multi-hit attacks read it one hit at a time."
+    },
+    "JuGuang": {
+      "title": "Focus Light",
+      "description": "Increases the first damage hit of the next Light-path Attack. Fixed bonus damage is not repeated by multi-hit attacks."
+    },
+    "DingGuang": {
+      "title": "Fixed Light",
+      "description": "Increases the first hit of the next Attack that strikes a target already carrying Exposure, then clears after the first Attack damage resolves."
+    },
+    "YaoHua": {
+      "title": "Illumination",
+      "description": "Automatically spends the listed Radiance to empower this Gu or its generated card."
+    },
+    "LiuGuang": {
+      "title": "Stored Light",
+      "description": "At end of turn, gain Radiance if enough Block remains. Each application resolves once."
+    },
+    "PoJing": {
+      "title": "Shattered Mirror",
+      "description": "Gain Radiance the first time Block is completely broken during the current defense window. Each application triggers once."
+    },
+    "YiChu": {
+      "title": "Overflow",
+      "description": "When a resource gain exceeds its cap, the amount that could not be gained is converted into another benefit as stated by the card."
+    },
+    "ZhuiJi": {
+      "title": "Pursuit",
+      "description": "If the target dies, unresolved remaining hits move to another living enemy."
+    },
+    "XueHe": {
+      "title": "Blood River",
+      "description": "Automatically chooses a supply mode or high-defense mode based on current Blood Essence. High-defense mode spends Blood Essence and carries part of its Block into next turn."
     }
   },
   "cardDescriptionOverrides": {

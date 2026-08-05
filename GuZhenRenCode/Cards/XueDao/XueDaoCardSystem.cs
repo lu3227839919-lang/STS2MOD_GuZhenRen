@@ -35,7 +35,7 @@ internal static class XueDaoCardSystem
 
         foreach (YiHai card in remains)
         {
-            await CardCmd.Exhaust(choiceContext, card);
+            await CardExhaustCompat.ExhaustAsync(choiceContext, card);
         }
 
         return remains.Length;

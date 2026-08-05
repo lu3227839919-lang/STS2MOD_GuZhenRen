@@ -22,6 +22,11 @@ namespace GuZhenRen.Cards.HeLian;
 public abstract class AbstractHeLianGuCard
     : AbstractGuWormCard
 {
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        base.CanonicalKeywords
+            .Append(GuZhenRenKeywords.HeLian)
+            .Distinct();
+
     public override int YuanQiCost => 2;
 
     protected AbstractHeLianGuCard(

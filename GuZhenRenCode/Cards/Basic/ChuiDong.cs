@@ -28,28 +28,11 @@ public sealed class ChuiDong
     {
     }
 
-    protected override bool IsPlayable
-    {
-        get
-        {
-            if (IsCanonical)
-            {
-                return false;
-            }
+    protected override bool IsPlayable =>
+        !IsCanonical &&
+        GuActivationModeSystem.IsAutoPlayingActivator(this);
 
-            Player owner = Owner;
-
-            return base.IsPlayable &&
-                owner.PlayerCombatState != null &&
-                !GuActivationModeSystem.IsActiveFor(owner) &&
-                GuCardPileSystem.PileType
-                    .GetPile(owner)
-                    .Cards
-                    .Any(GuCardUsageRules.CanActivate);
-        }
-    }
-
-    protected override async Task OnPlay(
+    protected override Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay
     )
@@ -57,8 +40,9 @@ public sealed class ChuiDong
         ArgumentNullException.ThrowIfNull(choiceContext);
         ArgumentNullException.ThrowIfNull(cardPlay);
 
-        GuActivationModeSystem.Begin(Owner);
-        await Task.CompletedTask;
+        // “催动”现在是蛊牌的自动支付载体。选择蛊牌并确认目标后，
+        // GuActivationModeSystem 会自动打出一张手牌中的催动。
+        return Task.CompletedTask;
     }
 
     protected override void OnUpgrade()

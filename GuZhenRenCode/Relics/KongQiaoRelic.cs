@@ -201,14 +201,24 @@ public sealed class KongQiaoRelic
         CardPlay cardPlay
     )
     {
-        if (ReferenceEquals(cardPlay.Card.Owner, Owner) &&
-            cardPlay.Card is IGuWormCard &&
-            cardPlay.PlayIndex == 0)
+        if (!ReferenceEquals(cardPlay.Card.Owner, Owner))
+        {
+            return;
+        }
+
+        if (cardPlay.Card is IGuWormCard &&
+            cardPlay.IsFirstInSeries)
         {
             await GuCardPileSystem
                 .MoveDepletedGuCardsToRecoveryAsync(Owner);
             await GuRecoveryEffectSystem
                 .HandleEnteredRecoveryAsync(cardPlay.Card);
+        }
+
+        if (cardPlay.IsLastInSeries)
+        {
+            await ImmortalEssenceSystem
+                .ExhaustDepletedCardsAsync(Owner);
         }
     }
 
@@ -230,7 +240,9 @@ public sealed class KongQiaoRelic
             return allowedByBase;
         }
 
-        return GuCardUsageRules.CanActivate(card);
+        return GuCardUsageRules.CanActivate(card) &&
+            GuActivationModeSystem
+                .CanResolvePendingActivation(card);
     }
 
     /// <summary>
@@ -242,9 +254,21 @@ public sealed class KongQiaoRelic
 
         if (!ReferenceEquals(cardPlay.Card.Owner, Owner) ||
             cardPlay.Card is not IGuWormCard guCard ||
-            cardPlay.PlayIndex != 0)
+            !cardPlay.IsFirstInSeries)
         {
             return;
+        }
+
+        bool activatorPlayed =
+            await GuActivationModeSystem
+                .TryAutoPlayReservedActivatorAsync(cardPlay.Card);
+
+        if (!activatorPlayed)
+        {
+            string message =
+                $"手牌中没有可支付费用的催动，无法使用 {cardPlay.Card.Id}。";
+            GuActivationModeSystem.Cancel(message);
+            throw new InvalidOperationException(message);
         }
 
         int yuanQiCost = Math.Max(0, guCard.YuanQiCost);

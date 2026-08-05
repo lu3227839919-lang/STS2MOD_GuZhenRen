@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 using GuZhenRen.Aperture;
 
 using MegaCrit.Sts2.Core.Commands;
@@ -19,6 +21,20 @@ namespace GuZhenRen.Cards.ImmortalEssence;
 /// </summary>
 public static class ImmortalEssenceSystem
 {
+    private sealed class PendingExhaustState
+    {
+        public HashSet<AbstractXianYuanCard> Cards { get; } =
+            new(ReferenceEqualityComparer.Instance);
+    }
+
+    // 仙元在 Gu 的 BeforeCardPlayed 中归零时不能立刻 Exhaust：
+    // 0.110.0 会在当前蛊牌仍位于出牌区时嵌套修改手牌，导致出牌悬挂。
+    // 先只登记归零实例，等整次 CardPlay 系列结束后统一移除。
+    private static readonly ConditionalWeakTable<
+        Player,
+        PendingExhaustState
+    > PendingExhausts = new();
+
     private static readonly SavedAttachedState<CardModel, int>
         RemainingUnitsState = new(
             "gu_zhen_ren.immortal_essence_remaining_units",
@@ -76,8 +92,8 @@ public static class ImmortalEssenceSystem
     }
 
     /// <summary>
-    /// 在仙蛊出牌序列的第一段结算仙元。耗尽的仙元牌进入消耗牌堆；
-    /// 尚有余额的牌继续保留在手中，供后续回合催动。
+    /// 在仙蛊出牌序列的第一段结算仙元。归零的仙元牌先登记为
+    /// 待消耗，等本次出牌系列结束后再进入消耗牌堆。
     /// </summary>
     public static async Task<bool> SpendForActivation(
         CardPlay cardPlay
@@ -85,7 +101,7 @@ public static class ImmortalEssenceSystem
     {
         ArgumentNullException.ThrowIfNull(cardPlay);
 
-        if (cardPlay.PlayIndex != 0 ||
+        if (!cardPlay.IsFirstInSeries ||
             cardPlay.Card is not IGuWormCard guCard ||
             guCard.GuRank < ApertureProgression.ImmortalRank)
         {
@@ -129,14 +145,78 @@ public static class ImmortalEssenceSystem
             }
         }
 
-        foreach (AbstractXianYuanCard depleted in depletedCards)
+        if (depletedCards.Count > 0)
         {
-            await CardCmd.Exhaust(
+            PendingExhaustState state =
+                PendingExhausts.GetValue(
+                    player,
+                    static _ => new PendingExhaustState()
+                );
+
+            foreach (AbstractXianYuanCard depleted in depletedCards)
+            {
+                state.Cards.Add(depleted);
+            }
+        }
+
+        await Task.CompletedTask;
+        return remainingCost == 0;
+    }
+
+    /// <summary>
+    /// 在蛊牌的最后一段 CardPlay 完成后，统一消耗余额为零的仙元牌。
+    /// 这样既保留“耗尽时消耗”的规则，也避免在 BeforeCardPlayed
+    /// 中嵌套修改手牌造成当前蛊牌悬挂。
+    /// </summary>
+    internal static async Task ExhaustDepletedCardsAsync(
+        Player player
+    )
+    {
+        ArgumentNullException.ThrowIfNull(player);
+
+        if (!PendingExhausts.TryGetValue(
+                player,
+                out PendingExhaustState? state
+            ))
+        {
+            return;
+        }
+
+        AbstractXianYuanCard[] pending =
+            state.Cards.ToArray();
+
+        foreach (AbstractXianYuanCard depleted in pending)
+        {
+            state.Cards.Remove(depleted);
+
+            if (depleted.Pile?.Type != PileType.Hand ||
+                GetRemainingUnits(depleted) > 0)
+            {
+                continue;
+            }
+
+            if (depleted.CombatState == null)
+            {
+                // 兼容由旧版本创建、未登记进 CombatState 的战斗实例。
+                // 不再调用必然抛错的 CardCmd.Exhaust；本场结束后该临时牌
+                // 会随战斗状态清理。新生成的仙元已经统一由 CombatState
+                // 创建，因此正常流程不会进入此分支。
+                Entry.Logger.Warn(
+                    $"[仙元] 跳过未登记战斗状态的耗尽牌 {depleted.Id}；" +
+                    "请在下一场战斗使用重新生成的仙元实例。"
+                );
+                continue;
+            }
+
+            await CardExhaustCompat.ExhaustAsync(
                 new BlockingPlayerChoiceContext(),
                 depleted
             );
         }
 
-        return remainingCost == 0;
+        if (state.Cards.Count == 0)
+        {
+            PendingExhausts.Remove(player);
+        }
     }
 }

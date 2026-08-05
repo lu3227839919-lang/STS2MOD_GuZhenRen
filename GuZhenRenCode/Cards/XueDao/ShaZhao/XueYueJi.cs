@@ -18,7 +18,11 @@ namespace GuZhenRen.Cards.ShaZhao;
 public sealed class XueYueJi : AbstractShaZhaoCard
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        [CardKeyword.Exhaust];
+        [
+            CardKeyword.Exhaust,
+            GuZhenRenKeywords.XueJi,
+            GuZhenRenKeywords.FuHua,
+        ];
 
     protected override bool IsPlayable =>
         base.IsPlayable &&

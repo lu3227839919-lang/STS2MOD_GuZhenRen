@@ -51,6 +51,7 @@ public sealed class XueJiPower : ModPowerTemplate
 
         TriggerState state = GetInternalData<TriggerState>();
         state.ActiveCard = cardPlay.Card;
+        XueDaoParasiteSystem.MarkResolving(cardPlay.Card, true);
         state.EnemiesAliveBefore.Clear();
         state.EnemiesAliveBefore.AddRange(
             combatState.HittableEnemies
@@ -74,8 +75,7 @@ public sealed class XueJiPower : ModPowerTemplate
         }
 
         TriggerState state = GetInternalData<TriggerState>();
-        if (!ReferenceEquals(state.ActiveCard, cardPlay.Card) ||
-            !XueDaoParasiteSystem.HasParasite(cardPlay.Card))
+        if (!ReferenceEquals(state.ActiveCard, cardPlay.Card))
         {
             return;
         }
@@ -84,10 +84,24 @@ public sealed class XueJiPower : ModPowerTemplate
         state.ActiveCard = null;
         state.EnemiesAliveBefore.Clear();
 
-        await XueDaoParasiteSystem.TriggerFromCardPlayAsync(
-            choiceContext,
-            cardPlay,
-            enemiesAliveBefore
-        );
+        try
+        {
+            if (XueDaoParasiteSystem.HasParasite(cardPlay.Card))
+            {
+                await XueDaoParasiteSystem.TriggerFromCardPlayAsync(
+                    choiceContext,
+                    cardPlay,
+                    enemiesAliveBefore
+                );
+            }
+        }
+        finally
+        {
+            XueDaoParasiteSystem.MarkResolving(cardPlay.Card, false);
+            await XueDaoParasiteSystem.BreakIfExhaustedAsync(
+                choiceContext,
+                cardPlay.Card
+            );
+        }
     }
 }

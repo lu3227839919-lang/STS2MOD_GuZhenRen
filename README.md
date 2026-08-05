@@ -13,23 +13,21 @@
 
 | 项目 | 当前信息 |
 | --- | --- |
-| Mod 版本 | **0.5.0** |
+| Mod 版本 | **0.6.0** |
 | 适配游戏版本 | **0.110.0** |
 | 前置依赖 | **STS2-RitsuLib 0.5.10 或兼容版本** |
 | 构建环境 | Godot 4.5.1 .NET / .NET 9 |
 | 本地化 | 简体中文、English |
 | 开发状态 | 持续开发中 |
 
-### 0.5.0 更新摘要
+### 0.6.0 更新摘要
 
-- 重做血气蛊与血月蛊：不再生成衍生牌，改为寄生普通手牌。
-- 新增血道公共循环：自动支付血元、寄生击杀取骸、遗骸主动回收血元、血颅三层强化与满层溢出治疗。
-- 新增普通蛊：血池蛊、血皮蛊、血颅蛊、刀翅血蝠蛊。
-- 新增合练蛊：血胎蛊、血蝠王蛊、血河甲蛊。
-- 新增衍生牌：遗骸、刀翅血蝠、刀翅血蝠群、血蝠王。
-- 新增血道杀招：血漂流、万骸归潮、血月祭。
-- 刀翅血蝠蛊在拥有两张遗骸时允许选择基础血蝠或消耗遗骸生成血蝠群，不会同时塞入多张衍生牌。
-- 所有群体血道资源按全场总额度分配，避免随敌人数复制收益。
+- 血气蛊补全一至九转，高转血气寄生可跟随宿主跨牌堆触发多次。
+- 血月蛊改为“月光蛊＋血气蛊”的光血合练蛊，以残月、盈月、满月三阶段推进。
+- 血胎蛊新增吞寄与胎动：可吞噬血气或未满月的月相，达到3点胎动后孵化。
+- 新增破胎与孵化结算，并保持 Replay 整段只推进一次寄生。
+- 使用 STS2-RitsuLib 自有关键词悬浮提示，卡面改用催动、恢复、血寄、月相等简短术语。
+- 保留血元、遗骸、血颅、血蝠与三张血道杀招的既有联动。
 
 ## 核心特色
 
@@ -85,8 +83,12 @@ Replay 只在一次出牌序列的首段支付元气、仙元及相关资源，�
 ＋三转以上定光蛊 ×1
 ＝镜辉蛊
 
-三转以上血气蛊 ×1
-＋三转以上血月蛊 ×1
+三转以上月光蛊 ×1
+＋三转以上血气蛊 ×1
+＝血月蛊
+
+四转以上血气蛊 ×1
+＋四转以上血月蛊 ×1
 ＝血胎蛊
 
 四转以上血颅蛊 ×1
@@ -113,7 +115,7 @@ Replay 只在一次出牌序列的首段支付元气、仙元及相关资源，�
 | --- | --- | --- |
 | 光道 | 小光蛊、月光蛊、镜光蛊、定光蛊、流光蛊 | 月芒蛊、镜辉蛊 |
 | 土道 | 玉皮蛊 | — |
-| 血道 | 血气蛊、血月蛊、血池蛊、血皮蛊、血颅蛊、刀翅血蝠蛊 | 血胎蛊、血蝠王蛊、血河甲蛊 |
+| 血道 | 血气蛊、血池蛊、血皮蛊、血颅蛊、刀翅血蝠蛊 | 血月蛊、血胎蛊、血蝠王蛊、血河甲蛊 |
 
 ### 血道完整循环
 
@@ -123,14 +125,17 @@ Replay 只在一次出牌序列的首段支付元气、仙元及相关资源，�
 - **遗骸**：血道寄生牌击杀主要敌人后获得。可直接打出并获得2点血元，也可以被血颅蛊、刀翅血蝠蛊和杀招消耗。
 - **血颅**：最多3层，持续强化血道寄生、防御和血蝠多段攻击；满层后血颅蛊继续吸收遗骸会转化为治疗。
 
-血气蛊与血月蛊采用寄生机制，不再生成衍生牌：
+血道寄生采用“血寄胎变”机制：
 
 ```text
-血气蛊：自动支付1血元；不足时失去2生命代替
-血月蛊：血元不足2点时免费触发残月档；达到2点时自动消耗2点触发完整档
-寄生宿主打出后结算附加效果
-寄生牌完成合法击杀后获得遗骸
+血气蛊：按转数支付1～3血元，不足部分以生命代付；高转可触发2～3次
+血月蛊：支付2血元植入月相，按残月→盈月→满月推进
+血胎蛊：吞噬血气或未满月的月相，继承胎动并在3点时孵化
+宿主跨手牌、抽牌堆与弃牌堆移动时保留寄生
+未成熟宿主进入消耗堆时破胎，返还1点血元
+寄生击杀主要敌人时获得遗骸
 ```
+
 
 刀翅血蝠蛊属于纯衍生牌蛊：没有遗骸时生成刀翅血蝠；拥有至少两张遗骸时，可以选择保留遗骸，或自动消耗两张并生成刀翅血蝠群。寄生与衍生牌生成不会叠加到同一只蛊虫上。
 
@@ -141,7 +146,7 @@ Replay 只在一次出牌序列的首段支付元气、仙元及相关资源，�
 **血道**支持多条可独立成型的路线：
 
 - 血气寄生与单体取骸；
-- 血月双档与群体取骸；
+- 血月三阶段月相与群体取骸；
 - 血池供能与血皮防御；
 - 血颅长期强化与满层治疗；
 - 遗骸转化为刀翅血蝠群；
@@ -340,13 +345,13 @@ RitsuLib 版本
 - Simplified Chinese and English localization
 - Basic multiplayer and save-state compatibility
 
-The current source implements 17 Gu worms and 6 killer moves. Light Path focuses on generated-card combinations, while the expanded Blood Path uses automatic Blood Essence payments, host-card parasites, Remains, a three-stack Blood Skull buff, Blood Bat derivatives, fusion Gu, and Blood Path finishers.
+The current source implements 17 Gu worms and 6 killer moves. Version 0.6.0 extends Blood Qi Gu to rank 9, turns Blood Moon Gu into a fusion Gu with Crescent/Waxing/Full phases, adds persistent parasite stages and Blood Fetus progression, and uses RitsuLib keyword hover tips to keep card text concise.
 
 ## Current Requirements
 
 | Item | Version |
 | --- | --- |
-| Mod | 0.5.0 |
+| Mod | 0.6.0 |
 | Slay the Spire 2 | 0.110.0 |
 | STS2-RitsuLib | 0.5.10 or compatible |
 | Build stack | Godot 4.5.1 .NET / .NET 9 |

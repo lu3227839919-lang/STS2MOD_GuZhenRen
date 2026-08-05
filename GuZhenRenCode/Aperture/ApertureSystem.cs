@@ -374,21 +374,29 @@ public static class ApertureSystem
         Player owner
     )
     {
-        CardModel? card = rank switch
+        if (owner.Creature.CombatState is not { } combatState)
         {
-            6 => ModelDb.Card<QingTiXianYuan>().ToMutable(),
-            7 => ModelDb.Card<HongZaoXianYuan>().ToMutable(),
-            8 => ModelDb.Card<BaiLiXianYuan>().ToMutable(),
-            9 => ModelDb.Card<HuangXingXianYuan>().ToMutable(),
+            return null;
+        }
+
+        CardModel? canonical = rank switch
+        {
+            6 => ModelDb.Card<QingTiXianYuan>(),
+            7 => ModelDb.Card<HongZaoXianYuan>(),
+            8 => ModelDb.Card<BaiLiXianYuan>(),
+            9 => ModelDb.Card<HuangXingXianYuan>(),
             _ => null,
         };
 
-        if (card != null)
-        {
-            card.Owner = owner;
-        }
-
-        return card;
+        /*
+         * 战斗卡必须由当前 CombatState 创建。仅 ToMutable 并设置 Owner
+         * 虽然能暂时进入手牌，却不会登记进 CombatState.AllCards；余额
+         * 归零后 CardCmd.Exhaust 会因此抛出“must be added to a
+         * CombatState”。
+         */
+        return canonical == null
+            ? null
+            : combatState.CreateCard(canonical, owner);
     }
 
     private static int GetVictoryXp(CombatRoom room)
