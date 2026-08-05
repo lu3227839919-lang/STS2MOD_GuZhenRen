@@ -172,6 +172,36 @@
       "table": "secondary_resources",
       "key": "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.description",
       "text": "储存在蛊师空窍中的元气。战斗开始时拥有5点；从第2回合起，每回合开始恢复2点。元气上限随空窍转数提升，最高为25点。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_LU_POWER.title",
+      "text": "血颅"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_LU_POWER.description",
+      "text": "最多3层。每层强化血道寄生、血道防御及刀翅血蝠类多段攻击。血颅不提高资源产量。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_JI_POWER.title",
+      "text": "血寄"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_JI_POWER.description",
+      "text": "有{Amount}张牌带有尚未触发的血道寄生。宿主牌最后一次结算后触发寄生并移除此效果。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_HE_JIA_CARRY_POWER.title",
+      "text": "血河余甲"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_HE_JIA_CARRY_POWER.description",
+      "text": "下回合开始时获得{Amount}点格挡，然后移除。"
     }
   ],
   "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "一次可选择0至2张尚未达到最高转数的蛊牌，各提升一转；选择完成后需要主动点击确认。选择0张并确认将取消本次操作。每个休息点只能成功升炼一次。",

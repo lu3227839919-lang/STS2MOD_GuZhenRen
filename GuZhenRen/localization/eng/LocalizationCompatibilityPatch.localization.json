@@ -172,6 +172,36 @@
       "table": "secondary_resources",
       "key": "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.description",
       "text": "Primeval essence stored in a Gu Master's aperture. Begin combat with 5; from turn 2 onward, restore 2 at the start of each turn. Maximum essence increases with aperture rank, up to 25."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_LU_POWER.title",
+      "text": "Blood Skull"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_LU_POWER.description",
+      "text": "Up to 3 stacks. Each strengthens Blood Path parasites, defenses, and Blade-Wing Blood Bat multi-hit attacks, but does not increase resource generation."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_JI_POWER.title",
+      "text": "Blood Parasite"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_JI_POWER.description",
+      "text": "{Amount} card(s) carry an unresolved Blood Path parasite. The parasite triggers after the host’s final play and is then removed."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_HE_JIA_CARRY_POWER.title",
+      "text": "Blood River After-Armor"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XUE_HE_JIA_CARRY_POWER.description",
+      "text": "At the start of your next turn, gain {Amount} Block, then remove this effect."
     }
   ],
   "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "Select 0 to 2 eligible Gu Worms and raise each by one rank. Click Confirm after making your selection. Confirming with 0 selected cancels the action. Each rest site allows one successful refinement.",

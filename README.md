@@ -13,25 +13,23 @@
 
 | 项目 | 当前信息 |
 | --- | --- |
-| Mod 版本 | **0.4.14** |
+| Mod 版本 | **0.5.0** |
 | 适配游戏版本 | **0.110.0** |
 | 前置依赖 | **STS2-RitsuLib 0.5.10 或兼容版本** |
 | 构建环境 | Godot 4.5.1 .NET / .NET 9 |
 | 本地化 | 简体中文、English |
 | 开发状态 | 持续开发中 |
 
-### 0.4.14 更新摘要
+### 0.5.0 更新摘要
 
-- 修复方源进入 DARV 事件时，BaseLib 的 `DustyTome.SetupForPlayer` 扩展可能触发空引用并中断事件。
-- 补齐 DARV、OROBAS、PAEL、TANX、TEZCATARA、VAKUU、NONUPEIPE 七位先古遗民的中英文角色对话。
-- 卡图诊断日志只显示 `res://GuZhenRen/images/cards/...`，不再输出开发者本机目录。
-- 新增 `tools/Build-SourceArchive.ps1`，发布源码时主动排除 `local.props`、构建目录、日志和旧压缩包。
-
-### 0.4.13 更新摘要
-
-- 修复永久牌组中的高转蛊虫进入战斗后回退为一转。
-- 转数现在同时通过普通实例字段和 `SavedAttachedState` 保存，兼容战斗克隆、存档和多人快照。
-- 战斗初始化会再次根据永久牌组校准卡牌转数，并输出 `[蛊虫转数]` 验证日志。
+- 重做血气蛊与血月蛊：不再生成衍生牌，改为寄生普通手牌。
+- 新增血道公共循环：自动支付血元、寄生击杀取骸、遗骸主动回收血元、血颅三层强化与满层溢出治疗。
+- 新增普通蛊：血池蛊、血皮蛊、血颅蛊、刀翅血蝠蛊。
+- 新增合练蛊：血胎蛊、血蝠王蛊、血河甲蛊。
+- 新增衍生牌：遗骸、刀翅血蝠、刀翅血蝠群、血蝠王。
+- 新增血道杀招：血漂流、万骸归潮、血月祭。
+- 刀翅血蝠蛊在拥有两张遗骸时允许选择基础血蝠或消耗遗骸生成血蝠群，不会同时塞入多张衍生牌。
+- 所有群体血道资源按全场总额度分配，避免随敌人数复制收益。
 
 ## 核心特色
 
@@ -87,39 +85,70 @@ Replay 只在一次出牌序列的首段支付元气、仙元及相关资源，�
 ＋三转以上定光蛊 ×1
 ＝镜辉蛊
 
-月芒蛊 ×1
-＋血气蛊 ×1
-＝血月蛊
+三转以上血气蛊 ×1
+＋三转以上血月蛊 ×1
+＝血胎蛊
+
+四转以上血颅蛊 ×1
+＋四转以上刀翅血蝠蛊 ×1
+＝血蝠王蛊
+
+三转以上血池蛊 ×1
+＋三转以上血皮蛊 ×1
+＝血河甲蛊
 ```
 
 当前已实现的杀招包括：
 
-- 月霓裳
-- 白虹贯日
-- 镜月返照
+- 光道：月霓裳、白虹贯日、镜月返照
+- 血道：血漂流、万骸归潮、血月祭
 
 ## 当前可玩内容
 
 ### 蛊虫
 
-当前源码已实现 10 种蛊虫：
+当前源码已实现 **17 种蛊虫**：
 
-| 道途 | 蛊虫 |
-| --- | --- |
-| 光道 | 小光蛊、月光蛊、镜光蛊、定光蛊、流光蛊、月芒蛊、镜辉蛊 |
-| 土道 | 玉皮蛊 |
-| 血道 | 血气蛊、血月蛊 |
+| 道途 | 普通蛊与现有蛊 | 合练蛊 |
+| --- | --- | --- |
+| 光道 | 小光蛊、月光蛊、镜光蛊、定光蛊、流光蛊 | 月芒蛊、镜辉蛊 |
+| 土道 | 玉皮蛊 | — |
+| 血道 | 血气蛊、血月蛊、血池蛊、血皮蛊、血颅蛊、刀翅血蝠蛊 | 血胎蛊、血蝠王蛊、血河甲蛊 |
+
+### 血道完整循环
+
+血道目前围绕三种战斗资源展开：
+
+- **血元**：上限12。固定费用自动支付；血气蛊缺少血元时可以每缺1点失去2点生命代付，血月蛊禁止生命代付。
+- **遗骸**：血道寄生牌击杀主要敌人后获得。可直接打出并获得2点血元，也可以被血颅蛊、刀翅血蝠蛊和杀招消耗。
+- **血颅**：最多3层，持续强化血道寄生、防御和血蝠多段攻击；满层后血颅蛊继续吸收遗骸会转化为治疗。
+
+血气蛊与血月蛊采用寄生机制，不再生成衍生牌：
+
+```text
+血气蛊：自动支付1血元；不足时失去2生命代替
+血月蛊：血元不足2点时免费触发残月档；达到2点时自动消耗2点触发完整档
+寄生宿主打出后结算附加效果
+寄生牌完成合法击杀后获得遗骸
+```
+
+刀翅血蝠蛊属于纯衍生牌蛊：没有遗骸时生成刀翅血蝠；拥有至少两张遗骸时，可以选择保留遗骸，或自动消耗两张并生成刀翅血蝠群。寄生与衍生牌生成不会叠加到同一只蛊虫上。
 
 ### 构筑方向
 
-**光道**是目前内容最完整的体系，围绕以下机制展开：
+**光道**继续围绕折光、光辉、照破、耀化与恢复期衍生牌展开。
 
-- **折光**：交替打出不同类型的牌以获得光辉；
-- **照破**：让后续攻击的单段伤害获得额外收益；
-- **耀化**：选择消耗光辉强化蛊虫；
-- **恢复期衍生牌**：蛊虫进入恢复后，按转数生成新的战斗牌。
+**血道**支持多条可独立成型的路线：
 
-土道目前以玉皮蛊的防御与反光联动为主；血道目前围绕血气、流血、血元与血印形成基础循环。更多道途、蛊虫、配方、遗物和杀招仍在开发中。
+- 血气寄生与单体取骸；
+- 血月双档与群体取骸；
+- 血池供能与血皮防御；
+- 血颅长期强化与满层治疗；
+- 遗骸转化为刀翅血蝠群；
+- 合练蛊整合寄生、遗骸、多段攻击和防御；
+- 血漂流、万骸归潮与血月祭负责状态调度和终结。
+
+每只普通血道蛊在没有其他血道组件时仍有基础效果，两只即可形成联动，合练结果会替换材料以减轻蛊虫容量压力。
 
 ## 安装
 
@@ -307,17 +336,17 @@ RitsuLib 版本
 - Primeval essence, immortal essence, radiance, and blood essence resources
 - Campfire upgrading and Gu fusion
 - Killer-move derivation during combat
-- Light Path, Earth Path, and early Blood Path gameplay
+- Light Path, Earth Path, and a complete first Blood Path package
 - Simplified Chinese and English localization
 - Basic multiplayer and save-state compatibility
 
-The current source implements 10 Gu worms and 3 killer moves. Light Path is the most complete archetype, featuring Refraction, Radiance, Exposure, empowered activations, and recovery-generated cards.
+The current source implements 17 Gu worms and 6 killer moves. Light Path focuses on generated-card combinations, while the expanded Blood Path uses automatic Blood Essence payments, host-card parasites, Remains, a three-stack Blood Skull buff, Blood Bat derivatives, fusion Gu, and Blood Path finishers.
 
 ## Current Requirements
 
 | Item | Version |
 | --- | --- |
-| Mod | 0.4.14 |
+| Mod | 0.5.0 |
 | Slay the Spire 2 | 0.110.0 |
 | STS2-RitsuLib | 0.5.10 or compatible |
 | Build stack | Godot 4.5.1 .NET / .NET 9 |

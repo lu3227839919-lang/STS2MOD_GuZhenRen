@@ -10,8 +10,15 @@ internal static class GuRecoveryEffectSystem
 {
     internal static Task HandleEnteredRecoveryAsync(CardModel card)
     {
+        // AfterCardPlayed can run before the native card-play pipeline has
+        // physically inserted the card into its result pile.  Checking
+        // card.Pile here therefore drops the event while the depleted Gu is
+        // still in the play area.  The activation and recovery schedule are
+        // already authoritative at this point, so use them as the gate and
+        // let the per-card handled state prevent duplicate processing.
         return card is IGuRecoveryEffectSource source &&
-               card.Pile?.Type == GuCardPileSystem.RecoveryPileType
+               !GuCardUsageRules.CanUse(card) &&
+               GuCardUsageRules.HasRecoverySchedule(card)
             ? source.OnEnteredRecoveryAsync()
             : Task.CompletedTask;
     }

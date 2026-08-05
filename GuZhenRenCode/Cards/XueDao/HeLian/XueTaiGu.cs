@@ -1,4 +1,4 @@
-using GuZhenRen.Characters;
+using GuZhenRen.Cards.XueDao;
 using GuZhenRen.Combat;
 using GuZhenRen.Powers.XueDao;
 
@@ -10,41 +10,31 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib.Combat.SecondaryResources;
-using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
 
-namespace GuZhenRen.Cards.XueDao;
+namespace GuZhenRen.Cards.HeLian;
 
-/// <summary>
-/// 血气蛊：自动支付1点血元为一张普通手牌植入血气寄生；血元不足
-/// 时失去2点生命代替，且不能致死。
-/// </summary>
-[RegisterCard(typeof(GuZhenRenGuCardPool))]
-public sealed class XueQiGu : AbstractGuWormCard
+[HeLianRecipe(
+    typeof(XueQiGu),
+    typeof(XueYueGu),
+    MinimumMaterialRank = 3
+)]
+public sealed class XueTaiGu : AbstractHeLianGuCard
 {
-    public override int MaxGuRank => 5;
-
     public override int MaxUses => IsUpgraded ? 2 : 1;
 
-    public override int RecoveryDelayTurns => GuRank >= 5 ? 3 : 2;
+    public override int RecoveryDelayTurns => GuRank >= 7 ? 4 : 3;
 
     protected override bool IsPlayable =>
         base.IsPlayable &&
         (IsCanonical ||
-         (HasEligibleHost() &&
-          (XueDaoPowerSystem.GetXueYuan(Owner.Creature) > 0 ||
-           Owner.Creature.CurrentHp > 2)));
+         (HasEligibleHost() && CanPayBloodFetusCost()));
 
-    public XueQiGu()
-        : base(
-            baseCost: 0,
-            type: CardType.Skill,
-            rarity: CardRarity.Common,
-            target: TargetType.Self
-        )
+    public XueTaiGu()
+        : base(0, CardType.Skill, CardRarity.Rare, TargetType.Self)
     {
         SetDao(Dao.XueDao);
-        this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 1);
+        this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 2);
     }
 
     protected override async Task OnPlay(
@@ -61,7 +51,7 @@ public sealed class XueQiGu : AbstractGuWormCard
             },
             card => XueDaoParasiteSystem.CanAttach(
                 card,
-                allowBloodQiReplacement: false
+                allowBloodQiReplacement: true
             ),
             this
         )).FirstOrDefault();
@@ -71,28 +61,34 @@ public sealed class XueQiGu : AbstractGuWormCard
             return;
         }
 
-        if (XueDaoPowerSystem.GetXueYuan(Owner.Creature) > 0)
-        {
-            if (!await XueDaoPowerSystem.TrySpendXueYuan(
-                    choiceContext,
-                    this,
-                    1
-                ))
-            {
-                return;
-            }
-        }
-        else
-        {
-            if (Owner.Creature.CurrentHp <= 2)
-            {
-                return;
-            }
+        int availableBlood = Math.Min(
+            2,
+            XueDaoPowerSystem.GetXueYuan(Owner.Creature)
+        );
+        int missing = 2 - availableBlood;
 
+        if (missing > 0 &&
+            Owner.Creature.CurrentHp <= missing * 2)
+        {
+            return;
+        }
+
+        if (availableBlood > 0 &&
+            !await XueDaoPowerSystem.TrySpendXueYuan(
+                choiceContext,
+                this,
+                availableBlood
+            ))
+        {
+            return;
+        }
+
+        if (missing > 0)
+        {
             await CreatureCmd.Damage(
                 choiceContext,
                 Owner.Creature,
-                2,
+                missing * 2,
                 ValueProp.Unblockable | ValueProp.Unpowered,
                 this,
                 cardPlay
@@ -102,18 +98,38 @@ public sealed class XueQiGu : AbstractGuWormCard
         await XueDaoParasiteSystem.AttachAsync(
             choiceContext,
             host,
-            XueDaoParasiteSystem.ParasiteKind.BloodQi,
+            XueDaoParasiteSystem.ParasiteKind.BloodFetus,
             GuRank,
             IsUpgraded,
             this
         );
     }
 
+    protected override int CalculateHeLianResultRank(
+        IReadOnlyList<CardModel> materials
+    ) => Math.Min(
+        MaxGuRank,
+        materials
+            .OfType<IGuRankProvider>()
+            .Select(provider => provider.GuRank)
+            .DefaultIfEmpty(1)
+            .Min() + 1
+    );
+
     private bool HasEligibleHost() =>
         Owner.PlayerCombatState?.Hand.Cards.Any(card =>
             XueDaoParasiteSystem.CanAttach(
                 card,
-                allowBloodQiReplacement: false
+                allowBloodQiReplacement: true
             )
         ) == true;
+
+    private bool CanPayBloodFetusCost()
+    {
+        int missing = Math.Max(
+            0,
+            2 - XueDaoPowerSystem.GetXueYuan(Owner.Creature)
+        );
+        return Owner.Creature.CurrentHp > missing * 2;
+    }
 }

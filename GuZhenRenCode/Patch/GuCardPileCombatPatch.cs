@@ -33,6 +33,7 @@ internal static class GuCardPileCombatPatch
     private readonly record struct GuRankEntry(
         string CardId,
         bool IsUpgraded,
+        string? EnchantmentId,
         int Rank
     );
 
@@ -136,6 +137,7 @@ internal static class GuCardPileCombatPatch
                 .Select(card => new GuRankEntry(
                     card.Id.ToString(),
                     card.IsUpgraded,
+                    card.Enchantment?.Id.ToString(),
                     card.GuRank
                 ))
                 .ToArray(),
@@ -153,9 +155,9 @@ internal static class GuCardPileCombatPatch
 
     /// <summary>
     /// 原版 PopulateCombatState 会把永久牌组复制成战斗实例。
-    /// RitsuLib SavedAttachedState 参与存档，但不保证随该克隆过程复制，
-    /// 因此在蛊牌移入自定义牌堆前，按卡牌 ID、升级状态和重复出现顺序
-    /// 把永久牌组转数重新写入战斗实例。
+    /// RitsuLib SavedAttachedState 参与存档，但不保证随该克隆过程复制。
+    /// 因此在蛊牌移入自定义牌堆前，优先保留战斗克隆已有的正确转数；
+    /// 真正丢失转数时，再按卡牌 ID、升级状态和附魔进行回退校准。
     /// </summary>
     private static void ReconcileCombatCardRanks(
         Player owner,
@@ -167,19 +169,25 @@ internal static class GuCardPileCombatPatch
             return;
         }
 
-        Dictionary<(string CardId, bool IsUpgraded), Queue<int>>
-            ranksByCard = [];
+        Dictionary<
+            (string CardId, bool IsUpgraded, string? EnchantmentId),
+            List<int>
+        > ranksByCard = [];
 
         foreach (GuRankEntry entry in snapshot.Entries)
         {
-            var key = (entry.CardId, entry.IsUpgraded);
-            if (!ranksByCard.TryGetValue(key, out Queue<int>? ranks))
+            var key = (
+                entry.CardId,
+                entry.IsUpgraded,
+                entry.EnchantmentId
+            );
+            if (!ranksByCard.TryGetValue(key, out List<int>? ranks))
             {
-                ranks = new Queue<int>();
+                ranks = [];
                 ranksByCard.Add(key, ranks);
             }
 
-            ranks.Enqueue(entry.Rank);
+            ranks.Add(entry.Rank);
         }
 
         CardModel[] combatCards =
@@ -196,21 +204,39 @@ internal static class GuCardPileCombatPatch
         foreach (AbstractGuZhenRenCard card in combatCards
                      .OfType<AbstractGuZhenRenCard>())
         {
-            var key = (card.Id.ToString(), card.IsUpgraded);
-            if (!ranksByCard.TryGetValue(key, out Queue<int>? ranks) ||
+            var key = (
+                card.Id.ToString(),
+                card.IsUpgraded,
+                card.Enchantment?.Id.ToString()
+            );
+            if (!ranksByCard.TryGetValue(key, out List<int>? ranks) ||
                 ranks.Count == 0)
             {
                 continue;
             }
 
-            int sourceRank = ranks.Dequeue();
-            matchedCount++;
-
-            if (card.GuRank != sourceRank)
+            // MutableClone normally preserves the ordinary Gu-rank fields.
+            // Keep that exact per-instance rank whenever it exists in the
+            // source multiset instead of replacing it according to shuffled
+            // combat-pile order.  This preserves the association between a
+            // specific enchanted card and its rank.  Only cards whose rank
+            // was genuinely lost fall back to the source order.
+            int sourceRank;
+            int preservedRankIndex = ranks.IndexOf(card.GuRank);
+            if (preservedRankIndex >= 0)
             {
+                sourceRank = card.GuRank;
+                ranks.RemoveAt(preservedRankIndex);
+            }
+            else
+            {
+                sourceRank = ranks[0];
+                ranks.RemoveAt(0);
                 card.InitializeGuRankFromSource(sourceRank);
                 reconciledCount++;
             }
+
+            matchedCount++;
 
             if (sourceRank > AbstractGuZhenRenCard.MinimumGuRank)
             {

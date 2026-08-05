@@ -64,7 +64,7 @@ public sealed class XueYinPower : ModPowerTemplate
         TriggerState state = GetInternalData<TriggerState>();
 
         if (cardPlay.Card.Type == CardType.Attack &&
-            XueDaoPowerSystem.IsXueDaoGuCard(cardPlay.Card) &&
+            XueDaoPowerSystem.IsXueDaoEffectCard(cardPlay.Card) &&
             ReferenceEquals(cardPlay.Card.Owner.Creature, Applier))
         {
             state.ActiveCard = cardPlay.Card;
@@ -111,7 +111,7 @@ public sealed class XueYinPower : ModPowerTemplate
             Amount <= 0 ||
             result.UnblockedDamage <= 0 ||
             cardSource?.Type != CardType.Attack ||
-            !XueDaoPowerSystem.IsXueDaoGuCard(cardSource) ||
+            !XueDaoPowerSystem.IsXueDaoEffectCard(cardSource) ||
             !ReferenceEquals(dealer, Applier) ||
             !ReferenceEquals(state.ActiveCard, cardSource) ||
             state.PlayIndex != cardSource.CurrentPlayIndex ||
