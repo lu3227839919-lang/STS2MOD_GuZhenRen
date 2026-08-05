@@ -17,8 +17,8 @@ namespace GuZhenRen.Cards;
 /// </summary>
 public static class CardImageCatalog
 {
-    public const string LocalImageDirectory =
-        @"res://GuZhenRen/images/cards";
+    public const string ResourceImageDirectory =
+        "res://GuZhenRen/images/cards";
 
     private static readonly object WarningLock = new();
 
@@ -43,12 +43,6 @@ public static class CardImageCatalog
     {
         ArgumentNullException.ThrowIfNull(cardType);
         return $"{Entry.ResPath}/images/cards/{cardType.Name}.png";
-    }
-
-    public static string GetLocalPath(Type cardType)
-    {
-        ArgumentNullException.ThrowIfNull(cardType);
-        return $@"{LocalImageDirectory}\{cardType.Name}.png";
     }
 
     /// <summary>
@@ -117,7 +111,7 @@ public static class CardImageCatalog
         Entry.Logger.Warn(
             $"[卡图审计] 已检查 {cardTypes.Length} 张卡牌，" +
             $"其中 {missingCount} 张缺少同名图片。" +
-            $"请将 PNG 放入：{LocalImageDirectory}"
+            $"请将 PNG 放入：{ResourceImageDirectory}"
         );
     }
 
@@ -139,8 +133,7 @@ public static class CardImageCatalog
 
         Entry.Logger.Warn(
             $"[卡图缺失] {cardType.FullName} 未找到同名图片。" +
-            $" 资源路径：{resourcePath}；" +
-            $" 本地路径：{GetLocalPath(cardType)}"
+            $" 资源路径：{resourcePath}"
         );
     }
 }

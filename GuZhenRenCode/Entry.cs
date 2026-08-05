@@ -53,6 +53,7 @@ public partial class Entry
         new(nameof(CardUniquenessPatch), CardUniquenessPatch.Initialize, CardUniquenessPatch.Uninitialize),
         new(nameof(GuDeckCapacityReplacementPatch), GuDeckCapacityReplacementPatch.Initialize, GuDeckCapacityReplacementPatch.Uninitialize),
         new(nameof(MerchantInventoryCompatibilityPatch), MerchantInventoryCompatibilityPatch.Initialize, MerchantInventoryCompatibilityPatch.Uninitialize),
+        new(nameof(AncientCompatibilityPatch), AncientCompatibilityPatch.Initialize, AncientCompatibilityPatch.Uninitialize),
         new(nameof(ShaZhaoTuiYanSystem), ShaZhaoTuiYanSystem.Initialize, ShaZhaoTuiYanSystem.Uninitialize),
     ];
 

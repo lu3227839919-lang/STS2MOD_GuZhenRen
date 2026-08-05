@@ -13,12 +13,19 @@
 
 | 项目 | 当前信息 |
 | --- | --- |
-| Mod 版本 | **0.4.13** |
+| Mod 版本 | **0.4.14** |
 | 适配游戏版本 | **0.110.0** |
 | 前置依赖 | **STS2-RitsuLib 0.5.10 或兼容版本** |
 | 构建环境 | Godot 4.5.1 .NET / .NET 9 |
 | 本地化 | 简体中文、English |
 | 开发状态 | 持续开发中 |
+
+### 0.4.14 更新摘要
+
+- 修复方源进入 DARV 事件时，BaseLib 的 `DustyTome.SetupForPlayer` 扩展可能触发空引用并中断事件。
+- 补齐 DARV、OROBAS、PAEL、TANX、TEZCATARA、VAKUU、NONUPEIPE 七位先古遗民的中英文角色对话。
+- 卡图诊断日志只显示 `res://GuZhenRen/images/cards/...`，不再输出开发者本机目录。
+- 新增 `tools/Build-SourceArchive.ps1`，发布源码时主动排除 `local.props`、构建目录、日志和旧压缩包。
 
 ### 0.4.13 更新摘要
 
@@ -310,7 +317,7 @@ The current source implements 10 Gu worms and 3 killer moves. Light Path is the 
 
 | Item | Version |
 | --- | --- |
-| Mod | 0.4.13 |
+| Mod | 0.4.14 |
 | Slay the Spire 2 | 0.110.0 |
 | STS2-RitsuLib | 0.5.10 or compatible |
 | Build stack | Godot 4.5.1 .NET / .NET 9 |
