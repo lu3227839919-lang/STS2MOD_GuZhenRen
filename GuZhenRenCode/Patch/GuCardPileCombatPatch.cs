@@ -33,7 +33,7 @@ internal static class GuCardPileCombatPatch
     private readonly record struct GuRankEntry(
         string CardId,
         bool IsUpgraded,
-        string? EnchantmentId,
+        string EnchantmentId,
         int Rank
     );
 
@@ -137,7 +137,7 @@ internal static class GuCardPileCombatPatch
                 .Select(card => new GuRankEntry(
                     card.Id.ToString(),
                     card.IsUpgraded,
-                    card.Enchantment?.Id.ToString(),
+                    GetEnchantmentId(card),
                     card.GuRank
                 ))
                 .ToArray(),
@@ -156,8 +156,8 @@ internal static class GuCardPileCombatPatch
     /// <summary>
     /// 原版 PopulateCombatState 会把永久牌组复制成战斗实例。
     /// RitsuLib SavedAttachedState 参与存档，但不保证随该克隆过程复制。
-    /// 因此在蛊牌移入自定义牌堆前，优先保留战斗克隆已有的正确转数；
-    /// 真正丢失转数时，再按卡牌 ID、升级状态和附魔进行回退校准。
+    /// 普通实例字段通常已经携带正确转数；这里只在克隆桥丢失时修复，
+    /// 并按卡牌 ID、升级状态和附魔分组，避免同名蛊虫因洗牌交换转数。
     /// </summary>
     private static void ReconcileCombatCardRanks(
         Player owner,
@@ -170,7 +170,7 @@ internal static class GuCardPileCombatPatch
         }
 
         Dictionary<
-            (string CardId, bool IsUpgraded, string? EnchantmentId),
+            (string CardId, bool IsUpgraded, string EnchantmentId),
             List<int>
         > ranksByCard = [];
 
@@ -207,7 +207,7 @@ internal static class GuCardPileCombatPatch
             var key = (
                 card.Id.ToString(),
                 card.IsUpgraded,
-                card.Enchantment?.Id.ToString()
+                GetEnchantmentId(card)
             );
             if (!ranksByCard.TryGetValue(key, out List<int>? ranks) ||
                 ranks.Count == 0)
@@ -215,28 +215,33 @@ internal static class GuCardPileCombatPatch
                 continue;
             }
 
-            // MutableClone normally preserves the ordinary Gu-rank fields.
-            // Keep that exact per-instance rank whenever it exists in the
-            // source multiset instead of replacing it according to shuffled
-            // combat-pile order.  This preserves the association between a
-            // specific enchanted card and its rank.  Only cards whose rank
-            // was genuinely lost fall back to the source order.
+            // MutableClone 通常已经携带正确的转数桥字段。只要该转数
+            // 确实存在于永久牌组的同卡、同升级、同附魔分组中，就原样
+            // 保留；不能再按战斗牌堆顺序排队覆盖，因为牌堆会被洗牌，
+            // 旧逻辑会让“华彩”看起来随机跳到其他同名蛊虫转数上。
+            int currentRank = card.GuRank;
+            int matchingRankIndex = ranks.IndexOf(currentRank);
             int sourceRank;
-            int preservedRankIndex = ranks.IndexOf(card.GuRank);
-            if (preservedRankIndex >= 0)
+            if (matchingRankIndex >= 0)
             {
-                sourceRank = card.GuRank;
-                ranks.RemoveAt(preservedRankIndex);
+                sourceRank = currentRank;
+                ranks.RemoveAt(matchingRankIndex);
             }
             else
             {
+                // 仅对旧存档或确实丢失克隆桥字段的实例回退修复；
+                // 回退范围仍限制在同卡、同升级、同附魔分组内。
                 sourceRank = ranks[0];
                 ranks.RemoveAt(0);
-                card.InitializeGuRankFromSource(sourceRank);
-                reconciledCount++;
             }
 
             matchedCount++;
+
+            if (currentRank != sourceRank)
+            {
+                card.InitializeGuRankFromSource(sourceRank);
+                reconciledCount++;
+            }
 
             if (sourceRank > AbstractGuZhenRenCard.MinimumGuRank)
             {
@@ -256,6 +261,11 @@ internal static class GuCardPileCombatPatch
                 detail
             );
         }
+    }
+
+    private static string GetEnchantmentId(CardModel card)
+    {
+        return card.Enchantment?.Id.ToString() ?? string.Empty;
     }
 
     private static void DrawInternalPrefix(

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://mkvtq1puk4ry"
-path="res://.godot/imported/XueFuWangGu.png-a576a28253be399a8d2576938208326d.ctex"
+uid="uid://c1vtm1u7d2oog"
+path="res://.godot/imported/LiuXuePower-64x64.png-141443a4158878564de6a4e7bb2d35c9.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GuZhenRen/images/cards/XueFuWangGu.png"
-dest_files=["res://.godot/imported/XueFuWangGu.png-a576a28253be399a8d2576938208326d.ctex"]
+source_file="res://GuZhenRen/images/power/LiuXuePower-64x64.png"
+dest_files=["res://.godot/imported/LiuXuePower-64x64.png-141443a4158878564de6a4e7bb2d35c9.ctex"]
 
 [params]
 

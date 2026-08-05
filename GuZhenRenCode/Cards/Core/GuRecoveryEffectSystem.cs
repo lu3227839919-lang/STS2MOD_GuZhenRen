@@ -10,15 +10,13 @@ internal static class GuRecoveryEffectSystem
 {
     internal static Task HandleEnteredRecoveryAsync(CardModel card)
     {
-        // AfterCardPlayed can run before the native card-play pipeline has
-        // physically inserted the card into its result pile.  Checking
-        // card.Pile here therefore drops the event while the depleted Gu is
-        // still in the play area.  The activation and recovery schedule are
-        // already authoritative at this point, so use them as the gate and
-        // let the per-card handled state prevent duplicate processing.
+        // 0.110.0 中 AfterCardPlayed 可能早于出牌结果牌堆迁移完成。
+        // 此时卡牌会短暂处于无牌堆状态，按 card.Pile 判断将漏掉全部
+        // “进入恢复堆”效果。BeforeCardPlayed 已经登记催动次数，因此
+        // 以“催动次数已耗尽”作为稳定判据；未耗尽的升级蛊不会误触发。
         return card is IGuRecoveryEffectSource source &&
-               !GuCardUsageRules.CanUse(card) &&
-               GuCardUsageRules.HasRecoverySchedule(card)
+               card is IGuWormCard &&
+               !GuCardUsageRules.CanUse(card)
             ? source.OnEnteredRecoveryAsync()
             : Task.CompletedTask;
     }

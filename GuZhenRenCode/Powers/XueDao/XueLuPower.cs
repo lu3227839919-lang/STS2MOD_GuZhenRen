@@ -21,8 +21,8 @@ public sealed class XueLuPower : ModPowerTemplate
     public override PowerStackType StackType => PowerStackType.Counter;
 
     public override PowerAssetProfile AssetProfile => new(
-        IconPath: "res://GuZhenRen/images/power/GuangHuiPower-64x64.png",
-        BigIconPath: "res://GuZhenRen/images/power/GuangHuiPower-256x256.png"
+        IconPath: "res://GuZhenRen/images/power/XueLuPower-64x64.png",
+        BigIconPath: "res://GuZhenRen/images/power/XueLuPower-256x256.png"
     );
 
     public override bool TryModifyPowerAmountReceived(

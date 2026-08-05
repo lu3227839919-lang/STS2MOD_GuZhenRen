@@ -29,8 +29,8 @@ public sealed class XueJiPower : ModPowerTemplate
     public override PowerStackType StackType => PowerStackType.Counter;
 
     public override PowerAssetProfile AssetProfile => new(
-        IconPath: "res://GuZhenRen/images/power/ZhaoPoPower-64x64.png",
-        BigIconPath: "res://GuZhenRen/images/power/ZhaoPoPower-256x256.png"
+        IconPath: "res://GuZhenRen/images/power/XueJiPower-64x64.png",
+        BigIconPath: "res://GuZhenRen/images/power/XueJiPower-256x256.png"
     );
 
     protected override object InitInternalData() => new TriggerState();

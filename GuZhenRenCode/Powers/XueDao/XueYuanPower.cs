@@ -21,8 +21,8 @@ public sealed class XueYuanPower : ModPowerTemplate
 
     // 暂时复用现有资源图标，避免新增机制依赖尚未提供的美术文件。
     public override PowerAssetProfile AssetProfile => new(
-        IconPath: "res://GuZhenRen//images//power//GuangHuiPower-64x64.png",
-        BigIconPath: "res://GuZhenRen/images/power/GuangHuiPower-256x256.png"
+        IconPath: "res://GuZhenRen//images//power//XueYuanPower-64x64.png",
+        BigIconPath: "res://GuZhenRen/images/power/XueYuanPower-256x256.png"
     );
 
     public override bool TryModifyPowerAmountReceived(
