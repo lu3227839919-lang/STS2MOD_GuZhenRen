@@ -19,7 +19,8 @@ namespace GuZhenRen.Patches;
 /// MaxSelect 后立即跳转。
 ///
 /// 本补丁只接管 RequireManualConfirmation=true 且 MinSelect < MaxSelect
-/// 的可变数量牌组选择；固定数量选择继续使用原版预览确认流程。
+/// 的可变数量牌组选择，包括升炼的 0 至 2 张选择。
+/// 固定数量选择继续使用原版预览确认流程。
 /// </summary>
 internal static class DeckCardSelectionManualConfirmationPatch
 {
@@ -200,6 +201,7 @@ internal static class DeckCardSelectionManualConfirmationPatch
             grid.HighlightCard(card);
         }
 
+        // 选择 0、1 或 2 张时都保持在选牌界面。
         // 不在达到 MaxSelect 时自动进入预览；由玩家点击确认按钮。
         refreshConfirmButtonVisibility.Invoke(
             __instance,

@@ -173,5 +173,7 @@
       "key": "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.description",
       "text": "储存在蛊师空窍中的元气。战斗开始时拥有5点；从第2回合起，每回合开始恢复2点。元气上限随空窍转数提升，最高为25点。"
     }
-  ]
+  ],
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "一次可选择0至2张尚未达到最高转数的蛊牌，各提升一转；选择完成后需要主动点击确认。选择0张并确认将取消本次操作。每个休息点只能成功升炼一次。",
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "选择0至2张要提升一转的蛊牌，然后点击确认。"
 }

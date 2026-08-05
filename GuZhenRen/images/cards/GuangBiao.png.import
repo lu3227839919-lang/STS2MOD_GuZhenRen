@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dst7403hjffjh"
-path="res://.godot/imported/NinJingHui.png-e3dd03dc942a41b01d9a5916c2ab3c28.ctex"
+uid="uid://de56bxxwcpdff"
+path="res://.godot/imported/GuangBiao.png-534e981ba40bf6e7e7644cdf852d04cf.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GuZhenRen/images/cards/NinJingHui.png"
-dest_files=["res://.godot/imported/NinJingHui.png-e3dd03dc942a41b01d9a5916c2ab3c28.ctex"]
+source_file="res://GuZhenRen/images/cards/GuangBiao.png"
+dest_files=["res://.godot/imported/GuangBiao.png-534e981ba40bf6e7e7644cdf852d04cf.ctex"]
 
 [params]
 

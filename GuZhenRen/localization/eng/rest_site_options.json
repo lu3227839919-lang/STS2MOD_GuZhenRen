@@ -1,7 +1,7 @@
 {
   "OPTION_GU_ZHEN_REN_GU_RANK_UP.name": "Gu Refinement",
-  "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "By default, raise 1 eligible Gu Worm by one rank. After your deck contains a rank-6 Gu Worm, you may select up to 2. Each rest site allows one successful refinement.",
-  "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Choose Gu Worms to raise by one rank. After reaching rank 6, you may select up to 2.",
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "Select 0 to 2 eligible Gu Worms and raise each by one rank. Click Confirm after making your selection. Confirming with 0 selected cancels the action. Each rest site allows one successful refinement.",
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Select 0 to 2 Gu Worms to raise by one rank, then click Confirm.",
   "OPTION_GU_ZHEN_REN_HE_LIAN.name": "Gu Fusion",
   "OPTION_GU_ZHEN_REN_HE_LIAN.description": "Choose one or more Gu cards and click Confirm manually. The selection limit is determined by currently craftable recipes. Materials are consumed only when both their types and quantities match a recipe. A failed attempt does not consume the use. Fusion can succeed once per rest site.",
   "OPTION_GU_ZHEN_REN_HE_LIAN.selectionPrompt": "Choose fusion materials, then click Confirm. The required count depends on the recipe."

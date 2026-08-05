@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://buh4u22lpaw4g"
-path="res://.godot/imported/ChanMang.png-0b713f9b31d3f5de47f079daa843b114.ctex"
+uid="uid://snkk05vqjdkm"
+path="res://.godot/imported/CanMang.png-5789bc4a4a9726242b7239a1d549160d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GuZhenRen/images/cards/ChanMang.png"
-dest_files=["res://.godot/imported/ChanMang.png-0b713f9b31d3f5de47f079daa843b114.ctex"]
+source_file="res://GuZhenRen/images/cards/CanMang.png"
+dest_files=["res://.godot/imported/CanMang.png-5789bc4a4a9726242b7239a1d549160d.ctex"]
 
 [params]
 

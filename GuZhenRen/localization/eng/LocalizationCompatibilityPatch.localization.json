@@ -173,5 +173,7 @@
       "key": "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.description",
       "text": "Primeval essence stored in a Gu Master's aperture. Begin combat with 5; from turn 2 onward, restore 2 at the start of each turn. Maximum essence increases with aperture rank, up to 25."
     }
-  ]
+  ],
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "Select 0 to 2 eligible Gu Worms and raise each by one rank. Click Confirm after making your selection. Confirming with 0 selected cancels the action. Each rest site allows one successful refinement.",
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Select 0 to 2 Gu Worms to raise by one rank, then click Confirm."
 }
