@@ -105,31 +105,49 @@ internal static class GuCardConsoleCommandPatch
     )
     {
         int? requestedRank = null;
+        bool outOfCombat =
+            issuingPlayer.PlayerCombatState == null;
         bool allowPositionalRank =
             args.Length > 0 &&
             LooksLikeGuZhenRenCardArgument(args[0]);
 
-        if (args.Length > 1)
+        List<string> forwardedArgs = [];
+        if (args.Length > 0)
         {
-            List<string> forwardedArgs = [args[0]];
+            forwardedArgs.Add(args[0]);
+        }
 
-            for (int index = 1; index < args.Length; index++)
+        for (int index = 1; index < args.Length; index++)
+        {
+            string token = args[index];
+
+            if (TryParseRankToken(
+                    token,
+                    allowPositionalRank,
+                    out int rank
+                ))
             {
-                if (TryParseRankToken(
-                        args[index],
-                        allowPositionalRank,
-                        out int rank
-                    ))
-                {
-                    requestedRank = rank;
-                    continue;
-                }
-
-                forwardedArgs.Add(args[index]);
+                requestedRank = rank;
+                continue;
             }
 
-            args = forwardedArgs.ToArray();
+            // 原生 card 指令默认把牌放进 Hand，而战斗外不存在
+            // Hand。战斗外剔除用户可能传入的牌堆参数，并在调用
+            // 原方法前强制补上 Deck，避免原方法先于 Postfix 抛错。
+            if (outOfCombat && IsNativePileArgument(token))
+            {
+                continue;
+            }
+
+            forwardedArgs.Add(token);
         }
+
+        if (outOfCombat && args.Length > 0)
+        {
+            forwardedArgs.Add("Deck");
+        }
+
+        args = forwardedArgs.ToArray();
 
         __state = new CardCommandState
         {
@@ -210,6 +228,17 @@ internal static class GuCardConsoleCommandPatch
         }
 
         return result;
+    }
+
+    private static bool IsNativePileArgument(string token)
+    {
+        return token.Equals("None", StringComparison.OrdinalIgnoreCase) ||
+               token.Equals("Draw", StringComparison.OrdinalIgnoreCase) ||
+               token.Equals("Hand", StringComparison.OrdinalIgnoreCase) ||
+               token.Equals("Discard", StringComparison.OrdinalIgnoreCase) ||
+               token.Equals("Exhaust", StringComparison.OrdinalIgnoreCase) ||
+               token.Equals("Play", StringComparison.OrdinalIgnoreCase) ||
+               token.Equals("Deck", StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool TryParseRankToken(

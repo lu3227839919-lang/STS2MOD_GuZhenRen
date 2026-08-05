@@ -357,11 +357,28 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
             () => false
         );
 
+    /*
+     * SavedAttachedState 会参与存档和多人快照，但不会随原版
+     * CardModel.ToMutable / MutableClone 的 MemberwiseClone 自动复制到
+     * 新实例。转数因此还需要一份普通实例字段作为克隆桥。
+     *
+     * 写入转数时同时更新两套状态：
+     * - 普通字段保证永久牌组 -> 战斗牌组复制；
+     * - SavedAttachedState 保证保存、读档和多人同步。
+     */
+    private int _baseGuRank = MinimumGuRank;
+    private int _guRank = MinimumGuRank;
+    private bool _initialGuRankAssigned;
+
+    private bool HasInitialGuRankAssignment =>
+        InitialGuRankAssignedState[this] ||
+        _initialGuRankAssigned;
+
     /// <summary>
     /// 当前卡牌是否仍需要首次奖励赋阶。
     /// </summary>
     internal bool NeedsInitialGuRankAssignment =>
-        !InitialGuRankAssignedState[this];
+        !HasInitialGuRankAssignment;
 
     /// <summary>
     /// 永久保存的基础蛊虫转数。
@@ -371,12 +388,24 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
     /// </summary>
     public int BaseGuRank
     {
-        get => NormalizeGuRank(
-            BaseGuRankState[this]
-        );
-        protected set =>
-            BaseGuRankState[this] =
-                NormalizeGuRank(value);
+        get
+        {
+            int normalized = NormalizeGuRank(
+                InitialGuRankAssignedState[this]
+                    ? BaseGuRankState[this]
+                    : _baseGuRank
+            );
+
+            // 读档实例第一次读取时顺便回填普通字段，使后续克隆安全。
+            _baseGuRank = normalized;
+            return normalized;
+        }
+        protected set
+        {
+            int normalized = NormalizeGuRank(value);
+            _baseGuRank = normalized;
+            BaseGuRankState[this] = normalized;
+        }
     }
 
     /// <summary>
@@ -387,12 +416,24 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
     /// </summary>
     public int GuRank
     {
-        get => NormalizeGuRank(
-            GuRankState[this]
-        );
-        protected set =>
-            GuRankState[this] =
-                NormalizeGuRank(value);
+        get
+        {
+            int normalized = NormalizeGuRank(
+                InitialGuRankAssignedState[this]
+                    ? GuRankState[this]
+                    : _guRank
+            );
+
+            // 与 BaseGuRank 一样，确保读档后的下一次克隆保留转数。
+            _guRank = normalized;
+            return normalized;
+        }
+        protected set
+        {
+            int normalized = NormalizeGuRank(value);
+            _guRank = normalized;
+            GuRankState[this] = normalized;
+        }
     }
 
     /// <summary>
@@ -412,6 +453,12 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
                 MaxGuRank
             )
         );
+    }
+
+    private void MarkInitialGuRankAssigned()
+    {
+        _initialGuRankAssigned = true;
+        InitialGuRankAssignedState[this] = true;
     }
 
     /// <summary>
@@ -664,7 +711,7 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
 
         BaseGuRank = normalizedRank;
         GuRank = normalizedRank;
-        InitialGuRankAssignedState[this] = true;
+        MarkInitialGuRankAssigned();
 
         OnGuRankChanged();
     }
@@ -763,6 +810,7 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
                 {
                     BaseGuRank = targetGuRank;
                     GuRank = targetGuRank;
+                    MarkInitialGuRankAssigned();
 
                     OnGuRankIncreased(
                         previousGuRank,
@@ -789,8 +837,8 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
     /// </summary>
     internal bool EnsureMinimumGuRank()
     {
-        int rawBaseRank = BaseGuRankState[this];
-        int rawCurrentRank = GuRankState[this];
+        int rawBaseRank = BaseGuRank;
+        int rawCurrentRank = GuRank;
         int normalizedRank = NormalizeGuRank(
             Math.Max(
                 rawBaseRank,
@@ -801,11 +849,11 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
         bool changed =
             rawBaseRank != normalizedRank ||
             rawCurrentRank != normalizedRank ||
-            !InitialGuRankAssignedState[this];
+            !HasInitialGuRankAssignment;
 
         BaseGuRank = normalizedRank;
         GuRank = normalizedRank;
-        InitialGuRankAssignedState[this] = true;
+        MarkInitialGuRankAssigned();
 
         if (changed)
         {
@@ -827,7 +875,7 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
 
         BaseGuRank = normalizedRank;
         GuRank = normalizedRank;
-        InitialGuRankAssignedState[this] = true;
+        MarkInitialGuRankAssigned();
         OnGuRankLoaded();
         OnGuRankChanged();
     }
@@ -952,7 +1000,7 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
 
         GuRank = normalizedRank;
         BaseGuRank = normalizedRank;
-        InitialGuRankAssignedState[this] = true;
+        MarkInitialGuRankAssigned();
 
         // 让依赖品阶的子类恢复自身数值。
         OnGuRankLoaded();
@@ -996,8 +1044,9 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
         );
         copy.BaseGuRank = copiedRank;
         copy.GuRank = copiedRank;
-        InitialGuRankAssignedState[copy] =
-            InitialGuRankAssignedState[this];
+        bool rankAssigned = HasInitialGuRankAssignment;
+        copy._initialGuRankAssigned = rankAssigned;
+        InitialGuRankAssignedState[copy] = rankAssigned;
         copy.MyBaseDescription = MyBaseDescription;
         copy.CurrentDao = CurrentDao;
 
@@ -1047,7 +1096,7 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
         int maxRank = 9
     )
     {
-        if (InitialGuRankAssignedState[this])
+        if (HasInitialGuRankAssignment)
         {
             return false;
         }

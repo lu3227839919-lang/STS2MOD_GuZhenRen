@@ -25,6 +25,17 @@ internal static class GuCardPileCombatPatch
 
     private static bool _initialized;
 
+    private sealed class GuRankSnapshot
+    {
+        public required IReadOnlyList<GuRankEntry> Entries { get; init; }
+    }
+
+    private readonly record struct GuRankEntry(
+        string CardId,
+        bool IsUpgraded,
+        int Rank
+    );
+
     internal static void Initialize()
     {
         if (_initialized)
@@ -76,6 +87,10 @@ internal static class GuCardPileCombatPatch
         Harmony harmony = new(HarmonyId);
         harmony.Patch(
             populateCombatState,
+            prefix: new HarmonyMethod(
+                typeof(GuCardPileCombatPatch),
+                nameof(PopulateCombatStatePrefix)
+            ),
             postfix: new HarmonyMethod(
                 typeof(GuCardPileCombatPatch),
                 nameof(PopulateCombatStatePostfix)
@@ -109,11 +124,112 @@ internal static class GuCardPileCombatPatch
         }
     }
 
-    private static void PopulateCombatStatePostfix(
-        Player __instance
+    private static void PopulateCombatStatePrefix(
+        Player __instance,
+        out GuRankSnapshot __state
     )
     {
+        __state = new GuRankSnapshot
+        {
+            Entries = __instance.Deck.Cards
+                .OfType<AbstractGuZhenRenCard>()
+                .Select(card => new GuRankEntry(
+                    card.Id.ToString(),
+                    card.IsUpgraded,
+                    card.GuRank
+                ))
+                .ToArray(),
+        };
+    }
+
+    private static void PopulateCombatStatePostfix(
+        Player __instance,
+        GuRankSnapshot __state
+    )
+    {
+        ReconcileCombatCardRanks(__instance, __state);
         GuCardPileSystem.InitializeGuCardsForCombat(__instance);
+    }
+
+    /// <summary>
+    /// 原版 PopulateCombatState 会把永久牌组复制成战斗实例。
+    /// RitsuLib SavedAttachedState 参与存档，但不保证随该克隆过程复制，
+    /// 因此在蛊牌移入自定义牌堆前，按卡牌 ID、升级状态和重复出现顺序
+    /// 把永久牌组转数重新写入战斗实例。
+    /// </summary>
+    private static void ReconcileCombatCardRanks(
+        Player owner,
+        GuRankSnapshot snapshot
+    )
+    {
+        if (snapshot.Entries.Count == 0)
+        {
+            return;
+        }
+
+        Dictionary<(string CardId, bool IsUpgraded), Queue<int>>
+            ranksByCard = [];
+
+        foreach (GuRankEntry entry in snapshot.Entries)
+        {
+            var key = (entry.CardId, entry.IsUpgraded);
+            if (!ranksByCard.TryGetValue(key, out Queue<int>? ranks))
+            {
+                ranks = new Queue<int>();
+                ranksByCard.Add(key, ranks);
+            }
+
+            ranks.Enqueue(entry.Rank);
+        }
+
+        CardModel[] combatCards =
+        [
+            .. PileType.Draw.GetPile(owner).Cards,
+            .. PileType.Discard.GetPile(owner).Cards,
+            .. PileType.Hand.GetPile(owner).Cards,
+        ];
+
+        int matchedCount = 0;
+        int reconciledCount = 0;
+        List<string> elevatedCards = [];
+
+        foreach (AbstractGuZhenRenCard card in combatCards
+                     .OfType<AbstractGuZhenRenCard>())
+        {
+            var key = (card.Id.ToString(), card.IsUpgraded);
+            if (!ranksByCard.TryGetValue(key, out Queue<int>? ranks) ||
+                ranks.Count == 0)
+            {
+                continue;
+            }
+
+            int sourceRank = ranks.Dequeue();
+            matchedCount++;
+
+            if (card.GuRank != sourceRank)
+            {
+                card.InitializeGuRankFromSource(sourceRank);
+                reconciledCount++;
+            }
+
+            if (sourceRank > AbstractGuZhenRenCard.MinimumGuRank)
+            {
+                elevatedCards.Add($"{card.Id}={sourceRank}转");
+            }
+        }
+
+        if (reconciledCount > 0 || elevatedCards.Count > 0)
+        {
+            string detail = elevatedCards.Count > 0
+                ? $" 高转卡牌：{string.Join(", ", elevatedCards)}。"
+                : string.Empty;
+
+            Entry.Logger.Info(
+                $"[蛊虫转数] 战斗初始化已校验 {matchedCount} 张卡牌，" +
+                $"修正 {reconciledCount} 张。" +
+                detail
+            );
+        }
     }
 
     private static void DrawInternalPrefix(

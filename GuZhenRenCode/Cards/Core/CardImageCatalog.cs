@@ -14,14 +14,11 @@ namespace GuZhenRen.Cards;
 ///
 /// 每张具体卡牌都使用与运行时类型同名的 PNG：
 /// res://GuZhenRen/images/cards/{CardTypeName}.png
-///
-/// 对应开发机目录：
-/// E:\work\csharp\StS2_Mods\STS2_GuZhenRen\GuZhenRen\images\cards\{CardTypeName}.png
 /// </summary>
 public static class CardImageCatalog
 {
     public const string LocalImageDirectory =
-        @"E:\work\csharp\StS2_Mods\STS2_GuZhenRen\GuZhenRen\images\cards";
+        @"res://GuZhenRen/images/cards";
 
     private static readonly object WarningLock = new();
 
