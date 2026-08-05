@@ -231,7 +231,7 @@ internal static class AncientCompatibilityPatch
             !TryGetOrCreateSelection(
                 __instance,
                 owner!,
-                out CardModel? canonical
+                out CardModel canonical
             ))
         {
             return;
@@ -239,11 +239,13 @@ internal static class AncientCompatibilityPatch
 
         __instance.AncientCard = canonical.Id;
 
-        HashSet<CardModel> existingCards = owner!
-            .Deck
-            .Cards
-            .Where(card => card.Id == canonical.Id)
-            .ToHashSet(ReferenceEqualityComparer.Instance);
+        HashSet<CardModel> existingCards = new(
+            owner!
+                .Deck
+                .Cards
+                .Where(card => card.Id == canonical.Id),
+            ReferenceEqualityComparer.Instance
+        );
 
         __state = new DustyTomeGrantState(
             canonical,
@@ -315,7 +317,7 @@ internal static class AncientCompatibilityPatch
         if (!TryGetOrCreateSelection(
                 tome,
                 player,
-                out CardModel? canonical
+                out CardModel canonical
             ))
         {
             return false;
@@ -343,7 +345,7 @@ internal static class AncientCompatibilityPatch
     private static bool TryGetOrCreateSelection(
         DustyTome tome,
         Player player,
-        out CardModel? canonical
+        out CardModel canonical
     )
     {
         if (SelectionStates.TryGetValue(
@@ -374,7 +376,7 @@ internal static class AncientCompatibilityPatch
 
         if (allCandidates.Length == 0)
         {
-            canonical = null;
+            canonical = null!;
             Entry.Logger.Error(
                 "[先古遗民兼容] 蛊虫卡池中没有可作为 Dusty Tome 奖励的六转候选。"
             );
@@ -401,12 +403,15 @@ internal static class AncientCompatibilityPatch
             DustyTomeRngStreamId
         );
 
-        canonical = rng.NextItem(candidates);
+        AbstractGuZhenRenCard selected =
+            rng.NextItem(candidates) ?? candidates[0];
+
+        canonical = selected;
         SelectionStates.Add(
             tome,
             new DustyTomeSelectionState
             {
-                CanonicalCard = canonical,
+                CanonicalCard = selected,
             }
         );
         return true;
