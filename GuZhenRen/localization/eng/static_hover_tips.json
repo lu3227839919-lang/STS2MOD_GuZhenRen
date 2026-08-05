@@ -3,6 +3,7 @@
   "GU_ZHEN_REN_CARDPILE_GU_CARDS.description": "Displays Gu Worms with activations remaining as an extra hand. Play Activate before choosing a Gu card; canceling target selection keeps activation mode active.",
   "GU_ZHEN_REN_CARDPILE_GU_CARDS.empty": "The Gu Hand is empty.",
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.title": "Gu Recovery Pile",
-  "GU_ZHEN_REN_CARDPILE_GU_DISCARD.description": "Stores depleted Gu Worms. Each Gu Worm has an independent recovery time based on its type and rank; some rank-3 or higher Gu create normal derivative cards when entering or progressing through recovery.",
-  "GU_ZHEN_REN_CARDPILE_GU_DISCARD.empty": "The Gu Recovery Pile is empty."
+  "GU_ZHEN_REN_CARDPILE_GU_DISCARD.description": "Stores depleted Gu Worms. Each Gu Worm has an independent recovery time based on type and rank; some rank-3 or higher Gu create normal derivative cards during recovery. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move. Materials are selected from currently available Gu in the Gu Hand.",
+  "GU_ZHEN_REN_CARDPILE_GU_DISCARD.empty": "The Gu Recovery Pile is empty.",
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.selectionPrompt": "Choose the next Gu Worm in recipe order. {SelectedCount} selected; after choosing at least one, confirm or go back to finish."
 }

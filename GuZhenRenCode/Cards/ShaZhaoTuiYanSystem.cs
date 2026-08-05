@@ -28,7 +28,7 @@ using STS2RitsuLib.Interactions.RightClick;
 namespace GuZhenRen.Cards;
 
 /// <summary>
-/// 将“杀招推演”从系统卡迁移到蛊虫牌堆右键操作。
+/// 将“杀招推演”绑定到蛊恢复牌堆右键操作。
 ///
 /// 牌堆点击只负责发起请求；实际选择、扣费和结算由 RitsuLib 的托管
 /// 联机行动在所有端同步执行。每次只选择一张材料，因而配方顺序不会
@@ -116,8 +116,9 @@ internal static class ShaZhaoTuiYanSystem
     }
 
     /// <summary>
-    /// RitsuLib 的自定义牌堆按钮用左键查看牌堆；这里在原逻辑之前独占
-    /// 右键事件并发起杀招推演，确保左键永远不会触发推演。
+    /// RitsuLib 的自定义牌堆按钮用左键查看牌堆；这里仅接管蛊恢复堆
+    /// 的右键事件并发起杀招推演。材料仍从当前可用蛊手牌中选择，
+    /// 因此右键入口与材料所在牌堆彼此独立。
     /// 空窍遗物仅作为联机可序列化的行动锚点；元数据保证普通遗物右键
     /// 不会触发本系统。
     /// </summary>
@@ -132,21 +133,20 @@ internal static class ShaZhaoTuiYanSystem
                 ButtonIndex: MouseButton.Right,
             } mouse)
         {
-            // 左键及其他输入完整交还给 RitsuLib：左键只负责查看牌堆。
             return true;
         }
 
-        // 右键按下与释放都不再进入牌堆的普通点击路径。
+        // 只接管蛊恢复堆右键，其他自定义牌堆继续交给各自逻辑。
+        if (__instance.Definition?.PileType !=
+                GuCardPileSystem.RecoveryPileType ||
+            ____player is not { } player)
+        {
+            return true;
+        }
+
         __instance.AcceptEvent();
 
         if (mouse.Pressed)
-        {
-            return false;
-        }
-
-        if (__instance.Definition?.PileType !=
-                GuCardPileSystem.PileType ||
-            ____player is not { } player)
         {
             return false;
         }
@@ -171,15 +171,12 @@ internal static class ShaZhaoTuiYanSystem
             isController: false,
             metadata: TriggerMetadata,
             source: ModRightClickSource.Relic,
-            expectedCardPile: GuCardPileSystem.PileType
+            expectedCardPile: GuCardPileSystem.RecoveryPileType
         );
 
-        if (ModRightClickRegistry.TryDispatch(
-                new ModRightClickContext(player, anchor, trigger)
-            ))
-        {
-            __instance.AcceptEvent();
-        }
+        ModRightClickRegistry.TryDispatch(
+            new ModRightClickContext(player, anchor, trigger)
+        );
 
         return false;
     }
@@ -227,7 +224,8 @@ internal static class ShaZhaoTuiYanSystem
                 StringComparison.Ordinal
             ) &&
             trigger.Source == ModRightClickSource.Relic &&
-            trigger.ExpectedCardPile == GuCardPileSystem.PileType;
+            trigger.ExpectedCardPile ==
+                GuCardPileSystem.RecoveryPileType;
     }
 
     private static async Task ExecuteAsync(
