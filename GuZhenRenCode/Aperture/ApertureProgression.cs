@@ -29,18 +29,39 @@ public static class ApertureProgression
         };
 
     /// <summary>
-    /// 空窍转数对应的元气容量。六转达到 25 点后不再提高。
+    /// 空窍转数对应的元气容量上限。
+    /// 曲线 5、6、7、8、9、11、12、13、15；
+    /// 六转与九转为境界质变，各额外增加 1 点。
     /// </summary>
     private static readonly IReadOnlyDictionary<int, int>
         YuanQiCapacityByRank = new Dictionary<int, int>
         {
             [1] = 5,
-            [2] = 7,
-            [3] = 10,
-            [4] = 14,
-            [5] = 19,
-            [6] = 25,
+            [2] = 6,
+            [3] = 7,
+            [4] = 8,
+            [5] = 9,
+            [6] = 11,
+            [7] = 12,
+            [8] = 13,
+            [9] = 15,
         };
+
+    /// <summary>
+    /// 每回合元气回复（首回合固定发放 5 点，与转数无关）。
+    /// 一至二转 2、三至五转 3、六至七转 4、八至九转 5。
+    /// 九转回复不设超过 6 点，避免普通蛊与合练蛊难以消耗完元气。
+    /// </summary>
+    public static int GetYuanQiRecovery(int rank)
+    {
+        return Math.Max(MinimumRank, rank) switch
+        {
+            <= 2 => 2,
+            <= 5 => 3,
+            <= 7 => 4,
+            _ => 5,
+        };
+    }
 
     public static int GetRequiredXp(int rank)
     {
@@ -63,10 +84,12 @@ public static class ApertureProgression
 
     public static int GetYuanQiCapacity(int rank)
     {
-        int normalizedRank = Math.Max(MinimumRank, rank);
-        return normalizedRank >= ImmortalRank
-            ? YuanQiCapacityByRank[ImmortalRank]
-            : YuanQiCapacityByRank[normalizedRank];
+        int normalizedRank = Math.Clamp(
+            rank,
+            MinimumRank,
+            MaximumImplementedRank
+        );
+        return YuanQiCapacityByRank[normalizedRank];
     }
 
     /// <summary>

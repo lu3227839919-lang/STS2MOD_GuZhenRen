@@ -310,8 +310,8 @@ public sealed class KongQiaoRelic
     }
 
     /// <summary>
-    /// 一至六转的元气上限依次为 5、7、10、14、19、25；
-    /// 六转以后保持 25。
+    /// 一至九转的元气上限依次为 5、6、7、8、9、11、12、13、15；
+    /// 六转与九转因境界质变各额外增加 1 点。
     /// </summary>
     public decimal ModifyMaxSecondaryResource(
         SecondaryResourceMaxContext context,
@@ -337,7 +337,8 @@ public sealed class KongQiaoRelic
 
     /// <summary>
     /// 原生能量重置完成后，第一回合把元气设为 5 点；从第二回合起
-    /// 自动回复 2 点，且不超过转数上限。
+    /// 按空窍转数自动回复（一至二转 2、三至五转 3、六至七转 4、
+    /// 八至九转 5），且不超过转数上限。
     /// </summary>
     public override async Task AfterEnergyReset(Player player)
     {
@@ -354,6 +355,10 @@ public sealed class KongQiaoRelic
             player.PlayerCombatState.TurnNumber
         );
 
+        int rank = ApertureSystem.IsInitialized
+            ? ApertureSystem.GetState(Owner).Rank
+            : ApertureProgression.MinimumRank;
+
         int currentAmount = SecondaryResourceCmd.Get(
             player,
             YuanQiSystem.ResourceId
@@ -364,7 +369,8 @@ public sealed class KongQiaoRelic
         ) ?? YuanQiSystem.Definition.HardMaxAmount;
         int targetAmount = player.PlayerCombatState.TurnNumber <= 1
             ? 5
-            : currentAmount + 2;
+            : currentAmount +
+              ApertureProgression.GetYuanQiRecovery(rank);
 
         await SecondaryResourceCmd.Set(
             player,
