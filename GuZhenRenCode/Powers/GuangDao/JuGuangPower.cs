@@ -27,9 +27,9 @@ public sealed class JuGuangPower : ModPowerTemplate
 
     public override PowerAssetProfile AssetProfile => new(
         IconPath:
-            "res://GuZhenRen/images/power/GuangHuiPower-64x64.png",
+            "res://GuZhenRen/images/power/ShanYaoPower-64x64.png",
         BigIconPath:
-            "res://GuZhenRen/images/power/GuangHuiPower-256x256.png"
+            "res://GuZhenRen/images/power/ShanYaoPower-256x256.png"
     );
 
     public override decimal ModifyDamageAdditive(
