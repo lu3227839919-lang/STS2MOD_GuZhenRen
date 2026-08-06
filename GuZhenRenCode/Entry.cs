@@ -33,6 +33,7 @@ public partial class Entry
         new(nameof(GuCardPileSystem), GuCardPileSystem.Initialize, GuCardPileSystem.Uninitialize),
         new(nameof(GuCardConsoleCommandPatch), GuCardConsoleCommandPatch.Initialize, GuCardConsoleCommandPatch.Uninitialize),
         new(nameof(GuCardPileCombatPatch), GuCardPileCombatPatch.Initialize, GuCardPileCombatPatch.Uninitialize),
+        new(nameof(GuCardPlaySyncPatch), GuCardPlaySyncPatch.Initialize, GuCardPlaySyncPatch.Uninitialize),
         new(nameof(GuActivationModePatch), GuActivationModePatch.Initialize, GuActivationModePatch.Uninitialize),
         new(nameof(YuanQiSystem), YuanQiSystem.Initialize, YuanQiSystem.Uninitialize),
         new(nameof(ApertureSystem), ApertureSystem.Initialize, ApertureSystem.Uninitialize),

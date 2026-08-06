@@ -110,11 +110,12 @@ public static class GuActivationModeSystem
 
     /// <summary>
     /// 只有本地玩家、资源可支付且手牌中存在可用催动时，
-    /// 当前蛊手牌中的蛊虫才能被点击。
+    /// 当前蛊手牌中的蛊虫才能被点击（UI 选择入口）。
     /// </summary>
     public static bool CanSelect(CardModel? card)
     {
         return card != null &&
+            LocalContext.IsMine(card) &&
             card.Pile?.Type == GuCardPileSystem.PileType &&
             CanPlay(card);
     }
@@ -149,14 +150,10 @@ public static class GuActivationModeSystem
 
         // 蛊手牌中的牌只有在普通手牌里存在一张当前可支付费用的
         // “催动”时才显示为可用；玩家直接点击蛊牌，不再先进入模式。
+        // 本方法同时被 UI（CanSelect 已单独校验 IsMine）与各端同步的
+        // 出牌动作执行使用，后者不能因“不是本端玩家的牌”拒绝。
         if (card.Pile?.Type == GuCardPileSystem.PileType)
         {
-            if (!LocalContext.IsMine(card))
-            {
-                LogCanPlayRejection(card, "非本地玩家的蛊牌");
-                return false;
-            }
-
             bool available = FindAvailableActivator(owner) != null;
             if (!available)
             {
