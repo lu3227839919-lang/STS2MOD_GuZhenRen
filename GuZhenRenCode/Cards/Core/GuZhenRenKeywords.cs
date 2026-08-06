@@ -33,6 +33,9 @@ namespace GuZhenRen.Cards;
 [RegisterOwnedCardKeyword(nameof(YaoHua8), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(YaoHua9), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(XueQi), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
+[RegisterOwnedCardKeyword(nameof(XueQi1), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
+[RegisterOwnedCardKeyword(nameof(XueQi2), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
+[RegisterOwnedCardKeyword(nameof(XueQi3), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(YueXiang), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(CanYue), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(YingYue), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
@@ -68,6 +71,16 @@ public sealed class GuZhenRenKeywords
     public static readonly CardKeyword YaoHua8 = Create(nameof(YaoHua8));
     public static readonly CardKeyword YaoHua9 = Create(nameof(YaoHua9));
     public static readonly CardKeyword XueQi = Create(nameof(XueQi));
+
+    /// <summary>
+    /// 血气寄生的触发次数版关键词：X 为宿主牌触发次数。
+    /// 按转数触发 1～3 次，分别打上 血气1/血气2/血气3。
+    /// </summary>
+    public static readonly CardKeyword XueQi1 = Create(nameof(XueQi1));
+
+    public static readonly CardKeyword XueQi2 = Create(nameof(XueQi2));
+
+    public static readonly CardKeyword XueQi3 = Create(nameof(XueQi3));
     public static readonly CardKeyword YueXiang = Create(nameof(YueXiang));
     public static readonly CardKeyword CanYue = Create(nameof(CanYue));
     public static readonly CardKeyword YingYue = Create(nameof(YingYue));
@@ -127,7 +140,8 @@ public sealed class GuZhenRenKeywords
     public static IReadOnlySet<CardKeyword> ParasiteKeywords { get; } =
         new HashSet<CardKeyword>
         {
-            XueQi, YueXiang, CanYue, YingYue, ManYue,
+            XueQi, XueQi1, XueQi2, XueQi3,
+            YueXiang, CanYue, YingYue, ManYue,
             XueTai, TaiDong, PoTai, FuHua, TunJi,
         };
 
@@ -144,7 +158,8 @@ public sealed class GuZhenRenKeywords
             YaoHua1, YaoHua2, YaoHua3,
             YaoHua4, YaoHua5, YaoHua6,
             YaoHua7, YaoHua8, YaoHua9,
-            XueQi, YueXiang, CanYue,
+            XueQi, XueQi1, XueQi2, XueQi3,
+            YueXiang, CanYue,
             YingYue, ManYue, XueTai, TaiDong, PoTai, FuHua,
             TunJi, ZongEDu, YiChu, ZhuiJi,
         };

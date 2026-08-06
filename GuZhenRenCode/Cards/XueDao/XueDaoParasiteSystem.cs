@@ -83,7 +83,8 @@ public static class XueDaoParasiteSystem
     /// </summary>
     public static IEnumerable<CardKeyword> GetParasiteKeywords(
         ParasiteKind kind,
-        int stage
+        int stage,
+        int triggerCount
     )
     {
         kind = NormalizeLegacyKind(kind);
@@ -99,7 +100,13 @@ public static class XueDaoParasiteSystem
         switch (kind)
         {
             case ParasiteKind.BloodQi:
-                yield return GuZhenRenKeywords.XueQi;
+                // 血气 X：X 为宿主牌触发次数，按转数 1～3 次。
+                yield return triggerCount switch
+                {
+                    <= 1 => GuZhenRenKeywords.XueQi1,
+                    2 => GuZhenRenKeywords.XueQi2,
+                    _ => GuZhenRenKeywords.XueQi3,
+                };
                 break;
 
             case ParasiteKind.BloodMoon:
@@ -140,11 +147,67 @@ public static class XueDaoParasiteSystem
             return;
         }
 
+        int triggerCount = kind == ParasiteKind.BloodQi
+            ? GetBloodQiTriggerPercentages(GetRank(host)).Length
+            : 0;
+
         foreach (CardKeyword keyword in
-                 GetParasiteKeywords(kind, GetStage(host)))
+                 GetParasiteKeywords(
+                     kind,
+                     GetStage(host),
+                     triggerCount
+                 ))
         {
             host.AddKeyword(keyword);
         }
+    }
+
+    /// <summary>
+    /// 宿主牌卡面动态附加文本：显示寄生关键词对应的当前效果与数值。
+    /// 数值随蛊虫转数、触发次数、阶段动态注入，各端由同一份
+    /// SavedAttachedState 数据渲染，保证多人一致。
+    /// 无寄生时返回 null。
+    /// </summary>
+    public static string? GetHostCardDynamicText(
+        CardModel host
+    )
+    {
+        ParasiteKind kind = NormalizeLegacyKind(GetKind(host));
+        if (kind == ParasiteKind.None)
+        {
+            return null;
+        }
+
+        int rank = GetRank(host);
+        int stage = GetStage(host);
+        string? entry = kind switch
+        {
+            ParasiteKind.BloodQi =>
+                "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI.cardText",
+            ParasiteKind.BloodMoon => stage switch
+            {
+                <= 0 => "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.cardText",
+                1 => "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.cardText",
+                _ => "GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.cardText",
+            },
+            ParasiteKind.BloodFetus =>
+                "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS.cardText",
+            _ => null,
+        };
+
+        if (string.IsNullOrEmpty(entry))
+        {
+            return null;
+        }
+
+        LocString text = new("cards", entry);
+        text.Add("Rank", rank);
+        text.Add("Stage", Math.Clamp(stage, 0, 3));
+        text.Add("TriggersRemaining", GetTriggersRemaining(host));
+        text.Add("TriggerCount", GetBloodQiTriggerPercentages(rank).Length);
+        text.Add("ParasiteValue", GetBloodQiBaseValue(rank));
+        text.Add("ParasiteBleed", GetBloodQiBleed(rank));
+        return text.GetFormattedText();
     }
 
     internal static void MarkResolving(CardModel card, bool resolving) =>

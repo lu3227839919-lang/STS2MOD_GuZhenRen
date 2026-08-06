@@ -191,6 +191,32 @@ internal static class CardUniquenessPatch
             postfix: nameof(KeywordsPostfix)
         );
 
+        Patch(
+            harmony,
+            typeof(CardModel).GetMethods(
+                BindingFlags.Instance |
+                BindingFlags.Public |
+                BindingFlags.NonPublic
+            ).FirstOrDefault(method =>
+                method.Name == "GetDescriptionForPile" &&
+                method.GetParameters().Length == 2
+            ),
+            postfix: nameof(CardDescriptionPostfix)
+        );
+
+        Patch(
+            harmony,
+            typeof(CardModel).GetMethods(
+                BindingFlags.Instance |
+                BindingFlags.Public |
+                BindingFlags.NonPublic
+            ).FirstOrDefault(method =>
+                method.Name == "GetDescriptionForPile" &&
+                method.GetParameters().Length == 3
+            ),
+            postfix: nameof(CardDescriptionPostfix)
+        );
+
         _initialized = true;
     }
 
@@ -949,10 +975,24 @@ internal static class CardUniquenessPatch
         );
         if (XueDaoParasiteSystem.HasParasite(__instance))
         {
+            XueDaoParasiteSystem.ParasiteKind kind =
+                XueDaoParasiteSystem.GetKind(__instance);
+            int triggerCount =
+                kind ==
+                XueDaoParasiteSystem.ParasiteKind.BloodQi
+                    ? XueDaoParasiteSystem
+                        .GetBloodQiTriggerPercentages(
+                            XueDaoParasiteSystem
+                                .GetRank(__instance)
+                        )
+                        .Length
+                    : 0;
+
             foreach (CardKeyword keyword in
                      XueDaoParasiteSystem.GetParasiteKeywords(
-                         XueDaoParasiteSystem.GetKind(__instance),
-                         XueDaoParasiteSystem.GetStage(__instance)
+                         kind,
+                         XueDaoParasiteSystem.GetStage(__instance),
+                         triggerCount
                      ))
             {
                 keywords.Add(keyword);
@@ -1028,5 +1068,26 @@ internal static class CardUniquenessPatch
             IgnoredOriginals =
                 ignoredOriginals.ToHashSet();
         }
+    }
+
+    /// <summary>
+    /// 宿主牌卡面动态附加寄生效果文本（如“血气 2：触发 2 次…”）。
+    /// 数值由 SavedAttachedState 驱动，各端渲染一致；无寄生时不变更描述。
+    /// </summary>
+    private static void CardDescriptionPostfix(
+        CardModel __instance,
+        ref string __result
+    )
+    {
+        string? dynamicText =
+            XueDaoParasiteSystem
+                .GetHostCardDynamicText(__instance);
+        if (string.IsNullOrEmpty(dynamicText))
+        {
+            return;
+        }
+
+        __result =
+            $"{__result}\n{dynamicText}";
     }
 }

@@ -31,7 +31,7 @@
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.title": "防御",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.description": "获得 {Block:diff()} 点格挡。",
   "GU_ZHEN_REN_CARD_CHUI_DONG.title": "催动",
-  "GU_ZHEN_REN_CARD_CHUI_DONG.description": "进入催动模式：从蛊手牌选择一张可催动蛊虫并指定目标。按返回键取消。",
+  "GU_ZHEN_REN_CARD_CHUI_DONG.description": "从蛊手牌选择一张可催动蛊虫并指定目标。",
   "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.title": "青提仙元",
   "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description": "仙元，保留。提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗。",
   "GU_ZHEN_REN_CARD_HONG_ZAO_XIAN_YUAN.title": "红枣仙元",
@@ -159,8 +159,13 @@
   "GU_ZHEN_REN_CARD_XUE_YUE_JI.selectionScreenPrompt": "选择一张拥有血道寄生的牌。",
   "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.selectionScreenPrompt": "选择生成刀翅血蝠，或发动嗜骸 2生成刀翅血蝠群。",
   "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI.extraCardText": "附魔·血气（{Rank}转）：剩余{TriggersRemaining}次触发；打出宿主后结算。",
+  "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI.cardText": "血气 {TriggerCount}：触发 {TriggersRemaining} 次后孵化。攻击追加 {ParasiteValue} 伤害＋{ParasiteBleed} 流血；技能获得 {ParasiteValue} 格挡＋1 血元；能力获得 2 血元。",
   "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.extraCardText": "附魔·月相（{Rank}转·残月）：剩余{TriggersRemaining}次触发；打出宿主后推进。",
+  "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.cardText": "月相·残月（{Rank}转）：剩余 {TriggersRemaining} 次推进后孵化。",
   "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.extraCardText": "附魔·月相（{Rank}转·盈月）：剩余{TriggersRemaining}次触发；打出宿主后推进。",
+  "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.cardText": "月相·盈月（{Rank}转）：剩余 {TriggersRemaining} 次推进后孵化。",
   "GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.extraCardText": "附魔·月相（{Rank}转·满月）：剩余{TriggersRemaining}次触发；打出宿主后孵化。",
-  "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS.extraCardText": "附魔·血胎（{Rank}转）：{Stage}/3点胎动，剩余{TriggersRemaining}次触发；3点时孵化。"
+  "GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.cardText": "月相·满月（{Rank}转）：剩余 {TriggersRemaining} 次推进后孵化。",
+  "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS.extraCardText": "附魔·血胎（{Rank}转）：{Stage}/3点胎动，剩余{TriggersRemaining}次触发；3点时孵化。",
+  "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS.cardText": "血胎（{Rank}转）：胎动 {Stage}/3；剩余 {TriggersRemaining} 次触发，3 点时孵化。"
 }
