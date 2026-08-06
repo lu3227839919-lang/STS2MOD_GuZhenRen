@@ -46,11 +46,19 @@ public sealed class WanHaiGuiChao : AbstractShaZhaoCard
         RefreshRankValues();
     }
 
+    /// <summary>
+    /// 本场封印型终结杀招：材料在战斗结束前不返还。
+    /// </summary>
+    public override ShaZhaoLifecycle Lifecycle =>
+        ShaZhaoLifecycle.Sealed;
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay
     )
     {
+        await AdvanceLifecycleAsync(choiceContext);
+
         int consumed = await XueDaoCardSystem.ConsumeOldestRemains(
             choiceContext,
             Owner,

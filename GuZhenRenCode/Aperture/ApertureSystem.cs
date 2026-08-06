@@ -2,8 +2,10 @@ using System.Collections.Concurrent;
 
 using GuZhenRen.Cards;
 using GuZhenRen.Cards.ImmortalEssence;
+using GuZhenRen.Cards.ShaZhao;
 using GuZhenRen.Relics;
 
+using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -130,10 +132,145 @@ public static class ApertureSystem
                 data.ActiveCombatFloor = currentFloor;
                 data.EssenceGrantState =
                     ApertureEssenceGrantState.NotStarted;
+                data.ShaZhaoDerivationGrantFloor = -1;
+                data.ShaZhaoDerivationsThisCombat = 0;
             }
         );
 
         RefreshRelicVisualState(player);
+    }
+
+    /// <summary>
+    /// 空窍三转起，每场战斗开始时把“杀招推演”直接加入手牌。
+    /// 不占用起手抽牌；同一战斗层数只发放一次（重连安全）。
+    /// </summary>
+    internal static async Task HandleShaZhaoDerivationGrantAsync(
+        Player player
+    )
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        EnsureAvailable();
+
+        if (!HasAperture(player))
+        {
+            return;
+        }
+
+        ApertureRunData data = GetState(player);
+        if (data.Rank <
+            ApertureProgression.ShaZhaoDerivationUnlockRank)
+        {
+            return;
+        }
+
+        int currentFloor = player.RunState.TotalFloor;
+        if (data.ShaZhaoDerivationGrantFloor == currentFloor)
+        {
+            return;
+        }
+
+        if (player.PlayerCombatState is not { } combatState)
+        {
+            return;
+        }
+
+        CardModel derivation = player
+            .Creature
+            .CombatState
+            .CreateCard(
+                ModelDb.Card<ShaZhaoTuiYan>(),
+                player
+            );
+
+        await CardPileCmd.AddGeneratedCardToCombat(
+            derivation,
+            PileType.Hand,
+            player
+        );
+
+        _savedData!.Modify(
+            player,
+            d =>
+            {
+                d.Normalize();
+                if (d.ShaZhaoDerivationGrantFloor !=
+                    currentFloor)
+                {
+                    d.ShaZhaoDerivationGrantFloor =
+                        currentFloor;
+                }
+            }
+        );
+    }
+
+    /// <summary>
+    /// 推演成功后登记次数；八至九转每场最多 2 次，
+    /// 第一次成功后再把第二张“杀招推演”放入弃牌堆。
+    /// </summary>
+    internal static void RegisterShaZhaoDerivation(
+        Player player
+    )
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        EnsureAvailable();
+
+        if (!HasAperture(player))
+        {
+            return;
+        }
+
+        ApertureRunData data = GetState(player);
+        if (data.Rank <
+            ApertureProgression.ShaZhaoDerivationUnlockRank)
+        {
+            return;
+        }
+
+        int completed = data.ShaZhaoDerivationsThisCombat + 1;
+
+        _savedData!.Modify(
+            player,
+            d =>
+            {
+                d.Normalize();
+                d.ShaZhaoDerivationsThisCombat = Math.Max(
+                    0,
+                    completed
+                );
+            }
+        );
+
+        // 八至九转：第二次推演由第二张推演牌提供。
+        if (data.Rank >=
+                ApertureProgression.ShaZhaoDerivationSecondRank &&
+            completed <
+                ApertureProgression.ShaZhaoDerivationMaxPerCombat &&
+            player.PlayerCombatState is { })
+        {
+            CardModel second = player
+                .Creature
+                .CombatState
+                .CreateCard(
+                    ModelDb.Card<ShaZhaoTuiYan>(),
+                    player
+                );
+            _ = AddShaZhaoDerivationToDiscardAsync(
+                player,
+                second
+            );
+        }
+    }
+
+    private static async Task AddShaZhaoDerivationToDiscardAsync(
+        Player player,
+        CardModel second
+    )
+    {
+        await CardPileCmd.AddGeneratedCardToCombat(
+            second,
+            PileType.Discard,
+            player
+        );
     }
 
     /// <summary>

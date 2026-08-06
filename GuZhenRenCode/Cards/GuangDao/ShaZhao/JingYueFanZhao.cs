@@ -49,11 +49,21 @@ public sealed class JingYueFanZhao : AbstractShaZhaoCard
         RefreshRankValues();
     }
 
+    /// <summary>
+    /// 三阶段形态杀招：镜相→月相→返照，最终阶段后消耗并返还材料。
+    /// </summary>
+    public override ShaZhaoLifecycle Lifecycle =>
+        ShaZhaoLifecycle.Staged;
+
+    public override int MaxStages => 3;
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay
     )
     {
+        await AdvanceLifecycleAsync(choiceContext);
+
         Creature? target = cardPlay.Target;
         if (target == null || !IsValidTarget(target))
         {

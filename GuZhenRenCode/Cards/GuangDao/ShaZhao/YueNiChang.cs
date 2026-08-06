@@ -52,11 +52,21 @@ public sealed class YueNiChang
         RefreshRankValues();
     }
 
+    /// <summary>
+    /// 次数型防御杀招：每场最多使用 2 次，用尽后消耗并返还材料。
+    /// </summary>
+    public override ShaZhaoLifecycle Lifecycle =>
+        ShaZhaoLifecycle.Charged;
+
+    public override int MaxUses => 2;
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay
     )
     {
+        await AdvanceLifecycleAsync(choiceContext);
+
         await CreatureCmd.GainBlock(
             Owner.Creature,
             DynamicVars.Block,

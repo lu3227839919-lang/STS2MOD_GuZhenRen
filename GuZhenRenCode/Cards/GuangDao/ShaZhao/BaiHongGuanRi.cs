@@ -58,11 +58,19 @@ public sealed class BaiHongGuanRi : AbstractShaZhaoCard
         description.Add("GuangHuiCost", GuangHuiCost);
     }
 
+    /// <summary>
+    /// 瞬发终结杀招：使用一次后消耗并返还材料。
+    /// </summary>
+    public override ShaZhaoLifecycle Lifecycle =>
+        ShaZhaoLifecycle.Instant;
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay
     )
     {
+        await AdvanceLifecycleAsync(choiceContext);
+
         Creature? target = cardPlay.Target;
         if (target == null || !IsValidTarget(target))
         {

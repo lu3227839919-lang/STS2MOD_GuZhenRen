@@ -2,6 +2,7 @@ using System.Reflection;
 
 using Godot;
 
+using GuZhenRen.Aperture;
 using GuZhenRen.Cards.ShaZhao;
 using GuZhenRen.Characters;
 using GuZhenRen.Combat;
@@ -17,6 +18,7 @@ using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes.CommonUi;
@@ -26,6 +28,7 @@ using STS2RitsuLib;
 using STS2RitsuLib.CardPiles.Nodes;
 using STS2RitsuLib.Combat.SecondaryResources;
 using STS2RitsuLib.Interactions.RightClick;
+using STS2RitsuLib.Utils;
 
 namespace GuZhenRen.Cards;
 
@@ -405,18 +408,15 @@ internal static class ShaZhaoTuiYanSystem
             return 0;
         }
 
-        long totalMaterialCost = materials.Sum(card =>
-            (long)GetMaterialYuanQiCost(player, card)
-        );
-        long doubledTotal = Math.Min(
-            int.MaxValue,
-            totalMaterialCost * 2L
+        // 0.8.0 新公式：max(2, Σ材料元气 − 材料数量 + 1)
+        // 单材料不再被重复计费；多材料获得少量组合折扣。
+        int totalMaterialCost = materials.Sum(card =>
+            Math.Max(0, GetMaterialYuanQiCost(player, card))
         );
 
-        return (int)Math.Min(
-            int.MaxValue,
-            (doubledTotal + materials.Count - 1L) /
-                materials.Count
+        return Math.Max(
+            2,
+            totalMaterialCost - materials.Count + 1
         );
     }
 
@@ -713,5 +713,253 @@ internal static class ShaZhaoTuiYanSystem
         return card.IsValidTarget(player.Creature)
             ? player.Creature
             : null;
+    }
+
+    // =================================================================
+    //  0.8.0 杀招系统：材料封装与返还
+    // =================================================================
+
+    private static readonly SavedAttachedState<CardModel, string>
+        MaterialBoundShaZhaoState = new(
+            "gu_zhen_ren.sha_zhao.material_bound_sha_zhao",
+            static () => string.Empty
+        );
+
+    /// <summary>
+    /// 材料蛊是否已被某张杀招封装。
+    /// 封装期间不能催动、不能恢复、不能参与其他杀招。
+    /// </summary>
+    public static bool IsMaterialSealed(CardModel card)
+    {
+        return card is IGuWormCard &&
+            MaterialBoundShaZhaoState[card].Length > 0;
+    }
+
+    internal static void MarkMaterialSealed(
+        CardModel material,
+        CardModel shaZhao
+    )
+    {
+        MaterialBoundShaZhaoState[material] =
+            shaZhao.Id.ToString();
+
+        // 材料从蛊存放牌堆移入蛊恢复堆（封装区）：
+        // 恢复流程会跳过封装材料，因此它既不能催动也不会自动恢复。
+        Player player = material.Owner;
+        CardPile guPile =
+            GuCardPileSystem.PileType.GetPile(player);
+        if (ReferenceEquals(material.Pile, guPile))
+        {
+            GuCardPileSystem.MoveCardToPile(
+                material,
+                GuCardPileSystem.RecoveryPileType
+                    .GetPile(player)
+            );
+        }
+    }
+
+    /// <summary>
+    /// 解除封装并送还恢复：杀招正常消耗、主动解体时调用。
+    /// </summary>
+    public static async Task ReleaseMaterialsAsync(
+        PlayerChoiceContext choiceContext,
+        AbstractShaZhaoCard shaZhao,
+        Player player,
+        bool extraRecoveryTurn
+    )
+    {
+        IReadOnlyList<CardModel> materials =
+            shaZhao.BoundMaterials;
+
+        foreach (CardModel material in materials)
+        {
+            UnsealMaterial(
+                material,
+                shaZhao,
+                player,
+                extraRecoveryTurn
+            );
+        }
+
+        shaZhao.ClearBoundMaterials();
+        await Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// 战斗结束兜底：无条件解除全部杀招绑定并返还材料。
+    /// </summary>
+    public static void ReleaseMaterialsForCombatEnd(
+        AbstractShaZhaoCard shaZhao,
+        Player player
+    )
+    {
+        foreach (CardModel material in shaZhao.BoundMaterials)
+        {
+            MaterialBoundShaZhaoState[material] =
+                string.Empty;
+        }
+
+        shaZhao.ClearBoundMaterials();
+    }
+
+    private static void UnsealMaterial(
+        CardModel material,
+        AbstractShaZhaoCard shaZhao,
+        Player player,
+        bool extraRecoveryTurn
+    )
+    {
+        MaterialBoundShaZhaoState[material] =
+            string.Empty;
+
+        // 送回蛊恢复堆，并从当前回合开始完整恢复。
+        CardPile recoveryPile =
+            GuCardPileSystem.RecoveryPileType
+                .GetPile(player);
+        if (!ReferenceEquals(material.Pile, recoveryPile))
+        {
+            GuCardPileSystem.MoveCardToPile(
+                material,
+                recoveryPile
+            );
+        }
+
+        int currentTurn =
+            player.PlayerCombatState?.TurnNumber ?? 0;
+        GuCardUsageRules.ScheduleRecovery(
+            material,
+            currentTurn
+        );
+        if (extraRecoveryTurn)
+        {
+            GuCardUsageRules.DelayRecoveryBy(material, 1);
+        }
+    }
+
+    /// <summary>
+    /// 打出“杀招推演”系统牌的推演入口。
+    ///
+    /// 成功返回 true（推演牌应消耗）；取消、配方无效或资源不足
+    /// 返回 false（推演牌回到手牌，不产生任何惩罚）。
+    /// </summary>
+    public static async Task<bool> DeriveFromCardAsync(
+        PlayerChoiceContext choiceContext,
+        Player player,
+        CardModel derivationCard
+    )
+    {
+        PlayerCombatState? playerCombatState =
+            player.PlayerCombatState;
+        if (playerCombatState == null)
+        {
+            return false;
+        }
+
+        CardPile guPile =
+            GuCardPileSystem.PileType.GetPile(player);
+
+        List<CardModel> selectedCards =
+            await SelectMaterialsInOrder(
+                choiceContext,
+                player,
+                guPile
+            );
+
+        if (selectedCards.Count == 0)
+        {
+            return false;
+        }
+
+        if (playerCombatState.Energy < ActivationEnergyCost ||
+            !selectedCards.All(card =>
+                ReferenceEquals(card.Owner, player) &&
+                card.Pile?.Type == GuCardPileSystem.PileType &&
+                IsEligibleMaterial(card)
+            ))
+        {
+            ShowSynthesisFailure(player, "stateChanged");
+            return false;
+        }
+
+        if (!ShaZhaoRecipeRegistry.HasMatchingRecipe(
+                selectedCards
+            ))
+        {
+            ShowSynthesisFailure(player, "invalidRecipe");
+            return false;
+        }
+
+        int yuanQiCost = CalculateShaZhaoYuanQiCost(
+            player,
+            selectedCards
+        );
+
+        if (SecondaryResourceCmd.Get(
+                player,
+                YuanQiSystem.ResourceId
+            ) < yuanQiCost)
+        {
+            ShowSynthesisFailure(player, "insufficientResources");
+            return false;
+        }
+
+        if (!ShaZhaoRecipeRegistry.TryCreateResult(
+                selectedCards,
+                player,
+                out AbstractShaZhaoCard? shaZhao
+            ))
+        {
+            ShowSynthesisFailure(player, "creationFailed");
+            return false;
+        }
+
+        bool spentYuanQi =
+            await SecondaryResourceCmd.Spend(
+                player,
+                YuanQiSystem.ResourceId,
+                yuanQiCost,
+                card: shaZhao,
+                source: shaZhao
+            );
+
+        if (!spentYuanQi)
+        {
+            RemoveUncommittedResult(shaZhao);
+            ShowSynthesisFailure(player, "insufficientResources");
+            return false;
+        }
+
+        // 支付推演牌自身 1 点能量。
+        await PlayerCmd.LoseEnergy(
+            ActivationEnergyCost,
+            player
+        );
+
+        // 材料封装：材料移入隐藏材料区并绑定到杀招。
+        shaZhao.BindMaterials(selectedCards);
+
+        // 登记每场推演次数；八至九转补发第二张推演牌。
+        ApertureSystem.RegisterShaZhaoDerivation(player);
+
+        // 杀招加入手牌（满手时入弃牌堆）。
+        bool addedToHand =
+            await GuCardPileSystem.AddGeneratedCardToHand(
+                shaZhao,
+                player
+            );
+        if (!addedToHand)
+        {
+            await CardPileCmd.AddGeneratedCardToCombat(
+                shaZhao,
+                PileType.Discard,
+                player
+            );
+        }
+
+        Entry.Logger.Info(
+            $"[杀招推演] 成功推演 {shaZhao.GetType().Name}，消耗元气 {yuanQiCost}，材料 {selectedCards.Count} 张。"
+        );
+
+        return true;
     }
 }

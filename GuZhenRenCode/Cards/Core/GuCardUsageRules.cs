@@ -86,8 +86,35 @@ public static class GuCardUsageRules
     {
         ArgumentNullException.ThrowIfNull(card);
 
+        // 被杀招封装的材料不能催动。
+        if (ShaZhaoTuiYanSystem.IsMaterialSealed(card))
+        {
+            return false;
+        }
+
         return card is not IGuWormCard guCard ||
             GetRemainingUses(card, guCard) > 0;
+    }
+
+    /// <summary>
+    /// 把恢复就绪回合额外延后指定轮数（主动解体惩罚等）。
+    /// </summary>
+    public static void DelayRecoveryBy(
+        CardModel card,
+        int extraTurns
+    )
+    {
+        if (extraTurns <= 0 || card is not IGuWormCard)
+        {
+            return;
+        }
+
+        int currentReady = RecoveryReadyTurnState[card];
+        if (currentReady > 0)
+        {
+            RecoveryReadyTurnState[card] =
+                currentReady + extraTurns;
+        }
     }
 
     internal static SecondaryResourcePaymentPlan

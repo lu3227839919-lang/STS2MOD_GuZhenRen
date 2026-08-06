@@ -24,6 +24,8 @@
   "GU_ZHEN_REN_SHA_ZHAO_SYNTHESIS.creationFailed": "当前战斗状态无法创建杀招。费用未消耗，所选蛊虫已保留在蛊牌堆。",
   "GU_ZHEN_REN_SHA_ZHAO_SYNTHESIS.stateChanged": "选牌期间战斗状态发生变化，无法继续推演。费用未消耗，所选蛊虫已保留在蛊牌堆。",
   "GU_ZHEN_REN_CARD_YI_HAI.consumeSelectionPrompt": "选择要消耗的{Amount}张遗骸。",
+  "GU_ZHEN_REN_CARD_SHA_ZHAO_TUI_YAN.title": "杀招推演",
+  "GU_ZHEN_REN_CARD_SHA_ZHAO_TUI_YAN.description": "保留。选择蛊存放牌堆中已恢复的蛊虫作为材料。若材料可以组成杀招，支付推演元气，将材料封装，并将对应杀招加入手牌。成功后消耗。",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_STRIKE.title": "冲拳",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_STRIKE.description": "造成 {Damage:diff()} 点伤害。",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.title": "防御",

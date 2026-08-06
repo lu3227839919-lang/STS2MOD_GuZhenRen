@@ -14,6 +14,18 @@ public static class ApertureProgression
     public const int ImmortalRank = 6;
     public const int MaximumImplementedRank = 9;
 
+    /// <summary>
+    /// 空窍三转解锁“杀招推演”（0.8.0 杀招系统）。
+    /// </summary>
+    public const int ShaZhaoDerivationUnlockRank = 3;
+
+    /// <summary>
+    /// 八至九转每场最多推演两次；第一次成功后补发第二张推演牌。
+    /// </summary>
+    public const int ShaZhaoDerivationSecondRank = 8;
+
+    public const int ShaZhaoDerivationMaxPerCombat = 2;
+
     private static readonly IReadOnlyDictionary<int, int> RequiredXpByRank =
         new Dictionary<int, int>
         {

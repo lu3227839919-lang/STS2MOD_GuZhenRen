@@ -513,6 +513,10 @@ public static class GuCardPileSystem
         CardModel[] allRecoveringCards =
             recoveryPile.Cards
                 .Where(static card => card is IGuWormCard)
+                // 被杀招封装的材料不进入恢复循环。
+                .Where(card =>
+                    !ShaZhaoTuiYanSystem.IsMaterialSealed(card)
+                )
                 .ToArray();
 
         if (allRecoveringCards.Length == 0)
@@ -694,7 +698,17 @@ public static class GuCardPileSystem
         targetPile.AddInternal(card, silent: true);
 
         sourcePile?.InvokeContentsChanged();
-        targetPile.InvokeContentsChanged();
+        targetPile.InvokeContentsChanged();    }
+
+    /// <summary>
+    /// 在蛊牌堆之间移动卡牌（供杀招材料封装/返还等内部流程使用）。
+    /// </summary>
+    internal static void MoveCardToPile(
+        CardModel card,
+        CardPile targetPile
+    )
+    {
+        MoveCardWithoutAnimation(card, targetPile);
     }
 
     private static int GetActiveGuCount(Player owner) =>

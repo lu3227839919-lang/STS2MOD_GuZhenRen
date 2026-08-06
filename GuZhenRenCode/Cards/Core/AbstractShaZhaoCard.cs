@@ -1,4 +1,7 @@
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using GuZhenRen.Characters;
@@ -370,4 +373,272 @@ public abstract class AbstractShaZhaoCard
     {
     }
 
+    // =================================================================
+    //  杀招生命周期（0.8.0 重设计）
+    // =================================================================
+
+    /// <summary>
+    /// 杀招生命周期类型，决定材料蛊的封装与返还时机。
+    /// </summary>
+    public enum ShaZhaoLifecycle
+    {
+        /// <summary>瞬发：使用一次后消耗，材料立即进入恢复。</summary>
+        Instant,
+
+        /// <summary>次数型：可连续使用多次，用尽后消耗并返还材料。</summary>
+        Charged,
+
+        /// <summary>阶段型：按阶段推进形态，最终阶段后消耗并返还材料。</summary>
+        Staged,
+
+        /// <summary>封印型：本场战斗不返还材料，战斗结束后归还。</summary>
+        Sealed,
+    }
+
+    private static readonly SavedAttachedState<CardModel, string>
+        BoundMaterialIdsState = new(
+            "gu_zhen_ren.sha_zhao.bound_material_ids",
+            static () => string.Empty
+        );
+
+    private static readonly SavedAttachedState<CardModel, int>
+        SpentUsesState = new(
+            "gu_zhen_ren.sha_zhao.spent_uses",
+            static () => 0
+        );
+
+    private static readonly SavedAttachedState<CardModel, int>
+        StageState = new(
+            "gu_zhen_ren.sha_zhao.stage",
+            static () => 0
+        );
+
+    /// <summary>
+    /// 本杀招的生命周期类型，具体杀招重写。
+    /// </summary>
+    public virtual ShaZhaoLifecycle Lifecycle =>
+        ShaZhaoLifecycle.Instant;
+
+    /// <summary>
+    /// 次数型杀招的总使用次数。
+    /// </summary>
+    public virtual int MaxUses => 1;
+
+    /// <summary>
+    /// 阶段型杀招的总阶段数。
+    /// </summary>
+    public virtual int MaxStages => 1;
+
+    /// <summary>
+    /// 已使用次数（次数型）。
+    /// </summary>
+    public int SpentUses
+    {
+        get => Math.Clamp(
+            SpentUsesState[this],
+            0,
+            MaxUses
+        );
+        private set => SpentUsesState[this] = value;
+    }
+
+    /// <summary>
+    /// 当前阶段（阶段型，从 0 开始）。
+    /// </summary>
+    public int CurrentStage
+    {
+        get => Math.Clamp(
+            StageState[this],
+            0,
+            Math.Max(1, MaxStages)
+        );
+        private set => StageState[this] = value;
+    }
+
+    /// <summary>
+    /// 是否仍绑定材料（杀招存在期间材料被封装）。
+    /// </summary>
+    public bool HasBoundMaterials =>
+        BoundMaterialIdsState[this].Length > 0;
+
+    /// <summary>
+    /// 组成本杀招的真实材料卡牌（按绑定顺序）。
+    /// </summary>
+    public IReadOnlyList<CardModel> BoundMaterials
+    {
+        get
+        {
+            string encoded = BoundMaterialIdsState[this];
+            if (string.IsNullOrEmpty(encoded))
+            {
+                return Array.Empty<CardModel>();
+            }
+
+            return encoded
+                .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                .Select(ResolveBoundMaterial)
+                .Where(static material => material != null)
+                .Cast<CardModel>()
+                .ToArray();
+        }
+    }
+
+    private CardModel? ResolveBoundMaterial(string id)
+    {
+        if (Owner?.PlayerCombatState is not { } combatState)
+        {
+            return null;
+        }
+
+        return combatState
+            .AllCards
+            .FirstOrDefault(candidate =>
+                string.Equals(
+                    candidate.Id.ToString(),
+                    id,
+                    StringComparison.Ordinal
+                )
+            );
+    }
+
+    /// <summary>
+    /// 创建成功后把真实材料封装进本杀招：
+    /// 材料打上绑定标记、从蛊虫循环中移出，本杀招记录材料 ID。
+    /// </summary>
+    internal void BindMaterials(
+        IReadOnlyList<CardModel> materials
+    )
+    {
+        if (materials.Count == 0)
+        {
+            return;
+        }
+
+        BoundMaterialIdsState[this] = string.Join(
+            '\n',
+            materials.Select(material =>
+                material.Id.ToString()
+            )
+        );
+
+        foreach (CardModel material in materials)
+        {
+            ShaZhaoTuiYanSystem.MarkMaterialSealed(
+                material,
+                this
+            );
+        }
+    }
+
+    /// <summary>
+    /// 清除杀招上的材料绑定记录（返还材料后调用）。
+    /// </summary>
+    internal void ClearBoundMaterials()
+    {
+        BoundMaterialIdsState[this] = string.Empty;
+    }
+
+    /// <summary>
+    /// 杀招生命周期推进：次数型扣次、阶段型推进；
+    /// 达到终态时消耗杀招并返还材料。
+    /// 具体杀招在各自 OnPlay 末尾调用。
+    /// </summary>
+    protected async Task AdvanceLifecycleAsync(
+        PlayerChoiceContext choiceContext
+    )
+    {
+        switch (Lifecycle)
+        {
+            case ShaZhaoLifecycle.Instant:
+                await ConsumeAndReturnAsync(choiceContext);
+                break;
+
+            case ShaZhaoLifecycle.Charged:
+                int spent = SpentUses + 1;
+                SpentUses = spent;
+                if (spent >= MaxUses)
+                {
+                    await ConsumeAndReturnAsync(choiceContext);
+                }
+                break;
+
+            case ShaZhaoLifecycle.Staged:
+                int nextStage = CurrentStage + 1;
+                CurrentStage = nextStage;
+                if (nextStage >= MaxStages)
+                {
+                    await ConsumeAndReturnAsync(choiceContext);
+                }
+                break;
+
+            case ShaZhaoLifecycle.Sealed:
+                // 材料本场不返还；杀招按自身规则消耗。
+                await CardExhaustCompat.ExhaustAsync(
+                    choiceContext,
+                    this
+                );
+                break;
+        }
+    }
+
+    /// <summary>
+    /// 消耗本杀招并把材料送还恢复流程。
+    /// </summary>
+    protected async Task ConsumeAndReturnAsync(
+        PlayerChoiceContext choiceContext
+    )
+    {
+        Player player = Owner;
+        await ShaZhaoTuiYanSystem.ReleaseMaterialsAsync(
+            choiceContext,
+            this,
+            player,
+            extraRecoveryTurn: false
+        );
+        await CardExhaustCompat.ExhaustAsync(
+            choiceContext,
+            this
+        );
+    }
+
+    /// <summary>
+    /// 主动解体（右键）：1 费，材料返回并额外增加 1 回合恢复。
+    /// </summary>
+    internal async Task<bool> TryDismantleAsync(
+        PlayerChoiceContext choiceContext,
+        Player player
+    )
+    {
+        if (Lifecycle == ShaZhaoLifecycle.Instant ||
+            !HasBoundMaterials ||
+            player.PlayerCombatState is not { } combatState ||
+            combatState.Energy < 1)
+        {
+            return false;
+        }
+
+        await PlayerCmd.LoseEnergy(1, player);
+        await ShaZhaoTuiYanSystem.ReleaseMaterialsAsync(
+            choiceContext,
+            this,
+            player,
+            extraRecoveryTurn: true
+        );
+        await CardExhaustCompat.ExhaustAsync(
+            choiceContext,
+            this
+        );
+        return true;
+    }
+
+    /// <summary>
+    /// 战斗结束兜底：无条件返还全部绑定材料。
+    /// </summary>
+    internal void ReleaseMaterialsForCombatEnd(Player player)
+    {
+        ShaZhaoTuiYanSystem.ReleaseMaterialsForCombatEnd(
+            this,
+            player
+        );
+    }
 }

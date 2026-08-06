@@ -24,6 +24,8 @@
   "GU_ZHEN_REN_SHA_ZHAO_SYNTHESIS.creationFailed": "A Killer Move cannot be created in the current combat state. No costs were spent and all selected Gu remain in the Gu Hand.",
   "GU_ZHEN_REN_SHA_ZHAO_SYNTHESIS.stateChanged": "Combat state changed while selecting materials, so deduction cannot continue. No costs were spent and all selected Gu remain in the Gu Hand.",
   "GU_ZHEN_REN_CARD_YI_HAI.consumeSelectionPrompt": "Choose {Amount} Remains to exhaust.",
+  "GU_ZHEN_REN_CARD_SHA_ZHAO_TUI_YAN.title": "Sha Zhao Derivation",
+  "GU_ZHEN_REN_CARD_SHA_ZHAO_TUI_YAN.description": "Retain. Choose recovered Gu from the Gu Pile as materials. If they form a valid Sha Zhao recipe, pay the derivation essence, seal the materials, and add the corresponding Sha Zhao to your hand. Exhausts on success.",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_STRIKE.title": "Punch",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_STRIKE.description": "Deal {Damage:diff()} damage.",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.title": "Defend",

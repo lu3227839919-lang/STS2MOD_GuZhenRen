@@ -178,7 +178,7 @@ public sealed class KongQiaoRelic
     }
 
     /// <summary>
-    /// 只在本场第一次初始抽牌前发放对应仙元牌。
+    /// 只在本场第一次初始抽牌前发放对应仙元牌与杀招推演牌。
     /// </summary>
     public override Task BeforeHandDraw(
         Player player,
@@ -186,9 +186,15 @@ public sealed class KongQiaoRelic
         ICombatState combatState
     )
     {
-        return ReferenceEquals(player, Owner)
-            ? ApertureSystem.HandleBeforeHandDrawAsync(player)
-            : Task.CompletedTask;
+        if (!ReferenceEquals(player, Owner))
+        {
+            return Task.CompletedTask;
+        }
+
+        return Task.WhenAll(
+            ApertureSystem.HandleBeforeHandDrawAsync(player),
+            ApertureSystem.HandleShaZhaoDerivationGrantAsync(player)
+        );
     }
 
     public override Task AfterCombatVictory(CombatRoom room)

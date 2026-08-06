@@ -71,6 +71,18 @@ public sealed class ApertureRunData
 
     public int PendingRankAdvanceTo { get; set; }
 
+    /// <summary>
+    /// 已发放“杀招推演”牌的战斗层数（-1 表示本场尚未发放）。
+    /// 空窍三转起每场战斗开始时发放一张。
+    /// </summary>
+    public int ShaZhaoDerivationGrantFloor { get; set; } = -1;
+
+    /// <summary>
+    /// 当前战斗已完成的杀招推演次数。
+    /// 三至七转每场最多 1 次，八至九转最多 2 次。
+    /// </summary>
+    public int ShaZhaoDerivationsThisCombat { get; set; }
+
     public bool NeedsNormalization()
     {
         int normalizedRank = Math.Clamp(
@@ -144,6 +156,14 @@ public sealed class ApertureRunData
         Xp = Math.Max(0, Xp);
         ActiveCombatFloor = Math.Max(-1, ActiveCombatFloor);
         VictoryXpAppliedFloor = Math.Max(-1, VictoryXpAppliedFloor);
+        ShaZhaoDerivationGrantFloor = Math.Max(
+            -1,
+            ShaZhaoDerivationGrantFloor
+        );
+        ShaZhaoDerivationsThisCombat = Math.Max(
+            0,
+            ShaZhaoDerivationsThisCombat
+        );
 
         if (Rank >= ApertureProgression.MaximumImplementedRank)
         {

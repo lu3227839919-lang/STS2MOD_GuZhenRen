@@ -271,6 +271,12 @@ internal static class GuActivationModePatch
     private static void CombatEndedPrefix()
     {
         GuActivationModeSystem.Cancel("战斗已经结束。");
+
+        /*
+         * 杀招材料封装标记挂在战斗卡牌实例的 SavedAttachedState 上，
+         * 战斗结束所有战斗实例销毁后标记随之消失，永久牌组中的蛊
+         * 不受影响，因此这里无需显式遍历清理。
+         */
     }
 
     private static bool UnhandledInputPrefix(
