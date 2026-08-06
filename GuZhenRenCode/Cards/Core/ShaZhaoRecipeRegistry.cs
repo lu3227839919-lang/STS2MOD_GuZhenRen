@@ -162,6 +162,88 @@ public static class ShaZhaoRecipeRegistry
             .ToArray();
     }
 
+    /// <summary>
+    /// 所有配方用到的材料类型并集。推演系统用它做第一张材料的
+    /// 候选过滤，避免玩家选择任何配方都用不到的蛊虫。
+    /// </summary>
+    public static IReadOnlySet<Type>
+        GetMaterialCardTypes()
+    {
+        return Recipes.Value
+            .SelectMany(recipe =>
+                recipe.OrderedMaterialCardTypes
+            )
+            .ToHashSet();
+    }
+
+    /// <summary>
+    /// 判断已选材料再加上候选蛊虫后，是否仍是某个合法配方的前缀
+    /// （即存在配方 R，使已选 ∪ {候选} 是 R 材料多重集的子集且不超量）。
+    /// 推演系统用它过滤第二张及后续材料，引导玩家逐步补齐配方。
+    /// </summary>
+    public static bool CanExtendToRecipe(
+        IReadOnlyList<CardModel> selectedCards,
+        CardModel candidate
+    )
+    {
+        ArgumentNullException.ThrowIfNull(selectedCards);
+        ArgumentNullException.ThrowIfNull(candidate);
+
+        Type[] selectedTypes = Canonicalize(
+            selectedCards.Select(card => card.GetType())
+        );
+        Type candidateType = candidate.GetType();
+
+        foreach (Recipe recipe in Recipes.Value)
+        {
+            if (FitsPrefix(
+                    recipe.OrderedMaterialCardTypes,
+                    selectedTypes,
+                    candidateType
+                ))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool FitsPrefix(
+        IReadOnlyList<Type> materialTypes,
+        IReadOnlyList<Type> selectedTypes,
+        Type candidateType
+    )
+    {
+        Dictionary<Type, int> remaining =
+            materialTypes
+                .GroupBy(type => type)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.Count()
+                );
+
+        foreach (Type selectedType in selectedTypes)
+        {
+            if (!remaining.TryGetValue(
+                    selectedType,
+                    out int count
+                ) ||
+                count <= 0)
+            {
+                return false;
+            }
+
+            remaining[selectedType] = count - 1;
+        }
+
+        return remaining.TryGetValue(
+                candidateType,
+                out int candidateCount
+            ) &&
+            candidateCount > 0;
+    }
+
     private static IReadOnlyList<Recipe>
         DiscoverRecipes()
     {

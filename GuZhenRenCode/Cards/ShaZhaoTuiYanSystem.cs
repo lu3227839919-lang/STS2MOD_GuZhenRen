@@ -243,6 +243,8 @@ internal static class ShaZhaoTuiYanSystem
         )
     {
         List<CardModel> selected = [];
+        IReadOnlySet<Type> materialTypes =
+            ShaZhaoRecipeRegistry.GetMaterialCardTypes();
 
         while (true)
         {
@@ -250,7 +252,12 @@ internal static class ShaZhaoTuiYanSystem
                 guPile.Cards
                     .Where(card =>
                         !selected.Contains(card) &&
-                        IsEligibleMaterial(card)
+                        IsEligibleMaterial(card) &&
+                        IsEligibleRecipeStep(
+                            selected,
+                            card,
+                            materialTypes
+                        )
                     )
                     .Select((card, index) => (card, index))
                     .OrderBy(item =>
@@ -325,6 +332,28 @@ internal static class ShaZhaoTuiYanSystem
             card.Pile?.Type == GuCardPileSystem.PileType &&
             GuCardUsageRules.CanUse(card) &&
             !card.Keywords.Contains(CardKeyword.Unplayable);
+    }
+
+    /// <summary>
+    /// 配方引导：第一张材料必须出现在某个杀招配方中；之后的材料
+    /// 必须能补全某个已选材料所在的配方，避免玩家选到任何配方都
+    /// 用不到的蛊虫后得到“invalidRecipe”失败。
+    /// </summary>
+    private static bool IsEligibleRecipeStep(
+        IReadOnlyList<CardModel> selected,
+        CardModel card,
+        IReadOnlySet<Type> materialTypes
+    )
+    {
+        if (selected.Count == 0)
+        {
+            return materialTypes.Contains(card.GetType());
+        }
+
+        return ShaZhaoRecipeRegistry.CanExtendToRecipe(
+            selected,
+            card
+        );
     }
 
     private static async Task ResolveSuccessfulRecipe(
