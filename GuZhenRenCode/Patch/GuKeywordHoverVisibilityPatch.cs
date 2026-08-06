@@ -2,6 +2,8 @@ using System.Reflection;
 
 using Godot;
 
+using GuZhenRen.Cards;
+
 using HarmonyLib;
 
 using MegaCrit.Sts2.Core.Entities.Cards;
