@@ -1,4 +1,5 @@
 using GuZhenRen.Aperture;
+using GuZhenRen.Cards.HeLian;
 using GuZhenRen.Cards.Interfaces;
 using GuZhenRen.Combat;
 
@@ -29,9 +30,39 @@ public abstract class AbstractGuWormCard
     /// </summary>
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         base.CanonicalKeywords
-            .Concat(GetCommonGuKeywords())
-            .Concat(GetMechanicKeywords())
+            .Concat(GetDisplayKeywordsFor(this))
             .Distinct();
+
+    /// <summary>
+    /// 按当前转数返回蛊牌应显示的全部本模组关键词。
+    ///
+    /// 与 CanonicalKeywords 使用同一套规则，但独立于实例的
+    /// _keywords 快照：卡牌转数变化（升转/合练/读档/克隆）后快照
+    /// 不会自动同步，UI 重建关键词时必须用本方法保证只显示
+    /// 当前转数拥有的内容（低转不残留仙蛊、耀化等高转词）。
+    /// </summary>
+    internal static IEnumerable<CardKeyword> GetDisplayKeywordsFor(
+        AbstractGuWormCard guWorm
+    )
+    {
+        yield return GuZhenRenKeywords.CuiDong;
+        yield return GuZhenRenKeywords.HuiFu;
+
+        if (guWorm.GuRank >= GuZhenRenCardRules.XianGuRank)
+        {
+            yield return GuZhenRenKeywords.XianGu;
+        }
+
+        foreach (CardKeyword keyword in GetMechanicKeywords(guWorm))
+        {
+            yield return keyword;
+        }
+
+        if (guWorm is AbstractHeLianGuCard)
+        {
+            yield return GuZhenRenKeywords.HeLian;
+        }
+    }
 
     /// <summary>
     /// 当前转数没有衍生牌时不显示卡牌引用；具体蛊虫按真实生成
@@ -85,33 +116,17 @@ public abstract class AbstractGuWormCard
         description.Add("RecoveryTurns", RecoveryDelayTurns);
     }
 
-    private IEnumerable<CardKeyword> GetCommonGuKeywords()
+    private static IEnumerable<CardKeyword> GetMechanicKeywords(
+        IGuWormCard guWorm
+    )
     {
-        yield return GuZhenRenKeywords.CuiDong;
-        yield return GuZhenRenKeywords.HuiFu;
-
-        if (GuRank >= 6)
-        {
-            yield return GuZhenRenKeywords.XianGu;
-        }
-    }
-
-    /// <summary>
-    /// 为每种现有蛊虫附加真正相关的机制说明。
-    ///
-    /// 使用类型名映射可让所有现有蛊虫立即覆盖关键词提示，同时避免
-    /// 把不相关的流派术语全部堆到每张卡上。新增蛊虫时只需在此增加
-    /// 一项，或由具体卡牌继续重写 CanonicalKeywords。
-    /// </summary>
-    private IEnumerable<CardKeyword> GetMechanicKeywords()
-    {
-        return GetType().Name switch
+        return guWorm.GetType().Name switch
         {
             "YueGuangGu" =>
             [
                 GuZhenRenKeywords.GetYaoHuaKeyword(2),
             ],
-            "YueMangGu" when GuRank >= 5 =>
+            "YueMangGu" when guWorm.GuRank >= 5 =>
             [
                 GuZhenRenKeywords.GetYaoHuaKeyword(2),
             ],

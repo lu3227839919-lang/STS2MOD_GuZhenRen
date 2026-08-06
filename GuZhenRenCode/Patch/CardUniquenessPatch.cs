@@ -928,6 +928,26 @@ internal static class CardUniquenessPatch
             __result.ToHashSet();
 
         /*
+         * 蛊虫：完全按当前转数重建本模组关键词。
+         * GetKeywordsWithSources 返回的是实例 _keywords 快照，卡牌
+         * 转数变化（升转/合练/读档/克隆）后不会自动同步，低转卡
+         * 可能残留高转才有的词（如仙蛊）。先清掉全部本模组词，
+         * 再按当前转数重新加入。仅处理真正蛊虫（AbstractGuWormCard），
+         * 本命蛊等其他 IGuWormCard 保持原有清理逻辑。
+         */
+        if (__instance is AbstractGuWormCard guWorm)
+        {
+            keywords.RemoveWhere(
+                GuZhenRenKeywords.OwnedKeywords.Contains
+            );
+            foreach (CardKeyword keyword in
+                     AbstractGuWormCard.GetDisplayKeywordsFor(guWorm))
+            {
+                keywords.Add(keyword);
+            }
+        }
+
+        /*
          * 动态关键词可能在 MutableClone/读档过程中被复制进卡牌本地集合。
          * 因此每次都先清除已经废弃的展示关键词和旧仙蛊展示，再由
          * 当前保存状态重建。旧存档与多人快照不会重新显示转数、
