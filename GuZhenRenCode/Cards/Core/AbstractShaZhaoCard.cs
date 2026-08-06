@@ -593,8 +593,9 @@ public abstract class AbstractShaZhaoCard
             choiceContext,
             this,
             player,
-            extraRecoveryTurn: false,
-            returnMaterials: !CanonicalKeywords.Contains(
+            // 消耗牌杀招使用后：材料同样返还——从蛊封存堆飞入恢复堆，
+            // 从零恢复并额外 +1 回合恢复；非消耗杀招按常规返还。
+            extraRecoveryTurn: CanonicalKeywords.Contains(
                 CardKeyword.Exhaust
             )
         );

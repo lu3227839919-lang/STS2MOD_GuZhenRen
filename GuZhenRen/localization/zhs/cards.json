@@ -26,7 +26,7 @@
   "GU_ZHEN_REN_CARD_YI_HAI.consumeSelectionPrompt": "选择要消耗的{Amount}张遗骸。",
   "GU_ZHEN_REN_CARD_SHA_ZHAO_TUI_YAN.title": "杀招推演",
   "sha_zhao_material.title": "蛊封存堆",
-  "sha_zhao_material.description": "杀招推演时被封存的材料。杀招被解体后材料会返回蛊恢复堆；若组成的杀招是消耗牌，使用后材料不返还。",
+  "sha_zhao_material.description": "杀招推演时被封存的材料。杀招使用/解体后材料会飞回蛊恢复堆并从零恢复；若组成的杀招是消耗牌，使用后材料同样返还，但恢复回合额外 +1。",
   "sha_zhao_material.empty": "没有封存的材料。",
   "GU_ZHEN_REN_CARD_SHA_ZHAO_TUI_YAN.description": "保留。选择蛊存放牌堆中已恢复的蛊虫作为材料（只显示可组成杀招的蛊虫）。若成，消耗元气获得杀招；否则返还卡牌。",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_STRIKE.title": "冲拳",

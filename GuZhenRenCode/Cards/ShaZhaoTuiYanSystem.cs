@@ -567,33 +567,18 @@ internal static class ShaZhaoTuiYanSystem
 
     /// <summary>
     /// 解除封装并送还恢复：杀招正常消耗、主动解体时调用。
-    /// 消耗牌杀招（Exhaust）使用后材料不返还——永久留在蛊封存堆；
-    /// 主动解体始终返还材料。
+    /// 材料从蛊封存堆飞入蛊恢复堆，并从零强制恢复；
+    /// 消耗牌杀招（Exhaust）使用后额外 +1 回合恢复。
     /// </summary>
     public static async Task ReleaseMaterialsAsync(
         PlayerChoiceContext choiceContext,
         AbstractShaZhaoCard shaZhao,
         Player player,
-        bool extraRecoveryTurn,
-        bool returnMaterials = true
+        bool extraRecoveryTurn
     )
     {
         IReadOnlyList<CardModel> materials =
             shaZhao.BoundMaterials;
-
-        if (!returnMaterials)
-        {
-            // 消耗牌杀招使用后：材料永久封存（留在蛊封存堆），
-            // 仅清除绑定状态。
-            foreach (CardModel material in materials)
-            {
-                MaterialBoundShaZhaoState[material] =
-                    string.Empty;
-            }
-
-            shaZhao.ClearBoundMaterials();
-            return;
-        }
 
         foreach (CardModel material in materials)
         {
@@ -654,7 +639,9 @@ internal static class ShaZhaoTuiYanSystem
         MaterialBoundShaZhaoState[material] =
             string.Empty;
 
-        // 送回蛊恢复堆，并从当前回合开始完整恢复。
+        // 送回蛊恢复堆（飞行动画），并从当前回合开始从零强制恢复：
+        // 无视封存前已有的恢复进度，完整恢复周期重新计算；
+        // extraRecoveryTurn（主动解体 / 消耗牌杀招）再额外延后 1 回合。
         CardPile recoveryPile =
             GuCardPileSystem.RecoveryPileType
                 .GetPile(player);
@@ -662,20 +649,18 @@ internal static class ShaZhaoTuiYanSystem
         {
             await GuCardPileSystem.MoveCardToPileAsync(
                 material,
-                GuCardPileSystem.RecoveryPileType
+                GuCardPileSystem.RecoveryPileType,
+                skipVisuals: false
             );
         }
 
         int currentTurn =
             player.PlayerCombatState?.TurnNumber ?? 0;
-        GuCardUsageRules.ScheduleRecovery(
+        GuCardUsageRules.ResetRecovery(
             material,
-            currentTurn
+            currentTurn,
+            extraRecoveryTurn ? 1 : 0
         );
-        if (extraRecoveryTurn)
-        {
-            GuCardUsageRules.DelayRecoveryBy(material, 1);
-        }
     }
 
     /// <summary>

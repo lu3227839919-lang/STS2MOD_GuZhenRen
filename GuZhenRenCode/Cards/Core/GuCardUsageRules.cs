@@ -240,6 +240,27 @@ public static class GuCardUsageRules
         }
     }
 
+    /// <summary>
+    /// 从零强制恢复：无视此前已有的恢复进度，重新按完整恢复周期
+    /// 安排恢复就绪回合（可额外延后指定轮数）。
+    /// </summary>
+    public static void ResetRecovery(
+        CardModel card,
+        int depletedOnTurn,
+        int extraTurns = 0
+    )
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        if (card is not IGuWormCard guCard)
+        {
+            return;
+        }
+
+        int delay = Math.Max(1, guCard.RecoveryDelayTurns) + extraTurns;
+        RecoveryReadyTurnState[card] =
+            Math.Max(1, depletedOnTurn) + delay;
+    }
+
     public static bool HasRecoverySchedule(CardModel card) =>
         card is IGuWormCard && RecoveryReadyTurnState[card] > 0;
 
