@@ -593,7 +593,10 @@ public abstract class AbstractShaZhaoCard
             choiceContext,
             this,
             player,
-            extraRecoveryTurn: false
+            extraRecoveryTurn: false,
+            returnMaterials: !CanonicalKeywords.Contains(
+                CardKeyword.Exhaust
+            )
         );
         await CardExhaustCompat.ExhaustAsync(
             choiceContext,

@@ -133,16 +133,24 @@ public static class GuCardPileSystem
             PileType = definition.PileType;
             RecoveryPileType = recoveryDefinition.PileType;
 
-            // 杀招封装材料的隐藏牌堆：Headless 无 UI，且卡牌节点不可见，
-            // 封存材料既不占用蛊存放堆/恢复堆容量，也不会出现在画面内。
+            // 蛊封存堆：可见牌堆，放在原版消耗牌堆上方，使用原版
+            // 消耗牌堆图标；杀招推演时材料移入此处（不再返回蛊牌堆，
+            // 除非杀招被解体）。hover tip 名称见本地化
+            // sha_zhao_material.title / .description / .empty。
             ModCardPileDefinition materialDefinition =
                 registry.RegisterOwned(
                     MaterialLocalId,
                     new ModCardPileSpec
                     {
                         Scope = ModCardPileScope.CombatOnly,
-                        Style = ModCardPileUiStyle.Headless,
-                        CardShouldBeVisible = false,
+                        Style = ModCardPileUiStyle.BottomRight,
+                        IconPath =
+                            "res://images/packed/combat_ui/exhaust_pile.png",
+                        Anchor = new ModCardPileAnchor(
+                            ModCardPileAnchorKind.BottomRightPrimary,
+                            new Vector2(0f, -140f)
+                        ),
+                        CardShouldBeVisible = true,
                     }
                 );
             MaterialPileType = materialDefinition.PileType;

@@ -548,9 +548,9 @@ internal static class ShaZhaoTuiYanSystem
         MaterialBoundShaZhaoState[material] =
             shaZhao.Id.ToString();
 
-        // 材料从蛊存放堆/恢复堆移入 Headless 隐藏材料堆：
-        // 不占用蛊牌堆容量、无 UI 显示；恢复流程会跳过封装材料，
-        // 因此它既不能催动也不会自动恢复。
+        // 材料从蛊存放堆/恢复堆移入蛊封存堆（可见牌堆，位于原版
+        // 消耗牌堆上方）：使用原版消耗牌动画（飞行动画）移动；
+        // 恢复流程会跳过封装材料，因此它既不能催动也不会自动恢复。
         Player player = material.Owner;
         CardPile materialPile =
             GuCardPileSystem.MaterialPileType
@@ -559,23 +559,41 @@ internal static class ShaZhaoTuiYanSystem
         {
             await GuCardPileSystem.MoveCardToPileAsync(
                 material,
-                GuCardPileSystem.MaterialPileType
+                GuCardPileSystem.MaterialPileType,
+                skipVisuals: false
             );
         }
     }
 
     /// <summary>
     /// 解除封装并送还恢复：杀招正常消耗、主动解体时调用。
+    /// 消耗牌杀招（Exhaust）使用后材料不返还——永久留在蛊封存堆；
+    /// 主动解体始终返还材料。
     /// </summary>
     public static async Task ReleaseMaterialsAsync(
         PlayerChoiceContext choiceContext,
         AbstractShaZhaoCard shaZhao,
         Player player,
-        bool extraRecoveryTurn
+        bool extraRecoveryTurn,
+        bool returnMaterials = true
     )
     {
         IReadOnlyList<CardModel> materials =
             shaZhao.BoundMaterials;
+
+        if (!returnMaterials)
+        {
+            // 消耗牌杀招使用后：材料永久封存（留在蛊封存堆），
+            // 仅清除绑定状态。
+            foreach (CardModel material in materials)
+            {
+                MaterialBoundShaZhaoState[material] =
+                    string.Empty;
+            }
+
+            shaZhao.ClearBoundMaterials();
+            return;
+        }
 
         foreach (CardModel material in materials)
         {
