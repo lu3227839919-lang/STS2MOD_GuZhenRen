@@ -191,6 +191,17 @@ internal static class CardUniquenessPatch
             postfix: nameof(KeywordsPostfix)
         );
 
+        // 卡面渲染实际走 CardModel.Description 属性（getter 内部渲染
+        // LocString），必须先挂这里；牌堆查看/升级预览再补 ForPile 重载。
+        Patch(
+            harmony,
+            AccessTools.PropertyGetter(
+                typeof(CardModel),
+                "Description"
+            ),
+            postfix: nameof(CardDescriptionPostfix)
+        );
+
         Patch(
             harmony,
             typeof(CardModel).GetMethods(
