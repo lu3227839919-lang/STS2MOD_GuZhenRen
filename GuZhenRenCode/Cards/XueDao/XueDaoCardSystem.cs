@@ -10,6 +10,11 @@ namespace GuZhenRen.Cards.XueDao;
 
 internal static class XueDaoCardSystem
 {
+    /// <summary>
+    /// 遗骸在永久牌堆中最多保存的张数。超出后击杀不再生成新遗骸。
+    /// </summary>
+    internal const int MaxPersistentRemains = 4;
+
     internal static IReadOnlyList<YiHai> GetRemains(Player owner) =>
         PileType.Hand
             .GetPile(owner)
@@ -19,6 +24,23 @@ internal static class XueDaoCardSystem
 
     internal static int CountRemains(Player owner) =>
         GetRemains(owner).Count;
+
+    /// <summary>
+    /// 统计最终会保留到永久牌堆的遗骸数量：永久牌堆加上战斗中的
+    /// 抽牌堆/弃牌堆/手牌。已消耗（进入 Exhaust 堆）的遗骸不计入，
+    /// 因此主动消耗后名额会被释放。
+    /// </summary>
+    internal static int CountPersistentRemains(Player owner) =>
+        new[]
+            {
+                owner.Deck,
+                PileType.Draw.GetPile(owner),
+                PileType.Discard.GetPile(owner),
+                PileType.Hand.GetPile(owner),
+            }
+            .Sum(pile =>
+                pile.Cards.Count(static card => card is YiHai)
+            );
 
     internal static async Task<int> ConsumeOldestRemains(
         PlayerChoiceContext choiceContext,
@@ -93,7 +115,14 @@ internal static class XueDaoCardSystem
         int amount
     )
     {
-        for (int index = 0; index < amount; index++)
+        // 永久牌堆中遗骸最多 4 张：已达上限时不再生成新遗骸。
+        int slots = Math.Max(
+            0,
+            MaxPersistentRemains - CountPersistentRemains(owner)
+        );
+        int toAdd = Math.Min(amount, slots);
+
+        for (int index = 0; index < toAdd; index++)
         {
             YiHai card = GuGeneratedCardFactory.Create<YiHai>(
                 owner,

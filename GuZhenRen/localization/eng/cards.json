@@ -134,7 +134,7 @@
   "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.title": "Blade-Wing Blood Bat Gu",
   "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Activate[/gold] {RemainingUses}/{MaxUses}; [gold]Recover[/gold] {RecoveryTurns}. Add a same-rank [gold]Blade-Wing Blood Bat[/gold]; [gold]Devour Remains 2[/gold]: when consuming 2, add a [gold]Blade-Wing Blood Bat Swarm[/gold] instead.",
   "GU_ZHEN_REN_CARD_YI_HAI.title": "Remains",
-  "GU_ZHEN_REN_CARD_YI_HAI.description": "Gain {XueYuanPower:diff()} [gold]Blood Essence[/gold]. Retain. Cannot be parasitized.",
+  "GU_ZHEN_REN_CARD_YI_HAI.description": "Gain {XueYuanPower:diff()} [gold]Blood Essence[/gold]. Retain. Exhausts when used; unused Remains persist in your deck after combat (max 4). Cannot be parasitized.",
   "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU.title": "Blade-Wing Blood Bat",
   "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU.description": "Deal {Damage:diff()} damage {Hits} times. If the initial target had Bleed, attack once more. Then apply {LiuXuePower:diff()} Bleed. Each Blood Skull adds 1 damage to every hit. Ethereal.",
   "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_QUN.title": "Blade-Wing Blood Bat Swarm",

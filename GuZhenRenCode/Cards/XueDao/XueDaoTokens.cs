@@ -36,8 +36,9 @@ public abstract class AbstractXueDaoToken
 }
 
 /// <summary>
-/// 遗骸：寄生牌完成合法击杀后获得。主动使用恢复2点血元，或被
-/// 血颅蛊、刀翅血蝠蛊及相关杀招消耗。
+/// 遗骸：寄生牌完成合法击杀或流血致死后获得。主动使用恢复2点血元后
+/// 立即消耗消失；未被使用的遗骸在战斗结束后保留到永久牌堆（最多4张），
+/// 也可被血颅蛊、刀翅血蝠蛊及相关杀招主动消耗。
 /// </summary>
 [RegisterCard(typeof(GuZhenRenCardPool))]
 public sealed class YiHai : AbstractXueDaoToken
@@ -46,7 +47,7 @@ public sealed class YiHai : AbstractXueDaoToken
         [new PowerVar<XueYuanPower>(2m)];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        [CardKeyword.Retain, CardKeyword.Exhaust];
+        [CardKeyword.Retain];
 
     public YiHai()
         : base(
@@ -58,14 +59,21 @@ public sealed class YiHai : AbstractXueDaoToken
     {
     }
 
-    protected override Task OnPlay(
+    protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay
-    ) => XueDaoPowerSystem.GainXueYuanFromCardEffect(
-        choiceContext,
-        this,
-        DynamicVars[typeof(XueYuanPower).Name].IntValue
-    );
+    )
+    {
+        await XueDaoPowerSystem.GainXueYuanFromCardEffect(
+            choiceContext,
+            this,
+            DynamicVars[typeof(XueYuanPower).Name].IntValue
+        );
+
+        // 遗骸使用后立即消失（进入消耗堆），不可在永久牌堆中复用；
+        // 未使用的遗骸作为非消耗牌在战斗结束后保留至永久牌堆。
+        await CardExhaustCompat.ExhaustAsync(choiceContext, this);
+    }
 
     protected override void OnUpgrade()
     {

@@ -1,5 +1,7 @@
 using System.Linq;
 
+using GuZhenRen.Cards.XueDao;
+
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Creatures;
@@ -66,6 +68,15 @@ public sealed class LiuXuePower : ModPowerTemplate
                 cardSource: null,
                 cardPlay: null
             );
+
+            // 流血造成怪物死亡时同样产生遗骸（受永久牌堆 4 张上限约束）。
+            // 只有真正造成本次致命伤害的流血实例会触发：目标已死后其他
+            // 实例会因上方 IsDead 检查跳过伤害，不会重复生成。
+            if (target.IsDead &&
+                applier?.Player is { } owner)
+            {
+                await XueDaoCardSystem.AddRemains(owner, 1);
+            }
         }
     }
 }

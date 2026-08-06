@@ -134,7 +134,7 @@
   "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.title": "刀翅血蝠蛊",
   "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.description": "[gold]{Rank}转[/gold]。[gold]催动[/gold]{RemainingUses}/{MaxUses}；[gold]恢复[/gold]{RecoveryTurns}。获得同转[gold]刀翅血蝠[/gold]；[gold]嗜骸 2[/gold]：消耗2张时改为获得[gold]刀翅血蝠群[/gold]。",
   "GU_ZHEN_REN_CARD_YI_HAI.title": "遗骸",
-  "GU_ZHEN_REN_CARD_YI_HAI.description": "获得{XueYuanPower:diff()}点[gold]血元[/gold]。保留。不能被寄生。",
+  "GU_ZHEN_REN_CARD_YI_HAI.description": "获得{XueYuanPower:diff()}点[gold]血元[/gold]。保留。使用后消耗；未使用的遗骸在战斗结束后保留至永久牌堆（最多4张）。不能被寄生。",
   "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU.title": "刀翅血蝠",
   "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU.description": "造成{Damage:diff()}点伤害{Hits}次。若最初目标拥有流血，额外攻击1次。随后施加{LiuXuePower:diff()}层流血。每层血颅使每段伤害增加1。虚无。",
   "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_QUN.title": "刀翅血蝠群",
