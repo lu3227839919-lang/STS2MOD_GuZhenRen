@@ -505,6 +505,7 @@ public abstract class AbstractShaZhaoCard
         if (token.StartsWith("net:", StringComparison.Ordinal) &&
             uint.TryParse(token.AsSpan(4), out uint netId) &&
             NetCombatCardDb.Instance.TryGetCard(netId, out CardModel? netCard) &&
+            netCard is not null &&
             netCard.Owner == Owner &&
             !alreadyResolved.Contains(netCard))
         {
