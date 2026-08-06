@@ -302,8 +302,20 @@ internal static class CardUniquenessPatch
         ref IEnumerable<CardModel> __result
     )
     {
-        IEnumerable<CardModel> candidates = __result;
-        if (player.Character is GuZhenRenCharacter)
+        CardModel[] originalCandidates = __result.ToArray();
+
+        // Hook.ModifyMerchantCardPool 同时处理角色卡槽和无色卡槽。
+        // 无色槽的候选必须保持为原版无色池，不能套用“普通奖励只出
+        // 蛊虫”的限制。空候选也按无色查询处理，避免错误注入蛊牌。
+        bool isColorlessMerchantPool =
+            originalCandidates.Length == 0 ||
+            originalCandidates.All(static card =>
+                card.Pool.IsColorless
+            );
+
+        IEnumerable<CardModel> candidates = originalCandidates;
+        if (player.Character is GuZhenRenCharacter &&
+            !isColorlessMerchantPool)
         {
             candidates = candidates.Concat(
                 ModelDb.CardPool<GuZhenRenGuCardPool>().AllCards
@@ -314,6 +326,7 @@ internal static class CardUniquenessPatch
             .GroupBy(card => card.Id)
             .Select(group => group.First())
             .Where(card =>
+                isColorlessMerchantPool ||
                 player.Character is not GuZhenRenCharacter ||
                 GuZhenRenCardRules.CanAppearInCardReward(
                     player,

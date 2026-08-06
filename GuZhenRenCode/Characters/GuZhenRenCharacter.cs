@@ -17,7 +17,7 @@ public sealed class GuZhenRenCharacter : ModCharacterTemplate<GuZhenRenCardPool,
     private const string ImageRoot = $"{Entry.ResPath}/images/characters";
     private const string CharacterScenePath = $"{SceneCharactersRoot}/GuZhenRen_character.tscn";
     private const string EnergyCounterScenePath = $"{ScenesUiRoot}/nodes/GuZhenRen_energy_counter1.tscn";
-    private const string MerchantScenePath = $"{SceneCharactersRoot}/GuZhenRen_merchant.tscn";
+    private const string MerchantScenePath = $"{SceneCharactersRoot}/GuZhenRen_character.tscn";
     private const string RestSiteScenePath = $"{SceneCharactersRoot}/GuZhenRen_rest_site.tscn";
     private const string CharacterSelectBgScenePath = $"{SceneCharactersRoot}/GuZhenRen_character_select_bg.tscn";
 

@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 
 using STS2RitsuLib.Combat.SecondaryResources;
@@ -25,6 +26,14 @@ public sealed class DaoChiXueFuGu : AbstractGuWormCard
     {
         SetDao(Dao.XueDao);
         this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 1);
+    }
+
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add("RecoveryTurns", RecoveryDelayTurns);
     }
 
     protected override async Task OnPlay(

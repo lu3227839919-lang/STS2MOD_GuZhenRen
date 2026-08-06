@@ -1,0 +1,71 @@
+diff --git a/GuZhenRen/localization/eng/cards.json b/GuZhenRen/localization/eng/cards.json
+index 4f98e6a..b980c5a 100644
+--- a/GuZhenRen/localization/eng/cards.json
++++ b/GuZhenRen/localization/eng/cards.json
+@@ -49,7 +49,7 @@
+   "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.title": "Mystic Jade Palm",
+   "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.description": "Deal {Damage:diff()} damage. On the first segment, gain {Block:diff()} Block.{Rank:cond:>=7? NL [gold]Rank 7:[/gold] Costs 1 less Energy.|}{Rank:cond:>=8? NL [gold]Rank 8+:[/gold] Replay once; Replay repeats only the damage.|}",
+   "GU_ZHEN_REN_CARD_XUE_QI_GU.title": "Blood Qi Gu",
+-  "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Activate[/gold] {RemainingUses}/{MaxUses}; [gold]Recover[/gold] {RecoveryTurns}. Pay {BloodCost} [gold]Blood Essence[/gold] and implant [gold]Blood Qi[/gold] ({ParasiteValue}, Bleed {ParasiteBleed}, {TriggerCount} trigger(s){TriggerCount:cond:=1?·{Rate1}%|}{TriggerCount:cond:=2?·{Rate1}%/{Rate2}%|}{TriggerCount:cond:=3?·{Rate1}%/{Rate2}%/{Rate3}%|}). Lose 2 HP per missing Essence; then [gold]Hatch[/gold].",
++  "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Activate[/gold] {RemainingUses}/{MaxUses}; [gold]Recover[/gold] {RecoveryTurns}. Pay {BloodCost} [gold]Blood Essence[/gold] to implant [gold]Blood Qi[/gold] into 1 normal card in your hand: {ParasiteValue} potency, {ParasiteBleed} Bleed, {TriggerCount} trigger(s) ({TriggerCount:cond:=1?{Rate1}%|}{TriggerCount:cond:=2?{Rate1}%/{Rate2}%|}{TriggerCount:cond:=3?{Rate1}%/{Rate2}%/{Rate3}%|}). For each missing Blood Essence, lose 2 HP instead. [gold]Hatches[/gold] after its final trigger.",
+   "GU_ZHEN_REN_CARD_XUE_YUE_GU.title": "Blood Moon Gu",
+   "GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Fusion[/gold]; [gold]Activate[/gold] {RemainingUses}/{MaxUses}; [gold]Recover[/gold] {RecoveryTurns}. Pay 2 [gold]Blood Essence[/gold] and implant [gold]Moon Phase[/gold]. Three-stage shared damage: {CrescentBase}+{CrescentScale}X / {WaxingBase}+{WaxingScale}X / {FullBase}+{FullScale}X; Bleed {CrescentBleed}/{WaxingBleed}/{FullBleed}; Marks {CrescentMarks}/{WaxingMarks}/{FullMarks}. X is host Energy paid.",
+   "GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "Your 10-card Gu capacity is full. Choose an existing Gu Worm to replace to obtain [gold]{NewCard}[/gold].",
+@@ -132,7 +132,7 @@
+   "GU_ZHEN_REN_CARD_XUE_LU_GU.title": "Blood Skull Gu",
+   "GU_ZHEN_REN_CARD_XUE_LU_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Activate[/gold] {RemainingUses}/{MaxUses}. Gain {Block:diff()} Block; [gold]Devour Remains[/gold]. Each absorbed card grants 1 [gold]Blood Skull[/gold]; at the cap, instead heal {Heal:diff()} HP.",
+   "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.title": "Blade-Wing Blood Bat Gu",
+-  "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Activate[/gold] {RemainingUses}/{MaxUses}. Add a same-rank Blade-Wing Blood Bat; with at least 2 [gold]Remains[/gold], choose 2 to consume and add a Blade-Wing Blood Bat Swarm instead.",
++  "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Activate[/gold] {RemainingUses}/{MaxUses}; [gold]Recover[/gold] {RecoveryTurns}. Add 1 same-rank [gold]Blade-Wing Blood Bat[/gold]. With at least 2 [gold]Remains[/gold] in your hand, you may consume 2 of them to add a same-rank [gold]Blade-Wing Blood Bat Swarm[/gold] instead.",
+   "GU_ZHEN_REN_CARD_YI_HAI.title": "Remains",
+   "GU_ZHEN_REN_CARD_YI_HAI.description": "Gain {XueYuanPower:diff()} [gold]Blood Essence[/gold]. Retain. Cannot be parasitized.",
+   "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU.title": "Blade-Wing Blood Bat",
+diff --git a/GuZhenRen/localization/zhs/cards.json b/GuZhenRen/localization/zhs/cards.json
+index df939e5..e33dcd6 100644
+--- a/GuZhenRen/localization/zhs/cards.json
++++ b/GuZhenRen/localization/zhs/cards.json
+@@ -49,7 +49,7 @@
+   "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.title": "玄玉掌",
+   "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.description": "造成{Damage:diff()}点伤害。首段获得{Block:diff()}点格挡。{Rank:cond:>=7? NL [gold]七转：[/gold]能量消耗减少1。|}{Rank:cond:>=8? NL [gold]八转及以上：[/gold]重放1次；Replay只重复伤害。|}",
+   "GU_ZHEN_REN_CARD_XUE_QI_GU.title": "血气蛊",
+-  "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "[gold]{Rank}转[/gold]。[gold]催动[/gold]{RemainingUses}/{MaxUses}；[gold]恢复[/gold]{RecoveryTurns}。支付{BloodCost}点[gold]血元[/gold]，选择普通手牌植入[gold]血气[/gold]（{ParasiteValue}，流血{ParasiteBleed}，触发{TriggerCount}次{TriggerCount:cond:=1?·{Rate1}%|}{TriggerCount:cond:=2?·{Rate1}%/{Rate2}%|}{TriggerCount:cond:=3?·{Rate1}%/{Rate2}%/{Rate3}%|}）。不足血元每点失去2生命；完成后[gold]孵化[/gold]。",
++  "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "[gold]{Rank}转[/gold]。[gold]催动[/gold]{RemainingUses}/{MaxUses}；[gold]恢复[/gold]{RecoveryTurns}。支付{BloodCost}点[gold]血元[/gold]，选择1张普通手牌植入[gold]血气[/gold]：强度{ParasiteValue}，流血{ParasiteBleed}，触发{TriggerCount}次（{TriggerCount:cond:=1?{Rate1}%|}{TriggerCount:cond:=2?{Rate1}%/{Rate2}%|}{TriggerCount:cond:=3?{Rate1}%/{Rate2}%/{Rate3}%|}）。血元不足时，每缺1点改为失去2点生命；最后一次触发后[gold]孵化[/gold]。",
+   "GU_ZHEN_REN_CARD_XUE_YUE_GU.title": "血月蛊",
+   "GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "[gold]{Rank}转[/gold]。[gold]合练[/gold]；[gold]催动[/gold]{RemainingUses}/{MaxUses}；[gold]恢复[/gold]{RecoveryTurns}。支付2点[gold]血元[/gold]，植入[gold]月相[/gold]。三阶段[gold]总额度[/gold]伤害：{CrescentBase}+{CrescentScale}X／{WaxingBase}+{WaxingScale}X／{FullBase}+{FullScale}X；流血{CrescentBleed}/{WaxingBleed}/{FullBleed}；血印{CrescentMarks}/{WaxingMarks}/{FullMarks}。X为宿主支付能量。",
+   "GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "蛊虫容量已达10张。选择一张现有蛊虫替换，以获得[gold]{NewCard}[/gold]。",
+@@ -132,7 +132,7 @@
+   "GU_ZHEN_REN_CARD_XUE_LU_GU.title": "血颅蛊",
+   "GU_ZHEN_REN_CARD_XUE_LU_GU.description": "[gold]{Rank}转[/gold]。[gold]催动[/gold]{RemainingUses}/{MaxUses}。获得{Block:diff()}点格挡；[gold]噬骸[/gold]。每张获得1层[gold]血颅[/gold]；满层后改为回复{Heal:diff()}点生命。",
+   "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.title": "刀翅血蝠蛊",
+-  "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.description": "[gold]{Rank}转[/gold]。[gold]催动[/gold]{RemainingUses}/{MaxUses}。获得同转刀翅血蝠；若至少有2张[gold]遗骸[/gold]，选择2张消耗并改为获得刀翅血蝠群。",
++  "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.description": "[gold]{Rank}转[/gold]。[gold]催动[/gold]{RemainingUses}/{MaxUses}；[gold]恢复[/gold]{RecoveryTurns}。获得1张同转[gold]刀翅血蝠[/gold]。若手牌中至少有2张[gold]遗骸[/gold]，可选择消耗其中2张，改为获得同转[gold]刀翅血蝠群[/gold]。",
+   "GU_ZHEN_REN_CARD_YI_HAI.title": "遗骸",
+   "GU_ZHEN_REN_CARD_YI_HAI.description": "获得{XueYuanPower:diff()}点[gold]血元[/gold]。保留。不能被寄生。",
+   "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU.title": "刀翅血蝠",
+diff --git a/GuZhenRenCode/Cards/XueDao/DaoChiXueFuGu.cs b/GuZhenRenCode/Cards/XueDao/DaoChiXueFuGu.cs
+index 21333c3..7972ac7 100644
+--- a/GuZhenRenCode/Cards/XueDao/DaoChiXueFuGu.cs
++++ b/GuZhenRenCode/Cards/XueDao/DaoChiXueFuGu.cs
+@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.CardSelection;
+ using MegaCrit.Sts2.Core.Commands;
+ using MegaCrit.Sts2.Core.Entities.Cards;
+ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
++using MegaCrit.Sts2.Core.Localization;
+ using MegaCrit.Sts2.Core.Models;
+ 
+ using STS2RitsuLib.Combat.SecondaryResources;
+@@ -27,6 +28,14 @@ public sealed class DaoChiXueFuGu : AbstractGuWormCard
+         this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 1);
+     }
+ 
++    protected override void AddExtraArgsToDescription(
++        LocString description
++    )
++    {
++        base.AddExtraArgsToDescription(description);
++        description.Add("RecoveryTurns", RecoveryDelayTurns);
++    }
++
+     protected override async Task OnPlay(
+         PlayerChoiceContext choiceContext,
+         CardPlay cardPlay
