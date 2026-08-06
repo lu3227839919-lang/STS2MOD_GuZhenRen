@@ -18,7 +18,7 @@ namespace GuZhenRen.Cards;
 /// </summary>
 public static class GuCardPileSystem
 {
-    public const int ActivePileCapacity = 7;
+    public const int ActivePileCapacity = 5;
 
     public const string LocalId = "gu_cards";
 
