@@ -1,4 +1,4 @@
-BaiHong.png
+﻿BaiHong.png
 BaiHongGuanRi.png
 BaiLiXianYuan.png
 CanMang.png
@@ -6,7 +6,6 @@ CanYue.png
 ChuiDong.png
 DingGuangFu.png
 DingGuangGu.png
-EnemyTargetChoice.png
 FanHui.png
 FanZhao.png
 GuZhenRenDefend.png
@@ -31,8 +30,6 @@ NingJingHui.png
 NingYueMang.png
 QingTiXianYuan.png
 RiYun.png
-SaveGuangHuiChoice.png
-SpendGuangHuiChoice.png
 TianYueMang.png
 WeiGuang.png
 XiaoGuangGu.png
