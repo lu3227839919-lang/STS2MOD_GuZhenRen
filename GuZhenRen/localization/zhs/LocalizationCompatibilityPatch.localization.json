@@ -111,16 +111,16 @@
       "description": "光辉不少于9点时，自动消耗9点光辉并触发本牌的耀化效果。"
     },
     "ShiHai1": {
-      "title": "噬骸 1",
-      "description": "选择至多1张遗骸进行吸收。"
+      "title": "嗜骸 1",
+      "description": "本牌可选择至多1张手牌中的遗骸进行消耗或吸收；具体收益见卡牌描述。"
     },
     "ShiHai2": {
-      "title": "噬骸 2",
-      "description": "选择至多2张遗骸进行吸收。"
+      "title": "嗜骸 2",
+      "description": "本牌可选择至多2张手牌中的遗骸进行消耗或吸收；具体收益见卡牌描述。"
     },
     "ShiHai3": {
-      "title": "噬骸 3",
-      "description": "选择至多3张遗骸进行吸收。"
+      "title": "嗜骸 3",
+      "description": "本牌可选择至多3张手牌中的遗骸进行消耗或吸收；具体收益见卡牌描述。"
     }
   },
   "cardDescriptionOverrides": {
@@ -129,7 +129,19 @@
     "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description": "作为仙元保留在手中。可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
     "GU_ZHEN_REN_CARD_HONG_ZAO_XIAN_YUAN.description": "作为仙元保留在手中。等于两张青提仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
     "GU_ZHEN_REN_CARD_BAI_LI_XIAN_YUAN.description": "作为仙元保留在手中。等于两张红枣仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
-    "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description": "作为仙元保留在手中。等于两张白荔仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。"
+    "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description": "作为仙元保留在手中。等于两张白荔仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
+    "GU_ZHEN_REN_CARD_XUE_CHI_GU.description": "[gold]{Rank}转[/gold]。[gold]催动[/gold]{RemainingUses}/{MaxUses}；[gold]恢复[/gold]{RecoveryTurns}。获得{XueYuanPower:diff()}点[gold]血元[/gold]；[gold]溢出[/gold]每点转化为{OverflowBlock}点格挡。",
+    "GU_ZHEN_REN_CARD_XUE_PI_GU.description": "[gold]{Rank}转[/gold]。[gold]催动[/gold]{RemainingUses}/{MaxUses}；[gold]恢复[/gold]{RecoveryTurns}。获得{Block:diff()}点格挡；可自动支付1点[gold]血元[/gold]额外获得{EmpoweredBlock}点。每层[gold]血颅[/gold]再增加2点。",
+    "GU_ZHEN_REN_CARD_XUE_LU_GU.description": "[gold]{Rank}转[/gold]。[gold]催动[/gold]{RemainingUses}/{MaxUses}；[gold]恢复[/gold]{RecoveryTurns}。获得{Block:diff()}点格挡；[gold]嗜骸 {MaxAbsorb}[/gold]：每张获得1层[gold]血颅[/gold]，满层后改为回复{Heal:diff()}点生命。",
+    "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.description": "[gold]{Rank}转[/gold]。[gold]催动[/gold]{RemainingUses}/{MaxUses}；[gold]恢复[/gold]{RecoveryTurns}。获得1张同转[gold]刀翅血蝠[/gold]。[gold]嗜骸 2[/gold]：若手牌中至少有2张[gold]遗骸[/gold]，消耗2张并改为获得同转[gold]刀翅血蝠群[/gold]。",
+    "GU_ZHEN_REN_CARD_XUE_FU_WANG_GU.description": "[gold]{Rank}转[/gold]。[gold]催动[/gold]{RemainingUses}/{MaxUses}；[gold]恢复[/gold]{RecoveryTurns}。[gold]嗜骸 2[/gold]：获得同转[gold]血蝠王[/gold]，每张使其增加2次攻击；嗜骸2张时获得[gold]追击[/gold]。照常结算[gold]血颅[/gold]。",
+    "GU_ZHEN_REN_CARD_XUE_HE_JIA_GU.description": "[gold]{Rank}转[/gold]。[gold]催动[/gold]{RemainingUses}/{MaxUses}；[gold]恢复[/gold]{RecoveryTurns}。[gold]血河[/gold]：血元低于4时获得{LowBloodGain}点血元与{LowBlock}点格挡；否则支付2点血元获得{HighBlock}点格挡，下回合再获得一半。每层血颅使格挡+2。",
+    "GU_ZHEN_REN_CARD_WAN_HAI_GUI_CHAO.description": "[gold]嗜骸 3[/gold]。形成{Damage:diff()}＋每张{DamagePerRemains}点的总伤害池并分配给所有敌人；获得{Block:diff()}＋每张{BlockPerRemains}点格挡。",
+    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI.extraCardText": "附魔·血气（{Rank}转）：剩余{TriggersRemaining}次触发；打出宿主后结算。",
+    "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.extraCardText": "附魔·月相（{Rank}转·残月）：剩余{TriggersRemaining}次触发；打出宿主后推进。",
+    "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.extraCardText": "附魔·月相（{Rank}转·盈月）：剩余{TriggersRemaining}次触发；打出宿主后推进。",
+    "GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.extraCardText": "附魔·月相（{Rank}转·满月）：剩余{TriggersRemaining}次触发；打出宿主后孵化。",
+    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS.extraCardText": "附魔·血胎（{Rank}转）：{Stage}/3点胎动，剩余{TriggersRemaining}次触发；3点时孵化。"
   },
   "characterNameOverrides": {
     "title": "古月方源",

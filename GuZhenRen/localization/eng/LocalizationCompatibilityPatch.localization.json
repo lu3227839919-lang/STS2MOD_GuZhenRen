@@ -112,15 +112,15 @@
     },
     "ShiHai1": {
       "title": "Devour Remains 1",
-      "description": "Choose up to 1 Remains card to absorb."
+      "description": "Choose up to 1 Remains in your hand to consume or absorb; see this card's description for the effect."
     },
     "ShiHai2": {
       "title": "Devour Remains 2",
-      "description": "Choose up to 2 Remains cards to absorb."
+      "description": "Choose up to 2 Remains in your hand to consume or absorb; see this card's description for the effect."
     },
     "ShiHai3": {
       "title": "Devour Remains 3",
-      "description": "Choose up to 3 Remains cards to absorb."
+      "description": "Choose up to 3 Remains in your hand to consume or absorb; see this card's description for the effect."
     }
   },
   "cardDescriptionOverrides": {
@@ -129,7 +129,19 @@
     "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description": "Retain as immortal essence. Provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
     "GU_ZHEN_REN_CARD_HONG_ZAO_XIAN_YUAN.description": "Retain as immortal essence. Equals two Green Grape essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
     "GU_ZHEN_REN_CARD_BAI_LI_XIAN_YUAN.description": "Retain as immortal essence. Equals two Red Date essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
-    "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description": "Retain as immortal essence. Equals two White Litchi essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted."
+    "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description": "Retain as immortal essence. Equals two White Litchi essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
+    "GU_ZHEN_REN_CARD_XUE_CHI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Activate[/gold] {RemainingUses}/{MaxUses}; [gold]Recover[/gold] {RecoveryTurns}. Gain {XueYuanPower:diff()} [gold]Blood Essence[/gold]; each point of [gold]Overflow[/gold] becomes {OverflowBlock} Block.",
+    "GU_ZHEN_REN_CARD_XUE_PI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Activate[/gold] {RemainingUses}/{MaxUses}; [gold]Recover[/gold] {RecoveryTurns}. Gain {Block:diff()} Block; may automatically pay 1 [gold]Blood Essence[/gold] for {EmpoweredBlock} more. Each [gold]Blood Skull[/gold] adds 2.",
+    "GU_ZHEN_REN_CARD_XUE_LU_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Activate[/gold] {RemainingUses}/{MaxUses}; [gold]Recover[/gold] {RecoveryTurns}. Gain {Block:diff()} Block; [gold]Devour Remains {MaxAbsorb}[/gold]: each card grants 1 [gold]Blood Skull[/gold], or heals {Heal:diff()} HP while at the cap.",
+    "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Activate[/gold] {RemainingUses}/{MaxUses}; [gold]Recover[/gold] {RecoveryTurns}. Add 1 same-rank [gold]Blade-Wing Blood Bat[/gold]. [gold]Devour Remains 2[/gold]: with at least 2 [gold]Remains[/gold] in hand, consume 2 and add a same-rank [gold]Blade-Wing Blood Bat Swarm[/gold] instead.",
+    "GU_ZHEN_REN_CARD_XUE_FU_WANG_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Activate[/gold] {RemainingUses}/{MaxUses}; [gold]Recover[/gold] {RecoveryTurns}. [gold]Devour Remains 2[/gold]: add a same-rank [gold]Blood Bat King[/gold]; each card adds 2 hits, and 2 grants [gold]Pursuit[/gold]. Resolve [gold]Blood Skull[/gold] normally.",
+    "GU_ZHEN_REN_CARD_XUE_HE_JIA_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Activate[/gold] {RemainingUses}/{MaxUses}; [gold]Recover[/gold] {RecoveryTurns}. [gold]Blood River[/gold]: below 4 Essence, gain {LowBloodGain} Essence and {LowBlock} Block; otherwise pay 2 for {HighBlock} Block and gain half next turn. Each Blood Skull adds 2 Block.",
+    "GU_ZHEN_REN_CARD_WAN_HAI_GUI_CHAO.description": "[gold]Devour Remains 3[/gold]. Split a {Damage:diff()} + {DamagePerRemains} per Remains damage pool among all enemies. Gain {Block:diff()} + {BlockPerRemains} Block per Remains.",
+    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI.extraCardText": "Enchantment · Blood Qi (Rank {Rank}): {TriggersRemaining} trigger(s) remain; resolves after the host is played.",
+    "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.extraCardText": "Enchantment · Moon Phase (Rank {Rank} · Crescent): {TriggersRemaining} trigger(s) remain; advances after the host is played.",
+    "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.extraCardText": "Enchantment · Moon Phase (Rank {Rank} · Waxing): {TriggersRemaining} trigger(s) remain; advances after the host is played.",
+    "GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.extraCardText": "Enchantment · Moon Phase (Rank {Rank} · Full): {TriggersRemaining} trigger(s) remain; hatches after the host is played.",
+    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS.extraCardText": "Enchantment · Blood Fetus (Rank {Rank}): {Stage}/3 Fetal Movement, {TriggersRemaining} trigger(s) remain; hatches at 3."
   },
   "characterNameOverrides": {
     "title": "Gu Yue Fang Yuan",

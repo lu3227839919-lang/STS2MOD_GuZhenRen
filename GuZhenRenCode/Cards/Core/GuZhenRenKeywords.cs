@@ -172,7 +172,7 @@ public sealed class GuZhenRenKeywords
             _ => throw new ArgumentOutOfRangeException(
                 nameof(maximum),
                 maximum,
-                "噬骸选择上限必须位于一至三张。"
+                "嗜骸选择上限必须位于一至三张。"
             ),
         };
 

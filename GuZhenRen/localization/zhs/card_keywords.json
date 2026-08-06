@@ -55,10 +55,10 @@
   "GU_ZHEN_REN_KEYWORD_YAO_HUA8.description": "光辉不少于8点时，自动消耗8点光辉并触发本牌的耀化效果。",
   "GU_ZHEN_REN_KEYWORD_YAO_HUA9.title": "耀化 9",
   "GU_ZHEN_REN_KEYWORD_YAO_HUA9.description": "光辉不少于9点时，自动消耗9点光辉并触发本牌的耀化效果。",
-  "GU_ZHEN_REN_KEYWORD_SHI_HAI1.title": "噬骸 1",
-  "GU_ZHEN_REN_KEYWORD_SHI_HAI1.description": "选择至多1张遗骸进行吸收。",
-  "GU_ZHEN_REN_KEYWORD_SHI_HAI2.title": "噬骸 2",
-  "GU_ZHEN_REN_KEYWORD_SHI_HAI2.description": "选择至多2张遗骸进行吸收。",
-  "GU_ZHEN_REN_KEYWORD_SHI_HAI3.title": "噬骸 3",
-  "GU_ZHEN_REN_KEYWORD_SHI_HAI3.description": "选择至多3张遗骸进行吸收。"
+  "GU_ZHEN_REN_KEYWORD_SHI_HAI1.title": "嗜骸 1",
+  "GU_ZHEN_REN_KEYWORD_SHI_HAI1.description": "本牌可选择至多1张手牌中的遗骸进行消耗或吸收；具体收益见卡牌描述。",
+  "GU_ZHEN_REN_KEYWORD_SHI_HAI2.title": "嗜骸 2",
+  "GU_ZHEN_REN_KEYWORD_SHI_HAI2.description": "本牌可选择至多2张手牌中的遗骸进行消耗或吸收；具体收益见卡牌描述。",
+  "GU_ZHEN_REN_KEYWORD_SHI_HAI3.title": "嗜骸 3",
+  "GU_ZHEN_REN_KEYWORD_SHI_HAI3.description": "本牌可选择至多3张手牌中的遗骸进行消耗或吸收；具体收益见卡牌描述。"
 }

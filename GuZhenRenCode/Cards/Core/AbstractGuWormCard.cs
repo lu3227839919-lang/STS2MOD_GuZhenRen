@@ -2,6 +2,7 @@ using GuZhenRen.Cards.Interfaces;
 using GuZhenRen.Combat;
 
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 
 namespace GuZhenRen.Cards;
@@ -71,6 +72,18 @@ public abstract class AbstractGuWormCard
     {
     }
 
+    /// <summary>
+    /// 所有真正蛊虫都向卡面提供恢复回合数。派生类可继续覆盖同名
+    /// 参数；LocString 会以最后一次写入为准，不会产生重复变量。
+    /// </summary>
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add("RecoveryTurns", RecoveryDelayTurns);
+    }
+
     private IEnumerable<CardKeyword> GetCommonGuKeywords()
     {
         yield return GuZhenRenKeywords.CuiDong;
@@ -125,10 +138,12 @@ public abstract class AbstractGuWormCard
             "DaoChiXueFuGu" =>
             [
                 GuZhenRenKeywords.ZhuiJi,
+                GuZhenRenKeywords.GetShiHaiKeyword(2),
             ],
             "XueFuWangGu" =>
             [
                 GuZhenRenKeywords.ZhuiJi,
+                GuZhenRenKeywords.GetShiHaiKeyword(2),
             ],
             _ => [],
         };

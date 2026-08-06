@@ -17,6 +17,7 @@ using MegaCrit.Sts2.Core.Nodes.Cards;
 using MegaCrit.Sts2.Core.Nodes.CommonUi;
 using MegaCrit.Sts2.Core.Random;
 using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 
 namespace GuZhenRen.Cards;
 
@@ -188,6 +189,26 @@ internal static class CardUniquenessPatch
                 [typeof(KeywordSources)]
             ),
             postfix: nameof(KeywordsPostfix)
+        );
+
+        Patch(
+            harmony,
+            AccessTools.Method(
+                typeof(CardModel),
+                nameof(CardModel.GetDescriptionForPile),
+                [typeof(PileType), typeof(Creature)]
+            ),
+            postfix: nameof(CardDescriptionPostfix)
+        );
+
+        Patch(
+            harmony,
+            AccessTools.Method(
+                typeof(CardModel),
+                nameof(CardModel.GetDescriptionForUpgradePreview),
+                Type.EmptyTypes
+            ),
+            postfix: nameof(CardDescriptionPostfix)
         );
 
         _initialized = true;
@@ -965,6 +986,28 @@ internal static class CardUniquenessPatch
         }
 
         __result = keywords;
+    }
+
+    /// <summary>
+    /// 以原版附魔额外文本相同的紫色样式展示寄生状态，但不写入
+    /// CardModel.Enchantment，避免覆盖宿主已有附魔。
+    /// </summary>
+    private static void CardDescriptionPostfix(
+        CardModel __instance,
+        ref string __result
+    )
+    {
+        string description =
+            XueDaoParasiteSystem.GetEnchantmentDescription(__instance);
+        if (string.IsNullOrWhiteSpace(description))
+        {
+            return;
+        }
+
+        string extraText = $"[purple]{description}[/purple]";
+        __result = string.IsNullOrEmpty(__result)
+            ? extraText
+            : __result + '\n' + extraText;
     }
 
     private sealed class RewardQueryScope

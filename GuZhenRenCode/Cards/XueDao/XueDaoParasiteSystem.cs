@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
 
@@ -74,6 +75,49 @@ public static class XueDaoParasiteSystem
     public static int GetRank(CardModel card) => Math.Max(0, RankState[card]);
     public static int GetStage(CardModel card) => Math.Max(0, StageState[card]);
     public static int GetTriggersRemaining(CardModel card) => Math.Max(0, TriggersRemainingState[card]);
+
+    /// <summary>
+    /// 返回寄生宿主应追加在卡面上的附魔说明。寄生继续使用可保存的
+    /// AttachedState，不占用 CardModel 唯一的原版附魔槽，因而能与
+    /// 宿主原有附魔共存，也不会改变旧存档和多人快照的结构。
+    /// </summary>
+    public static string GetEnchantmentDescription(CardModel host)
+    {
+        ParasiteKind kind = NormalizeLegacyKind(GetKind(host));
+        if (kind == ParasiteKind.None)
+        {
+            return string.Empty;
+        }
+
+        string entry = kind switch
+        {
+            ParasiteKind.BloodQi =>
+                "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI.extraCardText",
+            ParasiteKind.BloodMoon => GetStage(host) switch
+            {
+                <= 0 => "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.extraCardText",
+                1 => "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.extraCardText",
+                _ => "GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.extraCardText",
+            },
+            ParasiteKind.BloodFetus =>
+                "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS.extraCardText",
+            _ => string.Empty,
+        };
+
+        if (string.IsNullOrEmpty(entry))
+        {
+            return string.Empty;
+        }
+
+        LocString description = new("cards", entry);
+        description.Add("Rank", GetRank(host));
+        description.Add("Stage", Math.Clamp(GetStage(host), 0, 3));
+        description.Add(
+            "TriggersRemaining",
+            GetTriggersRemaining(host)
+        );
+        return description.GetFormattedText();
+    }
 
     internal static void MarkResolving(CardModel card, bool resolving) =>
         ResolvingState[card] = resolving;
