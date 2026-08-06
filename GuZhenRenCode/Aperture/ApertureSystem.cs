@@ -207,7 +207,7 @@ public static class ApertureSystem
     /// 推演成功后登记次数；八至九转每场最多 2 次，
     /// 第一次成功后再把第二张“杀招推演”放入弃牌堆。
     /// </summary>
-    internal static void RegisterShaZhaoDerivation(
+    internal static async Task RegisterShaZhaoDerivationAsync(
         Player player
     )
     {
@@ -254,7 +254,7 @@ public static class ApertureSystem
                     ModelDb.Card<ShaZhaoTuiYan>(),
                     player
                 );
-            _ = AddShaZhaoDerivationToDiscardAsync(
+            await AddShaZhaoDerivationToDiscardAsync(
                 player,
                 second
             );

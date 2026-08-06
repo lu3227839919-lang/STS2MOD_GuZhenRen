@@ -37,6 +37,8 @@ public static class GuCardPileSystem
     /// 杀招封装材料的隐藏牌堆：Headless 样式，无任何 UI，
     /// 封存的材料既不占用蛊存放堆也不占用蛊恢复堆。
     /// </summary>
+    public const string MaterialLocalId = "sha_zhao_material";
+
     public const string MaterialPileId =
         "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL";
 
@@ -131,15 +133,16 @@ public static class GuCardPileSystem
             PileType = definition.PileType;
             RecoveryPileType = recoveryDefinition.PileType;
 
-            // 杀招封装材料的隐藏牌堆：Headless 无 UI，封存材料不占用
-            // 蛊存放堆与蛊恢复堆的容量与显示。
+            // 杀招封装材料的隐藏牌堆：Headless 无 UI，且卡牌节点不可见，
+            // 封存材料既不占用蛊存放堆/恢复堆容量，也不会出现在画面内。
             ModCardPileDefinition materialDefinition =
                 registry.RegisterOwned(
-                    MaterialPileId,
+                    MaterialLocalId,
                     new ModCardPileSpec
                     {
                         Scope = ModCardPileScope.CombatOnly,
                         Style = ModCardPileUiStyle.Headless,
+                        CardShouldBeVisible = false,
                     }
                 );
             MaterialPileType = materialDefinition.PileType;
@@ -736,6 +739,57 @@ public static class GuCardPileSystem
     )
     {
         MoveCardWithoutAnimation(card, targetPile);
+    }
+
+    /// <summary>
+    /// Moves an existing combat card through the native pile command.
+    /// Direct internal moves can leave an ExtraHand holder alive, so use
+    /// this path when a card enters or leaves a UI-backed custom pile.
+    /// </summary>
+    internal static async Task MoveCardToPileAsync(
+        CardModel card,
+        PileType targetPile,
+        bool skipVisuals = true
+    )
+    {
+        ArgumentNullException.ThrowIfNull(card);
+
+        EnsureInitialized();
+
+        CardPile destination = targetPile.GetPile(card.Owner);
+        if (ReferenceEquals(card.Pile, destination))
+        {
+            return;
+        }
+
+        try
+        {
+            await CardPileCmd.Add(
+                [card],
+                targetPile,
+                CardPilePosition.Bottom,
+                clonedBy: null,
+                skipVisuals: skipVisuals
+            );
+        }
+        catch (Exception exception)
+        {
+            if (!ReferenceEquals(card.Pile, destination))
+            {
+                MoveCardWithoutAnimation(card, destination);
+            }
+
+            Entry.Logger.Warn(
+                $"[蛊牌堆] 原生移牌失败，已回退内部移牌：" +
+                $"card={card.Id}, target={targetPile}, " +
+                $"error={exception.Message}"
+            );
+        }
+
+        if (!ReferenceEquals(card.Pile, destination))
+        {
+            MoveCardWithoutAnimation(card, destination);
+        }
     }
 
     private static int GetActiveGuCount(Player owner) =>

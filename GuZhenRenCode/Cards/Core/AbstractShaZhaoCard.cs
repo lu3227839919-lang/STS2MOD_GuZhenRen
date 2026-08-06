@@ -505,7 +505,7 @@ public abstract class AbstractShaZhaoCard
     /// 创建成功后把真实材料封装进本杀招：
     /// 材料打上绑定标记、从蛊虫循环中移出，本杀招记录材料 ID。
     /// </summary>
-    internal void BindMaterials(
+    internal async Task BindMaterialsAsync(
         IReadOnlyList<CardModel> materials
     )
     {
@@ -523,7 +523,7 @@ public abstract class AbstractShaZhaoCard
 
         foreach (CardModel material in materials)
         {
-            ShaZhaoTuiYanSystem.MarkMaterialSealed(
+            await ShaZhaoTuiYanSystem.MarkMaterialSealedAsync(
                 material,
                 this
             );
@@ -642,4 +642,3 @@ public abstract class AbstractShaZhaoCard
         );
     }
 }
-

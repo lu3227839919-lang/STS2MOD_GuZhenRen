@@ -1,6 +1,7 @@
 using GuZhenRen.Cards;
 using GuZhenRen.Characters;
 
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Models;
 
@@ -76,10 +77,11 @@ public sealed class ShaZhaoTuiYan : ModCardTemplate
         }
         else
         {
-            // 取消/失败：推演牌回到手牌，不消耗能量与元气。
-            GuCardPileSystem.MoveCardToPile(
+            // 取消/失败：推演牌回到普通手牌，不消耗能量与元气。
+            await GuCardPileSystem.MoveCardToPileAsync(
                 this,
-                PileType.Hand.GetPile(Owner)
+                PileType.Hand,
+                skipVisuals: false
             );
         }
     }

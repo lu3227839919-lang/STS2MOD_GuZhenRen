@@ -293,14 +293,22 @@ internal static class ShaZhaoTuiYanSystem
             prompt.Add("SelectedCount", selected.Count);
 
             bool hasSelectedMaterial = selected.Count > 0;
+            bool hasCompleteRecipe =
+                ShaZhaoRecipeRegistry.HasMatchingRecipe(selected);
+
+            // A partial recipe must collect another card before the
+            // selector can be confirmed.  The old min=0 setting allowed a
+            // single material to be submitted and only reported
+            // invalidRecipe after the selector closed.
             CardSelectorPrefs prefs = new(
                 prompt,
-                hasSelectedMaterial ? 0 : 1,
+                hasSelectedMaterial && hasCompleteRecipe ? 0 : 1,
                 1
             )
             {
-                Cancelable = hasSelectedMaterial,
-                RequireManualConfirmation = hasSelectedMaterial,
+                Cancelable = true,
+                RequireManualConfirmation =
+                    hasSelectedMaterial && hasCompleteRecipe,
                 PretendCardsCanBePlayed = true,
             };
 
@@ -532,7 +540,7 @@ internal static class ShaZhaoTuiYanSystem
             MaterialBoundShaZhaoState[card].Length > 0;
     }
 
-    internal static void MarkMaterialSealed(
+    internal static async Task MarkMaterialSealedAsync(
         CardModel material,
         CardModel shaZhao
     )
@@ -549,9 +557,9 @@ internal static class ShaZhaoTuiYanSystem
                 .GetPile(player);
         if (!ReferenceEquals(material.Pile, materialPile))
         {
-            GuCardPileSystem.MoveCardToPile(
+            await GuCardPileSystem.MoveCardToPileAsync(
                 material,
-                materialPile
+                GuCardPileSystem.MaterialPileType
             );
         }
     }
@@ -571,7 +579,7 @@ internal static class ShaZhaoTuiYanSystem
 
         foreach (CardModel material in materials)
         {
-            UnsealMaterial(
+            await UnsealMaterialAsync(
                 material,
                 shaZhao,
                 player,
@@ -595,12 +603,30 @@ internal static class ShaZhaoTuiYanSystem
         {
             MaterialBoundShaZhaoState[material] =
                 string.Empty;
+
+            CardPile recoveryPile =
+                GuCardPileSystem.RecoveryPileType
+                    .GetPile(player);
+            if (!ReferenceEquals(material.Pile, recoveryPile))
+            {
+                GuCardPileSystem.MoveCardToPile(
+                    material,
+                    recoveryPile
+                );
+            }
+
+            int currentTurn =
+                player.PlayerCombatState?.TurnNumber ?? 0;
+            GuCardUsageRules.ScheduleRecovery(
+                material,
+                currentTurn
+            );
         }
 
         shaZhao.ClearBoundMaterials();
     }
 
-    private static void UnsealMaterial(
+    private static async Task UnsealMaterialAsync(
         CardModel material,
         AbstractShaZhaoCard shaZhao,
         Player player,
@@ -616,9 +642,9 @@ internal static class ShaZhaoTuiYanSystem
                 .GetPile(player);
         if (!ReferenceEquals(material.Pile, recoveryPile))
         {
-            GuCardPileSystem.MoveCardToPile(
+            await GuCardPileSystem.MoveCardToPileAsync(
                 material,
-                recoveryPile
+                GuCardPileSystem.RecoveryPileType
             );
         }
 
@@ -734,10 +760,10 @@ internal static class ShaZhaoTuiYanSystem
         );
 
         // 材料封装：材料移入隐藏材料区并绑定到杀招。
-        shaZhao.BindMaterials(selectedCards);
+        await shaZhao.BindMaterialsAsync(selectedCards);
 
         // 登记每场推演次数；八至九转补发第二张推演牌。
-        ApertureSystem.RegisterShaZhaoDerivation(player);
+        await ApertureSystem.RegisterShaZhaoDerivationAsync(player);
 
         // 杀招加入手牌（满手时入弃牌堆）。
         bool addedToHand =
