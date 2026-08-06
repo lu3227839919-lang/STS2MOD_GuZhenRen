@@ -1,4 +1,4 @@
-using GuZhenRen.Cards.HeLian;
+﻿using GuZhenRen.Cards.HeLian;
 using GuZhenRen.Cards.XueDao;
 using GuZhenRen.Powers.XueDao;
 
@@ -45,7 +45,7 @@ public sealed class XueYueJi : AbstractShaZhaoCard
     public override ShaZhaoLifecycle Lifecycle =>
         ShaZhaoLifecycle.Charged;
 
-    public override int MaxUses => GuRank switch
+    public override int ShaZhaoMaxUses => GuRank switch
     {
         <= 2 => 1,
         <= 5 => 2,
@@ -129,3 +129,4 @@ public sealed class XueYueJi : AbstractShaZhaoCard
         EnergyCost.UpgradeBy(-1);
     }
 }
+

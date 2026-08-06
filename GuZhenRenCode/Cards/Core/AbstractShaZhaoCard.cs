@@ -1,4 +1,4 @@
-using MegaCrit.Sts2.Core.Commands;
+﻿using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -422,7 +422,7 @@ public abstract class AbstractShaZhaoCard
     /// <summary>
     /// 次数型杀招的总使用次数。
     /// </summary>
-    public virtual int MaxUses => 1;
+    public virtual int ShaZhaoMaxUses => 1;
 
     /// <summary>
     /// 阶段型杀招的总阶段数。
@@ -437,7 +437,7 @@ public abstract class AbstractShaZhaoCard
         get => Math.Clamp(
             SpentUsesState[this],
             0,
-            MaxUses
+            ShaZhaoMaxUses
         );
         private set => SpentUsesState[this] = value;
     }
@@ -556,7 +556,7 @@ public abstract class AbstractShaZhaoCard
             case ShaZhaoLifecycle.Charged:
                 int spent = SpentUses + 1;
                 SpentUses = spent;
-                if (spent >= MaxUses)
+                if (spent >= ShaZhaoMaxUses)
                 {
                     await ConsumeAndReturnAsync(choiceContext);
                 }
@@ -642,3 +642,4 @@ public abstract class AbstractShaZhaoCard
         );
     }
 }
+

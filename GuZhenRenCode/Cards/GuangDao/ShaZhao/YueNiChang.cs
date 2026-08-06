@@ -1,4 +1,4 @@
-using GuZhenRen.Cards.GuangDao;
+﻿using GuZhenRen.Cards.GuangDao;
 using GuZhenRen.Cards.Interfaces;
 using GuZhenRen.Cards.TuDao;
 using GuZhenRen.Characters;
@@ -58,7 +58,7 @@ public sealed class YueNiChang
     public override ShaZhaoLifecycle Lifecycle =>
         ShaZhaoLifecycle.Charged;
 
-    public override int MaxUses => 2;
+    public override int ShaZhaoMaxUses => 2;
 
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
@@ -178,3 +178,4 @@ public sealed class YueNiChang
         };
     }
 }
+

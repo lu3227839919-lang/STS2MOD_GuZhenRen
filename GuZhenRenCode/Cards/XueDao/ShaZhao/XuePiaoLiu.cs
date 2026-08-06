@@ -1,4 +1,4 @@
-using GuZhenRen.Cards.HeLian;
+﻿using GuZhenRen.Cards.HeLian;
 using GuZhenRen.Cards.XueDao;
 using GuZhenRen.Multiplayer;
 using GuZhenRen.Powers.XueDao;
@@ -46,7 +46,7 @@ public sealed class XuePiaoLiu : AbstractShaZhaoCard
     public override ShaZhaoLifecycle Lifecycle =>
         ShaZhaoLifecycle.Charged;
 
-    public override int MaxUses => 2;
+    public override int ShaZhaoMaxUses => 2;
 
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
@@ -190,3 +190,4 @@ public sealed class XuePiaoLiu : AbstractShaZhaoCard
         };
     }
 }
+

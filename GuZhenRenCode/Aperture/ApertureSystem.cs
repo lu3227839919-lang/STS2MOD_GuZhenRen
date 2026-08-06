@@ -176,7 +176,7 @@ public static class ApertureSystem
 
         CardModel derivation = player
             .Creature
-            .CombatState
+            .CombatState!
             .CreateCard(
                 ModelDb.Card<ShaZhaoTuiYan>(),
                 player
@@ -249,7 +249,7 @@ public static class ApertureSystem
         {
             CardModel second = player
                 .Creature
-                .CombatState
+                .CombatState!
                 .CreateCard(
                     ModelDb.Card<ShaZhaoTuiYan>(),
                     player

@@ -1,4 +1,4 @@
-using GuZhenRen.Cards.GuangDao;
+﻿using GuZhenRen.Cards.GuangDao;
 using GuZhenRen.Characters;
 using GuZhenRen.Powers.GuangDao;
 
@@ -182,3 +182,4 @@ public sealed class JingYueFanZhao : AbstractShaZhaoCard
         };
     }
 }
+
