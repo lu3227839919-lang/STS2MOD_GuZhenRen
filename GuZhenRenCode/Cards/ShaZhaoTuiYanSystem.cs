@@ -540,17 +540,18 @@ internal static class ShaZhaoTuiYanSystem
         MaterialBoundShaZhaoState[material] =
             shaZhao.Id.ToString();
 
-        // 材料从蛊存放牌堆移入蛊恢复堆（封装区）：
-        // 恢复流程会跳过封装材料，因此它既不能催动也不会自动恢复。
+        // 材料从蛊存放堆/恢复堆移入 Headless 隐藏材料堆：
+        // 不占用蛊牌堆容量、无 UI 显示；恢复流程会跳过封装材料，
+        // 因此它既不能催动也不会自动恢复。
         Player player = material.Owner;
-        CardPile guPile =
-            GuCardPileSystem.PileType.GetPile(player);
-        if (ReferenceEquals(material.Pile, guPile))
+        CardPile materialPile =
+            GuCardPileSystem.MaterialPileType
+                .GetPile(player);
+        if (!ReferenceEquals(material.Pile, materialPile))
         {
             GuCardPileSystem.MoveCardToPile(
                 material,
-                GuCardPileSystem.RecoveryPileType
-                    .GetPile(player)
+                materialPile
             );
         }
     }

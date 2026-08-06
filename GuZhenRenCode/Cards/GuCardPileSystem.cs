@@ -33,6 +33,13 @@ public static class GuCardPileSystem
 
     public const string DiscardPileId = RecoveryPileId;
 
+    /// <summary>
+    /// 杀招封装材料的隐藏牌堆：Headless 样式，无任何 UI，
+    /// 封存的材料既不占用蛊存放堆也不占用蛊恢复堆。
+    /// </summary>
+    public const string MaterialPileId =
+        "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL";
+
     private const string OpeningDrawRngStreamId =
         "gu_pile/opening_draw";
 
@@ -46,6 +53,12 @@ public static class GuCardPileSystem
     public static PileType RecoveryPileType { get; private set; }
 
     public static PileType DiscardPileType => RecoveryPileType;
+
+    /// <summary>
+    /// 杀招封装材料的隐藏牌堆（无 UI）。封存后材料从蛊存放堆/恢复堆
+    /// 移入此处，不占用蛊牌堆容量；解体或杀招消耗后移回。
+    /// </summary>
+    public static PileType MaterialPileType { get; private set; }
 
     private static readonly object SyncRoot = new();
 
@@ -117,6 +130,20 @@ public static class GuCardPileSystem
 
             PileType = definition.PileType;
             RecoveryPileType = recoveryDefinition.PileType;
+
+            // 杀招封装材料的隐藏牌堆：Headless 无 UI，封存材料不占用
+            // 蛊存放堆与蛊恢复堆的容量与显示。
+            ModCardPileDefinition materialDefinition =
+                registry.RegisterOwned(
+                    MaterialPileId,
+                    new ModCardPileSpec
+                    {
+                        Scope = ModCardPileScope.CombatOnly,
+                        Style = ModCardPileUiStyle.Headless,
+                    }
+                );
+            MaterialPileType = materialDefinition.PileType;
+
             _initialized = true;
         }
     }
