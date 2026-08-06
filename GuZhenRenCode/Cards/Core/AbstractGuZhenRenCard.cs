@@ -32,6 +32,51 @@ namespace GuZhenRen.Cards;
 /// </summary>
 public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
 {
+    private static readonly IReadOnlyDictionary<Dao, string>
+        DaoTitleLocalizationKeys =
+            new Dictionary<Dao, string>
+            {
+                [Dao.GuangDao] = "GU_ZHEN_REN_DAO_GUANG_DAO.title",
+                [Dao.YanDao] = "GU_ZHEN_REN_DAO_YAN_DAO.title",
+                [Dao.LiDao] = "GU_ZHEN_REN_DAO_LI_DAO.title",
+                [Dao.JinDao] = "GU_ZHEN_REN_DAO_JIN_DAO.title",
+                [Dao.TouDao] = "GU_ZHEN_REN_DAO_TOU_DAO.title",
+                [Dao.MuDao] = "GU_ZHEN_REN_DAO_MU_DAO.title",
+                [Dao.ShiDao] = "GU_ZHEN_REN_DAO_SHI_DAO.title",
+                [Dao.ShaDao] = "GU_ZHEN_REN_DAO_SHA_DAO.title",
+                [Dao.GuDao] = "GU_ZHEN_REN_DAO_GU_DAO.title",
+                [Dao.LuDao] = "GU_ZHEN_REN_DAO_LU_DAO.title",
+                [Dao.ZhiDao] = "GU_ZHEN_REN_DAO_ZHI_DAO.title",
+                [Dao.BianHuaDao] = "GU_ZHEN_REN_DAO_BIAN_HUA_DAO.title",
+                [Dao.YinYangDao] = "GU_ZHEN_REN_DAO_YIN_YANG_DAO.title",
+                [Dao.JianDao] = "GU_ZHEN_REN_DAO_JIAN_DAO.title",
+                [Dao.XueDao] = "GU_ZHEN_REN_DAO_XUE_DAO.title",
+                [Dao.YunDao] = "GU_ZHEN_REN_DAO_YUN_DAO.title",
+                [Dao.FengDao] = "GU_ZHEN_REN_DAO_FENG_DAO.title",
+                [Dao.ZhouDao] = "GU_ZHEN_REN_DAO_ZHOU_DAO.title",
+                [Dao.TuDao] = "GU_ZHEN_REN_DAO_TU_DAO.title",
+            };
+
+    public override string Title
+    {
+        get
+        {
+            string cardTitle = base.Title;
+            if (CurrentDao is not { } dao ||
+                !DaoTitleLocalizationKeys.TryGetValue(
+                    dao,
+                    out string? key
+                ))
+            {
+                return cardTitle;
+            }
+
+            string daoTitle = new LocString("cards", key)
+                .GetFormattedText();
+            return $"{daoTitle}-{cardTitle}";
+        }
+    }
+
     /// <summary>
     /// 默认使用与具体运行时卡牌类型同名的 PNG。
     /// </summary>

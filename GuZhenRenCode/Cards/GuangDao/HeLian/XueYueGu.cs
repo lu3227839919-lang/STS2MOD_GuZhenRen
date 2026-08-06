@@ -32,17 +32,8 @@ public sealed class XueYueGu : AbstractHeLianGuCard
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         base.CanonicalKeywords.Concat(
         [
-            GuZhenRenKeywords.XueYuan,
-            GuZhenRenKeywords.XueJi,
             GuZhenRenKeywords.YueXiang,
-            GuZhenRenKeywords.CanYue,
-            GuZhenRenKeywords.YingYue,
-            GuZhenRenKeywords.ManYue,
             GuZhenRenKeywords.ZongEDu,
-            GuZhenRenKeywords.PoTai,
-            GuZhenRenKeywords.FuHua,
-            GuZhenRenKeywords.LiuXue,
-            GuZhenRenKeywords.XueYin,
         ]).Distinct();
 
     protected override bool IsPlayable =>

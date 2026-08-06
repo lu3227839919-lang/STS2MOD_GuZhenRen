@@ -3,6 +3,7 @@ using System.Threading;
 
 using HarmonyLib;
 
+using GuZhenRen.Cards.Basic;
 using GuZhenRen.Characters;
 using GuZhenRen.Cards.XueDao;
 
@@ -139,7 +140,7 @@ internal static class CardUniquenessPatch
                     typeof(bool),
                 ]
             ),
-            postfix: nameof(TransformationOptionsPostfix)
+            prefix: nameof(TransformationOptionsPrefix)
         );
 
         // 单张显式转换最终也会调用这个批量重载。
@@ -154,6 +155,20 @@ internal static class CardUniquenessPatch
                     typeof(CardPreviewStyle),
                 ]
             )
+        );
+
+        Patch(
+            harmony,
+            AccessTools.Method(
+                typeof(CardCmd),
+                nameof(CardCmd.TransformToRandom),
+                [
+                    typeof(CardModel),
+                    typeof(Rng),
+                    typeof(CardPreviewStyle),
+                ]
+            ),
+            prefix: nameof(TransformToRandomPrefix)
         );
 
         Patch(
@@ -442,22 +457,117 @@ internal static class CardUniquenessPatch
         return __exception;
     }
 
-    private static void TransformationOptionsPostfix(
+    private static bool TransformationOptionsPrefix(
         CardModel original,
+        IEnumerable<CardModel> originalOptions,
+        bool isInCombat,
         ref CardModel[] __result
     )
     {
+        if (original.Owner.Character is not GuZhenRenCharacter ||
+            original.Pool is not (
+                GuZhenRenCardPool or GuZhenRenGuCardPool
+            ))
+        {
+            return true;
+        }
+
         TransformationPlan? plan =
             ActiveTransformationPlan.Value;
 
-        __result = __result.Where(replacement =>
-            GuZhenRenCardRules.CanUseAsTransformationResult(
-                original,
-                replacement,
-                plan?.IgnoredOriginals,
-                plan?.PlannedAdditions
+        IReadOnlySet<CardModel> ignoredOriginals =
+            plan?.IgnoredOriginals ??
+            new HashSet<CardModel> { original };
+
+        IEnumerable<CardModel> candidates = originalOptions;
+
+        if (original.Pool is GuZhenRenCardPool)
+        {
+            candidates = candidates.Where(card =>
+                card is GuZhenRenStrike or GuZhenRenDefend
+            );
+        }
+        else
+        {
+            candidates = candidates.Where(card =>
+                card.Rarity is CardRarity.Common or
+                    CardRarity.Uncommon or CardRarity.Rare
+            );
+        }
+
+        if (isInCombat)
+        {
+            candidates = candidates.Where(card =>
+                card.CanBeGeneratedInCombat
+            );
+        }
+
+        candidates = CardFactory.FilterForPlayerCount(
+            original.Owner.RunState,
+            candidates.Where(card => card.Id != original.Id)
+        );
+
+        __result = candidates
+            .Where(replacement =>
+                GuZhenRenCardRules.CanUseAsTransformationResult(
+                    original,
+                    replacement,
+                    ignoredOriginals,
+                    plan?.PlannedAdditions
+                )
             )
-        ).ToArray();
+            .GroupBy(card => card.Id)
+            .Select(group => group.First())
+            .OrderBy(card => card.Id.ToString(), StringComparer.Ordinal)
+            .ToArray();
+
+        return false;
+    }
+
+    /// <summary>
+    /// 原版单张随机转换对空结果直接调用 First()。最终仍无候选时保留
+    /// 原牌并返回失败结果，使事件继续收尾而不会软锁。
+    /// </summary>
+    private static bool TransformToRandomPrefix(
+        CardModel original,
+        ref Task<CardPileAddResult> __result
+    )
+    {
+        if (original.Owner.Character is not GuZhenRenCharacter ||
+            original.Pool is not (
+                GuZhenRenCardPool or GuZhenRenGuCardPool
+            ))
+        {
+            return true;
+        }
+
+        bool hasCandidate = CardFactory
+            .GetDefaultTransformationOptions(
+                original,
+                original.CombatState != null
+            )
+            .Any();
+
+        if (hasCandidate)
+        {
+            return true;
+        }
+
+        Entry.Logger.Warn(
+            $"{original.Id} 没有合法转换候选，已保留原牌并结束转换。"
+        );
+        CardPile? pile = original.Pile;
+        __result = Task.FromResult(
+            new CardPileAddResult
+            {
+                success = false,
+                cardAdded = original,
+                oldPile = pile,
+                targetPile = pile?.Type ?? PileType.None,
+                modifyingModels = null,
+            }
+        );
+        return false;
     }
 
     /// <summary>

@@ -27,14 +27,10 @@ public sealed class XueTaiGu : AbstractHeLianGuCard
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         base.CanonicalKeywords.Concat(
         [
-            GuZhenRenKeywords.XueYuan,
-            GuZhenRenKeywords.XueJi,
             GuZhenRenKeywords.XueTai,
             GuZhenRenKeywords.TaiDong,
             GuZhenRenKeywords.TunJi,
-            GuZhenRenKeywords.PoTai,
             GuZhenRenKeywords.FuHua,
-            GuZhenRenKeywords.ZongEDu,
         ]).Distinct();
 
     public override int RecoveryDelayTurns => GuRank >= 7 ? 4 : 3;

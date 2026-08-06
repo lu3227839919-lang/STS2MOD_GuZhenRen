@@ -32,28 +32,37 @@ public sealed class DaoChiXueFuGu : AbstractGuWormCard
         CardPlay cardPlay
     )
     {
-        DaoChiXueFu normal = GuGeneratedCardFactory.Create<DaoChiXueFu>(
-            Owner,
-            GuRank,
-            upgraded: IsUpgraded
-        );
-
         if (XueDaoCardSystem.CountRemains(Owner) < 2)
         {
-            await GuGeneratedCardFactory.AddToHandOrDiscard(normal, Owner);
+            DaoChiXueFu normal =
+                GuGeneratedCardFactory.Create<DaoChiXueFu>(
+                    Owner,
+                    GuRank,
+                    upgraded: IsUpgraded
+                );
+            await GuGeneratedCardFactory.AddToHandOrDiscard(
+                normal,
+                Owner
+            );
             return;
         }
 
-        DaoChiXueFuQun swarm =
-            GuGeneratedCardFactory.Create<DaoChiXueFuQun>(
-                Owner,
-                GuRank,
-                upgraded: IsUpgraded
+        // 选择界面使用未登记进 CombatState 的预览模型，避免未选中的
+        // 正式战斗牌残留为不可见孤儿牌。
+        DaoChiXueFu normalPreview =
+            GuCardReferenceFactory.Create<DaoChiXueFu>(
+                this,
+                IsUpgraded
+            );
+        DaoChiXueFuQun swarmPreview =
+            GuCardReferenceFactory.Create<DaoChiXueFuQun>(
+                this,
+                IsUpgraded
             );
 
         CardModel? selected = (await CardSelectCmd.FromSimpleGrid(
             choiceContext,
-            [normal, swarm],
+            [normalPreview, swarmPreview],
             Owner,
             new CardSelectorPrefs(SelectionScreenPrompt, 1)
             {
@@ -62,7 +71,8 @@ public sealed class DaoChiXueFuGu : AbstractGuWormCard
             }
         )).FirstOrDefault();
 
-        if (selected is DaoChiXueFuQun)
+        bool useSwarm = selected is DaoChiXueFuQun;
+        if (useSwarm)
         {
             int consumed = await XueDaoCardSystem.ConsumeOldestRemains(
                 choiceContext,
@@ -77,12 +87,24 @@ public sealed class DaoChiXueFuGu : AbstractGuWormCard
                 Entry.Logger.Warn(
                     "[刀翅血蝠蛊] 选择血蝠群后遗骸不足，已降级为基础血蝠。"
                 );
-                selected = normal;
+                useSwarm = false;
             }
         }
 
+        AbstractGuZhenRenCard generated = useSwarm
+            ? GuGeneratedCardFactory.Create<DaoChiXueFuQun>(
+                Owner,
+                GuRank,
+                upgraded: IsUpgraded
+            )
+            : GuGeneratedCardFactory.Create<DaoChiXueFu>(
+                Owner,
+                GuRank,
+                upgraded: IsUpgraded
+            );
+
         await GuGeneratedCardFactory.AddToHandOrDiscard(
-            selected ?? normal,
+            generated,
             Owner
         );
     }

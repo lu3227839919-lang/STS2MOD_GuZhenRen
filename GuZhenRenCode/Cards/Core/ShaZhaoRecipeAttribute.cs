@@ -5,7 +5,7 @@ namespace GuZhenRen.Cards.ShaZhao;
 /// <summary>
 /// 杀招配方声明特性。
 ///
-/// 参数顺序就是配方顺序：
+/// 参数只声明材料类型与数量，顺序不影响配方：
 ///
 /// <code>
 /// [ShaZhaoRecipe(
@@ -14,14 +14,14 @@ namespace GuZhenRen.Cards.ShaZhao;
 /// )]
 /// </code>
 ///
-/// 只匹配玩家依次选择 A、B 的情况；B、A 是另一条配方。
+/// 玩家依次选择 A、B 或 B、A 都会匹配同一条配方。
 ///
 /// 规则：
 ///
-/// 1. 材料顺序影响匹配；
-/// 2. 重复材料的数量和位置都影响匹配；
-/// 3. 同一杀招可以声明多条有序配方；
-/// 4. 两张杀招不能声明完全相同的有序配方。
+/// 1. 材料顺序不影响匹配；
+/// 2. 重复材料的数量影响匹配；
+/// 3. 同一杀招可以声明多条配方；
+/// 4. 两张杀招不能声明完全相同的配方。
 /// </summary>
 [AttributeUsage(
     AttributeTargets.Class,
@@ -68,7 +68,7 @@ public sealed class ShaZhaoRecipeAttribute
             }
         }
 
-        // 克隆时保留声明顺序，不进行任何排序。
+        // 克隆保证特性参数不会被外部修改；注册表负责规范化顺序。
         MaterialCardTypes =
             Array.AsReadOnly(
                 (Type[])
@@ -77,7 +77,7 @@ public sealed class ShaZhaoRecipeAttribute
     }
 
     /// <summary>
-    /// 严格按声明顺序保存的材料类型。
+    /// 声明的材料类型。匹配时由注册表按稳定顺序规范化。
     /// </summary>
     public IReadOnlyList<Type>
         MaterialCardTypes

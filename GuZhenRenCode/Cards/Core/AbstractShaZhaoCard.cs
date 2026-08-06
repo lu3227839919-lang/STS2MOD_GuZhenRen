@@ -181,11 +181,12 @@ public abstract class AbstractShaZhaoCard
     }
 
     // =================================================================
-    //  有序组成与转数
+    //  稳定组成快照与转数
     // =================================================================
 
     /// <summary>
-    /// 使用玩家按顺序选择的材料初始化杀招。
+    /// 使用玩家选择的材料初始化杀招。存档字段名保留 Ordered 前缀，
+    /// 以兼容旧存档。
     ///
     /// 最终转数等于所有材料 GuRank 的最大值。
     /// 未实现 IGuRankProvider 的材料按零转处理。
@@ -199,8 +200,24 @@ public abstract class AbstractShaZhaoCard
             orderedMaterials
         );
 
-        CardModel[] materials =
-            orderedMaterials.ToArray();
+        // 稳定排序使不同客户端即使选牌顺序不同，也写入相同附加状态。
+        CardModel[] materials = orderedMaterials
+            .Select((card, index) => (card, index))
+            .OrderBy(
+                item => item.card.GetType().FullName ??
+                    item.card.GetType().Name,
+                StringComparer.Ordinal
+            )
+            .ThenByDescending(item => GetMaterialRank(item.card))
+            .ThenBy(item => item.card.CurrentUpgradeLevel)
+            .ThenBy(
+                item => item.card.Enchantment?.Id.ToString() ??
+                    string.Empty,
+                StringComparer.Ordinal
+            )
+            .ThenBy(item => item.index)
+            .Select(item => item.card)
+            .ToArray();
 
         OrderedMaterialTypeNamesState[this] =
             EncodeMaterialTypeNames(

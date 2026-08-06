@@ -13,11 +13,13 @@ using HarmonyLib;
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes.CommonUi;
 using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib;
@@ -256,35 +258,25 @@ internal static class ShaZhaoTuiYanSystem
                 guPile
             );
 
-        if (selectedCards.Count == 0 ||
-            playerCombatState.Energy < ActivationEnergyCost ||
+        if (selectedCards.Count == 0)
+        {
+            return;
+        }
+
+        if (playerCombatState.Energy < ActivationEnergyCost ||
             !selectedCards.All(card =>
                 ReferenceEquals(card.Owner, player) &&
                 card.Pile?.Type == GuCardPileSystem.PileType &&
                 IsEligibleMaterial(card)
             ))
         {
+            ShowSynthesisFailure(player, "stateChanged");
             return;
         }
 
-        bool hasMatchingRecipe =
-            ShaZhaoRecipeRegistry.HasMatchingRecipe(
-                selectedCards
-            );
-
-        if (!hasMatchingRecipe)
+        if (!ShaZhaoRecipeRegistry.HasMatchingRecipe(selectedCards))
         {
-            // 错误配方保持原规则：先支付 1 点基础能量，再结算催动或反噬。
-            await PlayerCmd.LoseEnergy(
-                ActivationEnergyCost,
-                player
-            );
-            await ResolveFailedRecipe(
-                choiceContext,
-                player,
-                selectedCards,
-                playerCombatState
-            );
+            ShowSynthesisFailure(player, "invalidRecipe");
             return;
         }
 
@@ -296,13 +288,19 @@ internal static class ShaZhaoTuiYanSystem
         if (SecondaryResourceCmd.Get(
                 player,
                 YuanQiSystem.ResourceId
-            ) < yuanQiCost ||
-            !ShaZhaoRecipeRegistry.TryCreateResult(
+            ) < yuanQiCost)
+        {
+            ShowSynthesisFailure(player, "insufficientResources");
+            return;
+        }
+
+        if (!ShaZhaoRecipeRegistry.TryCreateResult(
                 selectedCards,
                 player,
                 out AbstractShaZhaoCard? shaZhao
             ))
         {
+            ShowSynthesisFailure(player, "creationFailed");
             return;
         }
 
@@ -317,9 +315,8 @@ internal static class ShaZhaoTuiYanSystem
 
         if (!spentYuanQi)
         {
-            var combatState = shaZhao.CombatState;
-            shaZhao.RemoveFromState();
-            combatState?.RemoveCard(shaZhao);
+            RemoveUncommittedResult(shaZhao);
+            ShowSynthesisFailure(player, "insufficientResources");
             return;
         }
 
@@ -335,6 +332,61 @@ internal static class ShaZhaoTuiYanSystem
             selectedCards,
             shaZhao
         );
+    }
+
+    private static void RemoveUncommittedResult(
+        AbstractShaZhaoCard shaZhao
+    )
+    {
+        var combatState = shaZhao.CombatState;
+        shaZhao.RemoveFromState();
+        combatState?.RemoveCard(shaZhao);
+    }
+
+    /// <summary>
+    /// 失败只影响发起玩家的界面；托管行动仍在所有端以相同状态结束。
+    /// 材料尚未移动，因此无需补偿命令，直接保留在蛊牌堆。
+    /// </summary>
+    private static void ShowSynthesisFailure(
+        Player player,
+        string reason
+    )
+    {
+        Entry.Logger.Info(
+            $"杀招推演失败（{reason}）：未消耗费用，材料保留在蛊牌堆。"
+        );
+
+        if (!LocalContext.IsMe(player))
+        {
+            return;
+        }
+
+        NModalContainer? container = NModalContainer.Instance;
+        if (container == null || container.OpenModal != null)
+        {
+            return;
+        }
+
+        LocString title = new(
+            "cards",
+            "GU_ZHEN_REN_SHA_ZHAO_SYNTHESIS.failureTitle"
+        );
+        LocString body = new(
+            "cards",
+            $"GU_ZHEN_REN_SHA_ZHAO_SYNTHESIS.{reason}"
+        );
+
+        NErrorPopup? popup = NErrorPopup.Create(
+            title,
+            body,
+            cancel: null,
+            showReportBugButton: false
+        );
+
+        if (popup != null)
+        {
+            container.Add(popup);
+        }
     }
 
     /// <summary>

@@ -146,38 +146,21 @@ public abstract class AbstractGuWormCard
             ],
             "XueQiGu" =>
             [
-                GuZhenRenKeywords.XueYuan,
-                GuZhenRenKeywords.XueJi,
                 GuZhenRenKeywords.XueQi,
-                GuZhenRenKeywords.PoTai,
                 GuZhenRenKeywords.FuHua,
                 GuZhenRenKeywords.YiHai,
-                GuZhenRenKeywords.LiuXue,
             ],
             "XueYueGu" =>
             [
-                GuZhenRenKeywords.XueYuan,
-                GuZhenRenKeywords.XueJi,
                 GuZhenRenKeywords.YueXiang,
-                GuZhenRenKeywords.CanYue,
-                GuZhenRenKeywords.YingYue,
-                GuZhenRenKeywords.ManYue,
                 GuZhenRenKeywords.ZongEDu,
-                GuZhenRenKeywords.PoTai,
-                GuZhenRenKeywords.FuHua,
-                GuZhenRenKeywords.LiuXue,
-                GuZhenRenKeywords.XueYin,
             ],
             "XueTaiGu" =>
             [
-                GuZhenRenKeywords.XueYuan,
-                GuZhenRenKeywords.XueJi,
                 GuZhenRenKeywords.XueTai,
                 GuZhenRenKeywords.TaiDong,
                 GuZhenRenKeywords.TunJi,
-                GuZhenRenKeywords.PoTai,
                 GuZhenRenKeywords.FuHua,
-                GuZhenRenKeywords.ZongEDu,
             ],
             "XueChiGu" =>
             [
@@ -197,15 +180,12 @@ public abstract class AbstractGuWormCard
             "DaoChiXueFuGu" =>
             [
                 GuZhenRenKeywords.YiHai,
-                GuZhenRenKeywords.XueLu,
-                GuZhenRenKeywords.LiuXue,
                 GuZhenRenKeywords.ZhuiJi,
             ],
             "XueFuWangGu" =>
             [
                 GuZhenRenKeywords.YiHai,
                 GuZhenRenKeywords.XueLu,
-                GuZhenRenKeywords.LiuXue,
                 GuZhenRenKeywords.ZhuiJi,
             ],
             "XueHeJiaGu" =>
