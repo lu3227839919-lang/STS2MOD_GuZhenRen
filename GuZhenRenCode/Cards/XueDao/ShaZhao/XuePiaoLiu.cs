@@ -53,92 +53,97 @@ public sealed class XuePiaoLiu : AbstractShaZhaoCard
         CardPlay cardPlay
     )
     {
-        await AdvanceLifecycleAsync(choiceContext);
-
-        Creature? destination = cardPlay.Target;
-        if (destination == null || !IsValidTarget(destination) ||
-            CombatState == null)
+        try
         {
-            return;
-        }
-
-        List<Creature> route = GuZhenRenDeterminism
-            .OrderCreatures(CombatState.HittableEnemies)
-            .Where(enemy => enemy.IsAlive && !ReferenceEquals(enemy, destination))
-            .ToList();
-        route.Add(destination);
-
-        int carry = 0;
-        int maximumConsumed = DynamicVars[MaxBleedConsumedVar].IntValue;
-        int damagePerBleed = DynamicVars[DamagePerBleedVar].IntValue;
-
-        foreach (Creature enemy in route)
-        {
-            LiuXuePower? power = XueDaoPowerSystem.GetLiuXue(
-                enemy,
-                Owner.Creature
-            );
-            int totalBleed = (power?.Amount ?? 0) + carry;
-            int consumed = Math.Min(maximumConsumed, totalBleed);
-            int remaining = Math.Max(0, totalBleed - consumed);
-
-            await XueDaoPowerSystem.SetLiuXueAmount(
-                choiceContext,
-                this,
-                enemy,
-                0
-            );
-
-            if (enemy.IsAlive)
+            Creature? destination = cardPlay.Target;
+            if (destination == null || !IsValidTarget(destination) ||
+                CombatState == null)
             {
-                await DamageCmd
-                    .Attack(
-                        DynamicVars.Damage.BaseValue +
-                        consumed * damagePerBleed
-                    )
-                    .FromCard(this, cardPlay)
-                    .Targeting(enemy)
-                    .WithHitFx("vfx/vfx_attack_slash")
-                    .Execute(choiceContext);
+                return;
             }
 
-            if (ReferenceEquals(enemy, destination))
+            List<Creature> route = GuZhenRenDeterminism
+                .OrderCreatures(CombatState.HittableEnemies)
+                .Where(enemy => enemy.IsAlive && !ReferenceEquals(enemy, destination))
+                .ToList();
+            route.Add(destination);
+
+            int carry = 0;
+            int maximumConsumed = DynamicVars[MaxBleedConsumedVar].IntValue;
+            int damagePerBleed = DynamicVars[DamagePerBleedVar].IntValue;
+
+            foreach (Creature enemy in route)
             {
-                // 六转质变：血潮抵达终点时，按本次经过的敌人数量
-                // 对终点额外施加流血（九转上限 4 层）。
-                if (GuRank >= 6 && enemy.IsAlive)
+                LiuXuePower? power = XueDaoPowerSystem.GetLiuXue(
+                    enemy,
+                    Owner.Creature
+                );
+                int totalBleed = (power?.Amount ?? 0) + carry;
+                int consumed = Math.Min(maximumConsumed, totalBleed);
+                int remaining = Math.Max(0, totalBleed - consumed);
+
+                await XueDaoPowerSystem.SetLiuXueAmount(
+                    choiceContext,
+                    this,
+                    enemy,
+                    0
+                );
+
+                if (enemy.IsAlive)
                 {
-                    int maxExtraBleed = GuRank >= 9 ? 4 : 3;
-                    int extraBleed = Math.Min(
-                        maxExtraBleed,
-                        route.Count
-                    );
-                    if (extraBleed > 0)
+                    await DamageCmd
+                        .Attack(
+                            DynamicVars.Damage.BaseValue +
+                            consumed * damagePerBleed
+                        )
+                        .FromCard(this, cardPlay)
+                        .Targeting(enemy)
+                        .WithHitFx("vfx/vfx_attack_slash")
+                        .Execute(choiceContext);
+                }
+
+                if (ReferenceEquals(enemy, destination))
+                {
+                    // 六转质变：血潮抵达终点时，按本次经过的敌人数量
+                    // 对终点额外施加流血（九转上限 4 层）。
+                    if (GuRank >= 6 && enemy.IsAlive)
+                    {
+                        int maxExtraBleed = GuRank >= 9 ? 4 : 3;
+                        int extraBleed = Math.Min(
+                            maxExtraBleed,
+                            route.Count
+                        );
+                        if (extraBleed > 0)
+                        {
+                            await XueDaoPowerSystem.ApplyLiuXue(
+                                choiceContext,
+                                this,
+                                enemy,
+                                extraBleed
+                            );
+                        }
+                    }
+
+                    if (remaining > 0 && enemy.IsAlive)
                     {
                         await XueDaoPowerSystem.ApplyLiuXue(
                             choiceContext,
                             this,
                             enemy,
-                            extraBleed
+                            remaining
                         );
                     }
+                    carry = 0;
                 }
-
-                if (remaining > 0 && enemy.IsAlive)
+                else
                 {
-                    await XueDaoPowerSystem.ApplyLiuXue(
-                        choiceContext,
-                        this,
-                        enemy,
-                        remaining
-                    );
+                    carry = remaining;
                 }
-                carry = 0;
             }
-            else
-            {
-                carry = remaining;
-            }
+        }
+        finally
+        {
+            await AdvanceLifecycleAsync(choiceContext);
         }
     }
 
@@ -190,4 +195,3 @@ public sealed class XuePiaoLiu : AbstractShaZhaoCard
         };
     }
 }
-

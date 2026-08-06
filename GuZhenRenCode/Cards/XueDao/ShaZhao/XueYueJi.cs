@@ -57,70 +57,75 @@ public sealed class XueYueJi : AbstractShaZhaoCard
         CardPlay cardPlay
     )
     {
-        await AdvanceLifecycleAsync(choiceContext);
-
-        // 可选宿主区域随转数提升：
-        // 一至五转仅手牌，六至七转加入弃牌堆，八至九转再加入抽牌堆。
-        List<CardModel> candidates =
-        [
-            .. PileType.Hand.GetPile(Owner).Cards
-                .Where(XueDaoParasiteSystem.HasParasite),
-        ];
-
-        if (GuRank >= 6)
+        try
         {
-            candidates.AddRange(
-                PileType.Discard.GetPile(Owner).Cards
-                    .Where(XueDaoParasiteSystem.HasParasite)
-            );
-        }
+            // 可选宿主区域随转数提升：
+            // 一至五转仅手牌，六至七转加入弃牌堆，八至九转再加入抽牌堆。
+            List<CardModel> candidates =
+            [
+                .. PileType.Hand.GetPile(Owner).Cards
+                    .Where(XueDaoParasiteSystem.HasParasite),
+            ];
 
-        if (GuRank >= 8)
-        {
-            candidates.AddRange(
-                PileType.Draw.GetPile(Owner).Cards
-                    .Where(XueDaoParasiteSystem.HasParasite)
-            );
-        }
+            if (GuRank >= 6)
+            {
+                candidates.AddRange(
+                    PileType.Discard.GetPile(Owner).Cards
+                        .Where(XueDaoParasiteSystem.HasParasite)
+                );
+            }
 
-        if (candidates.Count == 0)
-        {
-            return;
-        }
+            if (GuRank >= 8)
+            {
+                candidates.AddRange(
+                    PileType.Draw.GetPile(Owner).Cards
+                        .Where(XueDaoParasiteSystem.HasParasite)
+                );
+            }
 
-        CardModel? host = (
-            await CardSelectCmd.FromSimpleGrid(
+            if (candidates.Count == 0)
+            {
+                return;
+            }
+
+            CardModel? host = (
+                await CardSelectCmd.FromSimpleGrid(
+                    choiceContext,
+                    candidates.ToArray(),
+                    Owner,
+                    new CardSelectorPrefs(SelectionScreenPrompt, 1)
+                    {
+                        Cancelable = false,
+                        RequireManualConfirmation = true,
+                    }
+                )
+            ).FirstOrDefault();
+
+            if (host == null)
+            {
+                return;
+            }
+
+            await XueDaoParasiteSystem.TriggerDetachedAsync(
                 choiceContext,
-                candidates.ToArray(),
-                Owner,
-                new CardSelectorPrefs(SelectionScreenPrompt, 1)
-                {
-                    Cancelable = false,
-                    RequireManualConfirmation = true,
-                }
-            )
-        ).FirstOrDefault();
-
-        if (host == null)
-        {
-            return;
-        }
-
-        await XueDaoParasiteSystem.TriggerDetachedAsync(
-            choiceContext,
-            host,
-            this
-        );
-
-        // 九转质变：本次祭炼使寄生完成孵化时，额外获得 2 点血元。
-        if (GuRank >= 9 &&
-            !XueDaoParasiteSystem.HasParasite(host))
-        {
-            await XueDaoPowerSystem.GainXueYuanFromCardEffect(
-                choiceContext,
-                this,
-                2
+                host,
+                this
             );
+
+            // 九转质变：本次祭炼使寄生完成孵化时，额外获得 2 点血元。
+            if (GuRank >= 9 &&
+                !XueDaoParasiteSystem.HasParasite(host))
+            {
+                await XueDaoPowerSystem.GainXueYuanFromCardEffect(
+                    choiceContext,
+                    this,
+                    2
+                );
+            }
+        }
+        finally
+        {
+            await AdvanceLifecycleAsync(choiceContext);
         }
     }
 
@@ -129,4 +134,3 @@ public sealed class XueYueJi : AbstractShaZhaoCard
         EnergyCost.UpgradeBy(-1);
     }
 }
-

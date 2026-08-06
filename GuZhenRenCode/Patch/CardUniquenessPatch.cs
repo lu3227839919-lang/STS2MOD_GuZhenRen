@@ -1115,8 +1115,24 @@ internal static class CardUniquenessPatch
         string? dynamicText =
             XueDaoParasiteSystem
                 .GetHostCardDynamicText(card);
-        if (string.IsNullOrEmpty(dynamicText) ||
-            __result.EndsWith(
+        if (string.IsNullOrEmpty(dynamicText))
+        {
+            return;
+        }
+
+        // Card text uses the game's named [purple] BBCode tag.  Older
+        // localization files used Godot's raw [color=#…] tag, which is left
+        // as literal text by the card renderer. Normalize both forms and
+        // guarantee the parasite line is rendered as purple.
+        dynamicText = dynamicText
+            .Replace("[color=#B388FF]", "[purple]", StringComparison.OrdinalIgnoreCase)
+            .Replace("[/color]", "[/purple]", StringComparison.OrdinalIgnoreCase);
+        if (!dynamicText.Contains("[purple]", StringComparison.OrdinalIgnoreCase))
+        {
+            dynamicText = $"[purple]{dynamicText}[/purple]";
+        }
+
+        if (__result.EndsWith(
                 dynamicText,
                 StringComparison.Ordinal
             ))

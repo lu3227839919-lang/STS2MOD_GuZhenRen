@@ -474,25 +474,51 @@ public abstract class AbstractShaZhaoCard
                 return Array.Empty<CardModel>();
             }
 
-            return encoded
-                .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-                .Select(ResolveBoundMaterial)
-                .Where(static material => material != null)
-                .Cast<CardModel>()
-                .ToArray();
+            HashSet<CardModel> resolved = [];
+            List<CardModel> materials = [];
+            foreach (string token in encoded.Split(
+                         '\n', StringSplitOptions.RemoveEmptyEntries))
+            {
+                CardModel? material = ResolveBoundMaterial(token, resolved);
+                if (material == null || !resolved.Add(material))
+                {
+                    continue;
+                }
+
+                materials.Add(material);
+            }
+
+            return materials;
         }
     }
 
-    private CardModel? ResolveBoundMaterial(string id)
+    private CardModel? ResolveBoundMaterial(
+        string token,
+        IReadOnlySet<CardModel> alreadyResolved
+    )
     {
         if (Owner?.PlayerCombatState is not { } combatState)
         {
             return null;
         }
 
+        if (token.StartsWith("net:", StringComparison.Ordinal) &&
+            uint.TryParse(token.AsSpan(4), out uint netId) &&
+            NetCombatCardDb.Instance.TryGetCard(netId, out CardModel? netCard) &&
+            netCard.Owner == Owner &&
+            !alreadyResolved.Contains(netCard))
+        {
+            return netCard;
+        }
+
+        string id = token.StartsWith("model:", StringComparison.Ordinal)
+            ? token["model:".Length..]
+            : token;
+
         return combatState
             .AllCards
             .FirstOrDefault(candidate =>
+                !alreadyResolved.Contains(candidate) &&
                 string.Equals(
                     candidate.Id.ToString(),
                     id,
@@ -516,9 +542,7 @@ public abstract class AbstractShaZhaoCard
 
         BoundMaterialIdsState[this] = string.Join(
             '\n',
-            materials.Select(material =>
-                material.Id.ToString()
-            )
+            materials.Select(EncodeBoundMaterialToken)
         );
 
         foreach (CardModel material in materials)
@@ -528,6 +552,18 @@ public abstract class AbstractShaZhaoCard
                 this
             );
         }
+    }
+
+    private static string EncodeBoundMaterialToken(CardModel material)
+    {
+        if (NetCombatCardDb.Instance.TryGetCardId(
+                material,
+                out uint netId))
+        {
+            return $"net:{netId}";
+        }
+
+        return $"model:{material.Id}";
     }
 
     /// <summary>
@@ -572,11 +608,9 @@ public abstract class AbstractShaZhaoCard
                 break;
 
             case ShaZhaoLifecycle.Sealed:
-                // 材料本场不返还；杀招按自身规则消耗。
-                await CardExhaustCompat.ExhaustAsync(
-                    choiceContext,
-                    this
-                );
+                // 封印型仍按消耗牌结算，但使用完成后解除封装并返还
+                // 材料；旧实现只消耗杀招并把材料留到战斗结束。
+                await ConsumeAndReturnAsync(choiceContext);
                 break;
         }
     }
@@ -613,8 +647,7 @@ public abstract class AbstractShaZhaoCard
         Player player
     )
     {
-        if (Lifecycle == ShaZhaoLifecycle.Instant ||
-            !HasBoundMaterials ||
+        if (!HasBoundMaterials ||
             player.PlayerCombatState is not { } combatState ||
             combatState.Energy < 1)
         {

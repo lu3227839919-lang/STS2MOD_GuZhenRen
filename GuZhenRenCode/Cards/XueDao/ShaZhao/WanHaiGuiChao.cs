@@ -58,65 +58,69 @@ public sealed class WanHaiGuiChao : AbstractShaZhaoCard
         CardPlay cardPlay
     )
     {
-        await AdvanceLifecycleAsync(choiceContext);
-
-        int consumed = await XueDaoCardSystem.ConsumeOldestRemains(
-            choiceContext,
-            Owner,
-            3
-        );
-
-        int totalDamage = DynamicVars.Damage.IntValue +
-            consumed * DynamicVars[DamagePerRemainsVar].IntValue;
-        int block = DynamicVars.Block.IntValue +
-            consumed * DynamicVars[BlockPerRemainsVar].IntValue;
-
-        await CreatureCmd.GainBlock(
-            Owner.Creature,
-            block,
-            ValueProp.Unpowered | ValueProp.Move,
-            cardPlay
-        );
-
-        // 六转质变：实际消耗满 3 张遗骸时，下回合获得本次格挡值的一半。
-        if (GuRank >= 6 && consumed >= 3)
+        try
         {
-            await PowerCmd.Apply<WanHaiGuiChaoRetainBlockPower>(
+            int consumed = await XueDaoCardSystem.ConsumeOldestRemains(
                 choiceContext,
-                Owner.Creature,
-                block / 2,
-                Owner.Creature,
-                this
+                Owner,
+                3
             );
+
+            int totalDamage = DynamicVars.Damage.IntValue +
+                consumed * DynamicVars[DamagePerRemainsVar].IntValue;
+            int block = DynamicVars.Block.IntValue +
+                consumed * DynamicVars[BlockPerRemainsVar].IntValue;
+
+            await CreatureCmd.GainBlock(
+                Owner.Creature,
+                block,
+                ValueProp.Unpowered | ValueProp.Move,
+                cardPlay
+            );
+
+            if (GuRank >= 6 && consumed >= 3)
+            {
+                await PowerCmd.Apply<WanHaiGuiChaoRetainBlockPower>(
+                    choiceContext,
+                    Owner.Creature,
+                    block / 2,
+                    Owner.Creature,
+                    this
+                );
+            }
+
+            if (CombatState == null)
+            {
+                return;
+            }
+
+            Creature[] enemies = GuZhenRenDeterminism
+                .OrderCreatures(CombatState.HittableEnemies)
+                .Where(enemy => enemy.IsAlive)
+                .ToArray();
+
+            if (enemies.Length == 0)
+            {
+                return;
+            }
+
+            int perEnemy = totalDamage / enemies.Length;
+            int remainder = totalDamage % enemies.Length;
+
+            for (int index = 0; index < enemies.Length; index++)
+            {
+                int damage = perEnemy + (index < remainder ? 1 : 0);
+                await DamageCmd
+                    .Attack(damage)
+                    .FromCard(this, cardPlay)
+                    .Targeting(enemies[index])
+                    .WithHitFx("vfx/vfx_attack_slash")
+                    .Execute(choiceContext);
+            }
         }
-
-        if (CombatState == null)
+        finally
         {
-            return;
-        }
-
-        Creature[] enemies = GuZhenRenDeterminism
-            .OrderCreatures(CombatState.HittableEnemies)
-            .Where(enemy => enemy.IsAlive)
-            .ToArray();
-
-        if (enemies.Length == 0)
-        {
-            return;
-        }
-
-        int perEnemy = totalDamage / enemies.Length;
-        int remainder = totalDamage % enemies.Length;
-
-        for (int index = 0; index < enemies.Length; index++)
-        {
-            int damage = perEnemy + (index < remainder ? 1 : 0);
-            await DamageCmd
-                .Attack(damage)
-                .FromCard(this, cardPlay)
-                .Targeting(enemies[index])
-                .WithHitFx("vfx/vfx_attack_slash")
-                .Execute(choiceContext);
+            await AdvanceLifecycleAsync(choiceContext);
         }
     }
 

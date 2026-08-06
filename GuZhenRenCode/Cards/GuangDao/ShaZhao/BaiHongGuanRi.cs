@@ -69,67 +69,72 @@ public sealed class BaiHongGuanRi : AbstractShaZhaoCard
         CardPlay cardPlay
     )
     {
-        await AdvanceLifecycleAsync(choiceContext);
-
-        Creature? target = cardPlay.Target;
-        if (target == null || !IsValidTarget(target))
+        try
         {
-            return;
-        }
+            Creature? target = cardPlay.Target;
+            if (target == null || !IsValidTarget(target))
+            {
+                return;
+            }
 
-        ZhaoPoPower? zhaoPoPower = target.GetPower<ZhaoPoPower>();
-        int consumed = Math.Min(
-            zhaoPoPower?.Amount ?? 0,
-            DynamicVars["MaxZhaoPoConsumed"].IntValue
-        );
-
-        if (zhaoPoPower != null && consumed > 0)
-        {
-            await PowerCmd.ModifyAmount(
-                choiceContext,
-                zhaoPoPower,
-                -consumed,
-                Owner.Creature,
-                this
+            ZhaoPoPower? zhaoPoPower = target.GetPower<ZhaoPoPower>();
+            int consumed = Math.Min(
+                zhaoPoPower?.Amount ?? 0,
+                DynamicVars["MaxZhaoPoConsumed"].IntValue
             );
-        }
 
-        decimal damage = DynamicVars.Damage.BaseValue +
-            consumed * DynamicVars["DamagePerZhaoPo"].BaseValue;
+            if (zhaoPoPower != null && consumed > 0)
+            {
+                await PowerCmd.ModifyAmount(
+                    choiceContext,
+                    zhaoPoPower,
+                    -consumed,
+                    Owner.Creature,
+                    this
+                );
+            }
 
-        bool empowered = await GuangDaoPowerSystem.TryAutoSpendGuangHui(
-            choiceContext,
-            this,
-            cardPlay,
-            GuangHuiCost
-        );
+            decimal damage = DynamicVars.Damage.BaseValue +
+                consumed * DynamicVars["DamagePerZhaoPo"].BaseValue;
 
-        decimal piercedDamage = empowered
-            ? Math.Min(
-                DynamicVars["PierceCap"].BaseValue,
-                Math.Min(damage, (decimal)target.Block)
-            )
-            : 0m;
-
-        await DamageCmd
-            .Attack(damage)
-            .FromCard(this, cardPlay)
-            .Targeting(target)
-            .WithHitFx("vfx/vfx_attack_slash")
-            .Execute(choiceContext);
-
-        // 普通攻击已经照常消耗格挡；额外的不可格挡伤害使本次攻击
-        // 等效无视至多 PierceCap 点原有格挡，但不会在无格挡时白送伤害。
-        if (piercedDamage > 0 && !target.IsDead)
-        {
-            await CreatureCmd.Damage(
+            bool empowered = await GuangDaoPowerSystem.TryAutoSpendGuangHui(
                 choiceContext,
-                target,
-                piercedDamage,
-                ValueProp.Unblockable | ValueProp.Unpowered | ValueProp.Move,
                 this,
-                cardPlay
+                cardPlay,
+                GuangHuiCost
             );
+
+            decimal piercedDamage = empowered
+                ? Math.Min(
+                    DynamicVars["PierceCap"].BaseValue,
+                    Math.Min(damage, (decimal)target.Block)
+                )
+                : 0m;
+
+            await DamageCmd
+                .Attack(damage)
+                .FromCard(this, cardPlay)
+                .Targeting(target)
+                .WithHitFx("vfx/vfx_attack_slash")
+                .Execute(choiceContext);
+
+            // 普通攻击已经照常消耗格挡；额外的不可格挡伤害使本次攻击
+            // 等效无视至多 PierceCap 点原有格挡，但不会在无格挡时白送伤害。
+            if (piercedDamage > 0 && !target.IsDead)
+            {
+                await CreatureCmd.Damage(
+                    choiceContext,
+                    target,
+                    piercedDamage,
+                    ValueProp.Unblockable | ValueProp.Unpowered | ValueProp.Move,
+                    this,
+                    cardPlay
+                );
+            }
+        }
+        finally
+        {
+            await AdvanceLifecycleAsync(choiceContext);
         }
     }
 

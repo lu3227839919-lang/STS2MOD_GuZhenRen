@@ -162,13 +162,13 @@
   "GU_ZHEN_REN_CARD_XUE_YUE_JI.selectionScreenPrompt": "Choose a card with a Blood Parasite.",
   "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.selectionScreenPrompt": "Choose a Blade-Wing Blood Bat, or use Devour Remains 2 to create a Blood Bat Swarm.",
   "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI.extraCardText": "Enchantment · Blood Qi (Rank {Rank}): {TriggersRemaining} trigger(s) remain; resolves after the host is played.",
-  "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI.cardText": "[color=#B388FF]Implanted Blood Qi {TriggerCount}: {TriggersRemaining} trigger(s) left until hatching. Attacks add {ParasiteValue} damage and {ParasiteBleed} Bleed; skills gain {ParasiteValue} Block and 1 Blood Essence; powers gain 2 Blood Essence.[/color]",
+  "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI.cardText": "[purple]Implanted Blood Qi {TriggerCount}: {TriggersRemaining} trigger(s) left until hatching. Attacks add {ParasiteValue} damage and {ParasiteBleed} Bleed; skills gain {ParasiteValue} Block and 1 Blood Essence; powers gain 2 Blood Essence.[/purple]",
   "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.extraCardText": "Enchantment · Moon Phase (Rank {Rank} · Crescent): {TriggersRemaining} trigger(s) remain; advances after the host is played.",
-  "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.cardText": "[color=#B388FF]Implanted Moon Phase · Crescent (Rank {Rank}): {TriggersRemaining} advance(s) left until hatching.[/color]",
+  "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.cardText": "[purple]Implanted Moon Phase · Crescent (Rank {Rank}): {TriggersRemaining} advance(s) left until hatching.[/purple]",
   "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.extraCardText": "Enchantment · Moon Phase (Rank {Rank} · Waxing): {TriggersRemaining} trigger(s) remain; advances after the host is played.",
-  "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.cardText": "[color=#B388FF]Implanted Moon Phase · Waxing (Rank {Rank}): {TriggersRemaining} advance(s) left until hatching.[/color]",
+  "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.cardText": "[purple]Implanted Moon Phase · Waxing (Rank {Rank}): {TriggersRemaining} advance(s) left until hatching.[/purple]",
   "GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.extraCardText": "Enchantment · Moon Phase (Rank {Rank} · Full): {TriggersRemaining} trigger(s) remain; hatches after the host is played.",
-  "GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.cardText": "[color=#B388FF]Implanted Moon Phase · Full (Rank {Rank}): {TriggersRemaining} advance(s) left until hatching.[/color]",
+  "GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.cardText": "[purple]Implanted Moon Phase · Full (Rank {Rank}): {TriggersRemaining} advance(s) left until hatching.[/purple]",
   "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS.extraCardText": "Enchantment · Blood Fetus (Rank {Rank}): {Stage}/3 Fetal Movement, {TriggersRemaining} trigger(s) remain; hatches at 3.",
-  "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS.cardText": "[color=#B388FF]Implanted Blood Fetus (Rank {Rank}): Fetal Movement {Stage}/3; {TriggersRemaining} trigger(s) left, hatches at 3.[/color]"
+  "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS.cardText": "[purple]Implanted Blood Fetus (Rank {Rank}): Fetal Movement {Stage}/3; {TriggersRemaining} trigger(s) left, hatches at 3.[/purple]"
 }

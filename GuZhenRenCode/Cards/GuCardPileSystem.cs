@@ -155,7 +155,9 @@ public static class GuCardPileSystem
                             ? MaterialPileIconPath
                             : RecoveryPileIconPath,
                         Anchor = new ModCardPileAnchor(
-                            ModCardPileAnchorKind.BottomRightPrimary
+                            ModCardPileAnchorKind.BottomRightPrimary,
+                            // 将封存堆固定放到原版消耗牌堆正上方。
+                            new Vector2(100f, -140f)
                         ),
                         HoverTipPlacement =
                             ModCardPileHoverTipPlacement.AboveButtonCentered,

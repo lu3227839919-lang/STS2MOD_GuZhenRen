@@ -64,79 +64,86 @@ public sealed class JingYueFanZhao : AbstractShaZhaoCard
         CardPlay cardPlay
     )
     {
-        // 生命周期推进：CurrentStage 在本方法开头已被更新为本次使用序号。
-        await AdvanceLifecycleAsync(choiceContext);
-
-        decimal fullValue = DynamicVars.Damage.BaseValue;
-
-        switch (CurrentStage)
+        // 先读取本次阶段，待效果完成后再提交生命周期状态。这样最终
+        // 阶段的材料返还不会在卡牌效果之前发生。
+        int stage = Math.Clamp(CurrentStage + 1, 1, MaxStages);
+        try
         {
-            // 第一阶段：镜相——获得完整数值的格挡。
-            case 1:
-                await CreatureCmd.GainBlock(
-                    Owner.Creature,
-                    new BlockVar(fullValue, ValueProp.Move),
-                    cardPlay
-                );
-                break;
+            decimal fullValue = DynamicVars.Damage.BaseValue;
 
-            // 第二阶段：月相——对一个敌人造成完整数值伤害。
-            case 2:
+            switch (stage)
             {
-                Creature? target = cardPlay.Target;
-                if (target == null || !IsValidTarget(target))
-                {
-                    return;
-                }
-
-                await DamageCmd
-                    .Attack(fullValue)
-                    .FromCard(this, cardPlay)
-                    .Targeting(target)
-                    .WithHitFx("vfx/vfx_attack_slash")
-                    .Execute(choiceContext);
-                break;
-            }
-
-            // 第三阶段：返照——仅六转以上存在。
-            // 获得一半数值的格挡，并对所有敌人造成一半数值伤害；
-            // 七至八转获得 1 点光辉，九转获得 2 点。
-            default:
-            {
-                decimal halfValue = fullValue / 2m;
-
-                await CreatureCmd.GainBlock(
-                    Owner.Creature,
-                    new BlockVar(halfValue, ValueProp.Move),
-                    cardPlay
-                );
-
-                if (CombatState != null)
-                {
-                    foreach (Creature enemy in
-                             CombatState.HittableEnemies)
-                    {
-                        await DamageCmd
-                            .Attack(halfValue)
-                            .FromCard(this, cardPlay)
-                            .Targeting(enemy)
-                            .WithHitFx("vfx/vfx_attack_slash")
-                            .Execute(choiceContext);
-                    }
-                }
-
-                int guangHui =
-                    DynamicVars["GuangHui"].IntValue;
-                if (guangHui > 0)
-                {
-                    await GuangDaoPowerSystem.GainGuangHui(
-                        choiceContext,
-                        this,
-                        guangHui
+                // 第一阶段：镜相——获得完整数值的格挡。
+                case 1:
+                    await CreatureCmd.GainBlock(
+                        Owner.Creature,
+                        new BlockVar(fullValue, ValueProp.Move),
+                        cardPlay
                     );
+                    break;
+
+                // 第二阶段：月相——对一个敌人造成完整数值伤害。
+                case 2:
+                {
+                    Creature? target = cardPlay.Target;
+                    if (target == null || !IsValidTarget(target))
+                    {
+                        return;
+                    }
+
+                    await DamageCmd
+                        .Attack(fullValue)
+                        .FromCard(this, cardPlay)
+                        .Targeting(target)
+                        .WithHitFx("vfx/vfx_attack_slash")
+                        .Execute(choiceContext);
+                    break;
                 }
-                break;
+
+                // 第三阶段：返照——仅六转以上存在。
+                // 获得一半数值的格挡，并对所有敌人造成一半数值伤害；
+                // 七至八转获得 1 点光辉，九转获得 2 点。
+                default:
+                {
+                    decimal halfValue = fullValue / 2m;
+
+                    await CreatureCmd.GainBlock(
+                        Owner.Creature,
+                        new BlockVar(halfValue, ValueProp.Move),
+                        cardPlay
+                    );
+
+                    if (CombatState != null)
+                    {
+                        foreach (Creature enemy in
+                                 CombatState.HittableEnemies)
+                        {
+                            await DamageCmd
+                                .Attack(halfValue)
+                                .FromCard(this, cardPlay)
+                                .Targeting(enemy)
+                                .WithHitFx("vfx/vfx_attack_slash")
+                                .Execute(choiceContext);
+                        }
+                    }
+
+                    int guangHui =
+                        DynamicVars["GuangHui"].IntValue;
+                    if (guangHui > 0)
+                    {
+                        await GuangDaoPowerSystem.GainGuangHui(
+                            choiceContext,
+                            this,
+                            guangHui
+                        );
+                    }
+                    break;
+                }
             }
+        }
+        finally
+        {
+            await AdvanceLifecycleAsync(choiceContext);
         }
     }
 
@@ -182,4 +189,3 @@ public sealed class JingYueFanZhao : AbstractShaZhaoCard
         };
     }
 }
-

@@ -66,17 +66,13 @@ internal static class ShaZhaoTuiYanSystem
         // 0.8.0 杀招系统：推演入口改为“杀招推演”系统牌，
         // 不再注册蛊恢复堆的右键推演。
         //
-        // 主动解体：右键手牌中的杀招，支付 1 费，材料返回
-        // 并额外增加 1 回合恢复，随后杀招消耗。
+        // 主动解体：右键手牌中的任意已绑定杀招（包括瞬发/消耗型），
+        // 支付 1 费，材料返回并额外增加 1 回合恢复，随后杀招消耗。
         _rightClickBinding = ModRightClickRegistry.Register<CardModel>(
             Entry.ModId,
             "sha_zhao_dismantle",
             static ctx => ctx.Model
-                    is AbstractShaZhaoCard
-                    {
-                        Lifecycle: not AbstractShaZhaoCard
-                            .ShaZhaoLifecycle.Instant
-                    } shaZhao
+                    is AbstractShaZhaoCard shaZhao
                 && shaZhao.HasBoundMaterials
                 && ctx.Player.PlayerCombatState is { } combatState
                 && combatState.Energy >= 1
@@ -251,7 +247,11 @@ internal static class ShaZhaoTuiYanSystem
             CardModel[] choices =
                 guPile.Cards
                     .Where(card =>
-                        !selected.Contains(card) &&
+                        // CardModel.Id identifies a card type, not a physical
+                        // card. Compare references so identical materials
+                        // remain independently selectable after the first one.
+                        !selected.Any(selectedCard =>
+                            ReferenceEquals(selectedCard, card)) &&
                         IsEligibleMaterial(card) &&
                         IsEligibleRecipeStep(
                             selected,

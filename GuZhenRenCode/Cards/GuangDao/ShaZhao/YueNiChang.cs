@@ -65,41 +65,46 @@ public sealed class YueNiChang
         CardPlay cardPlay
     )
     {
-        await AdvanceLifecycleAsync(choiceContext);
-
-        await CreatureCmd.GainBlock(
-            Owner.Creature,
-            DynamicVars.Block,
-            cardPlay
-        );
-
-        await GuangDaoPowerSystem.GainGuangHui(
-            choiceContext,
-            this,
-            DynamicVars["GuangHui"].IntValue
-        );
-
-        if (GuRank < 3 || cardPlay.PlayIndex != 0)
+        try
         {
-            return;
-        }
-
-        AbstractGuZhenRenCard generated = GuRank >= 9
-            ? GuGeneratedCardFactory.Create<ManYueRen>(
-                Owner,
-                GuRank,
-                upgraded: IsUpgraded
-            )
-            : GuGeneratedCardFactory.Create<YueRen>(
-                Owner,
-                GuRank,
-                upgraded: IsUpgraded || GuRank >= 6
+            await CreatureCmd.GainBlock(
+                Owner.Creature,
+                DynamicVars.Block,
+                cardPlay
             );
 
-        await GuGeneratedCardFactory.AddToHandOrDiscard(
-            generated,
-            Owner
-        );
+            await GuangDaoPowerSystem.GainGuangHui(
+                choiceContext,
+                this,
+                DynamicVars["GuangHui"].IntValue
+            );
+
+            if (GuRank < 3 || cardPlay.PlayIndex != 0)
+            {
+                return;
+            }
+
+            AbstractGuZhenRenCard generated = GuRank >= 9
+                ? GuGeneratedCardFactory.Create<ManYueRen>(
+                    Owner,
+                    GuRank,
+                    upgraded: IsUpgraded
+                )
+                : GuGeneratedCardFactory.Create<YueRen>(
+                    Owner,
+                    GuRank,
+                    upgraded: IsUpgraded || GuRank >= 6
+                );
+
+            await GuGeneratedCardFactory.AddToHandOrDiscard(
+                generated,
+                Owner
+            );
+        }
+        finally
+        {
+            await AdvanceLifecycleAsync(choiceContext);
+        }
     }
 
     public IReadOnlyList<CardModel> GetCarouselCards()
@@ -178,4 +183,3 @@ public sealed class YueNiChang
         };
     }
 }
-
