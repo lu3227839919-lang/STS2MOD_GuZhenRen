@@ -20,7 +20,6 @@ public sealed class XueYueJi : AbstractShaZhaoCard
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         [
             CardKeyword.Exhaust,
-            GuZhenRenKeywords.XueJi,
             GuZhenRenKeywords.FuHua,
         ];
 

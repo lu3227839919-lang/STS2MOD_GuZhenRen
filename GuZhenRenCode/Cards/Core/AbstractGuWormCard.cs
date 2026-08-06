@@ -22,7 +22,7 @@ public abstract class AbstractGuWormCard
     /// <summary>
     /// 所有蛊虫只显示会影响操作的催动与恢复说明。
     ///
-    /// 六转以上额外显示仙蛊与仙元。各蛊虫自己的机制词由类型映射
+    /// 六转以上额外显示仙蛊。各蛊虫自己的机制词由类型映射
     /// 追加；Distinct 保证派生类再次追加同一关键词时不会重复显示。
     /// </summary>
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
@@ -79,7 +79,6 @@ public abstract class AbstractGuWormCard
         if (GuRank >= 6)
         {
             yield return GuZhenRenKeywords.XianGu;
-            yield return GuZhenRenKeywords.XianYuan;
         }
     }
 
@@ -94,55 +93,18 @@ public abstract class AbstractGuWormCard
     {
         return GetType().Name switch
         {
-            "XiaoGuangGu" =>
-            [
-                GuZhenRenKeywords.JuGuang,
-            ],
             "YueGuangGu" =>
             [
                 GuZhenRenKeywords.GetYaoHuaKeyword(2),
-                GuZhenRenKeywords.ZhaoPo,
-            ],
-            "JingGuangGu" =>
-            [
-                GuZhenRenKeywords.ZheGuang,
-                GuZhenRenKeywords.JuGuang,
-            ],
-            "DingGuangGu" =>
-            [
-                GuZhenRenKeywords.ZhaoPo,
-                GuZhenRenKeywords.DingGuang,
-            ],
-            "LiuGuangGu" =>
-            [
-                GuZhenRenKeywords.ZheGuang,
-                GuZhenRenKeywords.ZhaoPo,
             ],
             "YueMangGu" when GuRank >= 5 =>
             [
                 GuZhenRenKeywords.GetYaoHuaKeyword(2),
-                GuZhenRenKeywords.ZhaoPo,
-            ],
-            "YueMangGu" =>
-            [
-                GuZhenRenKeywords.ZhaoPo,
-            ],
-            "JingHuiGu" =>
-            [
-                GuZhenRenKeywords.ZhaoPo,
-                GuZhenRenKeywords.JuGuang,
-                GuZhenRenKeywords.LiuGuang,
-                GuZhenRenKeywords.PoJing,
-            ],
-            "YuPiGu" =>
-            [
-                GuZhenRenKeywords.ZheGuang,
             ],
             "XueQiGu" =>
             [
                 GuZhenRenKeywords.XueQi,
                 GuZhenRenKeywords.FuHua,
-                GuZhenRenKeywords.YiHai,
             ],
             "XueYueGu" =>
             [
@@ -158,35 +120,15 @@ public abstract class AbstractGuWormCard
             ],
             "XueChiGu" =>
             [
-                GuZhenRenKeywords.XueYuan,
                 GuZhenRenKeywords.YiChu,
-            ],
-            "XuePiGu" =>
-            [
-                GuZhenRenKeywords.XueYuan,
-                GuZhenRenKeywords.XueLu,
-            ],
-            "XueLuGu" =>
-            [
-                GuZhenRenKeywords.YiHai,
-                GuZhenRenKeywords.XueLu,
             ],
             "DaoChiXueFuGu" =>
             [
-                GuZhenRenKeywords.YiHai,
                 GuZhenRenKeywords.ZhuiJi,
             ],
             "XueFuWangGu" =>
             [
-                GuZhenRenKeywords.YiHai,
-                GuZhenRenKeywords.XueLu,
                 GuZhenRenKeywords.ZhuiJi,
-            ],
-            "XueHeJiaGu" =>
-            [
-                GuZhenRenKeywords.XueYuan,
-                GuZhenRenKeywords.XueLu,
-                GuZhenRenKeywords.XueHe,
             ],
             _ => [],
         };

@@ -33,7 +33,6 @@ public sealed class WanHaiGuiChao : AbstractShaZhaoCard
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
         CardKeyword.Exhaust,
-        GuZhenRenKeywords.YiHai,
         GuZhenRenKeywords.ZongEDu,
     ];
 

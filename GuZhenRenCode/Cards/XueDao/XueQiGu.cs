@@ -37,7 +37,6 @@ public sealed class XueQiGu : AbstractGuWormCard
         [
             GuZhenRenKeywords.XueQi,
             GuZhenRenKeywords.FuHua,
-            GuZhenRenKeywords.YiHai,
         ]).Distinct();
 
     protected override bool IsPlayable =>

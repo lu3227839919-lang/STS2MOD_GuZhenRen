@@ -897,7 +897,7 @@ internal static class CardUniquenessPatch
          * 动态关键词可能在 MutableClone/读档过程中被复制进卡牌本地集合。
          * 因此每次都先清除已经废弃的展示关键词和旧仙蛊展示，再由
          * 当前保存状态重建。旧存档与多人快照不会重新显示转数、
-         * 蛊虫、光辉、元气或无阈值的耀化提示。
+         * 蛊虫、资源、卡牌或 Power 已经能够说明的重复提示。
          */
         keywords.ExceptWith(
             GuZhenRenKeywords.RemovedDisplayKeywords
@@ -907,7 +907,6 @@ internal static class CardUniquenessPatch
         );
         if (XueDaoParasiteSystem.HasParasite(__instance))
         {
-            keywords.Add(GuZhenRenKeywords.XueJi);
             keywords.Add(GuZhenRenKeywords.PoTai);
             keywords.Add(GuZhenRenKeywords.FuHua);
 
