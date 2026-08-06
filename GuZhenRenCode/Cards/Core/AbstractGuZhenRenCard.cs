@@ -428,7 +428,9 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
     /// <summary>
     /// 永久保存的基础蛊虫转数。
     ///
-    /// 与 CardModel.IsUpgraded 完全无关。
+    /// 与原生升级存储相互独立。真正蛊虫达到六转后，
+    /// GuWormUpgradePatch 会在读取 CardModel.IsUpgraded 时将其视为
+    /// 已升级，但不会写入或执行原生升级生命周期。
     /// 所有写入都会同步更新模型附加保存状态。
     /// </summary>
     public int BaseGuRank
@@ -456,7 +458,8 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
     /// <summary>
     /// 当前蛊虫转数。
     ///
-    /// 普通卡牌升级不会改变该值。
+    /// 真正蛊虫的所有转数变化均由升炼、奖励赋阶、合炼或存档恢复处理；
+    /// 原生卡牌升级不参与蛊虫转数成长。
     /// 所有写入都会同步更新模型附加保存状态。
     /// </summary>
     public int GuRank
@@ -822,8 +825,9 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
     /// <summary>
     /// 独立提升蛊虫转数。
     ///
-    /// 不调用 UpgradeInternal、OnUpgrade，
-    /// 也不改变 IsUpgraded。
+    /// 本方法本身不调用 UpgradeInternal、OnUpgrade，也不写入原生
+    /// 升级状态；包括五转到六转在内的转数提升均由升炼体系处理。
+    /// 真正蛊虫达到六转后，IsUpgraded 只会由转数映射为 true。
     /// </summary>
     public virtual bool TryIncreaseGuRank(
         int amount = 1

@@ -20,7 +20,7 @@ namespace GuZhenRen.Cards.HeLian;
 [HeLianRecipe(typeof(YueGuangGu), typeof(XueQiGu), MinimumMaterialRank = 3)]
 public sealed class XueYueGu : AbstractHeLianGuCard
 {
-    public override int MaxUses => IsUpgraded ? 2 : 1;
+    public override int MaxUses => 1;
 
     public override int RecoveryDelayTurns => GuRank switch
     {
@@ -81,7 +81,7 @@ public sealed class XueYueGu : AbstractHeLianGuCard
             host,
             XueDaoParasiteSystem.ParasiteKind.BloodMoon,
             GuRank,
-            IsUpgraded,
+            false,
             this
         );
     }
@@ -91,14 +91,6 @@ public sealed class XueYueGu : AbstractHeLianGuCard
             MaxGuRank,
             materials.OfType<IGuRankProvider>().Select(provider => provider.GuRank).DefaultIfEmpty(3).Min() + 1
         );
-
-    protected override void OnHeLianCompleted(IReadOnlyList<CardModel> materials)
-    {
-        if (materials.All(card => card.IsUpgraded) && !IsUpgraded)
-        {
-            CardCmd.Upgrade(this);
-        }
-    }
 
     private bool HasEligibleHost() =>
         Owner.PlayerCombatState?.Hand.Cards.Any(card =>
@@ -111,7 +103,7 @@ public sealed class XueYueGu : AbstractHeLianGuCard
         XueDaoParasiteSystem.BloodMoonPhaseValues values
     )
     {
-        description.Add(prefix + "Base", values.BaseDamage + (IsUpgraded ? 3 : 0));
+        description.Add(prefix + "Base", values.BaseDamage);
         description.Add(prefix + "Scale", values.EnergyScale);
         description.Add(prefix + "Bleed", values.TotalBleed);
         description.Add(prefix + "Marks", values.TotalMarks);

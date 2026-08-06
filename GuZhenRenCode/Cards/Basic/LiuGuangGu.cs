@@ -44,7 +44,7 @@ public sealed class LiuGuangGu
             static () => false
         );
 
-    public override int MaxUses => IsUpgraded ? 2 : 1;
+    public override int MaxUses => 1;
 
     public override int RecoveryDelayTurns => GuRank switch
     {
@@ -196,8 +196,7 @@ public sealed class LiuGuangGu
             return [];
         }
 
-        bool upgraded = IsUpgraded ||
-            GuRank >= 6 ||
+        bool upgraded = GuRank >= 6 ||
             EmpoweredTokenState[this];
 
         if (GuRank >= 9)
@@ -232,8 +231,7 @@ public sealed class LiuGuangGu
     private T CreatePrimaryToken<T>()
         where T : AbstractGuZhenRenCard
     {
-        bool upgraded = IsUpgraded ||
-            GuRank >= 6 ||
+        bool upgraded = GuRank >= 6 ||
             EmpoweredTokenState[this];
 
         return GuGeneratedCardFactory.Create<T>(

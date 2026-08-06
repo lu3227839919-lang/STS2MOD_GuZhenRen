@@ -22,7 +22,7 @@ namespace GuZhenRen.Cards.HeLian;
 )]
 public sealed class XueTaiGu : AbstractHeLianGuCard
 {
-    public override int MaxUses => IsUpgraded ? 2 : 1;
+    public override int MaxUses => 1;
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         base.CanonicalKeywords.Concat(
@@ -117,7 +117,7 @@ public sealed class XueTaiGu : AbstractHeLianGuCard
             host,
             XueDaoParasiteSystem.ParasiteKind.BloodFetus,
             GuRank,
-            IsUpgraded,
+            false,
             this
         );
     }

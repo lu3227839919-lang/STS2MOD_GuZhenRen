@@ -19,7 +19,7 @@ namespace GuZhenRen.Cards.HeLian;
 )]
 public sealed class XueFuWangGu : AbstractHeLianGuCard
 {
-    public override int MaxUses => IsUpgraded ? 2 : 1;
+    public override int MaxUses => 1;
 
     public override int RecoveryDelayTurns => GuRank >= 7 ? 4 : 3;
 
@@ -62,7 +62,7 @@ public sealed class XueFuWangGu : AbstractHeLianGuCard
             GuGeneratedCardFactory.Create<XueFuWang>(
                 Owner,
                 GuRank,
-                upgraded: IsUpgraded
+                upgraded: false
             );
         generated.ConfigureConsumedRemains(consumed);
 
@@ -74,7 +74,7 @@ public sealed class XueFuWangGu : AbstractHeLianGuCard
 
     public override IReadOnlyList<CardModel> GetCarouselCards() =>
     [
-        GuCardReferenceFactory.Create<XueFuWang>(this, IsUpgraded),
+        GuCardReferenceFactory.Create<XueFuWang>(this, false),
     ];
 
     protected override int CalculateHeLianResultRank(

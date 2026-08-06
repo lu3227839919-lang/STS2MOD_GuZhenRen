@@ -25,7 +25,7 @@ public sealed class XueHeJiaGu : AbstractHeLianGuCard
     private const string HighBlockVar = "HighBlock";
     private const string LowBloodGainVar = "LowBloodGain";
 
-    public override int MaxUses => IsUpgraded ? 2 : 1;
+    public override int MaxUses => 1;
 
     public override int RecoveryDelayTurns => 3;
 

@@ -3,13 +3,12 @@ namespace GuZhenRen.Cards;
 /// <summary>
 /// 提供蛊虫转数的卡牌。
 ///
-/// GuRank 与游戏原生升级完全独立：
+/// GuRank 表示卡牌体系中的转数。
 ///
-/// - OnUpgrade / IsUpgraded 表示卡牌升级；
-/// - GuRank / TryIncreaseGuRank 表示蛊虫升转。
-///
-/// 普通升级不会提高 GuRank；
-/// 升转也不会调用 OnUpgrade 或改变 IsUpgraded。
+/// 真正蛊虫牌不参与游戏原生卡牌升级；包括五转到六转在内，
+/// 所有转数变化均由升炼、奖励赋阶、合炼或存档恢复处理。
+/// 六转及以上真正蛊虫仅在状态语义上视为已升级。
+/// 杀招、虚影等其他实现者可以保留自己的升级规则。
 /// </summary>
 public interface IGuRankProvider
 {

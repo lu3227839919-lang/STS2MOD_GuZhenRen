@@ -50,6 +50,7 @@ public partial class Entry
         new(nameof(NCardXuYingEnergyIconPatch), NCardXuYingEnergyIconPatch.Initialize, NCardXuYingEnergyIconPatch.Uninitialize),
         new(nameof(XuYingHiddenBehaviorPatch), XuYingHiddenBehaviorPatch.Initialize, XuYingHiddenBehaviorPatch.Uninitialize),
         new(nameof(GuRankRewardPatch), GuRankRewardPatch.Initialize, GuRankRewardPatch.Uninitialize),
+        new(nameof(GuWormUpgradePatch), GuWormUpgradePatch.Initialize, GuWormUpgradePatch.Uninitialize),
         new(nameof(CardUniquenessPatch), CardUniquenessPatch.Initialize, CardUniquenessPatch.Uninitialize),
         // 自定义关键词承担精简卡面说明的职责，所有卡牌界面都显示提示。
         new(nameof(XueDaoParasiteExhaustPatch), XueDaoParasiteExhaustPatch.Initialize, XueDaoParasiteExhaustPatch.Uninitialize),

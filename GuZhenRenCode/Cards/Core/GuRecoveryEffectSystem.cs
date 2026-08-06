@@ -13,7 +13,7 @@ internal static class GuRecoveryEffectSystem
         // 0.110.0 中 AfterCardPlayed 可能早于出牌结果牌堆迁移完成。
         // 此时卡牌会短暂处于无牌堆状态，按 card.Pile 判断将漏掉全部
         // “进入恢复堆”效果。BeforeCardPlayed 已经登记催动次数，因此
-        // 以“催动次数已耗尽”作为稳定判据；未耗尽的升级蛊不会误触发。
+        // 以“催动次数已耗尽”作为稳定判据；仍有剩余次数的蛊虫不会误触发。
         return card is IGuRecoveryEffectSource source &&
                card is IGuWormCard &&
                !GuCardUsageRules.CanUse(card)

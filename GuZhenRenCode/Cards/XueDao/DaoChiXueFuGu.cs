@@ -17,7 +17,7 @@ namespace GuZhenRen.Cards.XueDao;
 [RegisterCard(typeof(GuZhenRenGuCardPool))]
 public sealed class DaoChiXueFuGu : AbstractGuWormCard
 {
-    public override int MaxUses => IsUpgraded ? 2 : 1;
+    public override int MaxUses => 1;
 
     public override int RecoveryDelayTurns => GuRank >= 6 ? 3 : 2;
 
@@ -47,7 +47,7 @@ public sealed class DaoChiXueFuGu : AbstractGuWormCard
                 GuGeneratedCardFactory.Create<DaoChiXueFu>(
                     Owner,
                     GuRank,
-                    upgraded: IsUpgraded
+                    upgraded: false
                 );
             await GuGeneratedCardFactory.AddToHandOrDiscard(
                 normal,
@@ -61,12 +61,12 @@ public sealed class DaoChiXueFuGu : AbstractGuWormCard
         DaoChiXueFu normalPreview =
             GuCardReferenceFactory.Create<DaoChiXueFu>(
                 this,
-                IsUpgraded
+                false
             );
         DaoChiXueFuQun swarmPreview =
             GuCardReferenceFactory.Create<DaoChiXueFuQun>(
                 this,
-                IsUpgraded
+                false
             );
 
         CardModel? selected = (await CardSelectCmd.FromSimpleGrid(
@@ -104,12 +104,12 @@ public sealed class DaoChiXueFuGu : AbstractGuWormCard
             ? GuGeneratedCardFactory.Create<DaoChiXueFuQun>(
                 Owner,
                 GuRank,
-                upgraded: IsUpgraded
+                upgraded: false
             )
             : GuGeneratedCardFactory.Create<DaoChiXueFu>(
                 Owner,
                 GuRank,
-                upgraded: IsUpgraded
+                upgraded: false
             );
 
         await GuGeneratedCardFactory.AddToHandOrDiscard(
@@ -120,7 +120,7 @@ public sealed class DaoChiXueFuGu : AbstractGuWormCard
 
     public override IReadOnlyList<CardModel> GetCarouselCards() =>
     [
-        GuCardReferenceFactory.Create<DaoChiXueFu>(this, IsUpgraded),
-        GuCardReferenceFactory.Create<DaoChiXueFuQun>(this, IsUpgraded),
+        GuCardReferenceFactory.Create<DaoChiXueFu>(this, false),
+        GuCardReferenceFactory.Create<DaoChiXueFuQun>(this, false),
     ];
 }

@@ -213,16 +213,6 @@ public sealed class YueMangGu
             .Min();
     }
 
-    protected override void OnHeLianCompleted(
-        IReadOnlyList<CardModel> materials
-    )
-    {
-        if (materials.All(card => card.IsUpgraded) && !IsUpgraded)
-        {
-            CardCmd.Upgrade(this);
-        }
-    }
-
     protected override void OnGuRankChanged()
     {
         base.OnGuRankChanged();
@@ -242,7 +232,7 @@ public sealed class YueMangGu
             [
                 GuCardReferenceFactory.Create<TianYueMang>(
                     this,
-                    IsUpgraded
+                    false
                 ),
             ];
         }
@@ -253,7 +243,7 @@ public sealed class YueMangGu
             [
                 GuCardReferenceFactory.Create<NingYueMang>(
                     this,
-                    IsUpgraded
+                    false
                 ),
             ];
 
@@ -271,7 +261,7 @@ public sealed class YueMangGu
         [
             GuCardReferenceFactory.Create<YueMang>(
                 this,
-                IsUpgraded
+                false
             ),
         ];
     }
@@ -282,7 +272,7 @@ public sealed class YueMangGu
         return GuGeneratedCardFactory.Create<T>(
             Owner,
             GuRank,
-            upgraded: IsUpgraded
+            upgraded: false
         );
     }
 

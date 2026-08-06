@@ -23,7 +23,7 @@ namespace GuZhenRen.Cards.XueDao;
 [RegisterCard(typeof(GuZhenRenGuCardPool))]
 public sealed class XueQiGu : AbstractGuWormCard
 {
-    public override int MaxUses => IsUpgraded ? 2 : 1;
+    public override int MaxUses => 1;
 
     public override int RecoveryDelayTurns => GuRank switch
     {
@@ -56,7 +56,7 @@ public sealed class XueQiGu : AbstractGuWormCard
         int[] rates = XueDaoParasiteSystem.GetBloodQiTriggerPercentages(GuRank);
         description.Add("RecoveryTurns", RecoveryDelayTurns);
         description.Add("BloodCost", XueDaoParasiteSystem.GetBloodQiCost(GuRank));
-        description.Add("ParasiteValue", XueDaoParasiteSystem.GetBloodQiBaseValue(GuRank) + (IsUpgraded ? 2 : 0));
+        description.Add("ParasiteValue", XueDaoParasiteSystem.GetBloodQiBaseValue(GuRank));
         description.Add("ParasiteBleed", XueDaoParasiteSystem.GetBloodQiBleed(GuRank));
         description.Add("TriggerCount", rates.Length);
         description.Add("Rate1", rates[0]);
@@ -111,7 +111,7 @@ public sealed class XueQiGu : AbstractGuWormCard
             host,
             XueDaoParasiteSystem.ParasiteKind.BloodQi,
             GuRank,
-            IsUpgraded,
+            false,
             this
         );
     }

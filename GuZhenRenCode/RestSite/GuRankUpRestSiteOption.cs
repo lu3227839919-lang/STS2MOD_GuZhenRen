@@ -18,8 +18,9 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace GuZhenRen.RestSite;
 
 /// <summary>
-/// 篝火选项：一次可选择 0 至 2 张蛊虫升炼。
-/// 选牌不会因达到数量上限自动提交，必须由玩家主动点击确认。
+/// 篝火选项：凡蛊一次最多升炼 2 只，仙蛊一次最多升炼 1 只。
+/// 首次选择若为凡蛊，会再提供一次可选的凡蛊选择；若为仙蛊，
+/// 本次立即按单只结算。五转升六转同样由升炼完成。
 /// 选择 0 张并确认等同于取消；每个休息点只能成功使用一次。
 /// </summary>
 public sealed class GuRankUpRestSiteOption
@@ -38,6 +39,12 @@ public sealed class GuRankUpRestSiteOption
         new(
             "rest_site_ui",
             "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt"
+        );
+
+    private static readonly LocString SecondMortalSelectionPrompt =
+        new(
+            "rest_site_ui",
+            "OPTION_GU_ZHEN_REN_GU_RANK_UP.secondMortalSelectionPrompt"
         );
 
     private const string FallbackIconPath =
@@ -119,22 +126,20 @@ public sealed class GuRankUpRestSiteOption
             return false;
         }
 
-        const int maximumSelectionCount = 2;
-
-        CardSelectorPrefs prefs = new(
+        CardSelectorPrefs firstPrefs = new(
             SelectionPrompt,
             0,
-            maximumSelectionCount
+            1
         )
         {
             Cancelable = true,
             RequireManualConfirmation = true
         };
 
-        IEnumerable<CardModel> selected =
+        IEnumerable<CardModel> firstSelection =
             await CardSelectCmd.FromDeckGeneric(
                 player: Owner,
-                prefs: prefs,
+                prefs: firstPrefs,
                 filter: IsEligibleCard,
                 sortingOrder: card =>
                     card is AbstractGuZhenRenCard gu
@@ -142,18 +147,61 @@ public sealed class GuRankUpRestSiteOption
                         : int.MaxValue
             );
 
-        List<AbstractGuZhenRenCard> selectedGuCards =
-            selected
+        AbstractGuZhenRenCard? firstGu =
+            firstSelection
                 .OfType<AbstractGuZhenRenCard>()
-                .Take(maximumSelectionCount)
-                .ToList();
+                .FirstOrDefault();
 
-        if (selectedGuCards.Count == 0)
+        if (firstGu == null)
         {
             Entry.Logger.Info(
                 "本次篝火升炼未选择蛊牌，已取消。"
             );
             return false;
+        }
+
+        List<AbstractGuZhenRenCard> selectedGuCards =
+            [firstGu];
+
+        // 凡蛊允许再选择一只凡蛊；仙蛊本次只能升炼这一只。
+        if (IsMortalGu(firstGu) &&
+            Owner.Deck.Cards.Any(card =>
+                !ReferenceEquals(card, firstGu) &&
+                IsEligibleMortalCard(card)
+            ))
+        {
+            CardSelectorPrefs secondPrefs = new(
+                SecondMortalSelectionPrompt,
+                0,
+                1
+            )
+            {
+                Cancelable = true,
+                RequireManualConfirmation = true
+            };
+
+            IEnumerable<CardModel> secondSelection =
+                await CardSelectCmd.FromDeckGeneric(
+                    player: Owner,
+                    prefs: secondPrefs,
+                    filter: card =>
+                        !ReferenceEquals(card, firstGu) &&
+                        IsEligibleMortalCard(card),
+                    sortingOrder: card =>
+                        card is AbstractGuZhenRenCard gu
+                            ? gu.GuRank
+                            : int.MaxValue
+                );
+
+            AbstractGuZhenRenCard? secondGu =
+                secondSelection
+                    .OfType<AbstractGuZhenRenCard>()
+                    .FirstOrDefault();
+
+            if (secondGu != null)
+            {
+                selectedGuCards.Add(secondGu);
+            }
         }
 
         foreach (AbstractGuZhenRenCard selectedGu in
@@ -252,5 +300,17 @@ public sealed class GuRankUpRestSiteOption
                 gu,
                 gu.GuRank + 1
             );
+    }
+
+    private static bool IsEligibleMortalCard(CardModel card)
+    {
+        return IsEligibleCard(card) &&
+            card is AbstractGuZhenRenCard gu &&
+            IsMortalGu(gu);
+    }
+
+    private static bool IsMortalGu(AbstractGuZhenRenCard gu)
+    {
+        return gu.GuRank < GuZhenRenCardRules.XianGuRank;
     }
 }

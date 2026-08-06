@@ -43,7 +43,7 @@ public sealed class YueGuangGu
             static () => false
         );
 
-    public override int MaxUses => IsUpgraded ? 2 : 1;
+    public override int MaxUses => 1;
 
     public override int RecoveryDelayTurns => GuRank switch
     {
@@ -195,7 +195,7 @@ public sealed class YueGuangGu
                 ? GuGeneratedCardFactory.Create<ManYueRen>(
                     Owner,
                     GuRank,
-                    upgraded: IsUpgraded
+                    upgraded: false
                 )
                 : CreateYueRen();
 
@@ -226,8 +226,8 @@ public sealed class YueGuangGu
             return [];
         }
 
-        bool moonbladeUpgraded = IsUpgraded ||
-            (GuRank >= 5 && LastActivationEmpoweredState[this]);
+        bool moonbladeUpgraded =
+            GuRank >= 5 && LastActivationEmpoweredState[this];
 
         if (GuRank >= 9)
         {
@@ -240,7 +240,7 @@ public sealed class YueGuangGu
                 GuCardReferenceFactory.Create<CanYue>(this),
                 GuCardReferenceFactory.Create<ManYueRen>(
                     this,
-                    IsUpgraded
+                    false
                 ),
             ];
         }
@@ -265,8 +265,8 @@ public sealed class YueGuangGu
 
     private YueRen CreateYueRen()
     {
-        bool upgraded = IsUpgraded ||
-            (GuRank >= 5 && LastActivationEmpoweredState[this]);
+        bool upgraded =
+            GuRank >= 5 && LastActivationEmpoweredState[this];
 
         return GuGeneratedCardFactory.Create<YueRen>(
             Owner,

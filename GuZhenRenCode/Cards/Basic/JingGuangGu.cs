@@ -33,7 +33,7 @@ public sealed class JingGuangGu
             static () => false
         );
 
-    public override int MaxUses => IsUpgraded ? 2 : 1;
+    public override int MaxUses => 1;
 
     public override int RecoveryDelayTurns => GuRank switch
     {
@@ -174,7 +174,7 @@ public sealed class JingGuangGu
             return [];
         }
 
-        bool upgraded = IsUpgraded || GuRank >= 6;
+        bool upgraded = GuRank >= 6;
         if (GuRank >= 9)
         {
             return
@@ -209,7 +209,7 @@ public sealed class JingGuangGu
         return GuGeneratedCardFactory.Create<T>(
             Owner,
             GuRank,
-            upgraded: IsUpgraded || GuRank >= 6
+            upgraded: GuRank >= 6
         );
     }
 

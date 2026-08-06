@@ -25,7 +25,9 @@ internal static class GuCardReferenceFactory
 
         preview.InitializeGuRankFromSource(source.GuRank);
 
-        if (upgraded && !preview.IsUpgraded)
+        if (upgraded &&
+            preview is not AbstractGuWormCard &&
+            !preview.IsUpgraded)
         {
             CardCmd.Upgrade(preview, CardPreviewStyle.None);
         }

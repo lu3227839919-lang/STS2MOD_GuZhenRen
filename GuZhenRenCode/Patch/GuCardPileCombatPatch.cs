@@ -32,7 +32,7 @@ internal static class GuCardPileCombatPatch
 
     private readonly record struct GuRankEntry(
         string CardId,
-        bool IsUpgraded,
+        bool UpgradeGroupingState,
         string EnchantmentId,
         int Rank
     );
@@ -136,7 +136,7 @@ internal static class GuCardPileCombatPatch
                 .OfType<AbstractGuZhenRenCard>()
                 .Select(card => new GuRankEntry(
                     card.Id.ToString(),
-                    card.IsUpgraded,
+                    GetUpgradeGroupingState(card),
                     GetEnchantmentId(card),
                     card.GuRank
                 ))
@@ -157,7 +157,9 @@ internal static class GuCardPileCombatPatch
     /// 原版 PopulateCombatState 会把永久牌组复制成战斗实例。
     /// RitsuLib SavedAttachedState 参与存档，但不保证随该克隆过程复制。
     /// 普通实例字段通常已经携带正确转数；这里只在克隆桥丢失时修复，
-    /// 并按卡牌 ID、升级状态和附魔分组，避免同名蛊虫因洗牌交换转数。
+    /// 并按卡牌 ID、普通牌升级状态和附魔分组，避免同名卡牌因洗牌
+    /// 交换转数。真正蛊虫不使用 IsUpgraded 参与分组，因为该值由转数
+    /// 派生，而战斗克隆可能在转数恢复前暂时呈现不同状态。
     /// </summary>
     private static void ReconcileCombatCardRanks(
         Player owner,
@@ -170,7 +172,11 @@ internal static class GuCardPileCombatPatch
         }
 
         Dictionary<
-            (string CardId, bool IsUpgraded, string EnchantmentId),
+            (
+                string CardId,
+                bool UpgradeGroupingState,
+                string EnchantmentId
+            ),
             List<int>
         > ranksByCard = [];
 
@@ -178,7 +184,7 @@ internal static class GuCardPileCombatPatch
         {
             var key = (
                 entry.CardId,
-                entry.IsUpgraded,
+                entry.UpgradeGroupingState,
                 entry.EnchantmentId
             );
             if (!ranksByCard.TryGetValue(key, out List<int>? ranks))
@@ -206,7 +212,7 @@ internal static class GuCardPileCombatPatch
         {
             var key = (
                 card.Id.ToString(),
-                card.IsUpgraded,
+                GetUpgradeGroupingState(card),
                 GetEnchantmentId(card)
             );
             if (!ranksByCard.TryGetValue(key, out List<int>? ranks) ||
@@ -230,7 +236,7 @@ internal static class GuCardPileCombatPatch
             else
             {
                 // 仅对旧存档或确实丢失克隆桥字段的实例回退修复；
-                // 回退范围仍限制在同卡、同升级、同附魔分组内。
+                // 回退范围仍限制在同卡、同普通牌升级状态、同附魔分组内。
                 sourceRank = ranks[0];
                 ranks.RemoveAt(0);
             }
@@ -261,6 +267,17 @@ internal static class GuCardPileCombatPatch
                 detail
             );
         }
+    }
+
+    private static bool GetUpgradeGroupingState(
+        AbstractGuZhenRenCard card
+    )
+    {
+        // 六转仙蛊的 IsUpgraded 由 BaseGuRank 派生。转数恢复之前，
+        // 永久牌和战斗克隆可能短暂返回不同值，所以蛊牌必须忽略该键。
+        // 普通牌仍按真实升级状态分组，维持原有同名牌匹配精度。
+        return card is not AbstractGuWormCard &&
+            card.IsUpgraded;
     }
 
     private static string GetEnchantmentId(CardModel card)

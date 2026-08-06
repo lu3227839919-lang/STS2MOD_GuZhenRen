@@ -49,7 +49,7 @@ public sealed class XiaoGuangGu
             static () => false
         );
 
-    public override int MaxUses => IsUpgraded ? 2 : 1;
+    public override int MaxUses => 1;
 
     public override int RecoveryDelayTurns => GuRank switch
     {
@@ -207,21 +207,21 @@ public sealed class XiaoGuangGu
             [
                 GuCardReferenceFactory.Create<WeiGuang>(
                     this,
-                    IsUpgraded
+                    false
                 ),
             ],
             <= 7 =>
             [
                 GuCardReferenceFactory.Create<JuGuang>(
                     this,
-                    IsUpgraded
+                    false
                 ),
             ],
             8 =>
             [
                 GuCardReferenceFactory.Create<JuGuang>(
                     this,
-                    IsUpgraded
+                    false
                 ),
                 GuCardReferenceFactory.Create<YuHui>(this),
             ],
@@ -229,7 +229,7 @@ public sealed class XiaoGuangGu
             [
                 GuCardReferenceFactory.Create<JiGuang>(
                     this,
-                    IsUpgraded
+                    false
                 ),
             ],
         };
@@ -241,7 +241,7 @@ public sealed class XiaoGuangGu
         return GuGeneratedCardFactory.Create<T>(
             Owner,
             GuRank,
-            upgraded: IsUpgraded
+            upgraded: false
         );
     }
 

@@ -20,7 +20,7 @@ public sealed class XueLuGu : AbstractGuWormCard
     private const string MaxAbsorbVar = "MaxAbsorb";
     private const int OverflowHealPerRemains = 3;
 
-    public override int MaxUses => IsUpgraded ? 2 : 1;
+    public override int MaxUses => 1;
 
     public override int RecoveryDelayTurns => GuRank >= 7 ? 4 : 3;
 

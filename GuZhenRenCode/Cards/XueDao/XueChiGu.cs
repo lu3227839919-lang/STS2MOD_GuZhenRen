@@ -19,7 +19,7 @@ public sealed class XueChiGu : AbstractGuWormCard
 {
     private const string OverflowBlockVar = "OverflowBlock";
 
-    public override int MaxUses => IsUpgraded ? 2 : 1;
+    public override int MaxUses => 1;
 
     public override int RecoveryDelayTurns => GuRank >= 6 ? 3 : 2;
 

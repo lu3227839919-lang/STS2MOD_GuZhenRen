@@ -200,16 +200,6 @@ public sealed class JingHuiGu
             .Min();
     }
 
-    protected override void OnHeLianCompleted(
-        IReadOnlyList<CardModel> materials
-    )
-    {
-        if (materials.All(card => card.IsUpgraded) && !IsUpgraded)
-        {
-            CardCmd.Upgrade(this);
-        }
-    }
-
     protected override void OnGuRankChanged()
     {
         base.OnGuRankChanged();
@@ -229,7 +219,7 @@ public sealed class JingHuiGu
             [
                 GuCardReferenceFactory.Create<ZhouTianJingHui>(
                     this,
-                    IsUpgraded
+                    false
                 ),
             ];
         }
@@ -240,7 +230,7 @@ public sealed class JingHuiGu
             [
                 GuCardReferenceFactory.Create<NingJingHui>(
                     this,
-                    IsUpgraded
+                    false
                 ),
             ];
 
@@ -258,7 +248,7 @@ public sealed class JingHuiGu
         [
             GuCardReferenceFactory.Create<JingHui>(
                 this,
-                IsUpgraded
+                false
             ),
         ];
     }
@@ -269,7 +259,7 @@ public sealed class JingHuiGu
         return GuGeneratedCardFactory.Create<T>(
             Owner,
             GuRank,
-            upgraded: IsUpgraded
+            upgraded: false
         );
     }
 
