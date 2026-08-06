@@ -51,7 +51,7 @@
   "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.title": "玄玉掌",
   "GU_ZHEN_REN_CARD_XUAN_YU_ZHANG.description": "造成{Damage:diff()}点伤害。首段获得{Block:diff()}点格挡。{Rank:cond:>=7? NL [gold]七转：[/gold]能量消耗减少1。|}{Rank:cond:>=8? NL [gold]八转及以上：[/gold]重放1次；Replay只重复伤害。|}",
   "GU_ZHEN_REN_CARD_XUE_QI_GU.title": "血气蛊",
-  "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "[gold]{Rank}转[/gold]。[gold]催动[/gold]{RemainingUses}/{MaxUses}；[gold]恢复[/gold]{RecoveryTurns}。[gold]渴血[/gold]{BloodCost}、[gold]自噬[/gold]。选择1张普通手牌植入[gold]血气[/gold]。每次完整打出宿主后，根据其牌型以对应倍率触发血气效果；共触发{TriggerCount}次，随后[gold]孵化[/gold]。",
+  "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "[gold]{Rank}转[/gold]。[gold]催动[/gold]{RemainingUses}/{MaxUses}；[gold]恢复[/gold]{RecoveryTurns}。[gold]渴血[/gold]{BloodCost}、[gold]自噬[/gold]。选择1张普通手牌植入[gold]血气{TriggerCount}[/gold]（触发{TriggerCount}次后孵化）。每次完整打出宿主后，根据其牌型以对应倍率触发血气效果；共触发{TriggerCount}次，随后[gold]孵化[/gold]。",
   "GU_ZHEN_REN_CARD_XUE_YUE_GU.title": "血月蛊",
   "GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "[gold]{Rank}转[/gold]。[gold]合练[/gold]；[gold]催动[/gold]{RemainingUses}/{MaxUses}；[gold]恢复[/gold]{RecoveryTurns}。[gold]渴血[/gold]2：植入[gold]月相[/gold]。三阶段[gold]总额度[/gold]——伤害{CrescentBase}+{CrescentScale}X／{WaxingBase}+{WaxingScale}X／{FullBase}+{FullScale}X；流血{CrescentBleed}/{WaxingBleed}/{FullBleed}；血印{CrescentMarks}/{WaxingMarks}/{FullMarks}。X为宿主耗能。",
   "GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "蛊虫容量已达{Capacity}张。选择一张现有蛊虫替换，以获得[gold]{NewCard}[/gold]。",
@@ -159,13 +159,13 @@
   "GU_ZHEN_REN_CARD_XUE_YUE_JI.selectionScreenPrompt": "选择一张拥有血道寄生的牌。",
   "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.selectionScreenPrompt": "选择生成刀翅血蝠，或发动嗜骸 2生成刀翅血蝠群。",
   "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI.extraCardText": "附魔·血气（{Rank}转）：剩余{TriggersRemaining}次触发；打出宿主后结算。",
-  "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI.cardText": "血气 {TriggerCount}：触发 {TriggersRemaining} 次后孵化。攻击追加 {ParasiteValue} 伤害＋{ParasiteBleed} 流血；技能获得 {ParasiteValue} 格挡＋1 血元；能力获得 2 血元。",
+  "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI.cardText": "[color=#B388FF]注入血气 {TriggerCount}：触发 {TriggersRemaining} 次后孵化。攻击追加 {ParasiteValue} 伤害＋{ParasiteBleed} 流血；技能获得 {ParasiteValue} 格挡＋1 血元；能力获得 2 血元。[/color]",
   "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.extraCardText": "附魔·月相（{Rank}转·残月）：剩余{TriggersRemaining}次触发；打出宿主后推进。",
-  "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.cardText": "月相·残月（{Rank}转）：剩余 {TriggersRemaining} 次推进后孵化。",
+  "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.cardText": "[color=#B388FF]注入月相·残月（{Rank}转）：剩余 {TriggersRemaining} 次推进后孵化。[/color]",
   "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.extraCardText": "附魔·月相（{Rank}转·盈月）：剩余{TriggersRemaining}次触发；打出宿主后推进。",
-  "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.cardText": "月相·盈月（{Rank}转）：剩余 {TriggersRemaining} 次推进后孵化。",
+  "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.cardText": "[color=#B388FF]注入月相·盈月（{Rank}转）：剩余 {TriggersRemaining} 次推进后孵化。[/color]",
   "GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.extraCardText": "附魔·月相（{Rank}转·满月）：剩余{TriggersRemaining}次触发；打出宿主后孵化。",
-  "GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.cardText": "月相·满月（{Rank}转）：剩余 {TriggersRemaining} 次推进后孵化。",
+  "GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.cardText": "[color=#B388FF]注入月相·满月（{Rank}转）：剩余 {TriggersRemaining} 次推进后孵化。[/color]",
   "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS.extraCardText": "附魔·血胎（{Rank}转）：{Stage}/3点胎动，剩余{TriggersRemaining}次触发；3点时孵化。",
-  "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS.cardText": "血胎（{Rank}转）：胎动 {Stage}/3；剩余 {TriggersRemaining} 次触发，3 点时孵化。"
+  "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS.cardText": "[color=#B388FF]注入血胎（{Rank}转）：胎动 {Stage}/3；剩余 {TriggersRemaining} 次触发，3 点时孵化。[/color]"
 }
