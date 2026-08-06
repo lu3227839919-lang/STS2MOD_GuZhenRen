@@ -336,9 +336,10 @@ public sealed class KongQiaoRelic
     }
 
     /// <summary>
-    /// 原生能量重置完成后，第一回合把元气设为 5 点；从第二回合起
-    /// 按空窍转数自动回复（一至二转 2、三至五转 3、六至七转 4、
-    /// 八至九转 5），且不超过转数上限。
+    /// 原生能量重置完成后，第一回合把元气设为当前空窍转数的
+    /// 战斗初始量（下限：一转 4 ~ 九转 14）；从第二回合起按转数
+    /// 自动回复（一至二转 2、三至五转 3、六至七转 4、八至九转 5），
+    /// 且不超过转数上限。
     /// </summary>
     public override async Task AfterEnergyReset(Player player)
     {
@@ -368,7 +369,7 @@ public sealed class KongQiaoRelic
             YuanQiSystem.ResourceId
         ) ?? YuanQiSystem.Definition.HardMaxAmount;
         int targetAmount = player.PlayerCombatState.TurnNumber <= 1
-            ? 5
+            ? ApertureProgression.GetYuanQiStartAmount(rank)
             : currentAmount +
               ApertureProgression.GetYuanQiRecovery(rank);
 

@@ -63,6 +63,36 @@ public static class ApertureProgression
         };
     }
 
+    /// <summary>
+    /// 每场战斗开始时的空窍元气量（下限）。
+    /// 采用元气存储量推荐范围的下限：
+    /// 一转 4、二转 5、三转 6、四转 7、五转 8、
+    /// 六转 10、七转 11、八转 12、九转 14。
+    /// </summary>
+    private static readonly IReadOnlyDictionary<int, int>
+        YuanQiStartAmountByRank = new Dictionary<int, int>
+        {
+            [1] = 4,
+            [2] = 5,
+            [3] = 6,
+            [4] = 7,
+            [5] = 8,
+            [6] = 10,
+            [7] = 11,
+            [8] = 12,
+            [9] = 14,
+        };
+
+    public static int GetYuanQiStartAmount(int rank)
+    {
+        int normalizedRank = Math.Clamp(
+            rank,
+            MinimumRank,
+            MaximumImplementedRank
+        );
+        return YuanQiStartAmountByRank[normalizedRank];
+    }
+
     public static int GetRequiredXp(int rank)
     {
         return RequiredXpByRank.TryGetValue(rank, out int value)
