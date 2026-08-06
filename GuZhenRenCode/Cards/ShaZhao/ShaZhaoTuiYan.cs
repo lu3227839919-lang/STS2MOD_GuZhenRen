@@ -1,3 +1,4 @@
+using GuZhenRen.Cards;
 using GuZhenRen.Characters;
 
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -41,6 +42,12 @@ public sealed class ShaZhaoTuiYan : ModCardTemplate
     /// </summary>
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         [CardKeyword.Retain];
+
+    /// <summary>
+    /// 卡图统一使用 images/cards/ShaZhaoTuiYan.png。
+    /// </summary>
+    public override CardAssetProfile AssetProfile =>
+        CardImageCatalog.Create(GetType());
 
     protected override void OnUpgrade()
     {
