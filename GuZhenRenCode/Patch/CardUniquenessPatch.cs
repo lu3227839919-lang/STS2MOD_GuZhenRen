@@ -191,26 +191,6 @@ internal static class CardUniquenessPatch
             postfix: nameof(KeywordsPostfix)
         );
 
-        Patch(
-            harmony,
-            AccessTools.Method(
-                typeof(CardModel),
-                nameof(CardModel.GetDescriptionForPile),
-                [typeof(PileType), typeof(Creature)]
-            ),
-            postfix: nameof(CardDescriptionPostfix)
-        );
-
-        Patch(
-            harmony,
-            AccessTools.Method(
-                typeof(CardModel),
-                nameof(CardModel.GetDescriptionForUpgradePreview),
-                Type.EmptyTypes
-            ),
-            postfix: nameof(CardDescriptionPostfix)
-        );
-
         _initialized = true;
     }
 
@@ -959,31 +939,23 @@ internal static class CardUniquenessPatch
         keywords.Remove(
             GuZhenRenKeywords.XianGu
         );
+        /*
+         * 寄生关键词：与真正写入卡牌 LocalKeywords 的词保持一致。
+         * 这里先清除快照中残留的寄生词（读档/克隆后 _keywords 可能与
+         * SavedAttachedState 不同步），再按当前寄生类型与阶段添加。
+         */
+        keywords.ExceptWith(
+            GuZhenRenKeywords.ParasiteKeywords
+        );
         if (XueDaoParasiteSystem.HasParasite(__instance))
         {
-            keywords.Add(GuZhenRenKeywords.PoTai);
-            keywords.Add(GuZhenRenKeywords.FuHua);
-
-            switch (XueDaoParasiteSystem.GetKind(__instance))
+            foreach (CardKeyword keyword in
+                     XueDaoParasiteSystem.GetParasiteKeywords(
+                         XueDaoParasiteSystem.GetKind(__instance),
+                         XueDaoParasiteSystem.GetStage(__instance)
+                     ))
             {
-                case XueDaoParasiteSystem.ParasiteKind.BloodQi:
-                    keywords.Add(GuZhenRenKeywords.XueQi);
-                    break;
-                case XueDaoParasiteSystem.ParasiteKind.CrescentMoon:
-                case XueDaoParasiteSystem.ParasiteKind.BloodMoon:
-                    keywords.Add(GuZhenRenKeywords.YueXiang);
-                    keywords.Add(XueDaoParasiteSystem.GetStage(__instance) switch
-                    {
-                        <= 0 => GuZhenRenKeywords.CanYue,
-                        1 => GuZhenRenKeywords.YingYue,
-                        _ => GuZhenRenKeywords.ManYue,
-                    });
-                    break;
-                case XueDaoParasiteSystem.ParasiteKind.BloodFetus:
-                    keywords.Add(GuZhenRenKeywords.XueTai);
-                    keywords.Add(GuZhenRenKeywords.TaiDong);
-                    keywords.Add(GuZhenRenKeywords.TunJi);
-                    break;
+                keywords.Add(keyword);
             }
         }
 
@@ -1006,28 +978,6 @@ internal static class CardUniquenessPatch
         }
 
         __result = keywords;
-    }
-
-    /// <summary>
-    /// 以原版附魔额外文本相同的紫色样式展示寄生状态，但不写入
-    /// CardModel.Enchantment，避免覆盖宿主已有附魔。
-    /// </summary>
-    private static void CardDescriptionPostfix(
-        CardModel __instance,
-        ref string __result
-    )
-    {
-        string description =
-            XueDaoParasiteSystem.GetEnchantmentDescription(__instance);
-        if (string.IsNullOrWhiteSpace(description))
-        {
-            return;
-        }
-
-        string extraText = $"[purple]{description}[/purple]";
-        __result = string.IsNullOrEmpty(__result)
-            ? extraText
-            : __result + '\n' + extraText;
     }
 
     private sealed class RewardQueryScope

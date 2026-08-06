@@ -77,46 +77,74 @@ public static class XueDaoParasiteSystem
     public static int GetTriggersRemaining(CardModel card) => Math.Max(0, TriggersRemainingState[card]);
 
     /// <summary>
-    /// 返回寄生宿主应追加在卡面上的附魔说明。寄生继续使用可保存的
-    /// AttachedState，不占用 CardModel 唯一的原版附魔槽，因而能与
-    /// 宿主原有附魔共存，也不会改变旧存档和多人快照的结构。
+    /// 按寄生类型与阶段返回宿主牌应显示的全部寄生关键词。
+    /// 关键词会真正写入卡牌 LocalKeywords（附着时 AddKeyword，
+    /// 解除时 RemoveKeyword），卡面以关键词标签展示附魔状态。
     /// </summary>
-    public static string GetEnchantmentDescription(CardModel host)
+    public static IEnumerable<CardKeyword> GetParasiteKeywords(
+        ParasiteKind kind,
+        int stage
+    )
     {
+        kind = NormalizeLegacyKind(kind);
+        if (kind == ParasiteKind.None)
+        {
+            yield break;
+        }
+
+        // 破胎与孵化是所有寄生共有的机制词。
+        yield return GuZhenRenKeywords.PoTai;
+        yield return GuZhenRenKeywords.FuHua;
+
+        switch (kind)
+        {
+            case ParasiteKind.BloodQi:
+                yield return GuZhenRenKeywords.XueQi;
+                break;
+
+            case ParasiteKind.BloodMoon:
+                yield return GuZhenRenKeywords.YueXiang;
+                yield return stage switch
+                {
+                    <= 0 => GuZhenRenKeywords.CanYue,
+                    1 => GuZhenRenKeywords.YingYue,
+                    _ => GuZhenRenKeywords.ManYue,
+                };
+                break;
+
+            case ParasiteKind.BloodFetus:
+                yield return GuZhenRenKeywords.XueTai;
+                yield return GuZhenRenKeywords.TaiDong;
+                yield return GuZhenRenKeywords.TunJi;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// 把宿主牌本地的寄生关键词与当前寄生状态对齐：先移除全部
+    /// 寄生关键词，再按当前类型/阶段写入。附着、阶段推进、解除
+    /// 三处都调用它，保证卡面关键词即时反映寄生状态。
+    /// </summary>
+    public static void RefreshHostKeywords(CardModel host)
+    {
+        foreach (CardKeyword keyword in
+                 GuZhenRenKeywords.ParasiteKeywords)
+        {
+            // 对不存在的关键词调用 RemoveKeyword 无副作用（集合移除失败即忽略）。
+            host.RemoveKeyword(keyword);
+        }
+
         ParasiteKind kind = NormalizeLegacyKind(GetKind(host));
         if (kind == ParasiteKind.None)
         {
-            return string.Empty;
+            return;
         }
 
-        string entry = kind switch
+        foreach (CardKeyword keyword in
+                 GetParasiteKeywords(kind, GetStage(host)))
         {
-            ParasiteKind.BloodQi =>
-                "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI.extraCardText",
-            ParasiteKind.BloodMoon => GetStage(host) switch
-            {
-                <= 0 => "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.extraCardText",
-                1 => "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.extraCardText",
-                _ => "GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.extraCardText",
-            },
-            ParasiteKind.BloodFetus =>
-                "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS.extraCardText",
-            _ => string.Empty,
-        };
-
-        if (string.IsNullOrEmpty(entry))
-        {
-            return string.Empty;
+            host.AddKeyword(keyword);
         }
-
-        LocString description = new("cards", entry);
-        description.Add("Rank", GetRank(host));
-        description.Add("Stage", Math.Clamp(GetStage(host), 0, 3));
-        description.Add(
-            "TriggersRemaining",
-            GetTriggersRemaining(host)
-        );
-        return description.GetFormattedText();
     }
 
     internal static void MarkResolving(CardModel card, bool resolving) =>
@@ -305,6 +333,9 @@ public static class XueDaoParasiteSystem
                 sourceCard
             );
         }
+
+        // 附着完成后把寄生关键词真正写入宿主卡牌。
+        RefreshHostKeywords(host);
 
         Entry.Logger.Info($"[血寄] {host.Id} 获得 {kind}，来源转数 {rank}，阶段 {stage}。");
     }
@@ -558,6 +589,10 @@ public static class XueDaoParasiteSystem
         TriggersCompletedState[host] = completed;
         StageState[host] = completed;
         TriggersRemainingState[host] = Math.Max(0, totalStages - completed);
+
+        // 阶段推进（残月→盈月→满月）后刷新阶段关键词。
+        RefreshHostKeywords(host);
+
         return completed >= totalStages;
     }
 
@@ -767,6 +802,9 @@ public static class XueDaoParasiteSystem
         TriggersRemainingState[host] = 0;
         TriggersCompletedState[host] = 0;
         ResolvingState[host] = false;
+
+        // 寄生解除后立即从卡牌上移除全部寄生关键词。
+        RefreshHostKeywords(host);
 
         if (host.Owner.Creature.GetPower<XueJiPower>() is { } power)
         {
