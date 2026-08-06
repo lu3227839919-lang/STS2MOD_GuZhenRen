@@ -5,5 +5,8 @@
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.title": "蛊恢复堆",
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.description": "存放冷却中的蛊，以及因蛊存放牌堆已满而待命的已恢复蛊。回合开始有空位时随机补入存放牌堆。左键查看；右键花费1点能量开始杀招推演，材料仅从蛊存放牌堆选择。",
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.empty": "蛊恢复堆为空。",
+  "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL.title": "杀招封存堆",
+  "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL.description": "存放已经被杀招封装的蛊虫。杀招消耗或主动解体后，材料会返回蛊恢复堆。",
+  "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL.empty": "杀招封存堆为空。",
   "GU_ZHEN_REN_CARDPILE_GU_CARDS.selectionPrompt": "选择下一张蛊虫牌（材料顺序不影响配方）。已选择{SelectedCount}张；只有完整配方可以确认，也可以随时返回取消。"
 }

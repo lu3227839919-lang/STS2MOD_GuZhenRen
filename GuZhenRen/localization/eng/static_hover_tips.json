@@ -5,5 +5,8 @@
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.title": "Gu Recovery Pile",
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.description": "Stores cooling Gu and recovered Gu waiting because the Gu Hand is full. At turn start, vacancies are filled at random. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move using materials only from the Gu Hand.",
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.empty": "The Gu Recovery Pile is empty.",
+  "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL.title": "Killer Move Materials",
+  "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL.description": "Stores Gu Worms sealed into Killer Moves. Materials return to the Gu Recovery Pile when the Killer Move is consumed or dismantled.",
+  "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL.empty": "No sealed materials.",
   "GU_ZHEN_REN_CARDPILE_GU_CARDS.selectionPrompt": "Choose the next Gu Worm (material order does not matter). {SelectedCount} selected; only a complete recipe can be confirmed, or go back to cancel."
 }

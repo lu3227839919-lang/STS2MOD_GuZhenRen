@@ -42,6 +42,12 @@ public static class GuCardPileSystem
     public const string MaterialPileId =
         "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL";
 
+    private const string MaterialPileIconPath =
+        "res://GuZhenRen/materials/ShaZhaoMaterialPile.svg";
+
+    private const string RecoveryPileIconPath =
+        "res://GuZhenRen/images/ui/QiPaiDui.png";
+
     private const string OpeningDrawRngStreamId =
         "gu_pile/opening_draw";
 
@@ -120,8 +126,7 @@ public static class GuCardPileSystem
                     {
                         Scope = ModCardPileScope.CombatOnly,
                         Style = ModCardPileUiStyle.BottomLeft,
-                        IconPath =
-                            "res://GuZhenRen/images/ui/QiPaiDui.png",
+                        IconPath = RecoveryPileIconPath,
 
                         Anchor = new ModCardPileAnchor(
                             ModCardPileAnchorKind.BottomLeftSecondary,
@@ -133,10 +138,10 @@ public static class GuCardPileSystem
             PileType = definition.PileType;
             RecoveryPileType = recoveryDefinition.PileType;
 
-            // 蛊封存堆：可见牌堆，放在原版消耗牌堆上方，使用原版
-            // 消耗牌堆图标；杀招推演时材料移入此处（不再返回蛊牌堆，
-            // 除非杀招被解体）。hover tip 名称见本地化
-            // sha_zhao_material.title / .description / .empty。
+            // 蛊封存堆：使用 RitsuLib 的右下自动槽位，紧邻原版
+            // 消耗牌堆。不要再叠加向上的固定偏移，否则不同分辨率下
+            // 会漂入敌人区域。独立 SVG 图标随模组 PCK 打包，避免引用
+            // 不存在的原版资源后只剩数量文本。
             ModCardPileDefinition materialDefinition =
                 registry.RegisterOwned(
                     MaterialLocalId,
@@ -144,12 +149,16 @@ public static class GuCardPileSystem
                     {
                         Scope = ModCardPileScope.CombatOnly,
                         Style = ModCardPileUiStyle.BottomRight,
-                        IconPath =
-                            "res://images/packed/combat_ui/exhaust_pile.png",
+                        IconPath = ResourceLoader.Exists(
+                            MaterialPileIconPath
+                        )
+                            ? MaterialPileIconPath
+                            : RecoveryPileIconPath,
                         Anchor = new ModCardPileAnchor(
-                            ModCardPileAnchorKind.BottomRightPrimary,
-                            new Vector2(0f, -140f)
+                            ModCardPileAnchorKind.BottomRightPrimary
                         ),
+                        HoverTipPlacement =
+                            ModCardPileHoverTipPlacement.AboveButtonCentered,
                         CardShouldBeVisible = true,
                     }
                 );
