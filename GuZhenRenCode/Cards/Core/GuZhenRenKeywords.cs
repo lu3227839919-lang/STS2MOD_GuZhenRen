@@ -18,6 +18,9 @@ namespace GuZhenRen.Cards;
 [RegisterOwnedCardKeyword(nameof(CuiDong), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(HuiFu), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(HeLian), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
+[RegisterOwnedCardKeyword(nameof(ShiHai1), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
+[RegisterOwnedCardKeyword(nameof(ShiHai2), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
+[RegisterOwnedCardKeyword(nameof(ShiHai3), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(YaoHua1), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(YaoHua2), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(YaoHua3), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
@@ -48,6 +51,9 @@ public sealed class GuZhenRenKeywords
     public static readonly CardKeyword CuiDong = Create(nameof(CuiDong));
     public static readonly CardKeyword HuiFu = Create(nameof(HuiFu));
     public static readonly CardKeyword HeLian = Create(nameof(HeLian));
+    public static readonly CardKeyword ShiHai1 = Create(nameof(ShiHai1));
+    public static readonly CardKeyword ShiHai2 = Create(nameof(ShiHai2));
+    public static readonly CardKeyword ShiHai3 = Create(nameof(ShiHai3));
     public static readonly CardKeyword YaoHua1 = Create(nameof(YaoHua1));
     public static readonly CardKeyword YaoHua2 = Create(nameof(YaoHua2));
     public static readonly CardKeyword YaoHua3 = Create(nameof(YaoHua3));
@@ -129,7 +135,7 @@ public sealed class GuZhenRenKeywords
         new HashSet<CardKeyword>
         {
             XuYing, Unique, XianGu, CuiDong, HuiFu,
-            HeLian,
+            HeLian, ShiHai1, ShiHai2, ShiHai3,
             YaoHua1, YaoHua2, YaoHua3,
             YaoHua4, YaoHua5, YaoHua6,
             YaoHua7, YaoHua8, YaoHua9,
@@ -156,6 +162,19 @@ public sealed class GuZhenRenKeywords
             "耀化阈值必须位于一至九点。"
         ),
     };
+
+    public static CardKeyword GetShiHaiKeyword(int maximum) =>
+        maximum switch
+        {
+            1 => ShiHai1,
+            2 => ShiHai2,
+            3 => ShiHai3,
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(maximum),
+                maximum,
+                "噬骸选择上限必须位于一至三张。"
+            ),
+        };
 
     private static CardKeyword Create(string localName) =>
         ModContentRegistry

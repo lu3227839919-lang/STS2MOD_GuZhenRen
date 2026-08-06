@@ -26,6 +26,15 @@ public sealed class XueLuGu : AbstractGuWormCard
 
     public override bool GainsBlock => true;
 
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        base.CanonicalKeywords
+            .Append(
+                GuZhenRenKeywords.GetShiHaiKeyword(
+                    GetMaximumAbsorb()
+                )
+            )
+            .Distinct();
+
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new BlockVar(6m, ValueProp.Move),
@@ -98,11 +107,14 @@ public sealed class XueLuGu : AbstractGuWormCard
             8 => 21,
             _ => 24,
         };
-        DynamicVars[MaxAbsorbVar].BaseValue = GuRank switch
+        DynamicVars[MaxAbsorbVar].BaseValue = GetMaximumAbsorb();
+    }
+
+    private int GetMaximumAbsorb() =>
+        GuRank switch
         {
             <= 3 => 1,
             <= 6 => 2,
             _ => 3,
         };
-    }
 }

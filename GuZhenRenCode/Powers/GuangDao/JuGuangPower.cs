@@ -15,8 +15,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace GuZhenRen.Powers.GuangDao;
 
 /// <summary>
-/// 聚光：下一张由持有者打出的光道攻击牌获得固定伤害加成，随后清空。
-/// 作为内部状态隐藏，具体数值通过微光、聚光和余辉牌展示。
+/// 闪耀 X：下一张由持有者打出的光道攻击牌第一段伤害提高 X 点，
+/// 随后清空。保留旧类名以兼容既有存档与多人快照中的 Power ID。
 /// </summary>
 [RegisterPower]
 public sealed class JuGuangPower : ModPowerTemplate
@@ -25,7 +25,12 @@ public sealed class JuGuangPower : ModPowerTemplate
 
     public override PowerStackType StackType => PowerStackType.Counter;
 
-    protected override bool IsVisibleInternal => false;
+    public override PowerAssetProfile AssetProfile => new(
+        IconPath:
+            "res://GuZhenRen/images/power/GuangHuiPower-64x64.png",
+        BigIconPath:
+            "res://GuZhenRen/images/power/GuangHuiPower-256x256.png"
+    );
 
     public override decimal ModifyDamageAdditive(
         Creature? target,
@@ -60,7 +65,7 @@ public sealed class JuGuangPower : ModPowerTemplate
         }
 
         // 固定增伤只作用于下一张光道攻击牌的第一段伤害，
-        // 防止月芒等多段攻击按段数重复放大聚光收益。
+        // 防止月芒等多段攻击按段数重复放大闪耀收益。
         await PowerCmd.ModifyAmount(
             choiceContext,
             this,

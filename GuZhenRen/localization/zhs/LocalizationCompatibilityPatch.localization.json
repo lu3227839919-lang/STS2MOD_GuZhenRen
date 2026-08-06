@@ -109,6 +109,18 @@
     "YaoHua9": {
       "title": "耀化 9",
       "description": "光辉不少于9点时，自动消耗9点光辉并触发本牌的耀化效果。"
+    },
+    "ShiHai1": {
+      "title": "噬骸 1",
+      "description": "选择至多1张遗骸进行吸收。"
+    },
+    "ShiHai2": {
+      "title": "噬骸 2",
+      "description": "选择至多2张遗骸进行吸收。"
+    },
+    "ShiHai3": {
+      "title": "噬骸 3",
+      "description": "选择至多3张遗骸进行吸收。"
     }
   },
   "cardDescriptionOverrides": {
@@ -140,7 +152,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "存放尚有催动次数的蛊虫牌。蛊虫耗尽后进入恢复堆，并按照自身类型与转数计算独立恢复时间；部分高转蛊虫会在恢复阶段生成普通衍生牌。左键查看。"
+      "text": "存放当前可催动的蛊虫牌，最多7张。存在空位时，会从蛊恢复堆中随机抽取已经恢复的蛊。杀招推演只可使用本牌堆中的材料。"
     },
     {
       "table": "static_hover_tips",
@@ -160,7 +172,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.description",
-      "text": "存放催动次数已耗尽的蛊虫。每张蛊虫按照自身类型与转数独立恢复；部分三转以上蛊虫会在进入恢复堆或恢复期间生成普通衍生牌。左键查看；右键花费1点能量开始杀招推演。成功时再支付材料有效元气消耗平均值的2倍（向上取整）；组成杀招的蛊虫材料直接消耗，杀招加入手牌且不属于蛊虫。"
+      "text": "存放冷却中的蛊，以及因蛊存放牌堆已满而待命的已恢复蛊。回合开始有空位时随机补入存放牌堆。左键查看；右键花费1点能量开始杀招推演，材料仅从蛊存放牌堆选择。"
     },
     {
       "table": "static_hover_tips",
@@ -266,6 +278,16 @@
       "table": "powers",
       "key": "GU_ZHEN_REN_POWER_XUE_HE_JIA_CARRY_POWER.description",
       "text": "下回合开始时获得{Amount}点格挡，然后移除。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_JU_GUANG_POWER.title",
+      "text": "闪耀"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_JU_GUANG_POWER.description",
+      "text": "下一张光道攻击的第一段伤害提高{Amount}点。多段攻击只获得一次加成。"
     }
   ],
   "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "一次可选择0至2张尚未达到最高转数的蛊牌，各提升一转；选择完成后需要主动点击确认。选择0张并确认将取消本次操作。每个休息点只能成功升炼一次。",

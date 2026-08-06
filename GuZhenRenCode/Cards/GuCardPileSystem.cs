@@ -4,8 +4,10 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Random;
 using Godot;
 
+using STS2RitsuLib;
 using STS2RitsuLib.CardPiles;
 
 namespace GuZhenRen.Cards;
@@ -16,6 +18,8 @@ namespace GuZhenRen.Cards;
 /// </summary>
 public static class GuCardPileSystem
 {
+    public const int ActivePileCapacity = 7;
+
     public const string LocalId = "gu_cards";
 
     public const string RecoveryLocalId = "gu_discard";
@@ -28,6 +32,12 @@ public static class GuCardPileSystem
         "GU_ZHEN_REN_CARDPILE_GU_DISCARD";
 
     public const string DiscardPileId = RecoveryPileId;
+
+    private const string OpeningDrawRngStreamId =
+        "gu_pile/opening_draw";
+
+    private const string RecoveredDrawRngStreamId =
+        "gu_pile/recovered_draw";
 
     /// <summary>The runtime pile type assigned by RitsuLib.</summary>
     public static PileType PileType { get; private set; }
@@ -135,10 +145,15 @@ public static class GuCardPileSystem
         EnsureInitialized();
         GuCardUsageRules.ResetUses(card);
 
+        PileType targetPile =
+            GetAvailableActiveSlots(owner) > 0
+                ? PileType
+                : RecoveryPileType;
+
         CardPileAddResult result =
             await CardPileCmd.AddGeneratedCardToCombat(
                 card,
-                PileType,
+                targetPile,
                 owner
             );
 
@@ -193,20 +208,29 @@ public static class GuCardPileSystem
             changedPile.InvokeContentsChanged();
         }
 
+        CardModel[] openingCards = DrawRandomGuCards(
+            owner,
+            guCards,
+            ActivePileCapacity,
+            OpeningDrawRngStreamId
+        );
+
         OpeningEntryStates.Remove(owner);
         OpeningEntryState state = OpeningEntryStates.GetValue(
             owner,
             static _ => new OpeningEntryState()
         );
-        state.Cards = guCards;
+        state.Cards = openingCards;
         state.Started = false;
-        state.Completed = guCards.Length == 0;
+        state.Completed = openingCards.Length == 0;
         state.AnimationTask = null;
 
         if (guCards.Length > 0)
         {
             Entry.Logger.Info(
-                $"[蛊牌入场] 已将 {guCards.Length} 张蛊牌暂存至恢复堆，等待首轮抽牌。"
+                $"[蛊牌入场] 共 {guCards.Length} 张蛊牌；随机选取 " +
+                $"{openingCards.Length} 张进入蛊存放牌堆，" +
+                $"{guCards.Length - openingCards.Length} 张留在恢复堆待命。"
             );
         }
     }
@@ -253,6 +277,7 @@ public static class GuCardPileSystem
                 card is IGuWormCard &&
                 ReferenceEquals(card.Pile, recoveryPile)
             )
+            .Take(GetAvailableActiveSlots(owner))
             .ToArray();
 
         try
@@ -306,10 +331,7 @@ public static class GuCardPileSystem
         }
     }
 
-    private static bool IsOpeningEntryPending(
-        Player owner,
-        CardModel card
-    )
+    private static bool IsOpeningEntryPending(Player owner)
     {
         if (!OpeningEntryStates.TryGetValue(owner, out var state) ||
             state.Completed)
@@ -319,7 +341,7 @@ public static class GuCardPileSystem
 
         lock (state)
         {
-            return !state.Completed && state.Cards.Contains(card);
+            return !state.Completed;
         }
     }
 
@@ -331,6 +353,8 @@ public static class GuCardPileSystem
 
         CardPile guPile = PileType.GetPile(owner);
         CardPile recoveryPile = RecoveryPileType.GetPile(owner);
+        MoveActiveOverflowToRecovery(owner);
+        int availableSlots = GetAvailableActiveSlots(owner);
 
         foreach (CardPile sourcePile in new[]
         {
@@ -354,7 +378,17 @@ public static class GuCardPileSystem
 
                 if (GuCardUsageRules.CanUse(card))
                 {
-                    guPile.AddInternal(card, silent: true);
+                    if (availableSlots > 0)
+                    {
+                        guPile.AddInternal(card, silent: true);
+                        availableSlots--;
+                    }
+                    else
+                    {
+                        // 可用但超过七张上限：作为“已恢复待命”蛊保留，
+                        // 不建立冷却时间戳。
+                        recoveryPile.AddInternal(card, silent: true);
+                    }
                 }
                 else
                 {
@@ -468,14 +502,17 @@ public static class GuCardPileSystem
 
         EnsureInitialized();
 
+        // 第一回合的起手入场与原版抽牌并行。此时不得让恢复流程先把
+        // 待命蛊塞满存放堆，否则稍后的入场动画会突破七张上限。
+        if (IsOpeningEntryPending(owner))
+        {
+            return;
+        }
+
+        CardPile recoveryPile = RecoveryPileType.GetPile(owner);
         CardModel[] allRecoveringCards =
-            RecoveryPileType
-                .GetPile(owner)
-                .Cards
-                .Where(card =>
-                    card is IGuWormCard &&
-                    !IsOpeningEntryPending(owner, card)
-                )
+            recoveryPile.Cards
+                .Where(static card => card is IGuWormCard)
                 .ToArray();
 
         if (allRecoveringCards.Length == 0)
@@ -487,6 +524,14 @@ public static class GuCardPileSystem
         // 避免在加载后被错误地立即刷新。
         foreach (CardModel card in allRecoveringCards)
         {
+            // 没有冷却时间戳且已有可用次数，表示该牌已经恢复，只因
+            // 七张上限暂存在恢复堆。它无需再次开始冷却或重复触发恢复效果。
+            if (GuCardUsageRules.CanUse(card) &&
+                !GuCardUsageRules.HasRecoverySchedule(card))
+            {
+                continue;
+            }
+
             if (!GuCardUsageRules.HasRecoverySchedule(card))
             {
                 GuCardUsageRules.ScheduleRecovery(card, turnNumber);
@@ -510,20 +555,37 @@ public static class GuCardPileSystem
         foreach (CardModel card in recoveredCards)
         {
             GuCardUsageRules.ResetUses(card);
+            await GuRecoveryEffectSystem.HandleRecoveredAsync(card);
         }
 
+        CardModel[] readyCards = recoveryPile.Cards
+            .Where(card =>
+                card is IGuWormCard &&
+                GuCardUsageRules.CanUse(card) &&
+                !GuCardUsageRules.HasRecoverySchedule(card)
+            )
+            .ToArray();
+
+        int availableSlots = GetAvailableActiveSlots(owner);
+        if (availableSlots <= 0 || readyCards.Length == 0)
+        {
+            return;
+        }
+
+        CardModel[] drawnCards = DrawRandomGuCards(
+            owner,
+            readyCards,
+            availableSlots,
+            RecoveredDrawRngStreamId
+        );
+
         await CardPileCmd.Add(
-            recoveredCards,
+            drawnCards,
             PileType,
             CardPilePosition.Bottom,
             clonedBy: null,
             skipVisuals: false
         );
-
-        foreach (CardModel card in recoveredCards)
-        {
-            await GuRecoveryEffectSystem.HandleRecoveredAsync(card);
-        }
     }
 
     /// <summary>
@@ -633,6 +695,105 @@ public static class GuCardPileSystem
 
         sourcePile?.InvokeContentsChanged();
         targetPile.InvokeContentsChanged();
+    }
+
+    private static int GetActiveGuCount(Player owner) =>
+        PileType
+            .GetPile(owner)
+            .Cards
+            .Count(static card => card is IGuWormCard);
+
+    private static int GetAvailableActiveSlots(Player owner) =>
+        Math.Max(0, ActivePileCapacity - GetActiveGuCount(owner));
+
+    /// <summary>
+    /// 兼容旧存档或其他模组直接移动蛊牌的情况，保证存放堆绝不超过
+    /// 七张。可用的溢出蛊作为已恢复待命牌保留；耗尽牌继续正常冷却。
+    /// </summary>
+    private static void MoveActiveOverflowToRecovery(Player owner)
+    {
+        CardPile guPile = PileType.GetPile(owner);
+        CardPile recoveryPile = RecoveryPileType.GetPile(owner);
+        CardModel[] overflowCards = guPile.Cards
+            .Where(static card => card is IGuWormCard)
+            .Skip(ActivePileCapacity)
+            .ToArray();
+
+        if (overflowCards.Length == 0)
+        {
+            return;
+        }
+
+        int currentTurn = owner.PlayerCombatState?.TurnNumber ?? 1;
+        foreach (CardModel card in overflowCards)
+        {
+            guPile.RemoveInternal(card, silent: true);
+
+            if (!GuCardUsageRules.CanUse(card) &&
+                !GuCardUsageRules.HasRecoverySchedule(card))
+            {
+                GuCardUsageRules.ScheduleRecovery(card, currentTurn);
+            }
+
+            recoveryPile.AddInternal(card, silent: true);
+        }
+
+        guPile.InvokeContentsChanged();
+        recoveryPile.InvokeContentsChanged();
+    }
+
+    /// <summary>
+    /// 使用按模组、玩家和用途隔离的确定性 RNG 随机抽取蛊牌。
+    /// 候选先按可保存属性稳定排序，确保多人端以相同顺序推进随机流。
+    /// 即使全部候选都能进入，也会随机排列入场顺序。
+    /// </summary>
+    private static CardModel[] DrawRandomGuCards(
+        Player owner,
+        IEnumerable<CardModel> candidates,
+        int maximumCount,
+        string rngStreamId
+    )
+    {
+        CardModel[] pool = candidates
+            .Where(static card => card is IGuWormCard)
+            .OrderBy(
+                static card => card.Id.ToString(),
+                StringComparer.Ordinal
+            )
+            .ThenBy(static card =>
+                card is IGuRankProvider rankProvider
+                    ? rankProvider.GuRank
+                    : 0
+            )
+            .ThenBy(static card => card.CurrentUpgradeLevel)
+            .ToArray();
+
+        int drawCount = Math.Clamp(maximumCount, 0, pool.Length);
+        if (drawCount == 0)
+        {
+            return [];
+        }
+
+        if (pool.Length > 1)
+        {
+            Rng rng = RitsuLibFramework.GetModPlayerRng(
+                owner,
+                Entry.ModId,
+                rngStreamId
+            );
+
+            for (int index = 0;
+                 index < drawCount && index < pool.Length - 1;
+                 index++)
+            {
+                int selectedIndex =
+                    index + rng.NextInt(pool.Length - index);
+                (pool[index], pool[selectedIndex]) =
+                    (pool[selectedIndex], pool[index]);
+            }
+        }
+
+        return pool.Take(drawCount).ToArray();
     }
 
     private static void EnsureInitialized()

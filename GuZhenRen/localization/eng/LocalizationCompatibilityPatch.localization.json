@@ -109,6 +109,18 @@
     "YaoHua9": {
       "title": "Illumination 9",
       "description": "When you have at least 9 Radiance, automatically spend 9 Radiance and trigger this card’s Illumination effect."
+    },
+    "ShiHai1": {
+      "title": "Devour Remains 1",
+      "description": "Choose up to 1 Remains card to absorb."
+    },
+    "ShiHai2": {
+      "title": "Devour Remains 2",
+      "description": "Choose up to 2 Remains cards to absorb."
+    },
+    "ShiHai3": {
+      "title": "Devour Remains 3",
+      "description": "Choose up to 3 Remains cards to absorb."
     }
   },
   "cardDescriptionOverrides": {
@@ -140,7 +152,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "Stores Gu Worms with activations remaining. Depleted Gu enter the Recovery Pile and use an independent recovery time based on type and rank; some higher-rank Gu create normal derivative cards during recovery. Left-click to inspect."
+      "text": "Stores up to 7 currently usable Gu Worms. When space is available, recovered Gu are drawn at random from the Gu Recovery Pile. Killer Move deduction can use only materials in this pile."
     },
     {
       "table": "static_hover_tips",
@@ -160,7 +172,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.description",
-      "text": "Stores depleted Gu Worms. Each Gu Worm recovers independently according to its type and rank; some rank-3 or higher Gu create normal derivative cards when entering or progressing through recovery. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move. On success, also pay twice the average effective Primeval Essence cost of all materials, rounded up. Materials are Exhausted, and the Killer Move enters your hand without counting as a Gu Worm."
+      "text": "Stores cooling Gu and recovered Gu waiting because the Gu Hand is full. At turn start, vacancies are filled at random. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move using materials only from the Gu Hand."
     },
     {
       "table": "static_hover_tips",
@@ -266,6 +278,16 @@
       "table": "powers",
       "key": "GU_ZHEN_REN_POWER_XUE_HE_JIA_CARRY_POWER.description",
       "text": "At the start of your next turn, gain {Amount} Block, then remove this effect."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_JU_GUANG_POWER.title",
+      "text": "Shine"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_JU_GUANG_POWER.description",
+      "text": "The first hit of your next Light Path Attack deals {Amount} more damage. Multi-hit attacks gain this bonus only once."
     }
   ],
   "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "Select 0 to 2 eligible Gu Worms and raise each by one rank. Click Confirm after making your selection. Confirming with 0 selected cancels the action. Each rest site allows one successful refinement.",
