@@ -1,6 +1,6 @@
 {
   "GU_ZHEN_REN_CARDPILE_GU_CARDS.title": "Gu Hand",
-  "GU_ZHEN_REN_CARDPILE_GU_CARDS.description": "The Gu Hand stores up to 7 usable Gu Worms. When space is available, recovered Gu are drawn at random from the recovery pile. Killer Move deduction can use only Gu in this pile. An affordable Activate in your normal hand lets you play a Gu.",
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.description": "The Gu Hand stores up to 5 usable Gu Worms. When space is available, recovered Gu are drawn at random from the recovery pile. Killer Move deduction can use only Gu in this pile. An affordable Activate in your normal hand lets you play a Gu.",
   "GU_ZHEN_REN_CARDPILE_GU_CARDS.empty": "The Gu Hand is empty.",
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.title": "Gu Recovery Pile",
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.description": "Stores cooling Gu and recovered Gu waiting because the Gu Hand is full. At turn start, vacancies are filled at random. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move using materials only from the Gu Hand.",

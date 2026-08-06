@@ -52,7 +52,7 @@
   "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Activate[/gold] {RemainingUses}/{MaxUses}; [gold]Recover[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] {BloodCost}, [gold]Self-Devour[/gold]. Choose 1 normal card in your hand and implant [gold]Blood Qi[/gold]. Each time the host is fully played, trigger Blood Qi at the corresponding multiplier based on its card type; trigger {TriggerCount} time(s) in total, then [gold]Hatch[/gold].",
   "GU_ZHEN_REN_CARD_XUE_YUE_GU.title": "Blood Moon Gu",
   "GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Fusion[/gold]; [gold]Activate[/gold] {RemainingUses}/{MaxUses}; [gold]Recover[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] 2: implant [gold]Moon Phase[/gold]. Three-stage [gold]Shared Pools[/gold]—damage {CrescentBase}+{CrescentScale}X / {WaxingBase}+{WaxingScale}X / {FullBase}+{FullScale}X; Bleed {CrescentBleed}/{WaxingBleed}/{FullBleed}; Marks {CrescentMarks}/{WaxingMarks}/{FullMarks}. X is host Energy spent.",
-  "GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "Your 10-card Gu capacity is full. Choose an existing Gu Worm to replace to obtain [gold]{NewCard}[/gold].",
+  "GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "Your {Capacity}-card Gu capacity is full. Choose an existing Gu Worm to replace to obtain [gold]{NewCard}[/gold].",
   "GU_ZHEN_REN_CARD_WEI_GUANG.title": "Glimmer",
   "GU_ZHEN_REN_CARD_WEI_GUANG.description": "Gain 3 [gold]Shine[/gold].",
   "GU_ZHEN_REN_CARD_JU_GUANG.title": "Focused Light",

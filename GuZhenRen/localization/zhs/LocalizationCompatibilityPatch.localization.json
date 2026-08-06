@@ -138,6 +138,7 @@
     "GU_ZHEN_REN_CARD_HONG_ZAO_XIAN_YUAN.description": "作为仙元保留在手中。等于两张青提仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
     "GU_ZHEN_REN_CARD_BAI_LI_XIAN_YUAN.description": "作为仙元保留在手中。等于两张红枣仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
     "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description": "作为仙元保留在手中。等于两张白荔仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
+    "GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "蛊虫容量已达{Capacity}张。选择一张现有蛊虫替换，以获得[gold]{NewCard}[/gold]。",
     "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "[gold]{Rank}转[/gold]。[gold]催动[/gold]{RemainingUses}/{MaxUses}；[gold]恢复[/gold]{RecoveryTurns}。[gold]渴血[/gold]{BloodCost}、[gold]自噬[/gold]。选择1张普通手牌植入[gold]血气[/gold]。每次完整打出宿主后，根据其牌型以对应倍率触发血气效果；共触发{TriggerCount}次，随后[gold]孵化[/gold]。",
     "GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "[gold]{Rank}转[/gold]。[gold]合练[/gold]；[gold]催动[/gold]{RemainingUses}/{MaxUses}；[gold]恢复[/gold]{RecoveryTurns}。[gold]渴血[/gold]2：植入[gold]月相[/gold]。三阶段[gold]总额度[/gold]——伤害{CrescentBase}+{CrescentScale}X／{WaxingBase}+{WaxingScale}X／{FullBase}+{FullScale}X；流血{CrescentBleed}/{WaxingBleed}/{FullBleed}；血印{CrescentMarks}/{WaxingMarks}/{FullMarks}。X为宿主耗能。",
     "GU_ZHEN_REN_CARD_XUE_CHI_GU.description": "[gold]{Rank}转[/gold]。[gold]催动[/gold]{RemainingUses}/{MaxUses}；[gold]恢复[/gold]{RecoveryTurns}。获得{XueYuanPower:diff()}点[gold]血元[/gold]；每点[gold]溢出[/gold]转化为{OverflowBlock}点格挡。",
@@ -175,7 +176,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "存放当前可催动的蛊虫牌，最多7张。存在空位时，会从蛊恢复堆中随机抽取已经恢复的蛊。杀招推演只可使用本牌堆中的材料。"
+      "text": "存放当前可催动的蛊虫牌，最多5张。存在空位时，会从蛊恢复堆中随机抽取已经恢复的蛊。杀招推演只可使用本牌堆中的材料。"
     },
     {
       "table": "static_hover_tips",

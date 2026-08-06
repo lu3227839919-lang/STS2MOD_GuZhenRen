@@ -2,7 +2,7 @@
   "id": "GuZhenRen",
   "name": "蛊真人",
   "author": "LU",
-  "description": "《杀戮尖塔 2》蛊真人 Mod。0.6.6 新增噬骸与闪耀，并将蛊存放牌堆限制为7张。",
+  "description": "《杀戮尖塔 2》蛊真人 Mod。0.6.6 新增噬骸与闪耀，并将蛊存放牌堆限制为5张、永久蛊虫容量设为15张。",
   "version": "0.6.6",
   "has_pck": true,
   "has_dll": true,

@@ -138,6 +138,7 @@
     "GU_ZHEN_REN_CARD_HONG_ZAO_XIAN_YUAN.description": "Retain as immortal essence. Equals two Green Grape essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
     "GU_ZHEN_REN_CARD_BAI_LI_XIAN_YUAN.description": "Retain as immortal essence. Equals two Red Date essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
     "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description": "Retain as immortal essence. Equals two White Litchi essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
+    "GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "Your {Capacity}-card Gu capacity is full. Choose an existing Gu Worm to replace to obtain [gold]{NewCard}[/gold].",
     "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Activate[/gold] {RemainingUses}/{MaxUses}; [gold]Recover[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] {BloodCost}, [gold]Self-Devour[/gold]. Choose 1 normal card in your hand and implant [gold]Blood Qi[/gold]. Each time the host is fully played, trigger Blood Qi at the corresponding multiplier based on its card type; trigger {TriggerCount} time(s) in total, then [gold]Hatch[/gold].",
     "GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Fusion[/gold]; [gold]Activate[/gold] {RemainingUses}/{MaxUses}; [gold]Recover[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] 2: implant [gold]Moon Phase[/gold]. Three-stage [gold]Shared Pools[/gold]—damage {CrescentBase}+{CrescentScale}X / {WaxingBase}+{WaxingScale}X / {FullBase}+{FullScale}X; Bleed {CrescentBleed}/{WaxingBleed}/{FullBleed}; Marks {CrescentMarks}/{WaxingMarks}/{FullMarks}. X is host Energy spent.",
     "GU_ZHEN_REN_CARD_XUE_CHI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Activate[/gold] {RemainingUses}/{MaxUses}; [gold]Recover[/gold] {RecoveryTurns}. Gain {XueYuanPower:diff()} [gold]Blood Essence[/gold]; convert each [gold]Overflow[/gold] into {OverflowBlock} Block.",
@@ -175,7 +176,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "Stores up to 7 currently usable Gu Worms. When space is available, recovered Gu are drawn at random from the Gu Recovery Pile. Killer Move deduction can use only materials in this pile."
+      "text": "Stores up to 5 currently usable Gu Worms. When space is available, recovered Gu are drawn at random from the Gu Recovery Pile. Killer Move deduction can use only materials in this pile."
     },
     {
       "table": "static_hover_tips",

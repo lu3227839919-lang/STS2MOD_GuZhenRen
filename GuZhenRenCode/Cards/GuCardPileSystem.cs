@@ -385,7 +385,7 @@ public static class GuCardPileSystem
                     }
                     else
                     {
-                        // 可用但超过七张上限：作为“已恢复待命”蛊保留，
+                        // 可用但超过五张上限：作为“已恢复待命”蛊保留，
                         // 不建立冷却时间戳。
                         recoveryPile.AddInternal(card, silent: true);
                     }
@@ -503,7 +503,7 @@ public static class GuCardPileSystem
         EnsureInitialized();
 
         // 第一回合的起手入场与原版抽牌并行。此时不得让恢复流程先把
-        // 待命蛊塞满存放堆，否则稍后的入场动画会突破七张上限。
+        // 待命蛊塞满存放堆，否则稍后的入场动画会突破五张上限。
         if (IsOpeningEntryPending(owner))
         {
             return;
@@ -525,7 +525,7 @@ public static class GuCardPileSystem
         foreach (CardModel card in allRecoveringCards)
         {
             // 没有冷却时间戳且已有可用次数，表示该牌已经恢复，只因
-            // 七张上限暂存在恢复堆。它无需再次开始冷却或重复触发恢复效果。
+            // 五张上限暂存在恢复堆。它无需再次开始冷却或重复触发恢复效果。
             if (GuCardUsageRules.CanUse(card) &&
                 !GuCardUsageRules.HasRecoverySchedule(card))
             {
@@ -708,7 +708,7 @@ public static class GuCardPileSystem
 
     /// <summary>
     /// 兼容旧存档或其他模组直接移动蛊牌的情况，保证存放堆绝不超过
-    /// 七张。可用的溢出蛊作为已恢复待命牌保留；耗尽牌继续正常冷却。
+    /// 五张。可用的溢出蛊作为已恢复待命牌保留；耗尽牌继续正常冷却。
     /// </summary>
     private static void MoveActiveOverflowToRecovery(Player owner)
     {

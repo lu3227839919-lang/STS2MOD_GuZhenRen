@@ -1,6 +1,6 @@
 {
   "GU_ZHEN_REN_CARDPILE_GU_CARDS.title": "蛊手牌",
-  "GU_ZHEN_REN_CARDPILE_GU_CARDS.description": "蛊存放牌堆最多7张。存在空位时，从蛊恢复堆中随机抽取已经恢复的蛊；杀招推演只能使用本牌堆中的蛊。普通手牌中有可支付费用的【催动】时，可直接使用蛊牌。",
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.description": "蛊存放牌堆最多5张。存在空位时，从蛊恢复堆中随机抽取已经恢复的蛊；杀招推演只能使用本牌堆中的蛊。普通手牌中有可支付费用的【催动】时，可直接使用蛊牌。",
   "GU_ZHEN_REN_CARDPILE_GU_CARDS.empty": "蛊手牌为空。",
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.title": "蛊恢复堆",
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.description": "存放冷却中的蛊，以及因蛊存放牌堆已满而待命的已恢复蛊。回合开始有空位时随机补入存放牌堆。左键查看；右键花费1点能量开始杀招推演，材料仅从蛊存放牌堆选择。",

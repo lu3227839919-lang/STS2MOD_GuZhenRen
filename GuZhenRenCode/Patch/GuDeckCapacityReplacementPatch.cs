@@ -157,6 +157,10 @@ internal static class GuDeckCapacityReplacementPatch
             "cards",
             "GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt"
         );
+        prompt.Add(
+            "Capacity",
+            GuZhenRenCardRules.GuWormDeckCapacity
+        );
         prompt.Add("NewCard", card.Title);
 
         CardSelectorPrefs prefs = new(prompt, 1, 1)
