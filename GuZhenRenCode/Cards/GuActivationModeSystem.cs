@@ -120,44 +120,117 @@ public static class GuActivationModeSystem
     }
 
     /// <summary>
-    /// 判断蛊牌能否通过原生出牌管线。除了蛊手牌中的卡，还允许
-    /// RitsuLib 正在进行目标选择、已临时移入原版 Hand 的那一张牌。
+    /// 判断蛊牌能否通过原生出牌管线。
+    ///
+    /// 蛊牌仍在自定义牌堆时是 UI 选择入口（仅本地玩家、手牌有可用催动
+    /// 才可选）；蛊牌被 RitsuLib 移入原版 Hand 后进入出牌校验阶段——
+    /// 该阶段由同步的 PlayCardAction 在各端执行，不能依赖只存在于发起端
+    /// （房主）的本地 pending 记录，也不能因“不是本端玩家的牌”而拒绝，
+    /// 否则客户端会直接跳过蛊牌结算，造成主客机状态分叉。
     /// </summary>
     public static bool CanPlay(CardModel? card)
     {
         if (card == null ||
             card is not IGuWormCard ||
-            !LocalContext.IsMine(card) ||
             !GuCardUsageRules.CanActivate(card))
         {
+            LogCanPlayRejection(
+                card,
+                card == null
+                    ? "空卡"
+                    : card is not IGuWormCard
+                        ? "非蛊牌"
+                        : "CanActivate 失败"
+            );
             return false;
         }
 
         Player owner = card.Owner;
 
         // 蛊手牌中的牌只有在普通手牌里存在一张当前可支付费用的
-        // “催动”时才显示为可用。玩家直接点击蛊牌，不再先进入模式。
+        // “催动”时才显示为可用；玩家直接点击蛊牌，不再先进入模式。
         if (card.Pile?.Type == GuCardPileSystem.PileType)
         {
-            return FindAvailableActivator(owner) != null;
-        }
-
-        // RitsuLib 开始原生目标选择时会把被点击的蛊牌临时移入 Hand。
-        // 这段窗口只允许刚刚从蛊手牌选中的实例继续通过 CanPlay。
-        ChuiDong? reservedActivator;
-        lock (SyncRoot)
-        {
-            if (!ReferenceEquals(_pendingCard, card) ||
-                card.Pile?.Type != PileType.Hand)
+            if (!LocalContext.IsMine(card))
             {
+                LogCanPlayRejection(card, "非本地玩家的蛊牌");
                 return false;
             }
 
-            reservedActivator = _pendingActivator;
+            bool available = FindAvailableActivator(owner) != null;
+            if (!available)
+            {
+                LogCanPlayRejection(card, "蛊牌堆中无可用催动");
+            }
+
+            return available;
         }
 
-        return IsActivatorAvailable(reservedActivator, owner) ||
-            FindAvailableActivator(owner) != null;
+        // RitsuLib 开始原生目标选择时会把被点击的蛊牌临时移入 Hand。
+        // 这段窗口同时服务房主（本地 pending）与客户端（同步出牌动作，
+        // 没有 pending、且卡牌不属于本端玩家），统一按“手牌存在可用
+        // 催动”放行。
+        if (card.Pile?.Type == PileType.Hand)
+        {
+            bool available = FindAvailableActivator(owner) != null;
+            if (!available)
+            {
+                LogCanPlayRejection(card, "Hand 中无可用催动");
+            }
+
+            return available;
+        }
+
+        LogCanPlayRejection(
+            card,
+            $"不在可打出位置（当前牌堆 {card.Pile?.Type}）"
+        );
+        return false;
+    }
+
+    private static readonly object LogLock = new();
+
+    private static readonly HashSet<string> WarnedCards = new(
+        StringComparer.Ordinal
+    );
+
+    private static void LogCanPlayRejection(
+        CardModel? card,
+        string reason
+    )
+    {
+        if (card == null)
+        {
+            return;
+        }
+
+        // 同一张卡同一原因只记一次；超过上限后整体清空，避免跨战斗
+        // 无界增长或永久静默。
+        string key = $"{card.Id}:{reason}";
+        lock (LogLock)
+        {
+            if (WarnedCards.Count > 256)
+            {
+                WarnedCards.Clear();
+            }
+
+            if (!WarnedCards.Add(key))
+            {
+                return;
+            }
+        }
+
+        string pendingId;
+        lock (SyncRoot)
+        {
+            pendingId = _pendingCard?.Id.ToString() ?? "无";
+        }
+
+        Entry.Logger.Warn(
+            $"[蛊牌催动] {card.Id} 不可打出：{reason}。" +
+            $"pile={card.Pile?.Type}, pending={pendingId}, " +
+            $"isMine={LocalContext.IsMine(card)}。"
+        );
     }
 
     internal static void PrepareTargeting(CardModel card)
@@ -180,29 +253,60 @@ public static class GuActivationModeSystem
 
     /// <summary>
     /// 蛊牌正式开始结算时，自动支付并打出目标选择前预留的“催动”。
-    /// 非玩家从蛊手牌直接选择的脚本 AutoPlay 不消费催动牌。
+    ///
+    /// 发起端（房主）使用本地预留的催动；客户端执行同一同步出牌动作时
+    /// 没有 pending 记录，直接查找手牌中可用的催动并打出，保证两端对
+    /// 催动与能量的消耗一致。脚本 AutoPlay（isAutoPlay=true）不消费
+    /// 催动牌。
     /// </summary>
     internal static async Task<bool>
-        TryAutoPlayReservedActivatorAsync(CardModel guCard)
+        TryAutoPlayReservedActivatorAsync(
+            CardModel guCard,
+            bool isAutoPlay
+        )
     {
         ArgumentNullException.ThrowIfNull(guCard);
 
         ChuiDong? activator;
+        bool hasPending;
         lock (SyncRoot)
         {
-            // 没有经过 ExtraHand 直接选择的脚本入口沿用原有行为。
-            if (!ReferenceEquals(_pendingCard, guCard))
-            {
-                return true;
-            }
-
-            activator = _pendingActivator;
+            hasPending = ReferenceEquals(_pendingCard, guCard);
+            activator = hasPending ? _pendingActivator : null;
         }
 
         Player owner = guCard.Owner;
-        if (!IsActivatorAvailable(activator, owner))
+        if (!hasPending)
         {
+            if (isAutoPlay)
+            {
+                // 没有经过 ExtraHand 直接选择的脚本入口沿用原有行为：
+                // 不自动打出催动。
+                return true;
+            }
+
+            // 客户端执行同步的蛊牌出牌动作：本地没有 pending 记录，
+            // 直接查找手牌中可用的催动，保证与发起端消耗一致。
             activator = FindAvailableActivator(owner);
+            if (activator == null)
+            {
+                Entry.Logger.Warn(
+                    $"[蛊牌催动] {guCard.Id} 出牌时本端未找到可用催动；" +
+                    $"pile={guCard.Pile?.Type}, isAutoPlay={isAutoPlay}。"
+                );
+                return false;
+            }
+        }
+        else if (!IsActivatorAvailable(activator, owner))
+        {
+            // 目标选择期间预留催动失效（被弃置/打出等），回退到当前
+            // 手牌中可用的催动，避免对已离手的卡牌执行 AutoPlay。
+            activator = FindAvailableActivator(owner);
+            if (activator == null)
+            {
+                ClearPendingActivation(guCard);
+                return false;
+            }
         }
 
         if (activator == null ||
@@ -240,7 +344,8 @@ public static class GuActivationModeSystem
 
             Entry.Logger.Info(
                 $"[蛊牌催动] 打出 {guCard.Id} 时已自动打出 " +
-                $"{activator.Id}，能量费用={energyCost}。"
+                $"{activator.Id}，能量费用={energyCost}，" +
+                $"pending={hasPending}。"
             );
             return true;
         }

@@ -265,9 +265,29 @@ public sealed class KongQiaoRelic
             return;
         }
 
+        // 客户端执行同步的蛊牌出牌动作时没有本地 pending/移牌记录，
+        // 蛊牌可能仍位于自定义蛊牌堆。这里在各端动作执行时幂等地把它
+        // 补移到原版 Hand，让原生出牌管线在两端看到一致的位置。
+        // （发起端 RitsuLib 已移入 Hand，此处跳过；脚本 AutoPlay 不打
+        // 普通手牌，保持原有路径。）
+        if (!cardPlay.IsAutoPlay &&
+            cardPlay.Card.Pile?.Type == GuCardPileSystem.PileType)
+        {
+            GuCardPileSystem.MoveCardToPile(
+                cardPlay.Card,
+                PileType.Hand.GetPile(Owner)
+            );
+            Entry.Logger.Info(
+                $"[蛊牌催动] {cardPlay.Card.Id} 出牌前已从蛊牌堆补移到 Hand。"
+            );
+        }
+
         bool activatorPlayed =
             await GuActivationModeSystem
-                .TryAutoPlayReservedActivatorAsync(cardPlay.Card);
+                .TryAutoPlayReservedActivatorAsync(
+                    cardPlay.Card,
+                    cardPlay.IsAutoPlay
+                );
 
         if (!activatorPlayed)
         {
