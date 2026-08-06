@@ -1,4 +1,5 @@
-using System.Reflection;
+﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 using HarmonyLib;
@@ -12,6 +13,7 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Factories;
 using MegaCrit.Sts2.Core.Hooks;
+using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes.Cards;
 using MegaCrit.Sts2.Core.Nodes.CommonUi;
@@ -28,6 +30,13 @@ internal static class CardUniquenessPatch
 
     private static readonly AsyncLocal<TransformationPlan?>
         ActiveTransformationPlan = new();
+
+    // 卡面描述渲染：登记 LocString → 宿主牌，供 GetFormattedText 追加
+    // 动态寄生文本。弱引用表，宿主牌与 LocString 被回收后自动清理。
+    private static readonly ConditionalWeakTable<
+        LocString,
+        CardModel
+    > DescriptionOwners = new();
 
     private static readonly AsyncLocal<int>
         RewardCandidateQueryDepth = new();
@@ -191,41 +200,27 @@ internal static class CardUniquenessPatch
             postfix: nameof(KeywordsPostfix)
         );
 
-        // 卡面渲染实际走 CardModel.Description 属性（getter 内部渲染
-        // LocString），必须先挂这里；牌堆查看/升级预览再补 ForPile 重载。
+        // 卡面/牌堆查看/升级预览最终都渲染 CardModel.Description
+        // （LocString）。Description getter 返回 LocString（不能用
+        // ref string），这里登记 LocString→卡牌 映射，再统一在
+        // LocString.GetFormattedText 追加动态寄生文本，覆盖全部路径。
         Patch(
             harmony,
             AccessTools.PropertyGetter(
                 typeof(CardModel),
                 "Description"
             ),
-            postfix: nameof(CardDescriptionPostfix)
+            postfix: nameof(DescriptionRegisterPostfix)
         );
 
         Patch(
             harmony,
-            typeof(CardModel).GetMethods(
-                BindingFlags.Instance |
-                BindingFlags.Public |
-                BindingFlags.NonPublic
-            ).FirstOrDefault(method =>
-                method.Name == "GetDescriptionForPile" &&
-                method.GetParameters().Length == 2
+            AccessTools.DeclaredMethod(
+                typeof(LocString),
+                "GetFormattedText",
+                Type.EmptyTypes
             ),
-            postfix: nameof(CardDescriptionPostfix)
-        );
-
-        Patch(
-            harmony,
-            typeof(CardModel).GetMethods(
-                BindingFlags.Instance |
-                BindingFlags.Public |
-                BindingFlags.NonPublic
-            ).FirstOrDefault(method =>
-                method.Name == "GetDescriptionForPile" &&
-                method.GetParameters().Length == 3
-            ),
-            postfix: nameof(CardDescriptionPostfix)
+            postfix: nameof(GetFormattedTextPostfix)
         );
 
         _initialized = true;
@@ -1082,23 +1077,53 @@ internal static class CardUniquenessPatch
     }
 
     /// <summary>
-    /// 宿主牌卡面动态附加寄生效果文本（如“血气 2：触发 2 次…”）。
-    /// 数值由 SavedAttachedState 驱动，各端渲染一致；无寄生时不变更描述。
+    /// 登记 LocString → 宿主牌 的映射，供 GetFormattedText 追加文本。
     /// </summary>
-    private static void CardDescriptionPostfix(
+    private static void DescriptionRegisterPostfix(
         CardModel __instance,
-        ref string __result
+        ref LocString __result
     )
     {
-        string? dynamicText =
-            XueDaoParasiteSystem
-                .GetHostCardDynamicText(__instance);
-        if (string.IsNullOrEmpty(dynamicText))
+        if (__result == null ||
+            !XueDaoParasiteSystem.HasParasite(__instance))
         {
             return;
         }
 
-        __result =
-            $"{__result}\n{dynamicText}";
+        DescriptionOwners.Remove(__result);
+        DescriptionOwners.Add(__result, __instance);
+    }
+
+    /// <summary>
+    /// 所有卡面/牌堆/预览描述渲染的最终出口：对已登记的有寄生宿主牌，
+    /// 在格式化文本后追加动态效果行。ConditionalWeakTable 弱引用保证
+    /// 无泄漏；无寄生或未登记的 LocString 立即返回。
+    /// </summary>
+    private static void GetFormattedTextPostfix(
+        LocString __instance,
+        ref string __result
+    )
+    {
+        if (!DescriptionOwners.TryGetValue(
+                __instance,
+                out CardModel? card
+            ))
+        {
+            return;
+        }
+
+        string? dynamicText =
+            XueDaoParasiteSystem
+                .GetHostCardDynamicText(card);
+        if (string.IsNullOrEmpty(dynamicText) ||
+            __result.EndsWith(
+                dynamicText,
+                StringComparison.Ordinal
+            ))
+        {
+            return;
+        }
+
+        __result = $"{__result}\n{dynamicText}";
     }
 }
