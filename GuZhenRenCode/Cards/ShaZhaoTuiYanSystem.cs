@@ -65,6 +65,29 @@ internal static class ShaZhaoTuiYanSystem
 
         // 0.8.0 杀招系统：推演入口改为“杀招推演”系统牌，
         // 不再注册蛊恢复堆的右键推演。
+        //
+        // 主动解体：右键手牌中的杀招，支付 1 费，材料返回
+        // 并额外增加 1 回合恢复，随后杀招消耗。
+        _rightClickBinding = ModRightClickRegistry.Register<CardModel>(
+            Entry.ModId,
+            "sha_zhao_dismantle",
+            static ctx => ctx.Model
+                    is AbstractShaZhaoCard
+                    {
+                        Lifecycle: not AbstractShaZhaoCard
+                            .ShaZhaoLifecycle.Instant
+                    } shaZhao
+                && shaZhao.HasBoundMaterials
+                && ctx.Player.PlayerCombatState is { } combatState
+                && combatState.Energy >= 1
+                && combatState.Hand.Cards.Contains(shaZhao),
+            static ctx => ctx.Player is { } player
+                && ctx.PlayerChoiceContext is { } choiceContext
+                    ? ((AbstractShaZhaoCard)ctx.Model)
+                        .TryDismantleAsync(choiceContext, player)
+                    : Task.CompletedTask,
+            priority: 100
+        );
         _initialized = true;
     }
 
