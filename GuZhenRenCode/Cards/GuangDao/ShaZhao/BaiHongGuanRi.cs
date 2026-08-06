@@ -27,21 +27,21 @@ public sealed class BaiHongGuanRi : AbstractShaZhaoCard
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(12m, ValueProp.Move),
+        new DamageVar(14m, ValueProp.Move),
         new DynamicVar("MaxZhaoPoConsumed", 1m),
         new DynamicVar("DamagePerZhaoPo", 4m),
-        new DynamicVar("PierceCap", 12m),
+        new DynamicVar("PierceCap", 8m),
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        [CardKeyword.Exhaust];
+        [CardKeyword.Retain, CardKeyword.Exhaust];
 
     public override CardAssetProfile AssetProfile =>
         CardImageCatalog.Create(GetType());
 
     public BaiHongGuanRi()
         : base(
-            baseCost: 3,
+            baseCost: 2,
             type: CardType.Attack,
             target: TargetType.AnyEnemy
         )
@@ -154,28 +154,41 @@ public sealed class BaiHongGuanRi : AbstractShaZhaoCard
     {
         DynamicVars.Damage.BaseValue = GuRank switch
         {
-            <= 1 => 12,
-            2 => 14,
-            3 => 16,
-            4 => 18,
-            5 => 20,
-            6 => 24,
-            7 => 28,
-            8 => 32,
-            _ => 36,
+            <= 1 => 14,
+            2 => 17,
+            3 => 20,
+            4 => 24,
+            5 => 28,
+            6 => 36,
+            7 => 42,
+            8 => 50,
+            _ => 60,
         };
         DynamicVars["MaxZhaoPoConsumed"].BaseValue = GuRank switch
         {
-            <= 4 => 1,
+            <= 5 => 1,
             <= 7 => 2,
             _ => 3,
         };
         DynamicVars["DamagePerZhaoPo"].BaseValue = GuRank switch
         {
-            <= 5 => 4,
-            6 => 5,
-            <= 8 => 6,
+            <= 4 => 4,
+            5 => 5,
+            6 => 6,
+            7 => 7,
             _ => 8,
+        };
+        DynamicVars["PierceCap"].BaseValue = GuRank switch
+        {
+            <= 1 => 8,
+            2 => 10,
+            3 => 12,
+            4 => 14,
+            5 => 16,
+            6 => 20,
+            7 => 24,
+            8 => 28,
+            _ => 32,
         };
     }
 }

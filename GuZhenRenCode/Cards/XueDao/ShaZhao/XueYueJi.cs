@@ -1,9 +1,11 @@
 using GuZhenRen.Cards.HeLian;
 using GuZhenRen.Cards.XueDao;
+using GuZhenRen.Powers.XueDao;
 
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 
@@ -19,7 +21,7 @@ public sealed class XueYueJi : AbstractShaZhaoCard
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         [
-            CardKeyword.Exhaust,
+            CardKeyword.Retain,
             GuZhenRenKeywords.FuHua,
         ];
 
@@ -37,12 +39,18 @@ public sealed class XueYueJi : AbstractShaZhaoCard
     }
 
     /// <summary>
-    /// 次数型寄生推进杀招：每场最多使用 2 次。
+    /// 次数型寄生推进杀招：一至二转 1 次、三至五转 2 次、
+    /// 六至九转 3 次；最后一次使用后消耗并返还材料。
     /// </summary>
     public override ShaZhaoLifecycle Lifecycle =>
         ShaZhaoLifecycle.Charged;
 
-    public override int MaxUses => 2;
+    public override int MaxUses => GuRank switch
+    {
+        <= 2 => 1,
+        <= 5 => 2,
+        _ => 3,
+    };
 
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
@@ -51,23 +59,67 @@ public sealed class XueYueJi : AbstractShaZhaoCard
     {
         await AdvanceLifecycleAsync(choiceContext);
 
-        CardModel? host = (await CardSelectCmd.FromHand(
-            choiceContext,
-            Owner,
-            new CardSelectorPrefs(SelectionScreenPrompt, 1)
-            {
-                Cancelable = false
-            },
-            XueDaoParasiteSystem.HasParasite,
-            this
-        )).FirstOrDefault();
+        // 可选宿主区域随转数提升：
+        // 一至五转仅手牌，六至七转加入弃牌堆，八至九转再加入抽牌堆。
+        List<CardModel> candidates =
+        [
+            .. PileType.Hand.GetPile(Owner).Cards
+                .Where(XueDaoParasiteSystem.HasParasite),
+        ];
 
-        if (host != null)
+        if (GuRank >= 6)
         {
-            await XueDaoParasiteSystem.TriggerDetachedAsync(
+            candidates.AddRange(
+                PileType.Discard.GetPile(Owner).Cards
+                    .Where(XueDaoParasiteSystem.HasParasite)
+            );
+        }
+
+        if (GuRank >= 8)
+        {
+            candidates.AddRange(
+                PileType.Draw.GetPile(Owner).Cards
+                    .Where(XueDaoParasiteSystem.HasParasite)
+            );
+        }
+
+        if (candidates.Count == 0)
+        {
+            return;
+        }
+
+        CardModel? host = (
+            await CardSelectCmd.FromSimpleGrid(
                 choiceContext,
-                host,
-                this
+                candidates.ToArray(),
+                Owner,
+                new CardSelectorPrefs(SelectionScreenPrompt, 1)
+                {
+                    Cancelable = false,
+                    RequireManualConfirmation = true,
+                }
+            )
+        ).FirstOrDefault();
+
+        if (host == null)
+        {
+            return;
+        }
+
+        await XueDaoParasiteSystem.TriggerDetachedAsync(
+            choiceContext,
+            host,
+            this
+        );
+
+        // 九转质变：本次祭炼使寄生完成孵化时，额外获得 2 点血元。
+        if (GuRank >= 9 &&
+            !XueDaoParasiteSystem.HasParasite(host))
+        {
+            await XueDaoPowerSystem.GainXueYuanFromCardEffect(
+                choiceContext,
+                this,
+                2
             );
         }
     }

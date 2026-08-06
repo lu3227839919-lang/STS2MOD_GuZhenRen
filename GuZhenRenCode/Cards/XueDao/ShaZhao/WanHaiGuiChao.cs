@@ -1,6 +1,7 @@
 using GuZhenRen.Cards.HeLian;
 using GuZhenRen.Cards.XueDao;
 using GuZhenRen.Multiplayer;
+using GuZhenRen.Powers.XueDao;
 
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -32,8 +33,8 @@ public sealed class WanHaiGuiChao : AbstractShaZhaoCard
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
+        CardKeyword.Retain,
         CardKeyword.Exhaust,
-        GuZhenRenKeywords.ZongEDu,
         GuZhenRenKeywords.GetShiHaiKeyword(3),
     ];
 
@@ -76,6 +77,18 @@ public sealed class WanHaiGuiChao : AbstractShaZhaoCard
             ValueProp.Unpowered | ValueProp.Move,
             cardPlay
         );
+
+        // 六转质变：实际消耗满 3 张遗骸时，下回合获得本次格挡值的一半。
+        if (GuRank >= 6 && consumed >= 3)
+        {
+            await PowerCmd.Apply<WanHaiGuiChaoRetainBlockPower>(
+                choiceContext,
+                Owner.Creature,
+                block / 2,
+                Owner.Creature,
+                this
+            );
+        }
 
         if (CombatState == null)
         {
@@ -128,33 +141,47 @@ public sealed class WanHaiGuiChao : AbstractShaZhaoCard
     {
         DynamicVars.Damage.BaseValue = GuRank switch
         {
-            <= 5 => 20,
-            6 => 24,
-            7 => 30,
-            8 => 36,
-            _ => 42,
+            <= 1 => 16,
+            2 => 18,
+            3 => 20,
+            4 => 24,
+            5 => 28,
+            6 => 36,
+            7 => 44,
+            8 => 54,
+            _ => 66,
         };
         DynamicVars[DamagePerRemainsVar].BaseValue = GuRank switch
         {
-            <= 6 => 14,
-            7 => 16,
-            8 => 18,
-            _ => 20,
+            <= 2 => 10,
+            <= 4 => 12,
+            5 => 14,
+            6 => 16,
+            7 => 18,
+            8 => 21,
+            _ => 24,
         };
         DynamicVars.Block.BaseValue = GuRank switch
         {
-            <= 5 => 10,
-            6 => 12,
-            7 => 15,
-            8 => 18,
-            _ => 21,
+            <= 1 => 8,
+            2 => 9,
+            3 => 10,
+            4 => 12,
+            5 => 14,
+            6 => 18,
+            7 => 22,
+            8 => 27,
+            _ => 33,
         };
         DynamicVars[BlockPerRemainsVar].BaseValue = GuRank switch
         {
-            <= 6 => 6,
-            7 => 7,
-            8 => 8,
-            _ => 9,
+            <= 2 => 4,
+            <= 4 => 5,
+            5 => 6,
+            6 => 8,
+            7 => 9,
+            8 => 10,
+            _ => 12,
         };
     }
 }

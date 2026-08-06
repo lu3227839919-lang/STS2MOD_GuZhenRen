@@ -31,7 +31,7 @@ public sealed class JingYueFanZhao : AbstractShaZhaoCard
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        [CardKeyword.Exhaust];
+        [CardKeyword.Retain];
 
     public override bool GainsBlock => true;
 
@@ -40,7 +40,7 @@ public sealed class JingYueFanZhao : AbstractShaZhaoCard
 
     public JingYueFanZhao()
         : base(
-            baseCost: 2,
+            baseCost: 1,
             type: CardType.Attack,
             target: TargetType.AnyEnemy
         )
@@ -50,47 +50,93 @@ public sealed class JingYueFanZhao : AbstractShaZhaoCard
     }
 
     /// <summary>
-    /// 三阶段形态杀招：镜相→月相→返照，最终阶段后消耗并返还材料。
+    /// 三阶段形态杀招：镜相→月相→（六转以上）返照。
+    /// 一至五转两阶段后解体，六至九转三阶段后解体。
     /// </summary>
     public override ShaZhaoLifecycle Lifecycle =>
         ShaZhaoLifecycle.Staged;
 
-    public override int MaxStages => 3;
+    public override int MaxStages =>
+        GuRank >= 6 ? 3 : 2;
 
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay
     )
     {
+        // 生命周期推进：CurrentStage 在本方法开头已被更新为本次使用序号。
         await AdvanceLifecycleAsync(choiceContext);
 
-        Creature? target = cardPlay.Target;
-        if (target == null || !IsValidTarget(target))
+        decimal fullValue = DynamicVars.Damage.BaseValue;
+
+        switch (CurrentStage)
         {
-            return;
-        }
+            // 第一阶段：镜相——获得完整数值的格挡。
+            case 1:
+                await CreatureCmd.GainBlock(
+                    Owner.Creature,
+                    new BlockVar(fullValue, ValueProp.Move),
+                    cardPlay
+                );
+                break;
 
-        await CreatureCmd.GainBlock(
-            Owner.Creature,
-            DynamicVars.Block,
-            cardPlay
-        );
+            // 第二阶段：月相——对一个敌人造成完整数值伤害。
+            case 2:
+            {
+                Creature? target = cardPlay.Target;
+                if (target == null || !IsValidTarget(target))
+                {
+                    return;
+                }
 
-        await DamageCmd
-            .Attack(DynamicVars.Damage.BaseValue)
-            .FromCard(this, cardPlay)
-            .Targeting(target)
-            .WithHitFx("vfx/vfx_attack_slash")
-            .Execute(choiceContext);
+                await DamageCmd
+                    .Attack(fullValue)
+                    .FromCard(this, cardPlay)
+                    .Targeting(target)
+                    .WithHitFx("vfx/vfx_attack_slash")
+                    .Execute(choiceContext);
+                break;
+            }
 
-        int guangHui = DynamicVars["GuangHui"].IntValue;
-        if (guangHui > 0 && cardPlay.PlayIndex == 0)
-        {
-            await GuangDaoPowerSystem.GainGuangHui(
-                choiceContext,
-                this,
-                guangHui
-            );
+            // 第三阶段：返照——仅六转以上存在。
+            // 获得一半数值的格挡，并对所有敌人造成一半数值伤害；
+            // 七至八转获得 1 点光辉，九转获得 2 点。
+            default:
+            {
+                decimal halfValue = fullValue / 2m;
+
+                await CreatureCmd.GainBlock(
+                    Owner.Creature,
+                    new BlockVar(halfValue, ValueProp.Move),
+                    cardPlay
+                );
+
+                if (CombatState != null)
+                {
+                    foreach (Creature enemy in
+                             CombatState.HittableEnemies)
+                    {
+                        await DamageCmd
+                            .Attack(halfValue)
+                            .FromCard(this, cardPlay)
+                            .Targeting(enemy)
+                            .WithHitFx("vfx/vfx_attack_slash")
+                            .Execute(choiceContext);
+                    }
+                }
+
+                int guangHui =
+                    DynamicVars["GuangHui"].IntValue;
+                if (guangHui > 0)
+                {
+                    await GuangDaoPowerSystem.GainGuangHui(
+                        choiceContext,
+                        this,
+                        guangHui
+                    );
+                }
+                break;
+            }
         }
     }
 
@@ -115,15 +161,15 @@ public sealed class JingYueFanZhao : AbstractShaZhaoCard
     {
         decimal value = GuRank switch
         {
-            <= 1 => 10,
-            2 => 12,
-            3 => 14,
-            4 => 15,
+            <= 1 => 8,
+            2 => 10,
+            3 => 12,
+            4 => 14,
             5 => 16,
-            6 => 16,
-            7 => 20,
-            8 => 24,
-            _ => 28,
+            6 => 20,
+            7 => 23,
+            8 => 26,
+            _ => 30,
         };
 
         DynamicVars.Block.BaseValue = value;

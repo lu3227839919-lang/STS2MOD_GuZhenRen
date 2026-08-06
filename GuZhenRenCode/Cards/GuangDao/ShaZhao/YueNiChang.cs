@@ -34,7 +34,7 @@ public sealed class YueNiChang
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        [CardKeyword.Exhaust];
+        [CardKeyword.Retain];
 
     public override bool GainsBlock => true;
 
@@ -43,7 +43,7 @@ public sealed class YueNiChang
 
     public YueNiChang()
         : base(
-            baseCost: 2,
+            baseCost: 1,
             type: CardType.Skill,
             target: TargetType.Self
         )
@@ -160,19 +160,19 @@ public sealed class YueNiChang
     {
         DynamicVars.Block.BaseValue = GuRank switch
         {
-            <= 1 => 12,
-            2 => 14,
-            3 => 16,
-            4 => 18,
-            5 => 20,
-            6 => 24,
-            7 => 28,
-            8 => 32,
-            _ => 36,
+            <= 1 => 10,
+            2 => 12,
+            3 => 14,
+            4 => 16,
+            5 => 18,
+            6 => 22,
+            7 => 25,
+            8 => 28,
+            _ => 32,
         };
         DynamicVars["GuangHui"].BaseValue = GuRank switch
         {
-            <= 4 => 1,
+            <= 5 => 1,
             <= 8 => 2,
             _ => 3,
         };

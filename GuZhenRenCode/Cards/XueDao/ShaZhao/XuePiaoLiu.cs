@@ -31,7 +31,7 @@ public sealed class XuePiaoLiu : AbstractShaZhaoCard
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        [CardKeyword.Exhaust];
+        [CardKeyword.Retain];
 
     public XuePiaoLiu()
         : base(2, CardType.Attack, TargetType.AnyEnemy)
@@ -104,6 +104,26 @@ public sealed class XuePiaoLiu : AbstractShaZhaoCard
 
             if (ReferenceEquals(enemy, destination))
             {
+                // 六转质变：血潮抵达终点时，按本次经过的敌人数量
+                // 对终点额外施加流血（九转上限 4 层）。
+                if (GuRank >= 6 && enemy.IsAlive)
+                {
+                    int maxExtraBleed = GuRank >= 9 ? 4 : 3;
+                    int extraBleed = Math.Min(
+                        maxExtraBleed,
+                        route.Count
+                    );
+                    if (extraBleed > 0)
+                    {
+                        await XueDaoPowerSystem.ApplyLiuXue(
+                            choiceContext,
+                            this,
+                            enemy,
+                            extraBleed
+                        );
+                    }
+                }
+
                 if (remaining > 0 && enemy.IsAlive)
                 {
                     await XueDaoPowerSystem.ApplyLiuXue(
@@ -143,18 +163,30 @@ public sealed class XuePiaoLiu : AbstractShaZhaoCard
     {
         DynamicVars.Damage.BaseValue = GuRank switch
         {
-            <= 5 => 5,
-            6 => 6,
-            7 => 7,
-            8 => 8,
-            _ => 10,
+            <= 1 => 4,
+            2 => 5,
+            3 => 6,
+            4 => 7,
+            5 => 8,
+            6 => 10,
+            7 => 12,
+            8 => 14,
+            _ => 16,
         };
-        DynamicVars[MaxBleedConsumedVar].BaseValue = GuRank >= 8 ? 3 : 2;
+        DynamicVars[MaxBleedConsumedVar].BaseValue = GuRank switch
+        {
+            <= 2 => 1,
+            <= 5 => 2,
+            <= 7 => 3,
+            _ => 4,
+        };
         DynamicVars[DamagePerBleedVar].BaseValue = GuRank switch
         {
-            <= 6 => 3,
-            <= 8 => 4,
-            _ => 5,
+            <= 2 => 2,
+            <= 5 => 3,
+            <= 7 => 4,
+            <= 8 => 5,
+            _ => 6,
         };
     }
 }
