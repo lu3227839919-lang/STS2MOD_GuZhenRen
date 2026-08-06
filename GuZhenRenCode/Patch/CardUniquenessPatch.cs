@@ -895,11 +895,12 @@ internal static class CardUniquenessPatch
 
         /*
          * 动态关键词可能在 MutableClone/读档过程中被复制进卡牌本地集合。
-         * 因此每次都先清除旧的转数和仙蛊展示，再由当前保存状态重建，
-         * 保证升转、降转、转换和多人快照恢复后不会显示过期标签。
+         * 因此每次都先清除已经废弃的展示关键词和旧仙蛊展示，再由
+         * 当前保存状态重建。旧存档与多人快照不会重新显示转数、
+         * 蛊虫、光辉、元气或无阈值的耀化提示。
          */
         keywords.ExceptWith(
-            GuZhenRenKeywords.RankKeywords
+            GuZhenRenKeywords.RemovedDisplayKeywords
         );
         keywords.Remove(
             GuZhenRenKeywords.XianGu
@@ -948,16 +949,6 @@ internal static class CardUniquenessPatch
             );
             keywords.Add(
                 GuZhenRenKeywords.XianGu
-            );
-        }
-
-        if (GuZhenRenCardRules.TryGetDisplayGuRank(
-                __instance,
-                out int rank
-            ))
-        {
-            keywords.Add(
-                GuZhenRenKeywords.GetRankKeyword(rank)
             );
         }
 

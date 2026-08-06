@@ -10,42 +10,6 @@
       "title": "Immortal Gu",
       "description": "A rank 6 or higher Gu. Across the run, all players may permanently own only one Immortal Gu with the same card identity. This rule is independent of [gold]Unique[/gold]."
     },
-    "Rank1": {
-      "title": "Rank 1",
-      "description": "This is a rank 1 Gu card."
-    },
-    "Rank2": {
-      "title": "Rank 2",
-      "description": "This is a rank 2 Gu card."
-    },
-    "Rank3": {
-      "title": "Rank 3",
-      "description": "This is a rank 3 Gu card."
-    },
-    "Rank4": {
-      "title": "Rank 4",
-      "description": "This is a rank 4 Gu card."
-    },
-    "Rank5": {
-      "title": "Rank 5",
-      "description": "This is a rank 5 Gu card."
-    },
-    "Rank6": {
-      "title": "Rank 6",
-      "description": "This is a rank 6 Gu card."
-    },
-    "Rank7": {
-      "title": "Rank 7",
-      "description": "This is a rank 7 Gu card."
-    },
-    "Rank8": {
-      "title": "Rank 8",
-      "description": "This is a rank 8 Gu card."
-    },
-    "Rank9": {
-      "title": "Rank 9",
-      "description": "This is a rank 9 Gu card."
-    },
     "CuiDong": {
       "title": "Activation",
       "description": "A Gu card requires an available Activation card in hand. Confirming the Gu automatically pays for and plays one Activation."
@@ -126,21 +90,9 @@
       "title": "Full Moon",
       "description": "Final Moon Phase. Resolve the largest shared pool and hatch; rank 6+ refunds Blood Essence and rank 9 also draws."
     },
-    "GuChong": {
-      "title": "Gu Worm",
-      "description": "Stored in the dedicated Gu pile and used through an Activation card in hand. It does not enter the normal draw cycle."
-    },
-    "YuanQi": {
-      "title": "Primeval Essence",
-      "description": "The combat resource used to activate Gu worms. The icon in the Gu card's cost position shows this resource rather than normal Energy."
-    },
     "XianYuan": {
       "title": "Immortal Essence",
       "description": "An additional activation resource for Rank 6 or higher Immortal Gu. A depleted essence card is Exhausted after the entire Gu play sequence finishes."
-    },
-    "GuangHui": {
-      "title": "Radiance",
-      "description": "A Light-path combat resource with a maximum of 9. It persists during combat and can pay for Illumination effects."
     },
     "ZheGuang": {
       "title": "Refraction",
@@ -157,10 +109,6 @@
     "DingGuang": {
       "title": "Fixed Light",
       "description": "Increases the first hit of the next Attack that strikes a target already carrying Exposure, then clears after the first Attack damage resolves."
-    },
-    "YaoHua": {
-      "title": "Illumination",
-      "description": "Automatically spends the listed Radiance to empower this Gu or its generated card."
     },
     "LiuGuang": {
       "title": "Stored Light",
@@ -181,6 +129,42 @@
     "XueHe": {
       "title": "Blood River",
       "description": "Automatically chooses a supply mode or high-defense mode based on current Blood Essence. High-defense mode spends Blood Essence and carries part of its Block into next turn."
+    },
+    "YaoHua1": {
+      "title": "Illumination 1",
+      "description": "When you have at least 1 Radiance, automatically spend 1 Radiance and trigger this card’s Illumination effect."
+    },
+    "YaoHua2": {
+      "title": "Illumination 2",
+      "description": "When you have at least 2 Radiance, automatically spend 2 Radiance and trigger this card’s Illumination effect."
+    },
+    "YaoHua3": {
+      "title": "Illumination 3",
+      "description": "When you have at least 3 Radiance, automatically spend 3 Radiance and trigger this card’s Illumination effect."
+    },
+    "YaoHua4": {
+      "title": "Illumination 4",
+      "description": "When you have at least 4 Radiance, automatically spend 4 Radiance and trigger this card’s Illumination effect."
+    },
+    "YaoHua5": {
+      "title": "Illumination 5",
+      "description": "When you have at least 5 Radiance, automatically spend 5 Radiance and trigger this card’s Illumination effect."
+    },
+    "YaoHua6": {
+      "title": "Illumination 6",
+      "description": "When you have at least 6 Radiance, automatically spend 6 Radiance and trigger this card’s Illumination effect."
+    },
+    "YaoHua7": {
+      "title": "Illumination 7",
+      "description": "When you have at least 7 Radiance, automatically spend 7 Radiance and trigger this card’s Illumination effect."
+    },
+    "YaoHua8": {
+      "title": "Illumination 8",
+      "description": "When you have at least 8 Radiance, automatically spend 8 Radiance and trigger this card’s Illumination effect."
+    },
+    "YaoHua9": {
+      "title": "Illumination 9",
+      "description": "When you have at least 9 Radiance, automatically spend 9 Radiance and trigger this card’s Illumination effect."
     }
   },
   "cardDescriptionOverrides": {

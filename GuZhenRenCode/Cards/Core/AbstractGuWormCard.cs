@@ -20,8 +20,7 @@ public abstract class AbstractGuWormCard
     public override bool CanBeGeneratedInCombat => false;
 
     /// <summary>
-    /// 所有蛊虫必定显示：
-    /// 蛊虫、当前转数、催动、恢复、元气。
+    /// 所有蛊虫只显示会影响操作的催动与恢复说明。
     ///
     /// 六转以上额外显示仙蛊与仙元。各蛊虫自己的机制词由类型映射
     /// 追加；Distinct 保证派生类再次追加同一关键词时不会重复显示。
@@ -74,11 +73,8 @@ public abstract class AbstractGuWormCard
 
     private IEnumerable<CardKeyword> GetCommonGuKeywords()
     {
-        yield return GuZhenRenKeywords.GuChong;
-        yield return GuZhenRenKeywords.GetRankKeyword(GuRank);
         yield return GuZhenRenKeywords.CuiDong;
         yield return GuZhenRenKeywords.HuiFu;
-        yield return GuZhenRenKeywords.YuanQi;
 
         if (GuRank >= 6)
         {
@@ -100,18 +96,15 @@ public abstract class AbstractGuWormCard
         {
             "XiaoGuangGu" =>
             [
-                GuZhenRenKeywords.GuangHui,
                 GuZhenRenKeywords.JuGuang,
             ],
             "YueGuangGu" =>
             [
-                GuZhenRenKeywords.GuangHui,
-                GuZhenRenKeywords.YaoHua,
+                GuZhenRenKeywords.GetYaoHuaKeyword(2),
                 GuZhenRenKeywords.ZhaoPo,
             ],
             "JingGuangGu" =>
             [
-                GuZhenRenKeywords.GuangHui,
                 GuZhenRenKeywords.ZheGuang,
                 GuZhenRenKeywords.JuGuang,
             ],
@@ -125,15 +118,17 @@ public abstract class AbstractGuWormCard
                 GuZhenRenKeywords.ZheGuang,
                 GuZhenRenKeywords.ZhaoPo,
             ],
+            "YueMangGu" when GuRank >= 5 =>
+            [
+                GuZhenRenKeywords.GetYaoHuaKeyword(2),
+                GuZhenRenKeywords.ZhaoPo,
+            ],
             "YueMangGu" =>
             [
-                GuZhenRenKeywords.GuangHui,
-                GuZhenRenKeywords.YaoHua,
                 GuZhenRenKeywords.ZhaoPo,
             ],
             "JingHuiGu" =>
             [
-                GuZhenRenKeywords.GuangHui,
                 GuZhenRenKeywords.ZhaoPo,
                 GuZhenRenKeywords.JuGuang,
                 GuZhenRenKeywords.LiuGuang,
@@ -141,7 +136,6 @@ public abstract class AbstractGuWormCard
             ],
             "YuPiGu" =>
             [
-                GuZhenRenKeywords.GuangHui,
                 GuZhenRenKeywords.ZheGuang,
             ],
             "XueQiGu" =>

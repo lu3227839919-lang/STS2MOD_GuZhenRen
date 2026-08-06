@@ -10,42 +10,6 @@
       "title": "仙蛊",
       "description": "六转及以上的蛊。每局所有玩家只能永久拥有一张同名仙蛊；此规则与[gold]唯一[/gold]关键词相互独立。"
     },
-    "Rank1": {
-      "title": "一转",
-      "description": "这是一张一转蛊牌。"
-    },
-    "Rank2": {
-      "title": "二转",
-      "description": "这是一张二转蛊牌。"
-    },
-    "Rank3": {
-      "title": "三转",
-      "description": "这是一张三转蛊牌。"
-    },
-    "Rank4": {
-      "title": "四转",
-      "description": "这是一张四转蛊牌。"
-    },
-    "Rank5": {
-      "title": "五转",
-      "description": "这是一张五转蛊牌。"
-    },
-    "Rank6": {
-      "title": "六转",
-      "description": "这是一张六转蛊牌。"
-    },
-    "Rank7": {
-      "title": "七转",
-      "description": "这是一张七转蛊牌。"
-    },
-    "Rank8": {
-      "title": "八转",
-      "description": "这是一张八转蛊牌。"
-    },
-    "Rank9": {
-      "title": "九转",
-      "description": "这是一张九转蛊牌。"
-    },
     "CuiDong": {
       "title": "催动",
       "description": "蛊牌必须借助手牌中的“催动”使用。确认蛊牌后，系统自动支付并打出一张可用的催动。"
@@ -126,21 +90,9 @@
       "title": "满月",
       "description": "月相最终阶段。宿主结算后造成最高总额度效果并孵化；六转以上返还血元，九转额外抽牌。"
     },
-    "GuChong": {
-      "title": "蛊虫",
-      "description": "存放在专属蛊牌堆，通过手牌中的“催动”使用；不进入普通抽牌循环。"
-    },
-    "YuanQi": {
-      "title": "元气",
-      "description": "催动蛊虫所需的战斗资源。蛊牌左上角显示的是元气费用，而不是普通能量费用。"
-    },
     "XianYuan": {
       "title": "仙元",
       "description": "六转及以上仙蛊的额外催动资源。仙元按单位消耗；余额归零后在本次蛊牌完整结算结束时消耗该仙元牌。"
-    },
-    "GuangHui": {
-      "title": "光辉",
-      "description": "光道战斗资源，上限9点，战斗中保留，可用于耀化等光道效果。"
     },
     "ZheGuang": {
       "title": "折光",
@@ -157,10 +109,6 @@
     "DingGuang": {
       "title": "定光",
       "description": "强化下一张攻击命中已有照破目标时的第一段伤害；首次攻击伤害结算后清除。"
-    },
-    "YaoHua": {
-      "title": "耀化",
-      "description": "自动支付指定光辉，使本次蛊虫或其衍生牌获得强化效果。"
     },
     "LiuGuang": {
       "title": "留光",
@@ -181,6 +129,42 @@
     "XueHe": {
       "title": "血河",
       "description": "根据当前血元自动选择供能档或高防档；高防档会支付血元并在下回合延续部分格挡。"
+    },
+    "YaoHua1": {
+      "title": "耀化 1",
+      "description": "光辉不少于1点时，自动消耗1点光辉并触发本牌的耀化效果。"
+    },
+    "YaoHua2": {
+      "title": "耀化 2",
+      "description": "光辉不少于2点时，自动消耗2点光辉并触发本牌的耀化效果。"
+    },
+    "YaoHua3": {
+      "title": "耀化 3",
+      "description": "光辉不少于3点时，自动消耗3点光辉并触发本牌的耀化效果。"
+    },
+    "YaoHua4": {
+      "title": "耀化 4",
+      "description": "光辉不少于4点时，自动消耗4点光辉并触发本牌的耀化效果。"
+    },
+    "YaoHua5": {
+      "title": "耀化 5",
+      "description": "光辉不少于5点时，自动消耗5点光辉并触发本牌的耀化效果。"
+    },
+    "YaoHua6": {
+      "title": "耀化 6",
+      "description": "光辉不少于6点时，自动消耗6点光辉并触发本牌的耀化效果。"
+    },
+    "YaoHua7": {
+      "title": "耀化 7",
+      "description": "光辉不少于7点时，自动消耗7点光辉并触发本牌的耀化效果。"
+    },
+    "YaoHua8": {
+      "title": "耀化 8",
+      "description": "光辉不少于8点时，自动消耗8点光辉并触发本牌的耀化效果。"
+    },
+    "YaoHua9": {
+      "title": "耀化 9",
+      "description": "光辉不少于9点时，自动消耗9点光辉并触发本牌的耀化效果。"
     }
   },
   "cardDescriptionOverrides": {
