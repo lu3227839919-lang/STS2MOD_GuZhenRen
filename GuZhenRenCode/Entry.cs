@@ -50,7 +50,6 @@ public partial class Entry
         new(nameof(NCardGuEnergyIconPatch), NCardGuEnergyIconPatch.Initialize, NCardGuEnergyIconPatch.Uninitialize),
         new(nameof(NCardXuYingEnergyIconPatch), NCardXuYingEnergyIconPatch.Initialize, NCardXuYingEnergyIconPatch.Uninitialize),
         new(nameof(XuYingHiddenBehaviorPatch), XuYingHiddenBehaviorPatch.Initialize, XuYingHiddenBehaviorPatch.Uninitialize),
-        new(nameof(YiHaiRetainBehaviorPatch), YiHaiRetainBehaviorPatch.Initialize, YiHaiRetainBehaviorPatch.Uninitialize),
         new(nameof(GuRankRewardPatch), GuRankRewardPatch.Initialize, GuRankRewardPatch.Uninitialize),
         new(nameof(GuWormUpgradePatch), GuWormUpgradePatch.Initialize, GuWormUpgradePatch.Uninitialize),
         new(nameof(CardUniquenessPatch), CardUniquenessPatch.Initialize, CardUniquenessPatch.Uninitialize),
