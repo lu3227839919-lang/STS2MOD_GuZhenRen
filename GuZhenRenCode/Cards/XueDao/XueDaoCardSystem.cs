@@ -148,9 +148,21 @@ internal static class XueDaoCardSystem
 
             if (!addedToHand)
             {
-                await GuGeneratedCardFactory.AddToHandOrDiscard(
-                    card,
-                    owner
+                // 手牌/弃牌堆拒绝新卡通常发生在最后一击（CombatManager
+                // IsEnding，战斗即将结束）时。这种击杀产生的遗骸没有
+                // 机会再使用，直接加入永久牌组保留。
+                CardPileAddResult deckResult =
+                    await CardPileCmd.Add(
+                        card,
+                        PileType.Deck,
+                        CardPilePosition.Bottom,
+                        clonedBy: null,
+                        skipVisuals: true
+                    );
+
+                Entry.Logger.Info(
+                    $"[遗骸生成] 遗骸 {card.Id} 直接入永久牌组:" +
+                    $"{deckResult.success}。"
                 );
             }
         }
