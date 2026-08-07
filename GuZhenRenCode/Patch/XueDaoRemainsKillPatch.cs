@@ -145,10 +145,17 @@ internal static class XueDaoRemainsKillPatch
                 out uint[]? aliveBefore) ||
             aliveBefore == null)
         {
+            Entry.Logger.Info(
+                $"[遗骸获取] 血道牌 {cardPlay.Card.Id} 打完但缺少出牌前快照，跳过。"
+            );
             return;
         }
 
         AliveBeforeByPlayer.Remove(cardPlay.Player);
+
+        Entry.Logger.Info(
+            $"[遗骸获取] 血道牌 {cardPlay.Card.Id} 击杀检测，出牌前存活 {aliveBefore.Length} 名敌人。"
+        );
 
         await XueDaoParasiteSystem.CreateRemainsForNewDeaths(
             cardPlay.Player,

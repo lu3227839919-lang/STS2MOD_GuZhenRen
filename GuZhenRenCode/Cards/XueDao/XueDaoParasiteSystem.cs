@@ -842,14 +842,19 @@ public static class XueDaoParasiteSystem
             return;
         }
 
+        // 血道牌/寄生击杀任意敌人（含次级敌人/小怪）都产生遗骸；
+        // 每次出牌系列最多 2 张，另有永久牌堆 4 张上限约束总量。
         int count = enemiesAliveBefore
             .Select(id => combatState.GetCreature(id))
-            .Where(enemy => enemy is { IsDead: true, IsPrimaryEnemy: true })
+            .Where(enemy => enemy is { IsDead: true })
             .Take(2)
             .Count();
 
         if (count > 0)
         {
+            Entry.Logger.Info(
+                $"[遗骸获取] {owner.NetId} 本次击杀检测到 {count} 名死亡敌人，生成遗骸。"
+            );
             await XueDaoCardSystem.AddRemains(owner, count);
         }
     }
