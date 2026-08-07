@@ -232,7 +232,10 @@ public sealed class KongQiaoRelic
             await GuCardPileSystem.MoveCardToPileAsync(
                 cardPlay.Card,
                 resultPile,
-                skipVisuals: true
+                // The result pile move occurs while the card is still shown
+                // in its play holder. Keep the native flight enabled so that
+                // holder is released instead of remaining on the combat UI.
+                skipVisuals: false
             );
 
             await GuCardPileSystem
