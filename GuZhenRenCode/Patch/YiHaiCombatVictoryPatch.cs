@@ -87,6 +87,9 @@ internal static class YiHaiCombatVictoryPatch
         CombatRoom room
     )
     {
+        Entry.Logger.Info(
+            "[遗骸保留] AfterCombatEnd postfix 触发。"
+        );
         __result = AwaitPersistRemainsAsync(
             __result,
             runState
@@ -108,16 +111,37 @@ internal static class YiHaiCombatVictoryPatch
 
     private static async Task PersistRemainsForPlayer(Player player)
     {
-        // 永久牌组中遗骸最多 4 张：已达上限时本场战斗的遗骸不再保留。
+        int handYiHai = PileType.Hand
+            .GetPile(player)
+            .Cards
+            .Count(static card => card is YiHai);
+        int drawYiHai = PileType.Draw
+            .GetPile(player)
+            .Cards
+            .Count(static card => card is YiHai);
+        int discardYiHai = PileType.Discard
+            .GetPile(player)
+            .Cards
+            .Count(static card => card is YiHai);
         int existing = player.Deck.Cards.Count(
             static card => card is YiHai
         );
+
+        Entry.Logger.Info(
+            $"[遗骸保留] {player.NetId} 检查：永久牌组 {existing}，" +
+            $"手牌 {handYiHai}，抽牌堆 {drawYiHai}，弃牌堆 {discardYiHai}。"
+        );
+
+        // 永久牌组中遗骸最多 4 张：已达上限时本场战斗的遗骸不再保留。
         int slots = Math.Max(
             0,
             XueDaoCardSystem.MaxPersistentRemains - existing
         );
         if (slots <= 0)
         {
+            Entry.Logger.Info(
+                $"[遗骸保留] {player.NetId} 永久牌组遗骸已达上限，跳过。"
+            );
             return;
         }
 
