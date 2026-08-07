@@ -79,11 +79,25 @@ internal static class YiHaiCombatVictoryPatch
         }
     }
 
-    private static async Task AfterCombatVictoryPostfix(
+    private static void AfterCombatVictoryPostfix(
+        ref Task __result,
         IRunState runState,
         CombatRoom room
     )
     {
+        __result = AwaitPersistRemainsAsync(
+            __result,
+            runState
+        );
+    }
+
+    private static async Task AwaitPersistRemainsAsync(
+        Task original,
+        IRunState runState
+    )
+    {
+        await original;
+
         foreach (Player player in runState.Players)
         {
             await PersistRemainsForPlayer(player);

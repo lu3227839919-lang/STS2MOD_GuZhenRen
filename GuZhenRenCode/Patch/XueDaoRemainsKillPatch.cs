@@ -111,12 +111,26 @@ internal static class XueDaoRemainsKillPatch
         );
     }
 
-    private static async Task AfterCardPlayedPostfix(
+    private static void AfterCardPlayedPostfix(
+        ref Task __result,
         ICombatState combatState,
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay
     )
     {
+        __result = AwaitKillRemainsAsync(
+            __result,
+            cardPlay
+        );
+    }
+
+    private static async Task AwaitKillRemainsAsync(
+        Task original,
+        CardPlay cardPlay
+    )
+    {
+        await original;
+
         if (!cardPlay.IsLastInSeries ||
             !XueDaoPowerSystem.IsXueDaoEffectCard(cardPlay.Card) ||
             // 寄生宿主由寄生路径（XueJiPower → TriggerFromCardPlayAsync）
