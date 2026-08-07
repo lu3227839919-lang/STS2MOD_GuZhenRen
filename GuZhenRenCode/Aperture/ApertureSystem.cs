@@ -803,8 +803,9 @@ public static class ApertureSystem
 
     /// <summary>
     /// 天人感应：角色升转时，随机将永久牌组中两只低于角色当前转数的
-    /// 蛊虫各升转一次。候选与随机流均跨端确定，保证多人一致；不足
-    /// 两只时升转全部候选。
+    /// 凡蛊各升转一次。仅升凡蛊：仙蛊不参与，五转凡蛊升一转即成仙蛊，
+    /// 也不参与，故实际只升转一至四转的凡蛊。候选与随机流均跨端确定，
+    /// 保证多人一致；不足两只时升转全部候选。
     /// </summary>
     private static void InvokeTianRenGanYing(
         Player player,
@@ -817,7 +818,10 @@ public static class ApertureSystem
                 .OfType<AbstractGuZhenRenCard>()
                 .Where(card =>
                     card is IGuWormCard &&
-                    card.GuRank < currentRank
+                    card.GuRank < currentRank &&
+                    // 只升凡蛊：升一转后仍为凡蛊（一至四转），
+                    // 仙蛊与五转凡蛊不参与天人感应。
+                    card.GuRank < GuZhenRenCardRules.XianGuRank - 1
                 )
                 // 同名同转蛊虫用网络卡牌 ID 稳定定序，确保各端
                 // 以相同顺序推进随机流。
