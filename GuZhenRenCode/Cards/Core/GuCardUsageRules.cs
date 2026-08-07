@@ -125,6 +125,27 @@ public static class GuCardUsageRules
         }
     }
 
+    public static void AccelerateRecoveryBy(
+        CardModel card,
+        int turns,
+        int currentTurn
+    )
+    {
+        if (turns <= 0 || card is not IGuWormCard)
+        {
+            return;
+        }
+
+        int currentReady = RecoveryReadyTurnState[card];
+        if (currentReady > 0)
+        {
+            RecoveryReadyTurnState[card] = Math.Max(
+                Math.Max(1, currentTurn) + 1,
+                currentReady - turns
+            );
+        }
+    }
+
     internal static SecondaryResourcePaymentPlan
         CreateActivationPaymentPlan(CardModel card)
     {

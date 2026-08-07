@@ -68,5 +68,11 @@
   "GU_ZHEN_REN_KEYWORD_SHI_HAI2.title": "Devour Remains 2",
   "GU_ZHEN_REN_KEYWORD_SHI_HAI2.description": "Choose up to 2 Remains in your hand to consume or absorb; see this card's description for the effect. Remains are gained when a Blood Path Gu card kills an enemy, or when Bleed kills it; unused Remains are kept in your permanent deck after combat.",
   "GU_ZHEN_REN_KEYWORD_SHI_HAI3.title": "Devour Remains 3",
-  "GU_ZHEN_REN_KEYWORD_SHI_HAI3.description": "Choose up to 3 Remains in your hand to consume or absorb; see this card's description for the effect. Remains are gained when a Blood Path Gu card kills an enemy, or when Bleed kills it; unused Remains are kept in your permanent deck after combat."
+  "GU_ZHEN_REN_KEYWORD_SHI_HAI3.description": "Choose up to 3 Remains in your hand to consume or absorb; see this card's description for the effect. Remains are gained when a Blood Path Gu card kills an enemy, or when Bleed kills it; unused Remains are kept in your permanent deck after combat.",
+  "GU_ZHEN_REN_KEYWORD_XU_YING.title": "Phantom",
+  "GU_ZHEN_REN_KEYWORD_XU_YING.description": "Remains in hand and cannot be played manually. After a non-Phantom Attack, the Strength controller checks manifestations in stable order. Phantoms do not trigger other Phantoms.",
+  "GU_ZHEN_REN_KEYWORD_LIAN_LI.title": "Strength Training",
+  "GU_ZHEN_REN_KEYWORD_LIAN_LI.description": "Strength Gu begin each combat sealed. The first resolution of their matching permanent companion card adds training; temporary copies and replays do not count. Full progress unseals the Gu.",
+  "GU_ZHEN_REN_KEYWORD_NING_YING.title": "Condense Phantom",
+  "GU_ZHEN_REN_KEYWORD_NING_YING.description": "Activating a Strength Gu whose Phantom is already present raises that Phantom's base manifestation chance instead of creating another: +10% at ranks 1–5, +15% at 6–8, and +20% at 9, capped at 80%."
 }

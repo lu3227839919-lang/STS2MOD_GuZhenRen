@@ -125,6 +125,18 @@
     "ShiHai3": {
       "title": "Devour Remains 3",
       "description": "Choose up to 3 Remains in your hand to consume or absorb; see this card's description for the effect. Remains are gained when a Blood Path Gu card kills an enemy, or when Bleed kills it; unused Remains are kept in your permanent deck after combat."
+    },
+    "XuYing": {
+      "title": "Phantom",
+      "description": "Remains in hand and cannot be played manually. After a non-Phantom Attack, the Strength controller checks manifestations in stable order."
+    },
+    "LianLi": {
+      "title": "Strength Training",
+      "description": "Strength Gu begin each combat sealed. The first resolution of their matching permanent companion adds progress; full progress unseals the Gu."
+    },
+    "NingYing": {
+      "title": "Condense Phantom",
+      "description": "Activating a beast-strength Gu whose Phantom is already present raises its base manifestation chance, up to 80%."
     }
   },
   "cardDescriptionOverrides": {
@@ -314,6 +326,26 @@
       "table": "powers",
       "key": "GU_ZHEN_REN_POWER_JU_GUANG_POWER.description",
       "text": "The first hit of your next Light Path Attack deals {Amount} more damage. Multi-hit attacks gain this bonus only once."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_KU_LI_POWER.title",
+      "text": "Bitter Strength"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_KU_LI_POWER.description",
+      "text": "Gain 0–4 Hardship from missing HP, increasing permanent Phantom manifestation chance and effect. Repeated activations grant up to 3 training stacks. High ranks can retry a failed manifestation, create a double shadow, or force one in desperation."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_ZI_LI_GENG_SHENG_POWER.title",
+      "text": "Self-Reliance"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_ZI_LI_GENG_SHENG_POWER.description",
+      "text": "Tracks different beast manifestations and Condensation this turn, building strength and healing by rank. Repeated activations grant up to 3 conditioning stacks; high ranks turn excess healing into Block."
     }
   ],
   "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "First select 1 eligible Gu Worm. If it is mortal, you may select up to 2 additional mortal Gu Worms (3 total); if it is immortal, you may select up to 1 additional immortal Gu Worm (2 total). Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",
