@@ -1,5 +1,6 @@
 using System.Reflection;
 
+using GuZhenRen.Cards.ShaZhao;
 using GuZhenRen.Multiplayer;
 using GuZhenRen.Powers.XueDao;
 
@@ -303,6 +304,7 @@ public static class XueDaoParasiteSystem
         card is not IGuWormCard &&
         card is not AbstractShaZhaoCard &&
         card is not AbstractXueDaoToken &&
+        card is not ShaZhaoTuiYan &&
         card.Type is CardType.Attack or CardType.Skill or CardType.Power;
 
     public static bool CanAttach(CardModel card, ParasiteKind incomingKind)
