@@ -36,6 +36,8 @@ public sealed class ZheGuangPower : ModPowerTemplate
 
     private const string PreviousTypeKey = "PreviousCardType";
     private const string GainedThisTurnKey = "GainedThisTurn";
+    private const string XiaoGuangClaimedThisTurnKey =
+        "XiaoGuangClaimedThisTurn";
     private const int MaximumGainPerTurn = 3;
 
     public override PowerType Type => PowerType.Buff;
@@ -49,6 +51,7 @@ public sealed class ZheGuangPower : ModPowerTemplate
     [
         new DynamicVar(PreviousTypeKey, (int)CardType.None),
         new DynamicVar(GainedThisTurnKey, 0),
+        new DynamicVar(XiaoGuangClaimedThisTurnKey, 0),
     ];
 
     public CardType PreviousCardType =>
@@ -67,9 +70,26 @@ public sealed class ZheGuangPower : ModPowerTemplate
             DynamicVars[PreviousTypeKey].BaseValue =
                 (int)CardType.None;
             DynamicVars[GainedThisTurnKey].BaseValue = 0;
+            DynamicVars[XiaoGuangClaimedThisTurnKey].BaseValue = 0;
         }
 
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// 小光蛊每回合仅第一次获得光辉；后续小光蛊改为获得闪耀。
+    /// 该标记必须属于战斗模型本身，避免多人端因本机 Player 对象生命周期
+    /// 或 ExtraHand 的提前移牌路径不同而产生未参与同步的隐藏状态。
+    /// </summary>
+    internal bool TryClaimXiaoGuangFirstGainThisTurn()
+    {
+        if ((int)DynamicVars[XiaoGuangClaimedThisTurnKey].BaseValue != 0)
+        {
+            return false;
+        }
+
+        DynamicVars[XiaoGuangClaimedThisTurnKey].BaseValue = 1;
+        return true;
     }
 
     /// <summary>

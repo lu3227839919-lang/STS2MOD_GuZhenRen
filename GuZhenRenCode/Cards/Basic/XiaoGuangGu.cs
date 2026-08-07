@@ -1,13 +1,9 @@
-using System.Runtime.CompilerServices;
-
 using GuZhenRen.Characters;
 using GuZhenRen.Combat;
 using GuZhenRen.Powers.GuangDao;
 
-using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
@@ -25,18 +21,6 @@ public sealed class XiaoGuangGu
     : AbstractGuWormCard,
       IGuRecoveryEffectSource
 {
-    private sealed class TurnGainState
-    {
-        public ICombatState? CombatState;
-        public int TurnNumber;
-        public bool Claimed;
-    }
-
-    private static readonly ConditionalWeakTable<
-        Player,
-        TurnGainState
-    > TurnGainStates = new();
-
     private static readonly SavedAttachedState<CardModel, bool>
         RecoveryHandledState = new(
             Entry.ModId + ".xiao_guang.recovery_handled",
@@ -108,7 +92,13 @@ public sealed class XiaoGuangGu
             return;
         }
 
-        bool firstThisTurn = TryClaimFirstGainThisTurn(Owner);
+        // “本回合首次小光蛊”必须存放在会随战斗状态共同克隆/同步的
+        // Power 模型中，不能依赖 ConditionalWeakTable<Player, ...>。
+        // ExtraHand 在发起端会提前把蛊牌移入 Hand，主客机对象生命周期
+        // 并不保证完全一致；纯本机弱表状态会因此产生隐形分叉。
+        bool firstThisTurn = Owner.Creature
+            .GetPower<ZheGuangPower>()?
+            .TryClaimXiaoGuangFirstGainThisTurn() ?? true;
         if (firstThisTurn)
         {
             await GuangDaoPowerSystem.GainGuangHui(
@@ -243,32 +233,6 @@ public sealed class XiaoGuangGu
             GuRank,
             upgraded: false
         );
-    }
-
-    private static bool TryClaimFirstGainThisTurn(Player owner)
-    {
-        ICombatState? combatState = owner.Creature.CombatState;
-        int turnNumber = owner.PlayerCombatState?.TurnNumber ?? 0;
-        TurnGainState state = TurnGainStates.GetValue(
-            owner,
-            static _ => new TurnGainState()
-        );
-
-        if (!ReferenceEquals(state.CombatState, combatState) ||
-            state.TurnNumber != turnNumber)
-        {
-            state.CombatState = combatState;
-            state.TurnNumber = turnNumber;
-            state.Claimed = false;
-        }
-
-        if (state.Claimed)
-        {
-            return false;
-        }
-
-        state.Claimed = true;
-        return true;
     }
 
     private void RefreshRankValues()
