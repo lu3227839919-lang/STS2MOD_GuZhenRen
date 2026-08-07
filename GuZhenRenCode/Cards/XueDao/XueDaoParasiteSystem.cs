@@ -832,7 +832,7 @@ public static class XueDaoParasiteSystem
         }
     }
 
-    private static async Task CreateRemainsForNewDeaths(
+    internal static async Task CreateRemainsForNewDeaths(
         Player owner,
         IReadOnlyCollection<uint> enemiesAliveBefore
     )

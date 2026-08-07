@@ -56,6 +56,7 @@ public partial class Entry
         // 自定义关键词承担精简卡面说明的职责，所有卡牌界面都显示提示。
         new(nameof(XueDaoParasiteExhaustPatch), XueDaoParasiteExhaustPatch.Initialize, XueDaoParasiteExhaustPatch.Uninitialize),
         new(nameof(YiHaiCombatVictoryPatch), YiHaiCombatVictoryPatch.Initialize, YiHaiCombatVictoryPatch.Uninitialize),
+        new(nameof(XueDaoRemainsKillPatch), XueDaoRemainsKillPatch.Initialize, XueDaoRemainsKillPatch.Uninitialize),
         new(nameof(GuDeckCapacityReplacementPatch), GuDeckCapacityReplacementPatch.Initialize, GuDeckCapacityReplacementPatch.Uninitialize),
         new(nameof(MerchantInventoryCompatibilityPatch), MerchantInventoryCompatibilityPatch.Initialize, MerchantInventoryCompatibilityPatch.Uninitialize),
         new(nameof(AncientCompatibilityPatch), AncientCompatibilityPatch.Initialize, AncientCompatibilityPatch.Uninitialize),

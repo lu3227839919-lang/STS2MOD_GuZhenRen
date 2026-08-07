@@ -116,6 +116,10 @@ internal static class YiHaiCombatVictoryPatch
             }
             .SelectMany(static pile => pile.Cards)
             .OfType<YiHai>()
+            // 永久牌组卡的战斗克隆体（DeckVersion != null）不计入：
+            // 其原件已常驻永久牌组，战斗结束克隆体由原版销毁即可，
+            // 避免与原件重复保留。
+            .Where(static card => card.DeckVersion == null)
             .Distinct()
             .OrderBy(
                 static card => card.Id.ToString(),
