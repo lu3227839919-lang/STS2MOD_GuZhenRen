@@ -116,11 +116,17 @@ internal static class XueDaoCardSystem
     )
     {
         // 永久牌堆中遗骸最多 4 张：已达上限时不再生成新遗骸。
+        int persistent = CountPersistentRemains(owner);
         int slots = Math.Max(
             0,
-            MaxPersistentRemains - CountPersistentRemains(owner)
+            MaxPersistentRemains - persistent
         );
         int toAdd = Math.Min(amount, slots);
+
+        Entry.Logger.Info(
+            $"[遗骸生成] {owner.NetId} 请求 {amount} 张，" +
+            $"现有 {persistent}，本次生成 {toAdd} 张。"
+        );
 
         for (int index = 0; index < toAdd; index++)
         {
@@ -128,7 +134,25 @@ internal static class XueDaoCardSystem
                 owner,
                 guRank: 1
             );
-            await GuGeneratedCardFactory.AddToHandOrDiscard(card, owner);
+
+            bool addedToHand =
+                await GuCardPileSystem.AddGeneratedCardToHand(
+                    card,
+                    owner
+                );
+
+            Entry.Logger.Info(
+                $"[遗骸生成] 遗骸 {card.Id} 入手牌:{addedToHand}，" +
+                $"当前牌堆:{card.Pile?.Type.ToString() ?? "null"}。"
+            );
+
+            if (!addedToHand)
+            {
+                await GuGeneratedCardFactory.AddToHandOrDiscard(
+                    card,
+                    owner
+                );
+            }
         }
     }
 }
