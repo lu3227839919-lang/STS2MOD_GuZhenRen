@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using GuZhenRen.Cards;
 using GuZhenRen.Cards.ImmortalEssence;
 using GuZhenRen.Cards.ShaZhao;
+using GuZhenRen.Multiplayer;
 using GuZhenRen.Relics;
 
 using MegaCrit.Sts2.Core.Combat;
@@ -10,6 +11,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Random;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Runs;
 
@@ -25,6 +27,10 @@ namespace GuZhenRen.Aperture;
 public static class ApertureSystem
 {
     private const string SavedDataKey = "aperture";
+
+    // 天人感应随机流的用途隔离键：角色升转时随机选择蛊虫升转。
+    private const string TianRenGanYingRngStreamId =
+        "aperture/tian_ren_gan_ying";
     private static readonly object SyncRoot = new();
     private static readonly ConcurrentDictionary<
         PlayerRunKey,
@@ -733,6 +739,8 @@ public static class ApertureSystem
             );
         }
 
+        InvokeTianRenGanYing(player, currentRank);
+
         if (currentRank != ApertureProgression.MaximumImplementedRank)
         {
             return;
@@ -790,6 +798,79 @@ public static class ApertureSystem
                     }
                     break;
             }
+        }
+    }
+
+    /// <summary>
+    /// 天人感应：角色升转时，随机将永久牌组中两只低于角色当前转数的
+    /// 蛊虫各升转一次。候选与随机流均跨端确定，保证多人一致；不足
+    /// 两只时升转全部候选。
+    /// </summary>
+    private static void InvokeTianRenGanYing(
+        Player player,
+        int currentRank
+    )
+    {
+        try
+        {
+            AbstractGuZhenRenCard[] candidates = player.Deck.Cards
+                .OfType<AbstractGuZhenRenCard>()
+                .Where(card =>
+                    card is IGuWormCard &&
+                    card.GuRank < currentRank
+                )
+                // 同名同转蛊虫用网络卡牌 ID 稳定定序，确保各端
+                // 以相同顺序推进随机流。
+                .OrderBy(GuZhenRenDeterminism.GetCardNetworkId)
+                .ToArray();
+
+            if (candidates.Length == 0)
+            {
+                return;
+            }
+
+            int count = Math.Min(2, candidates.Length);
+            Rng rng = RitsuLibFramework.GetModPlayerRng(
+                player,
+                Entry.ModId,
+                TianRenGanYingRngStreamId
+            );
+
+            for (int index = 0;
+                 index < count && index < candidates.Length - 1;
+                 index++)
+            {
+                int selectedIndex =
+                    index + rng.NextInt(candidates.Length - index);
+                (candidates[index], candidates[selectedIndex]) =
+                    (candidates[selectedIndex], candidates[index]);
+            }
+
+            for (int index = 0; index < count; index++)
+            {
+                AbstractGuZhenRenCard guCard = candidates[index];
+                int previousRank = guCard.GuRank;
+                if (!guCard.TryIncreaseGuRank())
+                {
+                    Entry.Logger.Info(
+                        $"[天人感应] 蛊虫 {guCard.Id} 升转失败" +
+                        $"（当前 {previousRank} 转）。"
+                    );
+                    continue;
+                }
+
+                Entry.Logger.Info(
+                    $"[天人感应] 角色升转至 {currentRank} 转，" +
+                    $"蛊虫 {guCard.Id} 由 {previousRank} 转升至 " +
+                    $"{guCard.GuRank} 转。"
+                );
+            }
+        }
+        catch (Exception exception)
+        {
+            Entry.Logger.Info(
+                $"天人感应扩展回调失败：{exception}"
+            );
         }
     }
 
