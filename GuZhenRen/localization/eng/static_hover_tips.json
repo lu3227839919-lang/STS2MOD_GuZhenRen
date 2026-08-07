@@ -8,5 +8,6 @@
   "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL.title": "Killer Move Materials",
   "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL.description": "Stores Gu Worms sealed into Killer Moves. Materials return to the Gu Recovery Pile when the Killer Move is consumed or dismantled.",
   "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL.empty": "No sealed materials.",
-  "GU_ZHEN_REN_CARDPILE_GU_CARDS.selectionPrompt": "Choose the next Gu Worm (material order does not matter). {SelectedCount} selected; only a complete recipe can be confirmed, or go back to cancel."
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.selectionPrompt": "Select Gu Worm materials matching the selected Killer Move, then confirm.",
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.targetSelectionPrompt": "First select the Killer Move to deduce. Only matching materials will be shown next."
 }

@@ -8,5 +8,6 @@
   "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL.title": "杀招封存堆",
   "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL.description": "存放已经被杀招封装的蛊虫。杀招消耗或主动解体后，材料会返回蛊恢复堆。",
   "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL.empty": "杀招封存堆为空。",
-  "GU_ZHEN_REN_CARDPILE_GU_CARDS.selectionPrompt": "选择下一张蛊虫牌（材料顺序不影响配方）。已选择{SelectedCount}张；只有完整配方可以确认，也可以随时返回取消。"
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.selectionPrompt": "选择与已选杀招目标匹配的蛊虫材料，然后点击确认。",
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.targetSelectionPrompt": "先选择要推演的杀招。随后只显示能够匹配该杀招的材料。"
 }

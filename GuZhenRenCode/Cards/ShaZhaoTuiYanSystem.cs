@@ -36,8 +36,8 @@ namespace GuZhenRen.Cards;
 /// 将“杀招推演”绑定到蛊恢复牌堆右键操作。
 ///
 /// 牌堆点击只负责发起请求；实际选择、扣费和结算由 RitsuLib 的托管
-/// 联机行动在所有端同步执行。每次只选择一张材料，因而配方顺序不会
-/// 依赖 HashSet 的枚举顺序。
+/// 联机行动在所有端同步执行。推演先选择可制作的杀招，再从蛊存放牌堆
+/// 中选择该杀招允许的材料，不要求玩家记忆材料配方。
 /// </summary>
 internal static class ShaZhaoTuiYanSystem
 {
@@ -230,108 +230,135 @@ internal static class ShaZhaoTuiYanSystem
         );
     }
 
-    private static async Task<List<CardModel>>
-        SelectMaterialsInOrder(
+    private static async Task<(
+        Type? TargetCardType,
+        List<CardModel> Materials
+    )>
+        SelectTargetAndMaterialsAsync(
             MegaCrit.Sts2.Core.GameActions.Multiplayer.PlayerChoiceContext
                 choiceContext,
             Player player,
             CardPile guPile
-        )
+    )
     {
-        List<CardModel> selected = [];
-        IReadOnlySet<Type> materialTypes =
-            ShaZhaoRecipeRegistry.GetMaterialCardTypes();
+        CardModel[] availableMaterials = guPile.Cards
+            .Where(IsEligibleMaterial)
+            .ToArray();
 
-        while (true)
+        Type[] craftableResultTypes =
+            ShaZhaoRecipeRegistry
+                .GetCraftableResultTypes(availableMaterials)
+                .ToArray();
+
+        if (craftableResultTypes.Length == 0)
         {
-            CardModel[] choices =
-                guPile.Cards
-                    .Where(card =>
-                        // CardModel.Id identifies a card type, not a physical
-                        // card. Compare references so identical materials
-                        // remain independently selectable after the first one.
-                        !selected.Any(selectedCard =>
-                            ReferenceEquals(selectedCard, card)) &&
-                        IsEligibleMaterial(card) &&
-                        IsEligibleRecipeStep(
-                            selected,
-                            card,
-                            materialTypes
-                        )
-                    )
-                    .Select((card, index) => (card, index))
-                    .OrderBy(item =>
-                        item.card.Id.ToString(),
-                        StringComparer.Ordinal
-                    )
-                    .ThenByDescending(item =>
-                        item.card is IGuRankProvider rankProvider
-                            ? rankProvider.GuRank
-                            : 0
-                    )
-                    .ThenBy(item =>
-                        item.card.CurrentUpgradeLevel
-                    )
-                    .ThenBy(item =>
-                        item.card.Enchantment?.Id.ToString() ??
-                        string.Empty,
-                        StringComparer.Ordinal
-                    )
-                    .ThenBy(item => item.index)
-                    .Select(item => item.card)
-                    .ToArray();
-
-            if (choices.Length == 0)
-            {
-                break;
-            }
-
-            LocString prompt = new(
-                "static_hover_tips",
-                GuCardPileSystem.PileId + ".selectionPrompt"
-            );
-            prompt.Add("SelectedCount", selected.Count);
-
-            bool hasSelectedMaterial = selected.Count > 0;
-            bool hasCompleteRecipe =
-                ShaZhaoRecipeRegistry.HasMatchingRecipe(selected);
-
-            // A partial recipe must collect another card before the
-            // selector can be confirmed.  The old min=0 setting allowed a
-            // single material to be submitted and only reported
-            // invalidRecipe after the selector closed.
-            CardSelectorPrefs prefs = new(
-                prompt,
-                hasSelectedMaterial && hasCompleteRecipe ? 0 : 1,
-                1
-            )
-            {
-                Cancelable = true,
-                RequireManualConfirmation =
-                    hasSelectedMaterial && hasCompleteRecipe,
-                PretendCardsCanBePlayed = true,
-            };
-
-            CardModel? next =
-                (
-                    await CardSelectCmd.FromSimpleGrid(
-                        choiceContext,
-                        choices,
-                        player,
-                        prefs
-                    )
-                ).FirstOrDefault();
-
-            // 已选至少一张后，确认空选择或返回都表示完成配方输入。
-            if (next == null)
-            {
-                break;
-            }
-
-            selected.Add(next);
+            return (null, []);
         }
 
-        return selected;
+        CardModel[] targetPreviews = craftableResultTypes
+            .Select(resultType =>
+                ModelDb
+                    .CardPool<GuZhenRenShaZhaoCardPool>()
+                    .AllCards
+                    .Single(card => card.GetType() == resultType)
+                    .ToMutable()
+            )
+            .ToArray();
+
+        LocString targetPrompt = new(
+            "static_hover_tips",
+            GuCardPileSystem.PileId + ".targetSelectionPrompt"
+        );
+        CardModel? target =
+            (
+                await CardSelectCmd.FromSimpleGrid(
+                    choiceContext,
+                    targetPreviews,
+                    player,
+                    new CardSelectorPrefs(targetPrompt, 1)
+                    {
+                        Cancelable = true,
+                        PretendCardsCanBePlayed = true,
+                    }
+                )
+            ).FirstOrDefault();
+
+        if (target == null)
+        {
+            return (null, []);
+        }
+
+        Type targetCardType = target.GetType();
+        IReadOnlyList<Type> materialTypes =
+            ShaZhaoRecipeRegistry.GetMaterialTypesForResult(
+                targetCardType
+            );
+        ShaZhaoRecipeRegistry.GetMaterialCountRangeForResult(
+            targetCardType,
+            out int minimumMaterialCount,
+            out int maximumMaterialCount
+        );
+
+        CardModel[] choices = guPile.Cards
+            .Where(card =>
+                IsEligibleMaterial(card) &&
+                materialTypes.Contains(card.GetType())
+            )
+            .Select((card, index) => (card, index))
+            .OrderBy(item => item.card.Id.ToString(), StringComparer.Ordinal)
+            .ThenByDescending(item =>
+                item.card is IGuRankProvider rankProvider
+                    ? rankProvider.GuRank
+                    : 0
+            )
+            .ThenBy(item => item.card.CurrentUpgradeLevel)
+            .ThenBy(item =>
+                item.card.Enchantment?.Id.ToString() ?? string.Empty,
+                StringComparer.Ordinal
+            )
+            .ThenBy(item => item.index)
+            .Select(item => item.card)
+            .ToArray();
+
+        if (choices.Length < minimumMaterialCount)
+        {
+            return (targetCardType, []);
+        }
+
+        LocString materialPrompt = new(
+            "static_hover_tips",
+            GuCardPileSystem.PileId + ".selectionPrompt"
+        );
+        materialPrompt.Add("TargetName", target.Title);
+
+        List<CardModel> selected =
+            (
+                await CardSelectCmd.FromSimpleGrid(
+                    choiceContext,
+                    choices,
+                    player,
+                    new CardSelectorPrefs(
+                        materialPrompt,
+                        minimumMaterialCount,
+                        maximumMaterialCount
+                    )
+                    {
+                        Cancelable = true,
+                        RequireManualConfirmation =
+                            minimumMaterialCount != maximumMaterialCount,
+                        PretendCardsCanBePlayed = true,
+                    }
+                )
+            )
+            .ToList();
+
+        if (selected.Count < minimumMaterialCount ||
+            selected.Count > maximumMaterialCount)
+        {
+            selected.Clear();
+        }
+
+        return (targetCardType, selected);
     }
 
     private static bool IsEligibleMaterial(CardModel card)
@@ -343,27 +370,6 @@ internal static class ShaZhaoTuiYanSystem
     }
 
     /// <summary>
-    /// 配方引导：第一张材料必须出现在某个杀招配方中；之后的材料
-    /// 必须能补全某个已选材料所在的配方，避免玩家选到任何配方都
-    /// 用不到的蛊虫后得到“invalidRecipe”失败。
-    /// </summary>
-    private static bool IsEligibleRecipeStep(
-        IReadOnlyList<CardModel> selected,
-        CardModel card,
-        IReadOnlySet<Type> materialTypes
-    )
-    {
-        if (selected.Count == 0)
-        {
-            return materialTypes.Contains(card.GetType());
-        }
-
-        return ShaZhaoRecipeRegistry.CanExtendToRecipe(
-            selected,
-            card
-        );
-    }
-
     private static async Task ResolveSuccessfulRecipe(
         MegaCrit.Sts2.Core.GameActions.Multiplayer.PlayerChoiceContext
             choiceContext,
@@ -685,14 +691,16 @@ internal static class ShaZhaoTuiYanSystem
         CardPile guPile =
             GuCardPileSystem.PileType.GetPile(player);
 
-        List<CardModel> selectedCards =
-            await SelectMaterialsInOrder(
+        (
+            Type? targetCardType,
+            List<CardModel> selectedCards
+        ) = await SelectTargetAndMaterialsAsync(
                 choiceContext,
                 player,
                 guPile
             );
 
-        if (selectedCards.Count == 0)
+        if (targetCardType == null || selectedCards.Count == 0)
         {
             return false;
         }
@@ -709,7 +717,8 @@ internal static class ShaZhaoTuiYanSystem
         }
 
         if (!ShaZhaoRecipeRegistry.HasMatchingRecipe(
-                selectedCards
+                selectedCards,
+                targetCardType
             ))
         {
             ShowSynthesisFailure(player, "invalidRecipe");
@@ -730,9 +739,10 @@ internal static class ShaZhaoTuiYanSystem
             return false;
         }
 
-        if (!ShaZhaoRecipeRegistry.TryCreateResult(
+        if (!ShaZhaoRecipeRegistry.TryCreateResultForTarget(
                 selectedCards,
                 player,
+                targetCardType,
                 out AbstractShaZhaoCard? shaZhao
             ))
         {

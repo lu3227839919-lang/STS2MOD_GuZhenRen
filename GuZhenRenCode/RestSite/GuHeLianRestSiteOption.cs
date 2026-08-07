@@ -2,6 +2,7 @@ using Godot;
 
 using GuZhenRen.Cards;
 using GuZhenRen.Cards.HeLian;
+using GuZhenRen.Characters;
 
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Context;
@@ -22,8 +23,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace GuZhenRen.RestSite;
 
 /// <summary>
-/// 篝火选项：玩家选择一张或多张蛊虫牌并手动确认；
-/// 材料数量由实际可制作配方决定。每个休息点只能成功合练一次。
+/// 篝火选项：玩家先选择一张当前可合成的蛊牌，再选择与该结果匹配的
+/// 材料。材料数量由目标牌配方决定，不要求玩家记忆配方。
 /// </summary>
 public sealed class GuHeLianRestSiteOption
     : ModRestSiteOptionTemplate
@@ -43,6 +44,12 @@ public sealed class GuHeLianRestSiteOption
         new(
             "rest_site_ui",
             "OPTION_GU_ZHEN_REN_HE_LIAN.selectionPrompt"
+        );
+
+    private static readonly LocString TargetSelectionPrompt =
+        new(
+            "rest_site_ui",
+            "OPTION_GU_ZHEN_REN_HE_LIAN.targetSelectionPrompt"
         );
 
     private const string FallbackIconPath =
@@ -114,20 +121,18 @@ public sealed class GuHeLianRestSiteOption
     }
 
     /// <summary>
-    /// 执行单次合练。返回 false 表示当前没有可用配方，
-    /// 玩家取消了材料选择，或所选组合不匹配任何配方。
+    /// 执行单次合练。先选择目标结果牌，再选择该目标的材料。
     /// </summary>
     private async Task<bool> TryPerformHeLianOnce()
     {
         CardModel[] availableMaterials =
             GetAvailableMaterials(Owner);
 
-        if (!HeLianRecipeRegistry
-            .TryGetCraftableMaterialCountRange(
-                availableMaterials,
-                out _,
-                out int maximumMaterialCount
-            ))
+        Type[] craftableResultTypes = HeLianRecipeRegistry
+            .GetCraftableResultTypes(availableMaterials)
+            .ToArray();
+
+        if (craftableResultTypes.Length == 0)
         {
             ShowHeLianFeedback(
                 success: false,
@@ -139,14 +144,66 @@ public sealed class GuHeLianRestSiteOption
             return false;
         }
 
+        CardModel[] targetPreviews = craftableResultTypes
+            .Select(resultType =>
+                ModelDb
+                    .CardPool<GuZhenRenGuCardPool>()
+                    .AllCards
+                    .Single(card => card.GetType() == resultType)
+                    .ToMutable()
+            )
+            .ToArray();
+
+        CardModel? target =
+            (
+                await CardSelectCmd.FromSimpleGrid(
+                    new BlockingPlayerChoiceContext(),
+                    targetPreviews,
+                    Owner,
+                    new CardSelectorPrefs(
+                        TargetSelectionPrompt,
+                        1
+                    )
+                    {
+                        Cancelable = true,
+                        PretendCardsCanBePlayed = true,
+                    }
+                )
+            ).FirstOrDefault();
+
+        if (target == null)
+        {
+            return false;
+        }
+
+        Type targetCardType = target.GetType();
+        IReadOnlyList<Type> materialTypes =
+            HeLianRecipeRegistry.GetMaterialTypesForResult(
+                targetCardType,
+                out _
+            );
+        if (!HeLianRecipeRegistry.GetMaterialCountRangeForResult(
+                targetCardType,
+                out int minimumMaterialCount,
+                out int maximumMaterialCount
+            ))
+        {
+            return false;
+        }
+
         CardSelectorPrefs prefs = new(
             SelectionPrompt,
-            MinimumSelectableMaterialCount,
+            Math.Max(
+                MinimumSelectableMaterialCount,
+                minimumMaterialCount
+            ),
             maximumMaterialCount
         )
         {
             Cancelable = true,
-            RequireManualConfirmation = true,
+            RequireManualConfirmation =
+                minimumMaterialCount != maximumMaterialCount,
+            PretendCardsCanBePlayed = true,
         };
 
         List<CardModel> selectedCards =
@@ -154,20 +211,29 @@ public sealed class GuHeLianRestSiteOption
                 await CardSelectCmd.FromDeckGeneric(
                     player: Owner,
                     prefs: prefs,
-                    filter: IsEligibleMaterial,
+                    filter: card =>
+                        IsEligibleMaterial(card) &&
+                        materialTypes.Contains(card.GetType()) &&
+                        HeLianRecipeRegistry
+                            .IsEligibleMaterialCardForResult(
+                                card,
+                                targetCardType
+                            ),
                     sortingOrder: GetMaterialSortOrder
                 )
             )
             .ToList();
 
-        if (selectedCards.Count == 0)
+        if (selectedCards.Count < minimumMaterialCount ||
+            selectedCards.Count > maximumMaterialCount)
         {
             return false;
         }
 
-        if (!HeLianRecipeRegistry.TryCreateResult(
+        if (!HeLianRecipeRegistry.TryCreateResultForTarget(
                 selectedCards,
                 Owner,
+                targetCardType,
                 out AbstractGuZhenRenCard? result
             ))
         {

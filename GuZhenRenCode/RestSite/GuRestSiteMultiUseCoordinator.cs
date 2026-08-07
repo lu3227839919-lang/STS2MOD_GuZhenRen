@@ -10,7 +10,8 @@ namespace GuZhenRen.RestSite;
 /// <summary>
 /// 由合练、升炼共享的休息点事务协调器。
 ///
-/// 合练与升炼现在都只成功执行一次；升炼的一次操作可以选择最多两张牌。
+/// 合练与升炼现在都只成功执行一次；升炼的一次操作会在首选蛊基础上
+/// 允许选择最多两张追加蛊（凡蛊总计三只，仙蛊总计两只）。
 /// 本协调器仍负责联机选择串行化、异常中断标记与历史恢复。
 /// </summary>
 internal static class GuRestSiteMultiUseCoordinator

@@ -45,6 +45,27 @@ public static class ShaZhaoRecipeRegistry
         out AbstractShaZhaoCard? result
     )
     {
+        return TryCreateResultForTarget(
+            selectedCards,
+            owner,
+            targetCardType: null,
+            out result
+        );
+    }
+
+    /// <summary>
+    /// 根据先选定的杀招结果牌匹配材料并创建结果。
+    /// targetCardType 为 null 时保留按材料匹配的兼容行为。
+    /// </summary>
+    public static bool TryCreateResultForTarget(
+        IEnumerable<CardModel>
+            selectedCards,
+        Player owner,
+        Type? targetCardType,
+        [NotNullWhen(true)]
+        out AbstractShaZhaoCard? result
+    )
+    {
         ArgumentNullException.ThrowIfNull(
             selectedCards
         );
@@ -56,7 +77,10 @@ public static class ShaZhaoRecipeRegistry
         CardModel[] orderedMaterials =
             selectedCards.ToArray();
 
-        Recipe? recipe = FindRecipe(orderedMaterials);
+        Recipe? recipe = FindRecipe(
+            orderedMaterials,
+            targetCardType
+        );
 
         if (recipe == null)
         {
@@ -122,8 +146,103 @@ public static class ShaZhaoRecipeRegistry
         return FindRecipe(selectedCards.ToArray()) != null;
     }
 
+    /// <summary>
+    /// 只检查材料是否匹配指定杀招。
+    /// </summary>
+    public static bool HasMatchingRecipe(
+        IEnumerable<CardModel> selectedCards,
+        Type targetCardType
+    )
+    {
+        ArgumentNullException.ThrowIfNull(selectedCards);
+        ArgumentNullException.ThrowIfNull(targetCardType);
+        return FindRecipe(
+            selectedCards.ToArray(),
+            targetCardType
+        ) != null;
+    }
+
+    /// <summary>
+    /// 返回当前蛊存放牌堆材料足以完成的杀招结果类型。
+    /// </summary>
+    public static IReadOnlyList<Type> GetCraftableResultTypes(
+        IEnumerable<CardModel> availableMaterials
+    )
+    {
+        ArgumentNullException.ThrowIfNull(availableMaterials);
+
+        Dictionary<Type, int> availableCounts = availableMaterials
+            .GroupBy(card => card.GetType())
+            .ToDictionary(group => group.Key, group => group.Count());
+
+        return Recipes.Value
+            .Where(recipe =>
+                ContainsMaterialMultiset(
+                    availableCounts,
+                    recipe.OrderedMaterialCardTypes
+                )
+            )
+            .Select(recipe => recipe.ResultCardType)
+            .Distinct()
+            .OrderBy(
+                type => type.FullName ?? type.Name,
+                StringComparer.Ordinal
+            )
+            .ToArray();
+    }
+
+    /// <summary>
+    /// 获取指定杀招的材料类型并集。杀招配方不设最低转数限制。
+    /// </summary>
+    public static IReadOnlyList<Type> GetMaterialTypesForResult(
+        Type resultCardType
+    )
+    {
+        ArgumentNullException.ThrowIfNull(resultCardType);
+
+        return Recipes.Value
+            .Where(recipe => recipe.ResultCardType == resultCardType)
+            .SelectMany(recipe => recipe.OrderedMaterialCardTypes)
+            .Distinct()
+            .OrderBy(
+                type => type.FullName ?? type.Name,
+                StringComparer.Ordinal
+            )
+            .ToArray();
+    }
+
+    /// <summary>
+    /// 获取指定杀招的材料数量范围。多条配方时，玩家可在范围内选择
+    /// 任意数量，最终仍由完整材料多重集合校验。
+    /// </summary>
+    public static bool GetMaterialCountRangeForResult(
+        Type resultCardType,
+        out int minimum,
+        out int maximum
+    )
+    {
+        ArgumentNullException.ThrowIfNull(resultCardType);
+
+        int[] counts = Recipes.Value
+            .Where(recipe => recipe.ResultCardType == resultCardType)
+            .Select(recipe => recipe.OrderedMaterialCardTypes.Count)
+            .ToArray();
+
+        if (counts.Length == 0)
+        {
+            minimum = 0;
+            maximum = 0;
+            return false;
+        }
+
+        minimum = counts.Min();
+        maximum = counts.Max();
+        return true;
+    }
+
     private static Recipe? FindRecipe(
-        IReadOnlyList<CardModel> orderedMaterials
+        IReadOnlyList<CardModel> orderedMaterials,
+        Type? targetCardType = null
     )
     {
         Type[] orderedSelectedTypes = Canonicalize(
@@ -132,6 +251,8 @@ public static class ShaZhaoRecipeRegistry
 
         return Recipes.Value.FirstOrDefault(
             candidate =>
+                (targetCardType == null ||
+                 candidate.ResultCardType == targetCardType) &&
                 candidate.OrderedMaterialCardTypes.Count ==
                     orderedSelectedTypes.Length &&
                 candidate.OrderedMaterialCardTypes.SequenceEqual(
@@ -163,8 +284,8 @@ public static class ShaZhaoRecipeRegistry
     }
 
     /// <summary>
-    /// 所有配方用到的材料类型并集。推演系统用它做第一张材料的
-    /// 候选过滤，避免玩家选择任何配方都用不到的蛊虫。
+    /// 所有配方用到的材料类型并集。保留此接口供旧调用方兼容；新的
+    /// 推演流程会先选择结果杀招，再使用 GetMaterialTypesForResult。
     /// </summary>
     public static IReadOnlySet<Type>
         GetMaterialCardTypes()
@@ -177,9 +298,8 @@ public static class ShaZhaoRecipeRegistry
     }
 
     /// <summary>
-    /// 判断已选材料再加上候选蛊虫后，是否仍是某个合法配方的前缀
-    /// （即存在配方 R，使已选 ∪ {候选} 是 R 材料多重集的子集且不超量）。
-    /// 推演系统用它过滤第二张及后续材料，引导玩家逐步补齐配方。
+    /// 判断已选材料再加上候选蛊虫后，是否仍是某个合法配方的前缀。
+    /// 保留此接口供旧调用方兼容。
     /// </summary>
     public static bool CanExtendToRecipe(
         IReadOnlyList<CardModel> selectedCards,
@@ -242,6 +362,26 @@ public static class ShaZhaoRecipeRegistry
                 out int candidateCount
             ) &&
             candidateCount > 0;
+    }
+
+    private static bool ContainsMaterialMultiset(
+        IReadOnlyDictionary<Type, int> availableCounts,
+        IReadOnlyList<Type> requiredTypes
+    )
+    {
+        foreach ((Type type, int requiredCount) in
+                 requiredTypes.GroupBy(type => type)
+                    .Select(group =>
+                        (group.Key, group.Count())))
+        {
+            if (!availableCounts.TryGetValue(type, out int count) ||
+                count < requiredCount)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static IReadOnlyList<Recipe>

@@ -28,7 +28,7 @@
   "sha_zhao_material.title": "Sealed Material Pile",
   "sha_zhao_material.description": "Materials sealed by Sha Zhao derivation. They fly back to the Gu recovery pile and recover from zero when the Sha Zhao is used or dismantled; if the Sha Zhao is an Exhaust card, materials are still returned after use, with +1 recovery turn.",
   "sha_zhao_material.empty": "No sealed materials.",
-  "GU_ZHEN_REN_CARD_SHA_ZHAO_TUI_YAN.description": "Retain. Choose recovered Gu from the Gu Pile as materials (only Gu that can form a Sha Zhao are shown). If successful, pay the derivation essence to gain the Sha Zhao; otherwise the cards are returned.",
+  "GU_ZHEN_REN_CARD_SHA_ZHAO_TUI_YAN.description": "Retain. First choose a craftable Killer Move, then choose matching Gu Worm materials. If successful, pay the derivation essence to gain the Killer Move; otherwise the card returns to your hand.",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_STRIKE.title": "Punch",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_STRIKE.description": "Deal {Damage:diff()} damage.",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.title": "Defend",

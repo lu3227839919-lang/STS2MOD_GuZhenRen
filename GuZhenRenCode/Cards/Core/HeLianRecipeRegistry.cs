@@ -38,6 +38,26 @@ public static class HeLianRecipeRegistry
         out AbstractGuZhenRenCard? result
     )
     {
+        return TryCreateResultForTarget(
+            selectedCards,
+            owner,
+            targetCardType: null,
+            out result
+        );
+    }
+
+    /// <summary>
+    /// 根据玩家先选定的结果牌，再匹配材料并创建结果牌。
+    /// targetCardType 为 null 时保留旧的“只按材料猜结果”兼容行为。
+    /// </summary>
+    public static bool TryCreateResultForTarget(
+        IEnumerable<CardModel> selectedCards,
+        Player owner,
+        Type? targetCardType,
+        [NotNullWhen(true)]
+        out AbstractGuZhenRenCard? result
+    )
+    {
         ArgumentNullException.ThrowIfNull(
             selectedCards
         );
@@ -60,6 +80,10 @@ public static class HeLianRecipeRegistry
             .ToArray();
 
         Recipe? recipe = Recipes.Value
+            .Where(candidate =>
+                targetCardType == null ||
+                candidate.ResultCardType == targetCardType
+            )
             .FirstOrDefault(candidate =>
                 HaveSameMaterialMultiset(
                     candidate.MaterialCardTypes,
@@ -153,6 +177,110 @@ public static class HeLianRecipeRegistry
 
         minimum = craftableCounts.Min();
         maximum = craftableCounts.Max();
+        return true;
+    }
+
+    /// <summary>
+    /// 返回当前材料足以完成的合练结果牌类型，顺序按完整类型名稳定排序。
+    /// </summary>
+    public static IReadOnlyList<Type> GetCraftableResultTypes(
+        IEnumerable<CardModel> availableMaterials
+    )
+    {
+        ArgumentNullException.ThrowIfNull(availableMaterials);
+
+        CardModel[] available = availableMaterials.ToArray();
+
+        return Recipes.Value
+            .Where(recipe =>
+                ContainsRequiredMaterials(
+                    available,
+                    recipe.MaterialCardTypes,
+                    recipe.MinimumMaterialRank
+                )
+            )
+            .Select(recipe => recipe.ResultCardType)
+            .Distinct()
+            .OrderBy(
+                type => type.FullName ?? type.Name,
+                StringComparer.Ordinal
+            )
+            .ToArray();
+    }
+
+    /// <summary>
+    /// 获取指定结果牌的全部候选材料类型并集与最低转数。
+    /// 结果牌可声明多条配方，玩家选定结果后仍可在这些配方之间自由选择。
+    /// </summary>
+    public static IReadOnlyList<Type> GetMaterialTypesForResult(
+        Type resultCardType,
+        out int minimumMaterialRank
+    )
+    {
+        ArgumentNullException.ThrowIfNull(resultCardType);
+
+        Recipe[] recipes = Recipes.Value
+            .Where(recipe => recipe.ResultCardType == resultCardType)
+            .ToArray();
+
+        minimumMaterialRank = recipes.Length == 0
+            ? 0
+            : recipes.Min(recipe => recipe.MinimumMaterialRank);
+
+        return recipes
+            .SelectMany(recipe => recipe.MaterialCardTypes)
+            .Distinct()
+            .OrderBy(
+                type => type.FullName ?? type.Name,
+                StringComparer.Ordinal
+            )
+            .ToArray();
+    }
+
+    /// <summary>
+    /// 判断材料是否至少能参与指定结果牌的一条配方，包含该配方的最低转数要求。
+    /// </summary>
+    public static bool IsEligibleMaterialCardForResult(
+        CardModel card,
+        Type resultCardType
+    )
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        ArgumentNullException.ThrowIfNull(resultCardType);
+
+        return card is IGuRankProvider provider &&
+            Recipes.Value.Any(recipe =>
+                recipe.ResultCardType == resultCardType &&
+                recipe.MaterialCardTypes.Contains(card.GetType()) &&
+                provider.GuRank >= recipe.MinimumMaterialRank
+            );
+    }
+
+    /// <summary>
+    /// 获取指定合练结果牌的材料数量范围。
+    /// </summary>
+    public static bool GetMaterialCountRangeForResult(
+        Type resultCardType,
+        out int minimum,
+        out int maximum
+    )
+    {
+        ArgumentNullException.ThrowIfNull(resultCardType);
+
+        int[] counts = Recipes.Value
+            .Where(recipe => recipe.ResultCardType == resultCardType)
+            .Select(recipe => recipe.MaterialCardTypes.Count)
+            .ToArray();
+
+        if (counts.Length == 0)
+        {
+            minimum = 0;
+            maximum = 0;
+            return false;
+        }
+
+        minimum = counts.Min();
+        maximum = counts.Max();
         return true;
     }
 

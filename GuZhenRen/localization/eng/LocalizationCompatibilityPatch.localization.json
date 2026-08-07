@@ -132,6 +132,7 @@
     }
   },
   "cardDescriptionOverrides": {
+    "GU_ZHEN_REN_CARD_SHA_ZHAO_TUI_YAN.description": "Retain. First choose a craftable Killer Move, then choose matching Gu Worm materials. If successful, pay the derivation essence to gain the Killer Move; otherwise the card returns to your hand.",
     "GU_ZHEN_REN_CARD_BAI_SHI_GU.description": "Gain {Dexterity:diff()} temporary [gold]Dexterity[/gold]. {BlockRetentionTurns:cond:>0?For the next {BlockRetentionTurns} turn(s), your Block is not removed at the start of your turn.|}",
     "GU_ZHEN_REN_CARD_FEI_XIONG_XU_YING.description": "Whenever you play an Attack, have a {ChancePercent}% chance to deal {Damage:diff()} damage to ALL enemies. NL Strength affects this damage {StrengthMultiplier} times.",
     "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description": "Retain as immortal essence. Provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
@@ -161,12 +162,13 @@
   },
   "restSiteLocalizationFallbacks": {
     "OPTION_GU_ZHEN_REN_GU_RANK_UP.name": "Gu Refinement",
-    "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "First select 1 eligible Gu Worm. If it is mortal, you may then select 1 additional mortal Gu Worm; if it is immortal, only that 1 Gu Worm can be refined this time. Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",
-    "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Select the first Gu Worm to refine. A mortal Gu Worm allows one additional mortal selection; an immortal Gu Worm is refined alone.",
+    "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "First select 1 eligible Gu Worm. If it is mortal, you may select up to 2 additional mortal Gu Worms (3 total); if it is immortal, you may select up to 1 additional immortal Gu Worm (2 total). Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",
+    "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Select the first Gu Worm to refine. Then select up to 2 more of the same kind; mortal Gu can total 3 and immortal Gu can total 2.",
     "OPTION_GU_ZHEN_REN_HE_LIAN.name": "Gu Fusion",
-    "OPTION_GU_ZHEN_REN_HE_LIAN.description": "Choose one or more Gu cards and click Confirm manually. The selection limit is determined by currently craftable recipes. Materials are consumed only when both their types and quantities match a recipe. A failed attempt does not consume the use. Fusion can succeed once per rest site.",
-    "OPTION_GU_ZHEN_REN_HE_LIAN.selectionPrompt": "Choose fusion materials, then click Confirm. The required count depends on the recipe.",
-    "OPTION_GU_ZHEN_REN_GU_RANK_UP.secondMortalSelectionPrompt": "You selected a mortal Gu Worm. Select 1 additional mortal Gu Worm, or confirm with 0 selected to refine only the first."
+    "OPTION_GU_ZHEN_REN_HE_LIAN.description": "First select a currently craftable Gu card, then select Gu Worm materials matching that target. Materials are consumed and the result is created only when both types and quantities match; failed attempts do not consume the use. Fusion can succeed once per rest site.",
+    "OPTION_GU_ZHEN_REN_HE_LIAN.selectionPrompt": "Select materials matching the target Gu card, then confirm.",
+    "OPTION_GU_ZHEN_REN_HE_LIAN.targetSelectionPrompt": "First select the Gu card to craft. Only materials that can match the target will be shown next.",
+    "OPTION_GU_ZHEN_REN_GU_RANK_UP.secondMortalSelectionPrompt": "Select additional Gu Worms of the same kind (up to 2 mortal or 1 immortal), or confirm with 0 selected."
   },
   "combatInterfaceLocalizationFallbacks": [
     {
@@ -187,7 +189,12 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.selectionPrompt",
-      "text": "Choose the next Gu Worm in recipe order. {SelectedCount} selected; after choosing at least one, confirm or go back to finish."
+      "text": "Select Gu Worm materials matching the selected Killer Move, then confirm."
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardPileId}.targetSelectionPrompt",
+      "text": "First select the Killer Move to deduce. Only matching materials will be shown next."
     },
     {
       "table": "static_hover_tips",
@@ -315,7 +322,7 @@
       "text": "The first hit of your next Light Path Attack deals {Amount} more damage. Multi-hit attacks gain this bonus only once."
     }
   ],
-  "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "First select 1 eligible Gu Worm. If it is mortal, you may then select 1 additional mortal Gu Worm; if it is immortal, only that 1 Gu Worm can be refined this time. Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",
-  "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Select the first Gu Worm to refine. A mortal Gu Worm allows one additional mortal selection; an immortal Gu Worm is refined alone.",
-  "OPTION_GU_ZHEN_REN_GU_RANK_UP.secondMortalSelectionPrompt": "You selected a mortal Gu Worm. Select 1 additional mortal Gu Worm, or confirm with 0 selected to refine only the first."
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "First select 1 eligible Gu Worm. If it is mortal, you may select up to 2 additional mortal Gu Worms (3 total); if it is immortal, you may select up to 1 additional immortal Gu Worm (2 total). Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Select the first Gu Worm to refine. Then select up to 2 more of the same kind; mortal Gu can total 3 and immortal Gu can total 2.",
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.secondMortalSelectionPrompt": "Select additional Gu Worms of the same kind (up to 2 mortal or 1 immortal), or confirm with 0 selected."
 }

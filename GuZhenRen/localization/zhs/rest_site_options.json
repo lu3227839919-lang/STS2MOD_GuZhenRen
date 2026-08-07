@@ -1,9 +1,10 @@
 {
   "OPTION_GU_ZHEN_REN_GU_RANK_UP.name": "升炼",
-  "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "先选择1只符合条件的蛊牌。若选择凡蛊，本次还可再选择1只凡蛊；若选择仙蛊，本次只能升炼该1只。每只所选蛊各提升一转，五转升六转同样由升炼完成。选择0只并确认将取消；本休息点只能成功升炼一次。",
-  "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "选择本次首先升炼的1只蛊。选择凡蛊后可再选1只凡蛊；选择仙蛊则本次只能升炼1只。",
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "先选择1只符合条件的蛊牌。若选择凡蛊，本次最多可再选择2只凡蛊（共3只）；若选择仙蛊，本次最多可再选择1只仙蛊（共2只）。每只所选蛊各提升一转，五转升六转同样由升炼完成。选择0只并确认将取消；本休息点只能成功升炼一次。",
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "选择本次首先升炼的1只蛊。之后可再选择最多2只同类蛊；凡蛊总计最多3只，仙蛊总计最多2只。",
   "OPTION_GU_ZHEN_REN_HE_LIAN.name": "合练",
-  "OPTION_GU_ZHEN_REN_HE_LIAN.description": "选择一张或多张蛊虫牌并主动点击确认。可选数量上限由当前可制作配方决定；只有材料种类和数量完整匹配配方时才会消耗材料并获得结果。失败不会消耗本次机会。每个休息点只能成功合练一次。",
-  "OPTION_GU_ZHEN_REN_HE_LIAN.selectionPrompt": "选择合练材料，然后点击确认。材料数量由配方决定。",
-  "OPTION_GU_ZHEN_REN_GU_RANK_UP.secondMortalSelectionPrompt": "你已选择凡蛊。可以再选择1只凡蛊，或选择0只并确认，仅升炼第一只。"
+  "OPTION_GU_ZHEN_REN_HE_LIAN.description": "先选择一张当前可合成的蛊牌，再选择与目标匹配的蛊虫材料。材料种类和数量完整匹配后才会消耗材料并获得结果；失败不会消耗本次机会。每个休息点只能成功合练一次。",
+  "OPTION_GU_ZHEN_REN_HE_LIAN.selectionPrompt": "选择与目标蛊牌匹配的材料，然后点击确认。",
+  "OPTION_GU_ZHEN_REN_HE_LIAN.targetSelectionPrompt": "先选择要合成的蛊牌。随后只显示能够匹配该目标的材料。",
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.secondMortalSelectionPrompt": "选择追加升炼的同类蛊牌（凡蛊最多追加2只，仙蛊最多追加1只），也可以选择0只。"
 }
