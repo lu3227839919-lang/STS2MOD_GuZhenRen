@@ -151,6 +151,9 @@ internal static class XueDaoCardSystem
                 // 手牌/弃牌堆拒绝新卡通常发生在最后一击（CombatManager
                 // IsEnding，战斗即将结束）时。这种击杀产生的遗骸没有
                 // 机会再使用，直接加入永久牌组保留。
+                // 战斗卡只登记在 CombatState，先登记到 RunState 才能入牌组。
+                owner.RunState.AddCard(card, owner);
+
                 CardPileAddResult deckResult =
                     await CardPileCmd.Add(
                         card,

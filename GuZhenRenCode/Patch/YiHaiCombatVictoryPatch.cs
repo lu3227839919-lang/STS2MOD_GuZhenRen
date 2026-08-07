@@ -173,6 +173,14 @@ internal static class YiHaiCombatVictoryPatch
             return;
         }
 
+        // 战斗卡只登记在 CombatState（CombatState.CreateCard 不写入
+        // RunState._allCards）；CardPileCmd.Add 到永久牌组要求卡已登记
+        // 到 RunState，先补登记再入牌组。
+        foreach (YiHai card in remains)
+        {
+            player.RunState.AddCard(card, player);
+        }
+
         await CardPileCmd.Add(
             remains,
             PileType.Deck,
