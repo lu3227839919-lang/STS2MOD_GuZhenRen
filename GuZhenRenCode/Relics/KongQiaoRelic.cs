@@ -215,6 +215,26 @@ public sealed class KongQiaoRelic
         if (cardPlay.Card is IGuWormCard &&
             cardPlay.IsFirstInSeries)
         {
+            // CardModel.OnPlayWrapper 在 AfterCardPlayed 之后才会把
+            // Play 堆中的卡牌送入结果堆。蛊牌的结果堆是 RitsuLib 自定义
+            // 牌堆；多人动作在客户端执行时，原版的最后一步迁移可能
+            // 发生在客户端仍保留普通手牌的状态窗口内，下一次操作便会
+            // 再次请求同一张卡，最终造成 checksum 分叉。
+            //
+            // 在两端都由同一个出牌钩子、基于已经登记的催动次数，明确
+            // 把当前卡牌送入结果蛊牌堆。此处使用原生 CardPileCmd.Add
+            // （而不是只改 CardPile 的内部列表），保证牌堆变更钩子和
+            // Multiplayer checksum 都按相同顺序执行。迁移后原版
+            // OnPlayWrapper 看到卡牌已不在 Play 堆，会跳过重复迁移。
+            PileType resultPile = GuCardUsageRules.CanUse(cardPlay.Card)
+                ? GuCardPileSystem.PileType
+                : GuCardPileSystem.RecoveryPileType;
+            await GuCardPileSystem.MoveCardToPileAsync(
+                cardPlay.Card,
+                resultPile,
+                skipVisuals: true
+            );
+
             await GuCardPileSystem
                 .MoveDepletedGuCardsToRecoveryAsync(Owner);
             await GuRecoveryEffectSystem
