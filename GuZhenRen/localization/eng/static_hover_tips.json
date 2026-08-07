@@ -5,9 +5,9 @@
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.title": "Gu Recovery Pile",
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.description": "Stores cooling Gu and recovered Gu waiting because the Gu Hand is full. At turn start, vacancies are filled at random. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move using materials only from the Gu Hand.",
   "GU_ZHEN_REN_CARDPILE_GU_DISCARD.empty": "The Gu Recovery Pile is empty.",
-  "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL.title": "Killer Move Materials",
-  "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL.description": "Stores Gu Worms sealed into Killer Moves. Materials return to the Gu Recovery Pile when the Killer Move is consumed or dismantled.",
-  "GU_ZHEN_REN_CARDPILE_SHA_ZHAO_MATERIAL.empty": "No sealed materials.",
+  "GU_ZHEN_REN_CARDPILE_GU_SEALED.title": "Sealed Gu Pile",
+  "GU_ZHEN_REN_CARDPILE_GU_SEALED.description": "Holds Strength Gu that have not finished training this combat, plus Gu Worms sealed into Killer Moves. Play their permanent companion cards to train them; at full progress they unseal into the Gu Hand. Materials return to the Gu Recovery Pile when the Killer Move is consumed or dismantled.",
+  "GU_ZHEN_REN_CARDPILE_GU_SEALED.empty": "No sealed Gu.",
   "GU_ZHEN_REN_CARDPILE_GU_CARDS.selectionPrompt": "Select Gu Worm materials matching the selected Killer Move, then confirm.",
   "GU_ZHEN_REN_CARDPILE_GU_CARDS.targetSelectionPrompt": "First select the Killer Move to deduce. Only matching materials will be shown next."
 }

@@ -48,7 +48,7 @@ public static class LiDaoTrainingSystem
     public static bool IsSealed(CardModel card) =>
         card is ILiDaoTrainingGuCard &&
         !UnsealedState[card] &&
-        card.Pile?.Type == GuCardPileSystem.LiDaoSealedPileType;
+        card.Pile?.Type == GuCardPileSystem.GuSealedPileType;
 
     /// <summary>
     /// 一张永久伴生牌完成其首次 CardPlay 后调用。临时生成牌没有
@@ -71,7 +71,7 @@ public static class LiDaoTrainingSystem
         }
 
         CardModel? sealedGu = GuCardPileSystem
-            .LiDaoSealedPileType
+            .GuSealedPileType
             .GetPile(companion.Owner)
             .Cards
             .Where(card =>
@@ -122,7 +122,7 @@ public static class LiDaoTrainingSystem
     {
         ArgumentNullException.ThrowIfNull(owner);
 
-        return GuCardPileSystem.LiDaoSealedPileType
+        return GuCardPileSystem.GuSealedPileType
             .GetPile(owner)
             .Cards
             .OfType<ILiDaoTrainingGuCard>()

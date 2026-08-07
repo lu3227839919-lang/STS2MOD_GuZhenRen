@@ -13,7 +13,7 @@ public enum LiDaoBeastKind
     ShiGui = 4,
 }
 
-/// <summary>需要在战斗开始时进入力道蛊封存、通过伴生牌练力解封的蛊。</summary>
+/// <summary>需要在战斗开始时进入蛊封存堆、通过伴生牌练力解封的蛊。</summary>
 public interface ILiDaoTrainingGuCard : IGuWormCard
 {
     int TrainingRequired { get; }
