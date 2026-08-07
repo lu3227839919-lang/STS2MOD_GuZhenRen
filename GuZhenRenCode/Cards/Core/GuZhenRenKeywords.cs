@@ -12,7 +12,6 @@ namespace GuZhenRen.Cards;
 /// 所有关键词的 CardDescriptionPlacement 都是 None：
 /// 关键词不会自动插入卡面正文，但会在卡牌附近生成悬浮提示框。
 /// </summary>
-[RegisterOwnedCardKeyword(nameof(XuYing), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(Unique), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(XianGu), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(CuiDong), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
@@ -50,7 +49,6 @@ namespace GuZhenRen.Cards;
 [RegisterOwnedCardKeyword(nameof(ZhuiJi), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 public sealed class GuZhenRenKeywords
 {
-    public static readonly CardKeyword XuYing = Create(nameof(XuYing));
     public static readonly CardKeyword Unique = Create(nameof(Unique));
     public static readonly CardKeyword XianGu = Create(nameof(XianGu));
     public static readonly CardKeyword CuiDong = Create(nameof(CuiDong));
@@ -152,7 +150,7 @@ public sealed class GuZhenRenKeywords
     public static IReadOnlySet<CardKeyword> OwnedKeywords { get; } =
         new HashSet<CardKeyword>
         {
-            XuYing, Unique, XianGu, CuiDong, HuiFu,
+            Unique, XianGu, CuiDong, HuiFu,
             HeLian, KeXue, ZiShi,
             ShiHai1, ShiHai2, ShiHai3,
             YaoHua1, YaoHua2, YaoHua3,

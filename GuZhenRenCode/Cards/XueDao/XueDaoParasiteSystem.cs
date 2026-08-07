@@ -183,8 +183,15 @@ public static class XueDaoParasiteSystem
         int stage = GetStage(host);
         string? entry = kind switch
         {
-            ParasiteKind.BloodQi =>
-                "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI.cardText",
+            ParasiteKind.BloodQi => host.Type switch
+            {
+                CardType.Attack =>
+                    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI_ATTACK.cardText",
+                CardType.Skill =>
+                    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI_SKILL.cardText",
+                _ =>
+                    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI_POWER.cardText",
+            },
             ParasiteKind.BloodMoon => stage switch
             {
                 <= 0 => "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.cardText",
@@ -208,6 +215,7 @@ public static class XueDaoParasiteSystem
         text.Add("TriggerCount", GetBloodQiTriggerPercentages(rank).Length);
         text.Add("ParasiteValue", GetBloodQiBaseValue(rank));
         text.Add("ParasiteBleed", GetBloodQiBleed(rank));
+        text.Add("ParasitePowerGain", GetBloodQiPowerGain(rank));
         return text.GetFormattedText();
     }
 

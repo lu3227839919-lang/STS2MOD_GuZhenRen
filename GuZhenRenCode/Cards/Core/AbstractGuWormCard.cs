@@ -45,14 +45,6 @@ public abstract class AbstractGuWormCard
         AbstractGuWormCard guWorm
     )
     {
-        yield return GuZhenRenKeywords.CuiDong;
-        yield return GuZhenRenKeywords.HuiFu;
-
-        if (guWorm.GuRank >= GuZhenRenCardRules.XianGuRank)
-        {
-            yield return GuZhenRenKeywords.XianGu;
-        }
-
         foreach (CardKeyword keyword in GetMechanicKeywords(guWorm))
         {
             yield return keyword;
@@ -114,6 +106,7 @@ public abstract class AbstractGuWormCard
     {
         base.AddExtraArgsToDescription(description);
         description.Add("RecoveryTurns", RecoveryDelayTurns);
+        description.Add("RecoveryTurnsCN", ToChineseNumber(RecoveryDelayTurns));
     }
 
     private static IEnumerable<CardKeyword> GetMechanicKeywords(

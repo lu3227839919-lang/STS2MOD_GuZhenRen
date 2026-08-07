@@ -160,8 +160,27 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
                 "RemainingUses",
                 GuCardUsageRules.GetRemainingUses(this)
             );
+            description.Add("RankCN", ToChineseNumber(GuRank));
+            description.Add(
+                "RemainingUsesCN",
+                ToChineseNumber(GuCardUsageRules.GetRemainingUses(this))
+            );
         }
     }
+
+    private static readonly string[] ChineseNumberDigits =
+    [
+        "零", "一", "二", "三", "四", "五", "六", "七", "八", "九",
+    ];
+
+    /// <summary>
+    /// 将 0-9 的阿拉伯数字转换为中文数字（用于文言风格的描述头部）。
+    /// 超出范围的数值原样回退为阿拉伯数字。
+    /// </summary>
+    protected static string ToChineseNumber(int value) =>
+        value >= 0 && value < ChineseNumberDigits.Length
+            ? ChineseNumberDigits[value]
+            : value.ToString();
 
     
 // =====================================================================

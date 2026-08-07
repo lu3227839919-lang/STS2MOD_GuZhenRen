@@ -2,6 +2,17 @@
 
 本项目的全部重要变更记录。版本号遵循 [SemVer](https://semver.org/lang/zh-CN/) 风格，规则见 [VERSIONING.md](VERSIONING.md)。历史版本大多未标注发布日期。
 
+## [0.8.6] - 2026-08-07
+
+### 修复
+- 卡牌描述换行修复：` NL ` 为尖塔1 的 LocString 换行标记，StS2 引擎不识别，会在卡面字面显示；全部本地化改用引擎支持的 JSON 转义 `\n`（可置于 `{...}` 条件块内），覆盖蛊虫卡、血道蛊、玄玉掌、飞熊虚影等所有含换行的描述。
+
+### 调整
+- 永久蛊虫容量由 15 张下调至 **12 张**（`GuWormDeckCapacity`）；容量已满时获得合法新蛊虫需要替换一张已有蛊虫。
+- 移除玄玉掌与飞熊虚影两张旧卡：删除本地化条目，并清理孤立的虚影机制代码（`AbstractXuYingCard`、虚影卡池、`NCardXuYingEnergyIconPatch`、`XuYingHiddenBehaviorPatch`、`IProbabilityCard`、虚影关键词/标签、Entry 注册与合练检查）。
+- 蛊虫卡描述头部文言化：转数/催动次数/恢复回合改用中文数字（`RankCN`/`RemainingUsesCN`/`RecoveryTurnsCN`），并移除催动/恢复/仙蛊三个卡面关键词标签。
+- 血气寄生宿主动态文本按牌型细分（攻击/格挡/能力三类 key），血元增益接入宿主卡面。
+
 ## [0.8.5] - 2026-08-07
 
 ### 修复
