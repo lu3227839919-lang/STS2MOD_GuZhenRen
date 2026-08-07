@@ -1,6 +1,7 @@
 using System.Reflection;
 
 using GuZhenRen.Cards.XueDao;
+using GuZhenRen.Multiplayer;
 
 using HarmonyLib;
 
@@ -165,6 +166,7 @@ internal static class YiHaiCombatVictoryPatch
                 static card => card.Id.ToString(),
                 StringComparer.Ordinal
             )
+            .ThenBy(GuZhenRenDeterminism.GetCardNetworkId)
             .Take(slots)
             .ToArray();
 

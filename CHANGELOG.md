@@ -2,6 +2,13 @@
 
 本项目的全部重要变更记录。版本号遵循 [SemVer](https://semver.org/lang/zh-CN/) 风格，规则见 [VERSIONING.md](VERSIONING.md)。历史版本大多未标注发布日期。
 
+## [0.8.5] - 2026-08-07
+
+### 修复
+- 多人模式 checksum 分歧（#17）根因修复：RitsuLib ExtraHand 会在本地玩家确认目标前把蛊牌临时移入 Hand，若上一张蛊牌仍在执行时开始下一次选择，该仅本地的提前移牌会被上一动作结束时的多人校验捕获。新增 GuCardPlaySyncPatch 跟踪 PlayCardAction 完整异步执行周期（Interlocked 计数，prefix/postfix/finalizer 三向释放），执行期间禁止开始新的蛊牌选择。
+- 同一 pending 蛊牌选择未清理前禁止被另一张蛊牌覆盖及其预留催动（GuActivationModeSystem.CanSelect 增加 pending 一致性检查）。
+- 同类卡牌跨端稳定排序加固：相同费用的多张催动、同名同转同升级蛊牌随机入场、仙元批量消耗与耗尽结算、战后遗骸保留、杀招材料选择均增加网络卡牌 ID（NetCombatCardDb）终结排序键，消除相同值卡牌继承各端本地集合/牌堆枚举顺序导致的分歧风险。
+
 ## [0.8.4] - 2026-08-07
 
 ### 修复

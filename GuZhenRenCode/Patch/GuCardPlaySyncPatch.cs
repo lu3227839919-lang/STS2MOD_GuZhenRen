@@ -26,6 +26,8 @@ internal static class GuCardPlaySyncPatch
 
     private static bool _initialized;
 
+    private static int _executingActionCount;
+
     private static MethodInfo? _toCardModelMethod;
 
     internal static void Initialize()
@@ -50,6 +52,14 @@ internal static class GuCardPlaySyncPatch
             prefix: new HarmonyMethod(
                 typeof(GuCardPlaySyncPatch),
                 nameof(ExecuteActionPrefix)
+            ),
+            postfix: new HarmonyMethod(
+                typeof(GuCardPlaySyncPatch),
+                nameof(ExecuteActionPostfix)
+            ),
+            finalizer: new HarmonyMethod(
+                typeof(GuCardPlaySyncPatch),
+                nameof(ExecuteActionFinalizer)
             )
         );
 
@@ -64,14 +74,26 @@ internal static class GuCardPlaySyncPatch
         }
         finally
         {
+            Interlocked.Exchange(ref _executingActionCount, 0);
             _initialized = false;
         }
     }
+
+    /// <summary>
+    /// RitsuLib ExtraHand 会在本地玩家确认目标前把蛊牌临时移入 Hand。
+    /// 如果玩家在上一张牌仍在结算时开始下一次选择，这个仅本地发生的
+    /// 提前移牌会污染上一动作结束时的多人校验。UI 入口据此暂时禁止
+    /// 新的蛊牌选择；同步动作本身仍可正常排队和执行。
+    /// </summary>
+    internal static bool IsCardActionExecuting =>
+        Volatile.Read(ref _executingActionCount) > 0;
 
     private static void ExecuteActionPrefix(
         PlayCardAction __instance
     )
     {
+        Interlocked.Increment(ref _executingActionCount);
+
         try
         {
             CardModel? card = ResolveCard(__instance);
@@ -95,6 +117,50 @@ internal static class GuCardPlaySyncPatch
                 $"[蛊牌催动] 出牌动作前补移蛊牌失败：" +
                 $"{exception.Message}"
             );
+        }
+    }
+
+    private static void ExecuteActionPostfix(ref Task __result)
+    {
+        __result = AwaitActionAndReleaseGateAsync(__result);
+    }
+
+    private static Exception? ExecuteActionFinalizer(
+        Exception? __exception
+    )
+    {
+        // async 异常由包装后的 Task finally 释放；这里只处理原方法在
+        // 返回 Task 之前同步抛出的异常，避免 UI 永久被锁住。
+        if (__exception != null)
+        {
+            ReleaseActionGate();
+        }
+
+        return __exception;
+    }
+
+    private static async Task AwaitActionAndReleaseGateAsync(
+        Task actionTask
+    )
+    {
+        try
+        {
+            await actionTask;
+        }
+        finally
+        {
+            ReleaseActionGate();
+        }
+    }
+
+    private static void ReleaseActionGate()
+    {
+        int remaining = Interlocked.Decrement(
+            ref _executingActionCount
+        );
+        if (remaining < 0)
+        {
+            Interlocked.Exchange(ref _executingActionCount, 0);
         }
     }
 

@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 
 using GuZhenRen.Aperture;
+using GuZhenRen.Multiplayer;
 
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -116,6 +117,7 @@ public static class ImmortalEssenceSystem
                 .OfType<AbstractXianYuanCard>()
                 .OrderBy(GetRemainingUnits)
                 .ThenBy(card => card.Id.Entry, StringComparer.Ordinal)
+                .ThenBy(GuZhenRenDeterminism.GetCardNetworkId)
                 .ToArray() ?? [];
 
         if (availableCards.Sum(GetRemainingUnits) < remainingCost)
@@ -183,7 +185,9 @@ public static class ImmortalEssenceSystem
         }
 
         AbstractXianYuanCard[] pending =
-            state.Cards.ToArray();
+            state.Cards
+                .OrderBy(GuZhenRenDeterminism.GetCardNetworkId)
+                .ToArray();
 
         foreach (AbstractXianYuanCard depleted in pending)
         {

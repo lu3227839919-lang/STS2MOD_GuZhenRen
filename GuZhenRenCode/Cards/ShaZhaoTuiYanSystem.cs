@@ -316,6 +316,9 @@ internal static class ShaZhaoTuiYanSystem
                 item.card.Enchantment?.Id.ToString() ?? string.Empty,
                 StringComparer.Ordinal
             )
+            .ThenBy(item =>
+                GuZhenRenDeterminism.GetCardNetworkId(item.card)
+            )
             .ThenBy(item => item.index)
             .Select(item => item.card)
             .ToArray();

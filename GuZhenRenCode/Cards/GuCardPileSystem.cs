@@ -1,5 +1,7 @@
 using System.Runtime.CompilerServices;
 
+using GuZhenRen.Multiplayer;
+
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -880,6 +882,10 @@ public static class GuCardPileSystem
                     : 0
             )
             .ThenBy(static card => card.CurrentUpgradeLevel)
+            // 同名、同转、同升级的多张卡仍必须使用跨端一致的最终键；
+            // 否则稳定排序会继承各端牌堆枚举顺序，随机索引可能选到
+            // 不同的战斗实例。
+            .ThenBy(GuZhenRenDeterminism.GetCardNetworkId)
             .ToArray();
 
         int drawCount = Math.Clamp(maximumCount, 0, pool.Length);

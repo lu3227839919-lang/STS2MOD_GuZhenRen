@@ -6,6 +6,7 @@ using Godot;
 using HarmonyLib;
 
 using GuZhenRen.Cards.Basic;
+using GuZhenRen.Multiplayer;
 
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
@@ -114,10 +115,26 @@ public static class GuActivationModeSystem
     /// </summary>
     public static bool CanSelect(CardModel? card)
     {
-        return card != null &&
-            LocalContext.IsMine(card) &&
-            card.Pile?.Type == GuCardPileSystem.PileType &&
-            CanPlay(card);
+        if (card == null ||
+            !LocalContext.IsMine(card) ||
+            card.Pile?.Type != GuCardPileSystem.PileType)
+        {
+            return false;
+        }
+
+        lock (SyncRoot)
+        {
+            // 一个本地 pending 记录只能对应一个即将同步的出牌动作。
+            // 在它结算并清理前禁止选择另一张蛊牌，避免覆盖预留催动，
+            // 也避免多张 ExtraHand 卡只在发起端提前进入 Hand。
+            if (_pendingCard != null &&
+                !ReferenceEquals(_pendingCard, card))
+            {
+                return false;
+            }
+        }
+
+        return CanPlay(card);
     }
 
     /// <summary>
@@ -401,6 +418,7 @@ public static class GuActivationModeSystem
             .OfType<ChuiDong>()
             .Where(card => IsActivatorAvailable(card, owner))
             .OrderBy(GetActivatorEnergyCost)
+            .ThenBy(GuZhenRenDeterminism.GetCardNetworkId)
             .FirstOrDefault();
     }
 

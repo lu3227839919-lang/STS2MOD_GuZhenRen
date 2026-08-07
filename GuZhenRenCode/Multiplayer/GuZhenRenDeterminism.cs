@@ -1,4 +1,7 @@
+using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Models;
 
 namespace GuZhenRen.Multiplayer;
 
@@ -9,6 +12,22 @@ namespace GuZhenRen.Multiplayer;
 /// </summary>
 internal static class GuZhenRenDeterminism
 {
+    /// <summary>
+    /// 战斗卡网络编号由原生多人层同步，可作为同 ID、同转数卡牌的
+    /// 最终稳定排序键。未登记的预览/牌组模型排在已登记战斗卡之后。
+    /// </summary>
+    internal static uint GetCardNetworkId(CardModel card)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+
+        return NetCombatCardDb.Instance.TryGetCardId(
+            card,
+            out uint netId
+        )
+            ? netId
+            : uint.MaxValue;
+    }
+
     internal static Creature[] OrderCreatures(
         IEnumerable<Creature> creatures
     )

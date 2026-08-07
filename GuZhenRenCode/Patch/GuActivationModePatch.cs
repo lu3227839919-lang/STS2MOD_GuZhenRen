@@ -232,6 +232,15 @@ internal static class GuActivationModePatch
             return;
         }
 
+        // ExtraHand 的原生流程会在网络动作真正执行前，先在发起端本地
+        // 把卡牌移入 Hand。上一张牌仍在执行时开始下一次选择，会让该
+        // 本地临时状态被上一动作的 checksum 捕获，而其他端仍在蛊牌堆。
+        if (GuCardPlaySyncPatch.IsCardActionExecuting)
+        {
+            __result = false;
+            return;
+        }
+
         __result = __result &&
             GuActivationModeSystem.CanSelect(holder.CardModel);
 
