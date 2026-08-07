@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 using GuZhenRen.Cards.XueDao;
 using GuZhenRen.Powers.XueDao;
 
@@ -7,32 +5,38 @@ using HarmonyLib;
 
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Hooks;
+using MegaCrit.Sts2.Core.Models;
 
 namespace GuZhenRen.Patches;
 
 /// <summary>
 /// 血道牌完成击杀后获得遗骸。
 ///
-/// 原版 Hook.BeforeCardPlayed / Hook.AfterCardPlayed 是每张牌出牌时
-/// 都会执行的全局钩子。本补丁为“血道效果牌”（血道蛊虫、血道杀招/
-/// 衍生牌）记录出牌前存活敌人，出牌结算后对比死亡的主敌人，生成遗骸。
+/// 原版击杀流程在敌人死亡后立即把尸体移出 CombatState
+/// （CreatureCmd.Kill → combatState.RemoveCreature），因此“出牌前
+/// 快照 + AfterCardPlayed 事后对比”无法检测死亡。本补丁改为在
+/// Hook.AfterDeath（死亡瞬间，尸体仍有效）挂载：血道效果牌
+/// （血道蛊虫、血道杀招/衍生、被寄生的宿主牌）开始结算时记录当前
+/// 活动血道牌，敌人死亡时若存在活动血道牌即生成遗骸，每次出牌系列
+/// 最多 2 张，另有永久牌堆 4 张上限约束总量。
 ///
-/// 被血道寄生的普通宿主牌由 XueJiPower → XueDaoParasiteSystem 的
-/// 寄生路径生成遗骸，这里显式排除，避免同一击杀重复产生。
-/// 流血致死（LiuXuePower）的遗骸来源保持不变。
+/// 流血致死（LiuXuePower，不在出牌结算内）由原路径独立产生遗骸，
+/// 与本补丁互不重复。
 /// </summary>
 internal static class XueDaoRemainsKillPatch
 {
     private const string HarmonyId =
         Entry.ModId + ".XueDaoRemainsKill";
 
-    private static readonly ConditionalWeakTable<
-        Player,
-        uint[]
-    > AliveBeforeByPlayer = new();
+    private const int MaxRemainsPerPlay = 2;
+
+    private static Player? _activePlayer;
+    private static CardModel? _activeCard;
+    private static int _remainsGrantedThisPlay;
 
     private static bool _initialized;
 
@@ -62,6 +66,20 @@ internal static class XueDaoRemainsKillPatch
         harmony.Patch(
             AccessTools.Method(
                 typeof(Hook),
+                nameof(Hook.AfterDeath)
+            ) ?? throw new MissingMethodException(
+                typeof(Hook).FullName,
+                nameof(Hook.AfterDeath)
+            ),
+            postfix: new HarmonyMethod(
+                typeof(XueDaoRemainsKillPatch),
+                nameof(AfterDeathPostfix)
+            )
+        );
+
+        harmony.Patch(
+            AccessTools.Method(
+                typeof(Hook),
                 nameof(Hook.AfterCardPlayed)
             ) ?? throw new MissingMethodException(
                 typeof(Hook).FullName,
@@ -85,6 +103,9 @@ internal static class XueDaoRemainsKillPatch
         }
         finally
         {
+            _activePlayer = null;
+            _activeCard = null;
+            _remainsGrantedThisPlay = 0;
             _initialized = false;
         }
     }
@@ -100,66 +121,68 @@ internal static class XueDaoRemainsKillPatch
             return;
         }
 
-        AliveBeforeByPlayer.Remove(cardPlay.Player);
-        AliveBeforeByPlayer.Add(
-            cardPlay.Player,
-            combatState.HittableEnemies
-                .Where(enemy => enemy.IsAlive)
-                .Select(enemy => enemy.CombatId)
-                .OfType<uint>()
-                .ToArray()
-        );
+        _activePlayer = cardPlay.Player;
+        _activeCard = cardPlay.Card;
+        _remainsGrantedThisPlay = 0;
     }
 
-    private static void AfterCardPlayedPostfix(
+    private static void AfterDeathPostfix(
         ref Task __result,
-        ICombatState combatState,
-        PlayerChoiceContext choiceContext,
-        CardPlay cardPlay
+        ICombatState? combatState,
+        Creature creature
     )
     {
-        __result = AwaitKillRemainsAsync(
+        if (_activePlayer == null ||
+            _activeCard == null ||
+            creature.Side != CombatSide.Enemy)
+        {
+            return;
+        }
+
+        __result = AwaitGrantRemainsOnDeathAsync(
             __result,
-            cardPlay
+            creature
         );
     }
 
-    private static async Task AwaitKillRemainsAsync(
+    private static async Task AwaitGrantRemainsOnDeathAsync(
         Task original,
-        CardPlay cardPlay
+        Creature creature
     )
     {
         await original;
 
-        if (!cardPlay.IsLastInSeries ||
-            !XueDaoPowerSystem.IsXueDaoEffectCard(cardPlay.Card) ||
-            // 寄生宿主由寄生路径（XueJiPower → TriggerFromCardPlayAsync）
-            // 统一生成遗骸，此处跳过避免重复。
-            XueDaoParasiteSystem.HasParasite(cardPlay.Card))
+        if (_activePlayer is not { } owner ||
+            _activeCard == null ||
+            _remainsGrantedThisPlay >= MaxRemainsPerPlay ||
+            creature.Side != CombatSide.Enemy)
         {
             return;
         }
 
-        if (!AliveBeforeByPlayer.TryGetValue(
-                cardPlay.Player,
-                out uint[]? aliveBefore) ||
-            aliveBefore == null)
-        {
-            Entry.Logger.Info(
-                $"[遗骸获取] 血道牌 {cardPlay.Card.Id} 打完但缺少出牌前快照，跳过。"
-            );
-            return;
-        }
-
-        AliveBeforeByPlayer.Remove(cardPlay.Player);
+        _remainsGrantedThisPlay++;
 
         Entry.Logger.Info(
-            $"[遗骸获取] 血道牌 {cardPlay.Card.Id} 击杀检测，出牌前存活 {aliveBefore.Length} 名敌人。"
+            $"[遗骸获取] {owner.NetId} 血道牌击杀 {creature.CombatId}，" +
+            $"本系列已生成 {_remainsGrantedThisPlay}/{MaxRemainsPerPlay} 张遗骸。"
         );
 
-        await XueDaoParasiteSystem.CreateRemainsForNewDeaths(
-            cardPlay.Player,
-            aliveBefore
-        );
+        await XueDaoCardSystem.AddRemains(owner, 1);
+    }
+
+    private static void AfterCardPlayedPostfix(
+        PlayerChoiceContext choiceContext,
+        CardPlay cardPlay
+    )
+    {
+        if (!cardPlay.IsLastInSeries ||
+            !ReferenceEquals(_activeCard, cardPlay.Card))
+        {
+            return;
+        }
+
+        _activePlayer = null;
+        _activeCard = null;
+        _remainsGrantedThisPlay = 0;
     }
 }
