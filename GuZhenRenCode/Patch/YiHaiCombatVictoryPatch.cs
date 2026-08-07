@@ -17,12 +17,14 @@ namespace GuZhenRen.Patches;
 /// <summary>
 /// 战斗胜利后把未消耗的遗骸（YiHai）移入永久牌组。
 ///
-/// 原版 Hook.AfterCombatVictory 在战斗胜利结算时（CombatManager 宿主
-/// 流程）调用，此时战斗卡牌实例仍然有效，且每局只在模拟端执行一次，
-/// CardPileCmd 会把牌堆变更同步给多人客户端。遗骸从手牌/抽牌堆/弃牌堆
-/// 收集（已进入消耗堆的遗骸不算），并按永久牌堆上限
-/// （XueDaoCardSystem.MaxPersistentRemains）截断；未使用的遗骸因此
-/// 保留到永久牌组，与本地化提示一致。
+/// 原版 Hook.AfterCombatEnd 在胜利结算流程（CombatManager 宿主端）中
+/// 于“清空战斗牌堆”（Player.AfterCombatEnd）之前调用，此时战斗卡牌
+/// 实例仍然有效；AfterCombatVictory 则在清空之后触发，届时遗骸已被
+/// 移出战斗牌堆，无法再收集。CardPileCmd 会把牌堆变更同步给多人
+/// 客户端。遗骸从手牌/抽牌堆/弃牌堆收集（已进入消耗堆的遗骸不算，
+/// 永久牌组卡的战斗克隆体 DeckVersion != null 也不算），并按永久
+/// 牌堆上限（XueDaoCardSystem.MaxPersistentRemains）截断；未使用的
+/// 遗骸因此保留到永久牌组，与本地化提示一致。
 /// </summary>
 internal static class YiHaiCombatVictoryPatch
 {
@@ -41,21 +43,21 @@ internal static class YiHaiCombatVictoryPatch
         MethodInfo original =
             AccessTools.Method(
                 typeof(Hook),
-                nameof(Hook.AfterCombatVictory)
+                nameof(Hook.AfterCombatEnd)
             )
             ?? throw new MissingMethodException(
                 typeof(Hook).FullName,
-                nameof(Hook.AfterCombatVictory)
+                nameof(Hook.AfterCombatEnd)
             );
 
         MethodInfo postfix =
             AccessTools.Method(
                 typeof(YiHaiCombatVictoryPatch),
-                nameof(AfterCombatVictoryPostfix)
+                nameof(AfterCombatEndPostfix)
             )
             ?? throw new MissingMethodException(
                 typeof(YiHaiCombatVictoryPatch).FullName,
-                nameof(AfterCombatVictoryPostfix)
+                nameof(AfterCombatEndPostfix)
             );
 
         new Harmony(HarmonyId).Patch(
@@ -79,7 +81,7 @@ internal static class YiHaiCombatVictoryPatch
         }
     }
 
-    private static void AfterCombatVictoryPostfix(
+    private static void AfterCombatEndPostfix(
         ref Task __result,
         IRunState runState,
         CombatRoom room
