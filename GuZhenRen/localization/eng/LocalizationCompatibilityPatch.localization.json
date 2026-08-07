@@ -120,15 +120,15 @@
     },
     "ShiHai1": {
       "title": "Devour Remains 1",
-      "description": "Choose up to 1 Remains in your hand to consume or absorb; see this card's description for the effect."
+      "description": "Choose up to 1 Remains in your hand to consume or absorb; see this card's description for the effect. Remains are gained when a Blood Path Gu card kills an enemy, or when Bleed kills it; unused Remains are kept in your permanent deck after combat."
     },
     "ShiHai2": {
       "title": "Devour Remains 2",
-      "description": "Choose up to 2 Remains in your hand to consume or absorb; see this card's description for the effect."
+      "description": "Choose up to 2 Remains in your hand to consume or absorb; see this card's description for the effect. Remains are gained when a Blood Path Gu card kills an enemy, or when Bleed kills it; unused Remains are kept in your permanent deck after combat."
     },
     "ShiHai3": {
       "title": "Devour Remains 3",
-      "description": "Choose up to 3 Remains in your hand to consume or absorb; see this card's description for the effect."
+      "description": "Choose up to 3 Remains in your hand to consume or absorb; see this card's description for the effect. Remains are gained when a Blood Path Gu card kills an enemy, or when Bleed kills it; unused Remains are kept in your permanent deck after combat."
     }
   },
   "cardDescriptionOverrides": {
@@ -219,7 +219,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_POWER_GUANG_HUI_POWER.description",
-      "text": "A character resource capped at 9. Brilliance does not disappear at end of turn; Light Path cards can gain or spend it."
+      "text": "A character resource capped at 9. Brilliance does not disappear at end of turn; Light Path cards can gain or spend it. Refraction: when the previous standard card you played has a different type, a Light Path card gains 1 Brilliance (up to 3 per turn)."
     },
     {
       "table": "powers",

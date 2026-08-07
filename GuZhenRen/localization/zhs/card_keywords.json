@@ -66,9 +66,9 @@
   "GU_ZHEN_REN_KEYWORD_YAO_HUA9.title": "耀化 9",
   "GU_ZHEN_REN_KEYWORD_YAO_HUA9.description": "光辉不少于9点时，自动消耗9点光辉并触发本牌的耀化效果。",
   "GU_ZHEN_REN_KEYWORD_SHI_HAI1.title": "嗜骸 1",
-  "GU_ZHEN_REN_KEYWORD_SHI_HAI1.description": "本牌可选择至多1张手牌中的遗骸进行消耗或吸收；具体收益见卡牌描述。",
+  "GU_ZHEN_REN_KEYWORD_SHI_HAI1.description": "本牌可选择至多1张手牌中的遗骸进行消耗或吸收；具体收益见卡牌描述。遗骸由血道蛊牌击杀敌人或流血致死时获得；未使用的遗骸在战斗结束后保留至永久牌堆。",
   "GU_ZHEN_REN_KEYWORD_SHI_HAI2.title": "嗜骸 2",
-  "GU_ZHEN_REN_KEYWORD_SHI_HAI2.description": "本牌可选择至多2张手牌中的遗骸进行消耗或吸收；具体收益见卡牌描述。",
+  "GU_ZHEN_REN_KEYWORD_SHI_HAI2.description": "本牌可选择至多2张手牌中的遗骸进行消耗或吸收；具体收益见卡牌描述。遗骸由血道蛊牌击杀敌人或流血致死时获得；未使用的遗骸在战斗结束后保留至永久牌堆。",
   "GU_ZHEN_REN_KEYWORD_SHI_HAI3.title": "嗜骸 3",
-  "GU_ZHEN_REN_KEYWORD_SHI_HAI3.description": "本牌可选择至多3张手牌中的遗骸进行消耗或吸收；具体收益见卡牌描述。"
+  "GU_ZHEN_REN_KEYWORD_SHI_HAI3.description": "本牌可选择至多3张手牌中的遗骸进行消耗或吸收；具体收益见卡牌描述。遗骸由血道蛊牌击杀敌人或流血致死时获得；未使用的遗骸在战斗结束后保留至永久牌堆。"
 }
