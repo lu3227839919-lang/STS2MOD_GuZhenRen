@@ -42,6 +42,28 @@ internal static class XueDaoCardSystem
                 pile.Cards.Count(static card => card is YiHai)
             );
 
+    /// <summary>
+    /// 消耗一张遗骸：先进入消耗堆，若它是永久牌组卡的战斗克隆体
+    /// （DeckVersion 指向永久牌组原件），同步从永久牌组删除原件，
+    /// 确保“消耗即永久消失”，与主动打出遗骸（YiHai.OnPlay）一致。
+    /// </summary>
+    internal static async Task ConsumeRemainCard(
+        PlayerChoiceContext choiceContext,
+        YiHai card
+    )
+    {
+        await CardExhaustCompat.ExhaustAsync(choiceContext, card);
+
+        if (card.DeckVersion is { } deckOriginal &&
+            deckOriginal.Pile?.Type == PileType.Deck)
+        {
+            await CardPileCmd.RemoveFromDeck(
+                deckOriginal,
+                showPreview: false
+            );
+        }
+    }
+
     internal static async Task<int> ConsumeOldestRemains(
         PlayerChoiceContext choiceContext,
         Player owner,
@@ -104,7 +126,7 @@ internal static class XueDaoCardSystem
 
         foreach (YiHai card in remains)
         {
-            await CardExhaustCompat.ExhaustAsync(choiceContext, card);
+            await ConsumeRemainCard(choiceContext, card);
         }
 
         return remains.Length;
@@ -154,7 +176,7 @@ internal static class XueDaoCardSystem
                 // 战斗卡只登记在 CombatState：先脱离战斗牌堆并清 Owner，
                 // 再登记到 RunState，才能通过 CardPileCmd.Add 入永久牌组。
                 card.RemoveFromCurrentPile();
-                card.Owner = null;
+                card.Owner = null!;
                 owner.RunState.AddCard(card, owner);
 
                 CardPileAddResult deckResult =

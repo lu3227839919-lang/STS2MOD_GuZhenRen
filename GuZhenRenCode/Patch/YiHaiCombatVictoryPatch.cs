@@ -179,7 +179,7 @@ internal static class YiHaiCombatVictoryPatch
         foreach (YiHai card in remains)
         {
             card.RemoveFromCurrentPile();
-            card.Owner = null;
+            card.Owner = null!;
             player.RunState.AddCard(card, player);
         }
 

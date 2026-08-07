@@ -72,19 +72,13 @@ public sealed class YiHai : AbstractXueDaoToken
 
         // 遗骸使用后立即消失（进入消耗堆），不可在永久牌堆中复用；
         // 未使用的遗骸作为非消耗牌在战斗结束后保留至永久牌堆。
-        await CardExhaustCompat.ExhaustAsync(choiceContext, this);
-
         // 遗骸若是永久牌组卡的战斗克隆体（DeckVersion 指向 Deck 原件），
-        // 使用后同步从永久牌组删除原件，确保“打出即永久消耗”，
+        // 消耗时同步从永久牌组删除原件，确保“打出即永久消耗”，
         // 与原版 SwipePower/DeprecatedCard 的取骸/移除先例一致。
-        if (DeckVersion is { } deckOriginal &&
-            deckOriginal.Pile?.Type == PileType.Deck)
-        {
-            await CardPileCmd.RemoveFromDeck(
-                deckOriginal,
-                showPreview: false
-            );
-        }
+        await XueDaoCardSystem.ConsumeRemainCard(
+            choiceContext,
+            this
+        );
     }
 
     protected override void OnUpgrade()
