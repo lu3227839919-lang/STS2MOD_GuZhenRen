@@ -269,9 +269,7 @@ public sealed class KongQiaoRelic
             return allowedByBase;
         }
 
-        return GuCardUsageRules.CanActivate(card) &&
-            GuActivationModeSystem
-                .CanResolvePendingActivation(card);
+        return GuCardUsageRules.CanActivate(card);
     }
 
     /// <summary>
@@ -303,21 +301,6 @@ public sealed class KongQiaoRelic
             Entry.Logger.Info(
                 $"[蛊牌催动] {cardPlay.Card.Id} 出牌前已从蛊牌堆补移到 Hand。"
             );
-        }
-
-        bool activatorPlayed =
-            await GuActivationModeSystem
-                .TryAutoPlayReservedActivatorAsync(
-                    cardPlay.Card,
-                    cardPlay.IsAutoPlay
-                );
-
-        if (!activatorPlayed)
-        {
-            string message =
-                $"手牌中没有可支付费用的催动，无法使用 {cardPlay.Card.Id}。";
-            GuActivationModeSystem.Cancel(message);
-            throw new InvalidOperationException(message);
         }
 
         int yuanQiCost = Math.Max(0, guCard.YuanQiCost);

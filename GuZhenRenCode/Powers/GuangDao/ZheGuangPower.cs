@@ -178,10 +178,8 @@ public sealed class ZheGuangPower : ModPowerTemplate
     {
         card = cardPlay.Card;
 
-        // 催动只是选择并自动打出蛊虫的载体。蛊虫的 AfterCardPlayed
-        // 先于外层催动结算；若记录催动本身，会覆盖刚记录的蛊虫类型。
-        if (card is ChuiDong ||
-            !ReferenceEquals(card.Owner, Owner.Player) ||
+        // 记录打出的标准类型牌（攻击/技能/能力），用于折光判定。
+        if (!ReferenceEquals(card.Owner, Owner.Player) ||
             card.Type is not (
                 CardType.Attack or
                 CardType.Skill or

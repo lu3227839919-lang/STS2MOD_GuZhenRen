@@ -4,7 +4,7 @@
   "GU_ZHEN_REN_KEYWORD_XIAN_GU.title": "仙蛊",
   "GU_ZHEN_REN_KEYWORD_XIAN_GU.description": "六转及以上的蛊。整局中，所有玩家的永久牌组里最多只能存在一张同名仙蛊。",
   "GU_ZHEN_REN_KEYWORD_CUI_DONG.title": "催动",
-  "GU_ZHEN_REN_KEYWORD_CUI_DONG.description": "蛊牌必须借助手牌中的“催动”使用。",
+  "GU_ZHEN_REN_KEYWORD_CUI_DONG.description": "蛊虫牌可从蛊手牌直接打出；打完后进入恢复堆冷却。",
   "GU_ZHEN_REN_KEYWORD_HUI_FU.title": "恢复",
   "GU_ZHEN_REN_KEYWORD_HUI_FU.description": "蛊虫催动次数耗尽后进入恢复堆；经过标注回合数后返回蛊牌堆。",
   "GU_ZHEN_REN_KEYWORD_HE_LIAN.title": "合练",

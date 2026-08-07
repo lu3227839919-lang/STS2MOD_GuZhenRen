@@ -35,6 +35,14 @@ public static class GuCardUsageRules
             () => 0
         );
 
+    // 0 表示旧存档或尚未记录；其他值是恢复完成时的回合编号。
+    // 用于恢复完成后按先后顺序给予蛊手牌空位（先恢复完的先上场）。
+    private static readonly SavedAttachedState<CardModel, int>
+        RecoveryCompletedTurnState = new(
+            "gu_zhen_ren.gu_recovery_completed_turn",
+            () => 0
+        );
+
     // 元气可能在 AutoPlay 创建 CardPlay 之前预付。该状态只在当前进程
     // 的一次出牌链中使用，不写入存档；真正的资源数量仍由游戏同步。
     private static readonly ConditionalWeakTable<
@@ -276,6 +284,35 @@ public static class GuCardUsageRules
 
         int readyTurn = RecoveryReadyTurnState[card];
         return readyTurn > 0 && currentTurn >= readyTurn;
+    }
+
+    /// <summary>
+    /// 记录蛊虫恢复完成的回合，用于恢复完成后按先后顺序给予手牌空位。
+    /// 旧存档中无记录的牌视为最早恢复完成（按 0 排序）。
+    /// </summary>
+    public static void MarkRecoveryCompleted(
+        CardModel card,
+        int turnNumber
+    )
+    {
+        ArgumentNullException.ThrowIfNull(card);
+
+        if (card is IGuWormCard)
+        {
+            RecoveryCompletedTurnState[card] = turnNumber;
+        }
+    }
+
+    /// <summary>
+    /// 取得蛊虫恢复完成时的回合编号；未记录或非蛊虫返回 0。
+    /// </summary>
+    public static int GetRecoveryCompletedTurn(CardModel card)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+
+        return card is IGuWormCard
+            ? RecoveryCompletedTurnState[card]
+            : 0;
     }
 
     private static async Task<bool> CommitActivationPaymentCore(

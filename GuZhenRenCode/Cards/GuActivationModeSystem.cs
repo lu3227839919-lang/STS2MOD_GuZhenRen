@@ -1,60 +1,33 @@
-using System.Reflection;
 using System.Runtime.CompilerServices;
 
 using Godot;
 
-using HarmonyLib;
-
-using GuZhenRen.Cards.Basic;
 using GuZhenRen.Multiplayer;
 
-using MegaCrit.Sts2.Core.Combat;
-using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes.Cards.Holders;
 using MegaCrit.Sts2.Core.Nodes.Combat;
-using MegaCrit.Sts2.Core.Nodes.Rooms;
 
 using STS2RitsuLib.CardPiles.Nodes;
 
 namespace GuZhenRen.Cards;
 
 /// <summary>
-/// 管理蛊手牌的直接催动流程。
+/// 管理蛊手牌的直接打出流程。
 ///
-/// 玩家手牌中存在一张可支付费用的“催动”时，可以直接从 RitsuLib
-/// ExtraHand 选择蛊牌并使用原生目标选择。目标确认后，系统自动打出
-/// 预留的“催动”；没有可用催动时，蛊牌保持不可用。
+/// 蛊虫牌位于 RitsuLib ExtraHand（蛊手牌）中，玩家直接点击蛊牌后
+/// 走原生目标选择并直接打出，不再依赖“催动”牌；打出时消耗可用次数
+/// 并支付元气/仙元，随后进入蛊恢复堆冷却。
 /// </summary>
 public static class GuActivationModeSystem
 {
-    private static readonly MethodInfo AnimDisableMethod =
-        AccessTools.DeclaredMethod(
-            typeof(NPlayerHand),
-            "AnimDisable"
-        ) ?? throw new MissingMethodException(
-            typeof(NPlayerHand).FullName,
-            "AnimDisable()"
-        );
-
-    private static readonly MethodInfo AnimEnableMethod =
-        AccessTools.DeclaredMethod(
-            typeof(NPlayerHand),
-            "AnimEnable"
-        ) ?? throw new MissingMethodException(
-            typeof(NPlayerHand).FullName,
-            "AnimEnable()"
-        );
-
     private static readonly object SyncRoot = new();
 
     // 保留 RitsuLib 原始大卡与扇形布局，只把蛊手牌作为普通手牌
-    // 后方的第二层手牌。普通手牌禁用时会向下移动 100 像素，正好
-    // 露出后方蛊手牌，完成催动后再由普通手牌遮住其下半部分。
+    // 后方的第二层手牌。
     private static readonly Vector2 ExtraHandDownOffset =
         new(0f, 200f);
 
@@ -74,44 +47,15 @@ public static class GuActivationModeSystem
         ExtraHandLayoutState
     > ExtraHandLayoutStates = new();
 
-    private static Player? _activePlayer;
-
     // RitsuLib 在开始原生目标选择前，会把额外手牌中的卡牌临时移动到
-    // 后端 PileType.Hand。记录当前被点击的蛊牌，使它在这段短暂窗口中
-    // 仍然通过 CardModel.CanPlay() 检查。
+    // 后端 PileType.Hand。记录当前被点击/结算的蛊牌，使它在这段短暂
+    // 窗口中仍然通过 CardModel.CanPlay() 检查，并防止同一 pending
+    // 蛊牌选择被另一张蛊牌覆盖（0.8.5 多人同步防护）。
     private static CardModel? _pendingCard;
 
-    // 直接点击蛊牌时，预留手牌中将被自动打出的“催动”。
-    // 预留只跨越原生目标选择窗口，不写入存档。
-    private static ChuiDong? _pendingActivator;
-
-    // “催动”改为只能由蛊牌流程自动打出。这个标记仅在
-    // CardCmd.AutoPlay 的同步调用链中开放其 IsPlayable。
-    private static CardModel? _autoPlayingActivator;
-
-    public static bool IsActive
-    {
-        get
-        {
-            lock (SyncRoot)
-            {
-                return _activePlayer != null;
-            }
-        }
-    }
-
-    public static bool IsActiveFor(Player? player)
-    {
-        lock (SyncRoot)
-        {
-            return player != null &&
-                ReferenceEquals(_activePlayer, player);
-        }
-    }
-
     /// <summary>
-    /// 只有本地玩家、资源可支付且手牌中存在可用催动时，
-    /// 当前蛊手牌中的蛊虫才能被点击（UI 选择入口）。
+    /// 只有本地玩家且资源可支付时，当前蛊手牌中的蛊虫才能被点击
+    /// （UI 选择入口）。
     /// </summary>
     public static bool CanSelect(CardModel? card)
     {
@@ -125,8 +69,8 @@ public static class GuActivationModeSystem
         lock (SyncRoot)
         {
             // 一个本地 pending 记录只能对应一个即将同步的出牌动作。
-            // 在它结算并清理前禁止选择另一张蛊牌，避免覆盖预留催动，
-            // 也避免多张 ExtraHand 卡只在发起端提前进入 Hand。
+            // 在它结算并清理前禁止选择另一张蛊牌，也避免多张
+            // ExtraHand 卡只在发起端提前进入 Hand。
             if (_pendingCard != null &&
                 !ReferenceEquals(_pendingCard, card))
             {
@@ -138,13 +82,13 @@ public static class GuActivationModeSystem
     }
 
     /// <summary>
-    /// 判断蛊牌能否通过原生出牌管线。
+    /// 判断蛊牌能否通过原生出牌管线直接打出。
     ///
-    /// 蛊牌仍在自定义牌堆时是 UI 选择入口（仅本地玩家、手牌有可用催动
-    /// 才可选）；蛊牌被 RitsuLib 移入原版 Hand 后进入出牌校验阶段——
-    /// 该阶段由同步的 PlayCardAction 在各端执行，不能依赖只存在于发起端
-    /// （房主）的本地 pending 记录，也不能因“不是本端玩家的牌”而拒绝，
-    /// 否则客户端会直接跳过蛊牌结算，造成主客机状态分叉。
+    /// 蛊牌仍在自定义牌堆时是 UI 选择入口；蛊牌被 RitsuLib 移入原版
+    /// Hand 后进入出牌校验阶段——该阶段由同步的 PlayCardAction 在各端
+    /// 执行，不能依赖只存在于发起端（房主）的本地 pending 记录，也不
+    /// 能因“不是本端玩家的牌”而拒绝，否则客户端会直接跳过蛊牌结算，
+    /// 造成主客机状态分叉。
     /// </summary>
     public static bool CanPlay(CardModel? card)
     {
@@ -163,43 +107,17 @@ public static class GuActivationModeSystem
             return false;
         }
 
-        Player owner = card.Owner;
-
-        // 蛊手牌中的牌只有在普通手牌里存在一张当前可支付费用的
-        // “催动”时才显示为可用；玩家直接点击蛊牌，不再先进入模式。
-        // 本方法同时被 UI（CanSelect 已单独校验 IsMine）与各端同步的
-        // 出牌动作执行使用，后者不能因“不是本端玩家的牌”拒绝。
-        if (card.Pile?.Type == GuCardPileSystem.PileType)
+        if (card.Pile?.Type != GuCardPileSystem.PileType &&
+            card.Pile?.Type != PileType.Hand)
         {
-            bool available = FindAvailableActivator(owner) != null;
-            if (!available)
-            {
-                LogCanPlayRejection(card, "蛊牌堆中无可用催动");
-            }
-
-            return available;
+            LogCanPlayRejection(
+                card,
+                $"不在可打出位置（当前牌堆 {card.Pile?.Type}）"
+            );
+            return false;
         }
 
-        // RitsuLib 开始原生目标选择时会把被点击的蛊牌临时移入 Hand。
-        // 这段窗口同时服务房主（本地 pending）与客户端（同步出牌动作，
-        // 没有 pending、且卡牌不属于本端玩家），统一按“手牌存在可用
-        // 催动”放行。
-        if (card.Pile?.Type == PileType.Hand)
-        {
-            bool available = FindAvailableActivator(owner) != null;
-            if (!available)
-            {
-                LogCanPlayRejection(card, "Hand 中无可用催动");
-            }
-
-            return available;
-        }
-
-        LogCanPlayRejection(
-            card,
-            $"不在可打出位置（当前牌堆 {card.Pile?.Type}）"
-        );
-        return false;
+        return true;
     }
 
     private static readonly object LogLock = new();
@@ -241,213 +159,28 @@ public static class GuActivationModeSystem
         }
 
         Entry.Logger.Warn(
-            $"[蛊牌催动] {card.Id} 不可打出：{reason}。" +
+            $"[蛊牌] {card.Id} 不可打出：{reason}。" +
             $"pile={card.Pile?.Type}, pending={pendingId}, " +
             $"isMine={LocalContext.IsMine(card)}。"
         );
     }
 
-    internal static void PrepareTargeting(CardModel card)
+    /// <summary>
+    /// 玩家点击蛊牌开始原生目标选择时记录该蛊牌，防止同一 pending
+    /// 选择被另一张蛊牌覆盖。
+    /// </summary>
+    internal static void MarkGuCardSelected(CardModel card)
     {
         ArgumentNullException.ThrowIfNull(card);
-
-        ChuiDong? activator = FindAvailableActivator(card.Owner);
 
         lock (SyncRoot)
         {
             _pendingCard = card;
-            _pendingActivator = activator;
         }
 
         Entry.Logger.Info(
-            $"[蛊牌催动] 已选择蛊牌 {card.Id}，等待目标确认；" +
-            $"预留催动={activator?.Id.ToString() ?? "无"}。"
+            $"[蛊牌] 已选择蛊牌 {card.Id}，等待目标确认。"
         );
-    }
-
-    /// <summary>
-    /// 蛊牌正式开始结算时，自动支付并打出目标选择前预留的“催动”。
-    ///
-    /// 发起端（房主）使用本地预留的催动；客户端执行同一同步出牌动作时
-    /// 没有 pending 记录，直接查找手牌中可用的催动并打出，保证两端对
-    /// 催动与能量的消耗一致。脚本 AutoPlay（isAutoPlay=true）不消费
-    /// 催动牌。
-    /// </summary>
-    internal static async Task<bool>
-        TryAutoPlayReservedActivatorAsync(
-            CardModel guCard,
-            bool isAutoPlay
-        )
-    {
-        ArgumentNullException.ThrowIfNull(guCard);
-
-        ChuiDong? activator;
-        bool hasPending;
-        lock (SyncRoot)
-        {
-            hasPending = ReferenceEquals(_pendingCard, guCard);
-            activator = hasPending ? _pendingActivator : null;
-        }
-
-        Player owner = guCard.Owner;
-        if (!hasPending)
-        {
-            if (isAutoPlay)
-            {
-                // 没有经过 ExtraHand 直接选择的脚本入口沿用原有行为：
-                // 不自动打出催动。
-                return true;
-            }
-
-            // 客户端执行同步的蛊牌出牌动作：本地没有 pending 记录，
-            // 直接查找手牌中可用的催动，保证与发起端消耗一致。
-            activator = FindAvailableActivator(owner);
-            if (activator == null)
-            {
-                Entry.Logger.Warn(
-                    $"[蛊牌催动] {guCard.Id} 出牌时本端未找到可用催动；" +
-                    $"pile={guCard.Pile?.Type}, isAutoPlay={isAutoPlay}。"
-                );
-                return false;
-            }
-        }
-        else if (!IsActivatorAvailable(activator, owner))
-        {
-            // 目标选择期间预留催动失效（被弃置/打出等），回退到当前
-            // 手牌中可用的催动，避免对已离手的卡牌执行 AutoPlay。
-            activator = FindAvailableActivator(owner);
-            if (activator == null)
-            {
-                ClearPendingActivation(guCard);
-                return false;
-            }
-        }
-
-        if (activator == null ||
-            owner.PlayerCombatState == null)
-        {
-            ClearPendingActivation(guCard);
-            return false;
-        }
-
-        int energyCost = GetActivatorEnergyCost(activator);
-        if (owner.PlayerCombatState.Energy < energyCost)
-        {
-            ClearPendingActivation(guCard);
-            return false;
-        }
-
-        if (energyCost > 0)
-        {
-            await activator.SpendEnergy(energyCost);
-        }
-
-        lock (SyncRoot)
-        {
-            _autoPlayingActivator = activator;
-        }
-
-        try
-        {
-            await CardCmd.AutoPlay(
-                new BlockingPlayerChoiceContext(),
-                activator,
-                owner.Creature,
-                skipXCapture: false
-            );
-
-            Entry.Logger.Info(
-                $"[蛊牌催动] 打出 {guCard.Id} 时已自动打出 " +
-                $"{activator.Id}，能量费用={energyCost}，" +
-                $"pending={hasPending}。"
-            );
-            return true;
-        }
-        finally
-        {
-            lock (SyncRoot)
-            {
-                if (ReferenceEquals(
-                        _autoPlayingActivator,
-                        activator
-                    ))
-                {
-                    _autoPlayingActivator = null;
-                }
-            }
-
-            ClearPendingActivation(guCard);
-        }
-    }
-
-    internal static bool IsAutoPlayingActivator(CardModel? card)
-    {
-        lock (SyncRoot)
-        {
-            return card != null &&
-                ReferenceEquals(_autoPlayingActivator, card);
-        }
-    }
-
-    /// <summary>
-    /// ShouldPlay 阶段再次确认目标选择前预留的催动仍然可用。
-    /// 脚本 AutoPlay 没有 pending 记录，继续沿用原有入口。
-    /// </summary>
-    internal static bool CanResolvePendingActivation(CardModel card)
-    {
-        ArgumentNullException.ThrowIfNull(card);
-
-        ChuiDong? activator;
-        lock (SyncRoot)
-        {
-            if (!ReferenceEquals(_pendingCard, card))
-            {
-                return true;
-            }
-
-            activator = _pendingActivator;
-        }
-
-        return IsActivatorAvailable(activator, card.Owner) ||
-            FindAvailableActivator(card.Owner) != null;
-    }
-
-    private static ChuiDong? FindAvailableActivator(Player owner)
-    {
-        return owner.PlayerCombatState?.Hand.Cards
-            .OfType<ChuiDong>()
-            .Where(card => IsActivatorAvailable(card, owner))
-            .OrderBy(GetActivatorEnergyCost)
-            .ThenBy(GuZhenRenDeterminism.GetCardNetworkId)
-            .FirstOrDefault();
-    }
-
-    private static bool IsActivatorAvailable(
-        ChuiDong? activator,
-        Player owner
-    )
-    {
-        return activator != null &&
-            !activator.IsCanonical &&
-            ReferenceEquals(activator.Owner, owner) &&
-            activator.Pile?.Type == PileType.Hand &&
-            owner.PlayerCombatState != null &&
-            owner.PlayerCombatState.Energy >=
-                GetActivatorEnergyCost(activator);
-    }
-
-    private static int GetActivatorEnergyCost(
-        ChuiDong activator
-    )
-    {
-        return activator.EnergyCost.CostsX
-            ? 0
-            : Math.Max(
-                0,
-                activator.EnergyCost.GetWithModifiers(
-                    CostModifiers.All
-                )
-            );
     }
 
     private static void ClearPendingActivation(CardModel card)
@@ -460,100 +193,42 @@ public static class GuActivationModeSystem
             }
 
             _pendingCard = null;
-            _pendingActivator = null;
         }
-    }
-
-    public static bool Begin(Player player)
-    {
-        ArgumentNullException.ThrowIfNull(player);
-
-        if (!LocalContext.IsMe(player) ||
-            player.PlayerCombatState == null ||
-            !GuCardPileSystem.PileType
-                .GetPile(player)
-                .Cards
-                .Any(CanBeginWith))
-        {
-            return false;
-        }
-
-        lock (SyncRoot)
-        {
-            if (_activePlayer != null)
-            {
-                return false;
-            }
-
-            _activePlayer = player;
-            _pendingCard = null;
-            _pendingActivator = null;
-        }
-
-        Entry.Logger.Info(
-            "[催动模式] 蛊手牌已激活；普通手牌暂时禁用。"
-        );
-
-        // 延迟到“催动”本身完成离手后再更新手牌动画和控制器焦点，
-        // 避免与当前卡牌的回手/弃置动画争用 holder。
-        Callable.From(ApplyActiveUi).CallDeferred();
-        return true;
     }
 
     /// <summary>
-    /// 蛊牌已经通过原生目标选择并正式开始结算时结束模式。
+    /// 蛊牌已经通过原生目标选择并正式开始结算时清理 pending 记录。
     /// </summary>
     public static void CompleteActivation(CardModel card)
     {
         ArgumentNullException.ThrowIfNull(card);
 
         ClearPendingActivation(card);
-
-        if (IsActiveFor(card.Owner))
-        {
-            End(
-                "[催动模式] 已选择蛊牌并确认目标，恢复普通手牌。"
-            );
-        }
     }
 
     public static void Cancel(string reason)
     {
-        bool hadActiveMode;
         bool hadPendingActivation;
 
         lock (SyncRoot)
         {
-            hadActiveMode = _activePlayer != null;
             hadPendingActivation = _pendingCard != null;
-
-            _activePlayer = null;
             _pendingCard = null;
-            _pendingActivator = null;
-            _autoPlayingActivator = null;
         }
 
-        if (!hadActiveMode && !hadPendingActivation)
+        if (!hadPendingActivation)
         {
             return;
         }
 
-        Entry.Logger.Info($"[蛊牌催动] 已取消：{reason}");
-
-        if (hadActiveMode)
-        {
-            RestoreNormalHandUi();
-        }
+        Entry.Logger.Info($"[蛊牌] 已取消：{reason}");
     }
 
     public static void ResetWithoutUi()
     {
         lock (SyncRoot)
         {
-            _activePlayer = null;
             _pendingCard = null;
-            _pendingActivator = null;
-            _autoPlayingActivator = null;
         }
     }
 
@@ -637,142 +312,5 @@ public static class GuActivationModeSystem
         }
 
         return zIndex;
-    }
-
-    internal static bool ShouldBlockNormalHand() => IsActive;
-
-    internal static void CancelIfPlayerActionsDisabled()
-    {
-        if (CombatManager.Instance.PlayerActionsDisabled)
-        {
-            Cancel("玩家操作阶段已经结束。");
-        }
-    }
-
-    private static bool CanBeginWith(CardModel card) =>
-        card is IGuWormCard && GuCardUsageRules.CanActivate(card);
-
-    private static void End(string logMessage)
-    {
-        lock (SyncRoot)
-        {
-            _activePlayer = null;
-            _pendingCard = null;
-            _pendingActivator = null;
-            _autoPlayingActivator = null;
-        }
-
-        Entry.Logger.Info(logMessage);
-        RestoreNormalHandUi();
-    }
-
-    private static void ApplyActiveUi()
-    {
-        if (!IsActive)
-        {
-            return;
-        }
-
-        NPlayerHand? hand = NPlayerHand.Instance;
-        if (hand != null && GodotObject.IsInstanceValid(hand))
-        {
-            AnimDisableMethod.Invoke(hand, null);
-        }
-
-        RefreshExtraHandLayout();
-        FocusFirstSelectableGuCard();
-    }
-
-    private static void RestoreNormalHandUi()
-    {
-        NPlayerHand? hand = NPlayerHand.Instance;
-        if (hand == null || !GodotObject.IsInstanceValid(hand))
-        {
-            return;
-        }
-
-        // 敌方回合、战斗结束或动作锁定期间，由原版状态机决定何时重新
-        // 启用手牌；此处强行 AnimEnable 会造成错误的可操作外观。
-        if (CombatManager.Instance.PlayerActionsDisabled ||
-            CombatManager.Instance.IsOverOrEnding)
-        {
-            return;
-        }
-
-        AnimEnableMethod.Invoke(hand, null);
-        RefreshExtraHandLayout();
-    }
-
-    private static void RefreshExtraHandLayout()
-    {
-        NCombatRoom? room = NCombatRoom.Instance;
-        if (room == null || !GodotObject.IsInstanceValid(room))
-        {
-            return;
-        }
-
-        foreach (Node node in EnumerateDescendants(room))
-        {
-            if (node is NModExtraHand extraHand &&
-                extraHand.Definition.PileType ==
-                    GuCardPileSystem.PileType)
-            {
-                UpdateExtraHandLayout(extraHand);
-            }
-        }
-    }
-
-    private static void FocusFirstSelectableGuCard()
-    {
-        NCombatRoom? room = NCombatRoom.Instance;
-        if (room == null || !GodotObject.IsInstanceValid(room))
-        {
-            return;
-        }
-
-        foreach (Node node in EnumerateDescendants(room))
-        {
-            if (node is not NModExtraHand extraHand ||
-                extraHand.Definition.PileType != GuCardPileSystem.PileType)
-            {
-                continue;
-            }
-
-            CardModel? first = GuCardPileSystem.PileType
-                .GetPile(_activePlayer!)
-                .Cards
-                .FirstOrDefault(CanSelect);
-
-            NHandCardHolder? holder =
-                first == null ? null : extraHand.GetHolder(first);
-
-            if (holder != null && GodotObject.IsInstanceValid(holder))
-            {
-                holder.GrabFocus();
-            }
-
-            return;
-        }
-    }
-
-    private static IEnumerable<Node> EnumerateDescendants(Node root)
-    {
-        Stack<Node> pending = new();
-
-        foreach (Node child in root.GetChildren())
-        {
-            pending.Push(child);
-        }
-
-        while (pending.Count > 0)
-        {
-            Node current = pending.Pop();
-            yield return current;
-
-            foreach (Node child in current.GetChildren())
-            {
-                pending.Push(child);
-            }
-        }
     }
 }

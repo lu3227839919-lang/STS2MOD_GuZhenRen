@@ -33,8 +33,6 @@
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_STRIKE.description": "造成 {Damage:diff()} 点伤害。",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.title": "防御",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.description": "获得 {Block:diff()} 点格挡。",
-  "GU_ZHEN_REN_CARD_CHUI_DONG.title": "催动",
-  "GU_ZHEN_REN_CARD_CHUI_DONG.description": "从蛊手牌选择一张可催动蛊虫并指定目标。",
   "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.title": "青提仙元",
   "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description": "仙元，保留。提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗。",
   "GU_ZHEN_REN_CARD_HONG_ZAO_XIAN_YUAN.title": "红枣仙元",

@@ -53,9 +53,6 @@ public static class GuCardPileSystem
     private const string OpeningDrawRngStreamId =
         "gu_pile/opening_draw";
 
-    private const string RecoveredDrawRngStreamId =
-        "gu_pile/recovered_draw";
-
     /// <summary>The runtime pile type assigned by RitsuLib.</summary>
     public static PileType PileType { get; private set; }
 
@@ -610,6 +607,10 @@ public static class GuCardPileSystem
         foreach (CardModel card in recoveredCards)
         {
             GuCardUsageRules.ResetUses(card);
+            GuCardUsageRules.MarkRecoveryCompleted(
+                card,
+                turnNumber
+            );
             await GuRecoveryEffectSystem.HandleRecoveredAsync(card);
         }
 
@@ -627,12 +628,16 @@ public static class GuCardPileSystem
             return;
         }
 
-        CardModel[] drawnCards = DrawRandomGuCards(
-            owner,
-            readyCards,
-            availableSlots,
-            RecoveredDrawRngStreamId
-        );
+        // 不再随机抽取：按恢复完成回合先后给予空位（先恢复完的先上场）。
+        // 同一回合恢复的多张蛊用网络卡牌 ID 稳定定序，保证跨端一致。
+        CardModel[] drawnCards = readyCards
+            .OrderBy(
+                card =>
+                    GuCardUsageRules.GetRecoveryCompletedTurn(card)
+            )
+            .ThenBy(GuZhenRenDeterminism.GetCardNetworkId)
+            .Take(availableSlots)
+            .ToArray();
 
         await CardPileCmd.Add(
             drawnCards,

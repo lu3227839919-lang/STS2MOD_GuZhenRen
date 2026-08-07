@@ -8,7 +8,7 @@
     },
     "CuiDong": {
       "title": "Activation",
-      "description": "A Gu card must be used with an Activation card in hand."
+      "description": "Gu cards can be played directly from the Gu Hand; they enter the recovery pile after use."
     },
     "HuiFu": {
       "title": "Recovery",
@@ -173,7 +173,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "Stores up to 5 currently usable Gu Worms. When space is available, recovered Gu are drawn at random from the Gu Recovery Pile. Killer Move deduction can use only materials in this pile."
+      "text": "Stores up to 5 currently usable Gu Worms. When space is available, recovered Gu are drawn in recovery order from the Gu Recovery Pile. Killer Move deduction can use only materials in this pile."
     },
     {
       "table": "static_hover_tips",

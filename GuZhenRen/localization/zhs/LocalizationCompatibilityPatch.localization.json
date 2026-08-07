@@ -8,7 +8,7 @@
     },
     "CuiDong": {
       "title": "催动",
-      "description": "蛊牌必须借助手牌中的“催动”使用。"
+      "description": "蛊虫牌可从蛊手牌直接打出；打完后进入恢复堆冷却。"
     },
     "HuiFu": {
       "title": "恢复",
@@ -173,12 +173,12 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "存放当前可催动的蛊虫牌，最多5张。存在空位时，会从蛊恢复堆中随机抽取已经恢复的蛊。杀招推演只可使用本牌堆中的材料。"
+      "text": "存放当前可用的蛊虫牌，最多5张。存在空位时，会从蛊恢复堆中按恢复顺序抽取已经恢复的蛊。杀招推演只可使用本牌堆中的材料。"
     },
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.empty",
-      "text": "蛊存放牌堆中没有可催动的蛊虫。"
+      "text": "蛊存放牌堆中没有可用的蛊虫。"
     },
     {
       "table": "static_hover_tips",

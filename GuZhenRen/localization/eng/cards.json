@@ -33,8 +33,6 @@
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_STRIKE.description": "Deal {Damage:diff()} damage.",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.title": "Defend",
   "GU_ZHEN_REN_CARD_GU_ZHEN_REN_DEFEND.description": "Gain {Block:diff()} Block.",
-  "GU_ZHEN_REN_CARD_CHUI_DONG.title": "Activate",
-  "GU_ZHEN_REN_CARD_CHUI_DONG.description": "Enter activation mode: choose an activatable Gu from the Gu Hand and pick a target. Press Back to cancel.",
   "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.title": "Green Grape Immortal Essence",
   "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description": "Immortal essence, Retain. Provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhausts when depleted.",
   "GU_ZHEN_REN_CARD_HONG_ZAO_XIAN_YUAN.title": "Red Date Immortal Essence",
