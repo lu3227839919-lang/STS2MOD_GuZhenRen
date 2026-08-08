@@ -59,6 +59,20 @@ internal static class GuCardPileCombatPatch
             );
         }
 
+        MethodInfo? startCombat =
+            AccessTools.DeclaredMethod(
+                typeof(NetCombatCardDb),
+                nameof(NetCombatCardDb.StartCombat),
+                [typeof(IReadOnlyList<Player>)]
+            );
+
+        if (startCombat == null)
+        {
+            throw new MissingMethodException(
+                "NetCombatCardDb.StartCombat was not found."
+            );
+        }
+
         MethodInfo? drawInternal =
             AccessTools.DeclaredMethod(
                 typeof(CardPileCmd),
@@ -96,6 +110,14 @@ internal static class GuCardPileCombatPatch
             postfix: new HarmonyMethod(
                 typeof(GuCardPileCombatPatch),
                 nameof(PopulateCombatStatePostfix)
+            )
+        );
+
+        harmony.Patch(
+            startCombat,
+            postfix: new HarmonyMethod(
+                typeof(GuCardPileCombatPatch),
+                nameof(NetCombatCardDbStartCombatPostfix)
             )
         );
 
@@ -163,7 +185,32 @@ internal static class GuCardPileCombatPatch
     )
     {
         ReconcileCombatCardRanks(__instance, __state);
-        GuCardPileSystem.InitializeGuCardsForCombat(__instance);
+    }
+
+    /// <summary>
+    /// 必须等原生 NetCombatCardDb 为全部战斗克隆建立编号后，再规范化
+    /// 重复蛊牌并搬入自定义牌堆。旧时序在编号建立前就按无效的
+    /// uint.MaxValue 排序，导致同一网络编号在两端携带不同转数。
+    /// </summary>
+    private static void NetCombatCardDbStartCombatPostfix(
+        IReadOnlyList<Player> players
+    )
+    {
+        foreach (Player player in players)
+        {
+            int canonicalizedCount =
+                GuZhenRenDeterminism.CanonicalizeCombatGuRanks(player);
+            if (canonicalizedCount > 0)
+            {
+                Entry.Logger.Info(
+                    $"[蛊虫转数] 网络编号建立后已将 " +
+                    $"{canonicalizedCount} 张同名战斗蛊牌的转数" +
+                    "规范到稳定网络实例。"
+                );
+            }
+
+            GuCardPileSystem.InitializeGuCardsForCombat(player);
+        }
     }
 
     /// <summary>

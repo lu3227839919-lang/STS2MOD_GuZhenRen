@@ -15,7 +15,7 @@ namespace GuZhenRen.Multiplayer;
 /// </summary>
 internal static class GuZhenRenDeterminism
 {
-    private readonly record struct GuDeckIdentity(
+    private readonly record struct GuCardIdentity(
         string CardId,
         int UpgradeLevel,
         string EnchantmentId
@@ -73,22 +73,63 @@ internal static class GuZhenRenDeterminism
     {
         ArgumentNullException.ThrowIfNull(player);
 
+        return CanonicalizeGuRanks(
+            player.Deck.Cards,
+            static card =>
+            {
+                int deckIndex = GetDeckCardIndex(card);
+                return deckIndex == int.MaxValue
+                    ? null
+                    : (ulong)deckIndex;
+            }
+        );
+    }
+
+    /// <summary>
+    /// NetCombatCardDb 建立编号后，以真正写入出牌协议的网络编号重新
+    /// 规范化战斗克隆体。永久牌组槽位在两端相同仍不足以保证自定义
+    /// 牌堆搬移前后的克隆实例相同，网络编号才是战斗内最终身份。
+    /// </summary>
+    internal static int CanonicalizeCombatGuRanks(Player player)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+
+        if (player.PlayerCombatState == null)
+        {
+            return 0;
+        }
+
+        return CanonicalizeGuRanks(
+            player.PlayerCombatState.AllCards,
+            static card =>
+            {
+                uint networkId = GetCardNetworkId(card);
+                return networkId == uint.MaxValue
+                    ? null
+                    : networkId;
+            }
+        );
+    }
+
+    private static int CanonicalizeGuRanks(
+        IEnumerable<CardModel> candidates,
+        Func<CardModel, ulong?> getStableIdentity
+    )
+    {
         Dictionary<
-            GuDeckIdentity,
+            GuCardIdentity,
             List<AbstractGuZhenRenCard>
         > groups = [];
 
-        // Deck.Cards 本身就是 NetDeckCard 使用的协议顺序；保持此插入
-        // 顺序，后续即可直接把排序后的转数写回固定槽位。
-        foreach (CardModel deckCard in player.Deck.Cards)
+        foreach (CardModel candidate in candidates)
         {
-            if (deckCard is not AbstractGuZhenRenCard guCard ||
+            if (candidate is not AbstractGuZhenRenCard guCard ||
                 guCard is not IGuWormCard)
             {
                 continue;
             }
 
-            GuDeckIdentity identity = new(
+            GuCardIdentity identity = new(
                 guCard.Id.ToString(),
                 guCard.CurrentUpgradeLevel,
                 guCard.Enchantment?.Id.ToString() ?? string.Empty
@@ -113,14 +154,39 @@ internal static class GuZhenRenDeterminism
                 continue;
             }
 
-            int[] canonicalRanks = cards
+            var identifiedCards = cards
+                .Select(card => new
+                {
+                    Card = card,
+                    StableIdentity = getStableIdentity(card),
+                })
+                .ToArray();
+
+            // 身份缺失或重复时不能继承本地枚举顺序，否则修复本身也会
+            // 制造不同步。正常的 DeckIndex/NetCombatCard ID 均唯一。
+            if (identifiedCards.Any(static item =>
+                    item.StableIdentity == null
+                ) ||
+                identifiedCards
+                    .Select(static item => item.StableIdentity)
+                    .Distinct()
+                    .Count() != identifiedCards.Length)
+            {
+                continue;
+            }
+
+            AbstractGuZhenRenCard[] orderedCards = identifiedCards
+                .OrderBy(static item => item.StableIdentity!.Value)
+                .Select(static item => item.Card)
+                .ToArray();
+            int[] canonicalRanks = orderedCards
                 .Select(static card => card.GuRank)
                 .OrderByDescending(static rank => rank)
                 .ToArray();
 
-            for (int index = 0; index < cards.Count; index++)
+            for (int index = 0; index < orderedCards.Length; index++)
             {
-                AbstractGuZhenRenCard card = cards[index];
+                AbstractGuZhenRenCard card = orderedCards[index];
                 int canonicalRank = canonicalRanks[index];
                 if (card.GuRank == canonicalRank)
                 {
