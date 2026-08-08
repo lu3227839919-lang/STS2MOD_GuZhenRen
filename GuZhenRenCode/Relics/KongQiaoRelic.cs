@@ -304,15 +304,20 @@ public sealed class KongQiaoRelic
         }
 
         int yuanQiCost = Math.Max(0, guCard.YuanQiCost);
+        bool freeByBrilliantScarf =
+            GuCardUsageRules.IsBrilliantScarfFreePlay(cardPlay.Card);
         bool paidByNativePipeline =
             yuanQiCost == 0 ||
+            freeByBrilliantScarf ||
             (
                 cardPlay.TryGetSecondaryResources(out var ledger) &&
                 ledger.Spent(YuanQiSystem.ResourceId) >= yuanQiCost
             );
 
         // ExtraHand 手动出牌会由 RitsuLib 的次级资源管线自动支付元气。
-        // 只有没有支付记录的旧 AutoPlay/脚本入口才由模组补付，避免双重扣费。
+        // 艳丽围巾的第 5 张免费由次级资源费用钩子把元气降为 0；
+        // 这里把它视为已支付，避免旧入口的兜底逻辑再次扣除元气。
+        // 只有没有支付记录的旧 AutoPlay/脚本入口才由模组补付。
         if (!paidByNativePipeline &&
             !await GuCardUsageRules
                 .EnsureActivationPayment(cardPlay.Card))
@@ -339,6 +344,32 @@ public sealed class KongQiaoRelic
 
         GuCardUsageRules.RegisterActivation(cardPlay.Card);
         GuActivationModeSystem.CompleteActivation(cardPlay.Card);
+    }
+
+    /// <summary>
+    /// 兼容先古之民遗物“艳丽围巾”：当其第 5 张牌免费效果已准备好时，
+    /// 同步把蛊牌的元气费用降为 0。只修改元气，不改变其他次级资源，
+    /// 也不接管艳丽围巾自身的出牌计数。
+    /// </summary>
+    public decimal ModifySecondaryResourceCostLate(
+        SecondaryResourceCostContext context,
+        decimal cost
+    )
+    {
+        if (!ReferenceEquals(context.Player, Owner) ||
+            context.Card is not IGuWormCard ||
+            !string.Equals(
+                context.Definition.Id,
+                YuanQiSystem.ResourceId,
+                StringComparison.OrdinalIgnoreCase
+            ))
+        {
+            return cost;
+        }
+
+        return GuCardUsageRules.IsBrilliantScarfFreePlay(context.Card)
+            ? 0m
+            : cost;
     }
 
     /// <summary>

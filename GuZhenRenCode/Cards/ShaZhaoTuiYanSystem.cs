@@ -257,12 +257,20 @@ internal static class ShaZhaoTuiYanSystem
 
         CardModel[] targetPreviews = craftableResultTypes
             .Select(resultType =>
-                ModelDb
-                    .CardPool<GuZhenRenShaZhaoCardPool>()
-                    .AllCards
-                    .Single(card => card.GetType() == resultType)
-                    .ToMutable()
-            )
+            {
+                CardModel preview =
+                    ModelDb
+                        .CardPool<GuZhenRenShaZhaoCardPool>()
+                        .AllCards
+                        .Single(card => card.GetType() == resultType)
+                        .ToMutable();
+
+                // NSimpleCardSelectScreen 在战斗中会从第一张候选牌的 Owner
+                // 初始化战斗牌堆。卡池模板的 ToMutable() 不会自动绑定玩家，
+                // 因此所有用于战斗选卡的预览牌都必须显式设置 Owner。
+                preview.Owner = player;
+                return preview;
+            })
             .ToArray();
 
         LocString targetPrompt = new(

@@ -148,12 +148,20 @@ public sealed class GuHeLianRestSiteOption
 
         CardModel[] targetPreviews = craftableResultTypes
             .Select(resultType =>
-                ModelDb
-                    .CardPool<GuZhenRenGuCardPool>()
-                    .AllCards
-                    .Single(card => card.GetType() == resultType)
-                    .ToMutable()
-            )
+            {
+                CardModel preview =
+                    ModelDb
+                        .CardPool<GuZhenRenGuCardPool>()
+                        .AllCards
+                        .Single(card => card.GetType() == resultType)
+                        .ToMutable();
+
+                // 保持所有进入 FromSimpleGrid 的预览牌都有明确玩家归属。
+                // 休息点当前不初始化战斗牌堆，但显式 Owner 可避免界面实现
+                // 或调用时机变化后再次出现无 Owner 的预览模型。
+                preview.Owner = Owner;
+                return preview;
+            })
             .ToArray();
 
         CardModel? target =

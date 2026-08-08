@@ -69,6 +69,11 @@ public sealed class DaoChiXueFuGu : AbstractGuWormCard
                 false
             );
 
+        // 这些预览不会登记进 CombatState，但战斗中的简单选卡界面会从
+        // 候选牌 Owner 初始化战斗牌堆，因此必须保留当前玩家归属。
+        normalPreview.Owner = Owner;
+        swarmPreview.Owner = Owner;
+
         CardModel? selected = (await CardSelectCmd.FromSimpleGrid(
             choiceContext,
             [normalPreview, swarmPreview],

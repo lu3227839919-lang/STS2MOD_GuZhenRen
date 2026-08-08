@@ -3,7 +3,10 @@ using System.Runtime.CompilerServices;
 using GuZhenRen.Cards.ImmortalEssence;
 using GuZhenRen.Combat;
 
+using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Relics;
 
 using STS2RitsuLib.Combat.SecondaryResources;
 using STS2RitsuLib.Utils;
@@ -178,12 +181,40 @@ public static class GuCardUsageRules
         IGuWormCard guCard
     )
     {
+        // 艳丽围巾在第 5 张牌前会进入 Active 状态。原版只把原生
+        // 能量费用降为 0；蛊牌的元气属于 RitsuLib 次级资源，因此
+        // 这里同步把本次催动视为无需元气，避免在出牌前被资源检查拦截。
+        if (IsBrilliantScarfFreePlay(card))
+        {
+            return true;
+        }
+
         int cost = Math.Max(0, guCard.YuanQiCost);
         return cost == 0 ||
             SecondaryResourceCmd.Get(
                 card.Owner,
                 YuanQiSystem.ResourceId
             ) >= cost;
+    }
+
+    /// <summary>
+    /// 艳丽围巾已准备令下一张（第 5 张）牌免费时，蛊牌的元气费用
+    /// 也应同步免费。蛊牌仍由原版 BrilliantScarf.AfterCardPlayed
+    /// 正常计入出牌次数，本方法不修改计数。
+    /// </summary>
+    internal static bool IsBrilliantScarfFreePlay(CardModel card)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+
+        if (!CombatManager.Instance.IsInProgress || card.IsCanonical)
+        {
+            return false;
+        }
+
+        return card.Owner.Relics.Any(relic =>
+            relic is BrilliantScarf &&
+            relic.Status == RelicStatus.Active
+        );
     }
 
     /// <summary>
