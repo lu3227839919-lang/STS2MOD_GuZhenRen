@@ -299,6 +299,7 @@ public abstract class AbstractXuYingCard
         CanonicalKeywords =>
         [
             GuZhenRenKeywords.XuYing,
+            CardKeyword.Retain,
         ];
 
     /// <summary>
