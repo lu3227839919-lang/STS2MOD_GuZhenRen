@@ -814,6 +814,10 @@ public static class ApertureSystem
     {
         try
         {
+            // 旧存档可能已经把同名蛊牌的转数挂在不同槽位上；必须先
+            // 规范化再筛选候选，否则各端的候选槽位仍可能不同。
+            GuZhenRenDeterminism.CanonicalizeDeckGuRanks(player);
+
             AbstractGuZhenRenCard[] candidates = player.Deck.Cards
                 .OfType<AbstractGuZhenRenCard>()
                 .Where(card =>
@@ -823,9 +827,9 @@ public static class ApertureSystem
                     // 仙蛊与五转凡蛊不参与天人感应。
                     card.GuRank < GuZhenRenCardRules.XianGuRank - 1
                 )
-                // 同名同转蛊虫用网络卡牌 ID 稳定定序，确保各端
-                // 以相同顺序推进随机流。
-                .OrderBy(GuZhenRenDeterminism.GetCardNetworkId)
+                // 永久牌组卡不在 NetCombatCardDb 中，不能用战斗网络
+                // 编号排序；使用原生 NetDeckCard 的牌组槽位身份。
+                .OrderBy(GuZhenRenDeterminism.GetDeckCardIndex)
                 .ToArray();
 
             if (candidates.Length == 0)
@@ -867,6 +871,19 @@ public static class ApertureSystem
                     $"[天人感应] 角色升转至 {currentRank} 转，" +
                     $"蛊虫 {guCard.Id} 由 {previousRank} 转升至 " +
                     $"{guCard.GuRank} 转。"
+                );
+            }
+
+            // 同名重复蛊牌在各端可能是不同的对象实例。随机结果的牌种
+            // 与转数多重集一致后，将其固定回相同牌组槽位，避免下一场
+            // 战斗的同一网络卡号携带不同转数。
+            int canonicalizedCount =
+                GuZhenRenDeterminism.CanonicalizeDeckGuRanks(player);
+            if (canonicalizedCount > 0)
+            {
+                Entry.Logger.Info(
+                    $"[天人感应] 已将 {canonicalizedCount} 张同名蛊牌" +
+                    "的转数规范到稳定牌组槽位。"
                 );
             }
         }

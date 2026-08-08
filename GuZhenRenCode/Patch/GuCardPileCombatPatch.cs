@@ -1,6 +1,7 @@
 using System.Reflection;
 
 using GuZhenRen.Cards;
+using GuZhenRen.Multiplayer;
 
 using HarmonyLib;
 
@@ -130,6 +131,18 @@ internal static class GuCardPileCombatPatch
         out GuRankSnapshot __state
     )
     {
+        // 修复旧存档以及升转发生在不同重复实例上的多人状态：战斗克隆
+        // 前先把同名蛊牌的转数多重集固定到原生 NetDeckCard 槽位。
+        int canonicalizedCount =
+            GuZhenRenDeterminism.CanonicalizeDeckGuRanks(__instance);
+        if (canonicalizedCount > 0)
+        {
+            Entry.Logger.Info(
+                $"[蛊虫转数] 战斗前已将 {canonicalizedCount} 张同名蛊牌" +
+                "的转数规范到稳定牌组槽位。"
+            );
+        }
+
         __state = new GuRankSnapshot
         {
             Entries = __instance.Deck.Cards
