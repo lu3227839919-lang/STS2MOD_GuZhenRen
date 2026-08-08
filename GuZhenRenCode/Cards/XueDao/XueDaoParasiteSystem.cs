@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
+using GuZhenRen.Cards.LiDao;
 using GuZhenRen.Cards.ShaZhao;
 using GuZhenRen.Multiplayer;
 using GuZhenRen.Patches;
@@ -345,7 +346,9 @@ public static class XueDaoParasiteSystem
 
     public static bool IsEligibleHost(CardModel card) =>
         !card.IsCanonical &&
-        card.CanBeGeneratedInCombat &&
+        (card.CanBeGeneratedInCombat ||
+         // 力道伴生牌是永久普通牌，允许作为血道寄生宿主。
+         card is ILiDaoCompanionCard) &&
         card is not IGuWormCard &&
         card is not AbstractShaZhaoCard &&
         card is not AbstractXueDaoToken &&

@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
@@ -30,6 +31,30 @@ public abstract class AbstractLiDaoCompanionCard :
     ) : base(1, type, CardRarity.Common, target)
     {
         SetDao(Dao.LiDao);
+    }
+
+    /// <summary>
+    /// 伴生牌与力道蛊一一对应，卡面转数跟随对应蛊。
+    /// 首次加入牌组（EnsureForGuAsync）与蛊升转时都会触发转数变化钩子，
+    /// 因此在此统一从 owner 牌组中同类型蛊同步当前转数。
+    /// canonical 实例（图鉴/卡池）没有 owner，保持默认一转。
+    /// </summary>
+    protected override void OnGuRankChanged()
+    {
+        base.OnGuRankChanged();
+        LiDaoCompanionSystem.SyncRankFromGuToCompanions(this);
+    }
+
+    /// <summary>
+    /// 伴生牌卡面头部显示与蛊虫卡一致的中文转数（如“三转”）。
+    /// 基类已注入 Rank / Rank1-9Exact；这里补上文言风格的中文数字参数。
+    /// </summary>
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add("RankCN", ToChineseNumber(GuRank));
     }
 
     public override async Task AfterCardPlayed(

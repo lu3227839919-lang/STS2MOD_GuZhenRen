@@ -49,6 +49,17 @@ public abstract class AbstractLiDaoGuCard :
         );
     }
 
+    /// <summary>
+    /// 蛊升转/读档/复制后同步永久牌组中的对应伴生牌转数，
+    /// 让伴生牌卡面显示的转数始终与对应力道蛊一致。
+    /// 子类覆写时继续调用 base.OnGuRankChanged() 即可。
+    /// </summary>
+    protected override void OnGuRankChanged()
+    {
+        base.OnGuRankChanged();
+        LiDaoCompanionSystem.SyncCompanionsForGu(this);
+    }
+
     public override Task AfterCardChangedPiles(
         CardModel card,
         PileType oldPileType,
