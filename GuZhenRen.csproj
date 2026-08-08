@@ -18,7 +18,7 @@
     <ModOutputDir>$(Sts2Dir)\mods\$(MSBuildProjectName)\</ModOutputDir>
     <ModPckPath>$(ModOutputDir)$(MSBuildProjectName).pck</ModPckPath>
 
-    <RitsuLibVersion Condition="'$(RitsuLibVersion)' == ''">0.5.10</RitsuLibVersion>
+    <RitsuLibVersion Condition="'$(RitsuLibVersion)' == ''">0.5.11</RitsuLibVersion>
     <CopyModOnBuild Condition="'$(CopyModOnBuild)' == ''">true</CopyModOnBuild>
     <RunPckExport Condition="'$(RunPckExport)' == '' and '$(DesignTimeBuild)' != 'true'">true</RunPckExport>
     <RunPckExport Condition="'$(RunPckExport)' == ''">false</RunPckExport>

@@ -13,12 +13,18 @@
 
 | 项目 | 当前信息 |
 | --- | --- |
-| Mod 版本 | **0.9.3** |
+| Mod 版本 | **0.9.4** |
 | 适配游戏版本 | **0.110.0** |
-| 前置依赖 | **STS2-RitsuLib 0.5.10 或兼容版本** |
+| 前置依赖 | **STS2-RitsuLib 0.5.11 或兼容版本** |
 | 构建环境 | Godot 4.5.1 .NET / .NET 9 |
 | 本地化 | 简体中文、English |
 | 开发状态 | 持续开发中 |
+
+### 0.9.4 更新摘要
+
+- **依赖升级**：STS2-RitsuLib 最低版本升至 0.5.11。
+- **修复胜利结算崩溃**：血道寄生旧存档兼容——0.9.3 早期构建写入的解析中标记不再导致胜利结算或退出保存时中断。
+- **清理过时提示**：删除蛊恢复堆悬停提示中已失效的"右键杀招推演"说明。
 
 ### 0.9.3 更新摘要
 
@@ -320,7 +326,7 @@ card GU_ZHEN_REN_CARD_YUE_GUANG_GU rank=7
 - .NET 9 SDK
 - Godot 4.5.1 .NET
 - 《杀戮尖塔 2》0.110.0 或兼容版本
-- STS2-RitsuLib 0.5.10 或兼容版本
+- STS2-RitsuLib 0.5.11 或兼容版本
 
 ### 配置
 
@@ -463,7 +469,7 @@ The current source implements 17 Gu worms and 6 killer moves. Version 0.6.0 exte
 | --- | --- |
 | Mod | 0.6.0 |
 | Slay the Spire 2 | 0.110.0 |
-| STS2-RitsuLib | 0.5.10 or compatible |
+| STS2-RitsuLib | 0.5.11 or compatible |
 | Build stack | Godot 4.5.1 .NET / .NET 9 |
 
 ## Development Status

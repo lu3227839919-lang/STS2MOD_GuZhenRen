@@ -57,6 +57,14 @@ public static class XueDaoParasiteSystem
     private static readonly SavedAttachedState<CardModel, int> LegacyTriggersCompletedState =
         new("gu_zhen_ren.xue_dao.parasite_triggers_completed", static () => 0);
 
+    // 0.9.3 的早期构建曾把一次出牌期间的 resolving 标记写入
+    // SavedProperties。即使新实现已经改用 ConditionalWeakTable，旧存档和
+    // Replay 历史仍可能携带该属性；若不继续注册它，0.110.x 会在胜利结算
+    // 或退出保存时因找不到属性 net ID 而中断。此状态仅作为旧档兼容占位，
+    // 实际结算仍只读取下方的运行时 ResolvingStates。
+    private static readonly SavedAttachedState<CardModel, bool> LegacyResolvingState =
+        new("gu_zhen_ren.xue_dao.parasite_resolving", static () => false);
+
     private sealed class ResolvingFlag
     {
         internal bool Value { get; set; }
@@ -248,6 +256,9 @@ public static class XueDaoParasiteSystem
 
     internal static void MarkResolving(CardModel card, bool resolving)
     {
+        // 旧档可能恢复出 true；立即归零，绝不让已废弃的持久化标记参与逻辑。
+        LegacyResolvingState[card] = false;
+
         if (resolving)
         {
             ResolvingStates.GetOrCreateValue(card).Value = true;
@@ -977,5 +988,6 @@ public static class XueDaoParasiteSystem
         LegacyStageState[card] = 0;
         LegacyTriggersRemainingState[card] = 0;
         LegacyTriggersCompletedState[card] = 0;
+        LegacyResolvingState[card] = false;
     }
 }
