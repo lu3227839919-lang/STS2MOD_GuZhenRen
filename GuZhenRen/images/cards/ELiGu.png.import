@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dy5igc8aw8ww7"
-path="res://.godot/imported/KuLiPower-256x256.png-2d1f3b109537c49a9dd7b80217f4696e.ctex"
+uid="uid://dctm1n3wgp3s1"
+path="res://.godot/imported/ELiGu.png-11163e1de70037562682e5afbae403bd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GuZhenRen/images/power/KuLiPower-256x256.png"
-dest_files=["res://.godot/imported/KuLiPower-256x256.png-2d1f3b109537c49a9dd7b80217f4696e.ctex"]
+source_file="res://GuZhenRen/images/cards/ELiGu.png"
+dest_files=["res://.godot/imported/ELiGu.png-11163e1de70037562682e5afbae403bd.ctex"]
 
 [params]
 

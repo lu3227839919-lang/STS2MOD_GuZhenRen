@@ -16,6 +16,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib;
 using STS2RitsuLib.Interop.AutoRegistration;
+using STS2RitsuLib.Scaffolding.Content;
 using STS2RitsuLib.Utils;
 
 namespace GuZhenRen.Cards.LiDao;
@@ -451,6 +452,10 @@ public sealed class QuanLiXuYing : AbstractLiDaoXuYing
     public override LiDaoBeastKind? BeastKind => null;
 
     public override bool IsFullForcePhantom => true;
+
+    // 与全力以赴蛊共用同一张卡图。
+    public override CardAssetProfile AssetProfile =>
+        CardImageCatalog.Create(typeof(QuanLiYiFuGu));
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
         [new DynamicVar("EffectPercent", 100m)];
