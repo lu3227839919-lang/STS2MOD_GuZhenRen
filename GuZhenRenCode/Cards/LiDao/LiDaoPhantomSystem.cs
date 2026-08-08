@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 using GuZhenRen.Multiplayer;
@@ -6,6 +7,7 @@ using GuZhenRen.Powers.LiDao;
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization;
@@ -23,6 +25,56 @@ public static class LiDaoPhantomSystem
 
     internal static bool OtherManifestedForCurrentAttack =>
         OtherManifestedState.Value;
+
+    /// <summary>
+    /// 本回合（按回合号）已发生虚影显化的记录，供伴生牌查询
+    /// "本回合已有其他虚影显化过" 等条件。战斗内临时状态，不参与存档。
+    /// </summary>
+    private sealed class TurnManifestation
+    {
+        internal int Turn;
+        internal bool Any;
+    }
+
+    private static readonly ConditionalWeakTable<Player, TurnManifestation>
+        TurnManifestations = new();
+
+    /// <summary>
+    /// 本回合是否已发生过虚影显化（用于牛角顶九转等"虚影联动"判定）。
+    /// 仅返回本回合（TurnNumber）内的记录，回合切换后自动视为未显化。
+    /// </summary>
+    internal static bool HasManifestedThisTurn(Player owner)
+    {
+        ArgumentNullException.ThrowIfNull(owner);
+        int turn = owner.PlayerCombatState?.TurnNumber ?? 1;
+        return TurnManifestations.TryGetValue(owner, out TurnManifestation? m) &&
+            m.Turn == turn &&
+            m.Any;
+    }
+
+    /// <summary>
+    /// 当前常驻虚影包含的兽力种类数（基础虚影计 1 种，百兽虚影按组成兽力计）。
+    /// 用于伴生牌"至少 2/3/4 种常驻虚影"的条件。
+    /// </summary>
+    public static int GetPermanentPhantomKinds(Player owner) =>
+        GetPermanentPhantoms(owner)
+            .SelectMany(phantom => phantom.LastManifestedKinds)
+            .Distinct()
+            .Count();
+
+    /// <summary>
+    /// 绞摔七转起"剩余段数追击其他敌人"的目标选择：当前 HP 最低的存活敌人。
+    /// 与鳄鱼虚影的追击判定一致（确定性排序）。
+    /// </summary>
+    public static Creature? FindPursuitTarget(CardModel source) =>
+        source.CombatState == null
+            ? null
+            : GuZhenRenDeterminism
+                .OrderCreatures(source.CombatState.HittableEnemies)
+                .Where(enemy => enemy.IsAlive)
+                .OrderBy(enemy => enemy.CurrentHp)
+                .ThenBy(enemy => enemy.CombatId)
+                .FirstOrDefault();
 
     public static IReadOnlyList<AbstractLiDaoXuYing> GetPermanentPhantoms(
         Player owner
@@ -418,6 +470,13 @@ public static class LiDaoPhantomSystem
             manifestedKinds.Add(kind);
             await LiDaoPowerSystem.NotifyManifested(owner.Creature, kind);
         }
+
+        TurnManifestation turnState = TurnManifestations.GetValue(
+            owner,
+            static _ => new TurnManifestation()
+        );
+        turnState.Turn = owner.PlayerCombatState?.TurnNumber ?? 1;
+        turnState.Any = true;
     }
 
     private static async Task EnsureCapacityAsync(
