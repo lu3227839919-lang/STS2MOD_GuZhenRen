@@ -35,8 +35,8 @@ public sealed class GuZhenRenCharacter : ModCharacterTemplate<GuZhenRenCardPool,
     public override int StartingHp => 70;
     public override int StartingGold => 99;
 
-    // 古月方源每回合默认拥有 4 点原生能量。
-    public override int MaxEnergy => 4;
+    // 古月方源每回合默认拥有 3 点原生能量。
+    public override int MaxEnergy => 3;
 
     // CharacterAssetProfile 按类别拆分。你只写需要替换的部分，其他字段会保留回退。
     // AssetProfile 只指定模板自带的静态占位资源；没有复制的音频、拖尾、转场等资源继续从占位角色回退。
