@@ -233,6 +233,35 @@ public static class GuActivationModeSystem
     }
 
     /// <summary>
+    /// 每帧清理已失效的 pending 记录。蛊牌被点击后 RitsuLib 会把它临时
+    /// 移入原版 Hand 走原生目标选择（目标选择/出牌排队期间卡停留在
+    /// Hand）；若玩家取消或放弃目标选择（右键、Esc、拖拽回手等），
+    /// RitsuLib 会把卡移回蛊牌堆，但本模组没有对应的取消 hook，
+    /// _pendingCard 会残留——此后 CanSelect 只放行该牌、拦截其余全部
+    /// 蛊牌，出现“摸过/点过的蛊牌必须先打出，其他蛊虫全部禁打”的
+    /// 卡死状态。这里检测到 pending 卡已回到蛊牌堆即清理，恢复正常
+    /// 选择；卡仍停留在 Hand 时（选择或排队进行中）保留。
+    /// </summary>
+    internal static void SweepStalePending()
+    {
+        CardModel? pending;
+        lock (SyncRoot)
+        {
+            pending = _pendingCard;
+        }
+
+        if (pending == null)
+        {
+            return;
+        }
+
+        if (pending.Pile?.Type == GuCardPileSystem.PileType)
+        {
+            ClearPendingActivation(pending);
+        }
+    }
+
+    /// <summary>
     /// 保留 RitsuLib 原始 ExtraHand 卡牌布局，同时将本模组的蛊手牌
     /// 放到普通手牌后方并整体下移。状态对象记录 RitsuLib 每次重新
     /// 布局后的基准坐标，避免逐帧重复叠加位移。

@@ -169,6 +169,11 @@ internal static class GuActivationModePatch
     )
     {
         GuActivationModeSystem.UpdateExtraHandLayout(__instance);
+
+        // 玩家点击蛊牌后若取消/放弃目标选择，RitsuLib 会把牌移回蛊牌堆
+        // 且不会通知本模组，_pendingCard 会残留并锁死其余蛊牌的选择。
+        // 每帧兜底清理：pending 卡已回到蛊牌堆即视为选择已放弃。
+        GuActivationModeSystem.SweepStalePending();
     }
 
     private static void CombatEndedPrefix()
