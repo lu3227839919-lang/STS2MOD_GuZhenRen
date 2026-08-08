@@ -1,7 +1,9 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 using GuZhenRen.Cards.ShaZhao;
 using GuZhenRen.Multiplayer;
+using GuZhenRen.Patches;
 using GuZhenRen.Powers.XueDao;
 
 using MegaCrit.Sts2.Core.Commands;
@@ -39,20 +41,29 @@ public static class XueDaoParasiteSystem
         int TotalMarks
     );
 
-    private static readonly SavedAttachedState<CardModel, int> KindState =
+    // 旧版旁路存档键仅用于首次读取时迁移。新数据全部写入
+    // XueDaoParasiteEnchantment 的 SavedProperty。
+    private static readonly SavedAttachedState<CardModel, int> LegacyKindState =
         new("gu_zhen_ren.xue_dao.parasite_kind", static () => 0);
-    private static readonly SavedAttachedState<CardModel, int> RankState =
+    private static readonly SavedAttachedState<CardModel, int> LegacyRankState =
         new("gu_zhen_ren.xue_dao.parasite_rank", static () => 0);
-    private static readonly SavedAttachedState<CardModel, bool> UpgradedState =
+    private static readonly SavedAttachedState<CardModel, bool> LegacyUpgradedState =
         new("gu_zhen_ren.xue_dao.parasite_upgraded", static () => false);
-    private static readonly SavedAttachedState<CardModel, int> StageState =
+    private static readonly SavedAttachedState<CardModel, int> LegacyStageState =
         new("gu_zhen_ren.xue_dao.parasite_stage", static () => 0);
-    private static readonly SavedAttachedState<CardModel, int> TriggersRemainingState =
+    private static readonly SavedAttachedState<CardModel, int> LegacyTriggersRemainingState =
         new("gu_zhen_ren.xue_dao.parasite_triggers_remaining", static () => 0);
-    private static readonly SavedAttachedState<CardModel, int> TriggersCompletedState =
+    private static readonly SavedAttachedState<CardModel, int> LegacyTriggersCompletedState =
         new("gu_zhen_ren.xue_dao.parasite_triggers_completed", static () => 0);
-    private static readonly SavedAttachedState<CardModel, bool> ResolvingState =
-        new("gu_zhen_ren.xue_dao.parasite_resolving", static () => false);
+
+    private sealed class ResolvingFlag
+    {
+        internal bool Value { get; set; }
+    }
+
+    // 只在一次出牌结算期间使用，不属于需要存档或同步的玩法状态。
+    private static readonly ConditionalWeakTable<CardModel, ResolvingFlag>
+        ResolvingStates = new();
 
     private static readonly MethodInfo? DrawInternalMethod = typeof(CardPileCmd).GetMethod(
         "DrawInternal",
@@ -62,112 +73,43 @@ public static class XueDaoParasiteSystem
         modifiers: null
     );
 
-    public static bool HasParasite(CardModel? card) =>
-        card != null && GetKind(card) != ParasiteKind.None;
+    public static bool HasParasite(CardModel? card)
+    {
+        if (card == null)
+        {
+            return false;
+        }
+
+        if (XueDaoEnchantmentSlotPatch.TryGetParasite(card) is { } parasite)
+        {
+            return parasite.Kind != ParasiteKind.None;
+        }
+
+        return TryMigrateLegacyParasite(card) is
+            { Kind: not ParasiteKind.None };
+    }
 
     public static ParasiteKind GetKind(CardModel card)
     {
-        int value = KindState[card];
-        return Enum.IsDefined(typeof(ParasiteKind), value)
-            ? (ParasiteKind)value
-            : ParasiteKind.None;
+        return GetParasiteEnchantment(card)?.Kind ?? ParasiteKind.None;
     }
 
-    public static int GetRank(CardModel card) => Math.Max(0, RankState[card]);
-    public static int GetStage(CardModel card) => Math.Max(0, StageState[card]);
-    public static int GetTriggersRemaining(CardModel card) => Math.Max(0, TriggersRemainingState[card]);
+    public static int GetRank(CardModel card) =>
+        GetParasiteEnchantment(card)?.Rank ?? 0;
 
-    /// <summary>
-    /// 按寄生类型与阶段返回宿主牌应显示的全部寄生关键词。
-    /// 关键词会真正写入卡牌 LocalKeywords（附着时 AddKeyword，
-    /// 解除时 RemoveKeyword），卡面以关键词标签展示附魔状态。
-    /// </summary>
-    public static IEnumerable<CardKeyword> GetParasiteKeywords(
-        ParasiteKind kind,
-        int stage,
-        int triggerCount
-    )
-    {
-        kind = NormalizeLegacyKind(kind);
-        if (kind == ParasiteKind.None)
-        {
-            yield break;
-        }
+    public static int GetStage(CardModel card) =>
+        GetParasiteEnchantment(card)?.Stage ?? 0;
 
-        // 破胎与孵化是所有寄生共有的机制词。
-        yield return GuZhenRenKeywords.PoTai;
-        yield return GuZhenRenKeywords.FuHua;
+    public static int GetTriggersRemaining(CardModel card) =>
+        GetParasiteEnchantment(card)?.TriggersRemaining ?? 0;
 
-        switch (kind)
-        {
-            case ParasiteKind.BloodQi:
-                // 血气 X：X 为宿主牌触发次数，按转数 1～3 次。
-                yield return triggerCount switch
-                {
-                    <= 1 => GuZhenRenKeywords.XueQi1,
-                    2 => GuZhenRenKeywords.XueQi2,
-                    _ => GuZhenRenKeywords.XueQi3,
-                };
-                break;
-
-            case ParasiteKind.BloodMoon:
-                yield return GuZhenRenKeywords.YueXiang;
-                yield return stage switch
-                {
-                    <= 0 => GuZhenRenKeywords.CanYue,
-                    1 => GuZhenRenKeywords.YingYue,
-                    _ => GuZhenRenKeywords.ManYue,
-                };
-                break;
-
-            case ParasiteKind.BloodFetus:
-                yield return GuZhenRenKeywords.XueTai;
-                yield return GuZhenRenKeywords.TaiDong;
-                yield return GuZhenRenKeywords.TunJi;
-                break;
-        }
-    }
-
-    /// <summary>
-    /// 把宿主牌本地的寄生关键词与当前寄生状态对齐：先移除全部
-    /// 寄生关键词，再按当前类型/阶段写入。附着、阶段推进、解除
-    /// 三处都调用它，保证卡面关键词即时反映寄生状态。
-    /// </summary>
-    public static void RefreshHostKeywords(CardModel host)
-    {
-        foreach (CardKeyword keyword in
-                 GuZhenRenKeywords.ParasiteKeywords)
-        {
-            // 对不存在的关键词调用 RemoveKeyword 无副作用（集合移除失败即忽略）。
-            host.RemoveKeyword(keyword);
-        }
-
-        ParasiteKind kind = NormalizeLegacyKind(GetKind(host));
-        if (kind == ParasiteKind.None)
-        {
-            return;
-        }
-
-        int triggerCount = kind == ParasiteKind.BloodQi
-            ? GetBloodQiTriggerPercentages(GetRank(host)).Length
-            : 0;
-
-        foreach (CardKeyword keyword in
-                 GetParasiteKeywords(
-                     kind,
-                     GetStage(host),
-                     triggerCount
-                 ))
-        {
-            host.AddKeyword(keyword);
-        }
-    }
-
-    /// <summary>
-    /// 宿主牌卡面动态附加文本：显示寄生关键词对应的当前效果与数值。
-    /// 数值随蛊虫转数、触发次数、阶段动态注入，各端由同一份
-    /// SavedAttachedState 数据渲染，保证多人一致。
-    /// 无寄生时返回 null。
+/// <summary>
+    /// 宿主牌与血寄附魔提示共用的动态效果文本。
+    ///
+    /// 文本严格从附魔的 SavedProperty 读取种类、转数、阶段与剩余次数，
+    /// 并在渲染时结合宿主牌类型、目标类型、血颅与来源升级状态计算下一次
+    /// 实际结算值。因此卡面、悬浮提示、克隆、读档和复合附魔都会显示相同的
+    /// 当前效果，而不会退化为静态说明。
     /// </summary>
     public static string? GetHostCardDynamicText(
         CardModel host
@@ -180,11 +122,48 @@ public static class XueDaoParasiteSystem
         }
 
         int rank = GetRank(host);
-        int stage = GetStage(host);
+        int stage = Math.Max(0, GetStage(host));
+        int triggersRemaining = GetTriggersRemaining(host);
+        XueDaoParasiteEnchantment? parasite =
+            GetParasiteEnchantment(host);
+        bool upgraded = parasite?.SourceWasUpgraded ?? false;
+        int skull = host.IsCanonical ||
+            host.Owner?.Creature is not { } ownerCreature
+                ? 0
+                : XueDaoPowerSystem.GetXueLu(ownerCreature);
+        int[] bloodQiRates = GetBloodQiTriggerPercentages(rank);
+        int triggerIndex = Math.Clamp(stage, 0, bloodQiRates.Length - 1);
+        int triggerChance = bloodQiRates[triggerIndex];
+        int bloodQiValue = ScaleCeiling(
+            GetBloodQiBaseValue(rank) + skull * 2 + (upgraded ? 2 : 0),
+            triggerChance
+        );
+        int bloodQiBleed = ScaleCeiling(
+            GetBloodQiBleed(rank),
+            triggerChance
+        );
+        BloodMoonPhaseValues moonValues =
+            GetBloodMoonPhaseValues(rank, Math.Clamp(stage, 0, 2));
+        int moonSkullScale = Math.Clamp(stage, 0, 2) switch
+        {
+            0 => 3,
+            1 => 4,
+            _ => 5,
+        };
+        int fetusHostValue = 8 + rank * 3 + skull * 2;
+        int fetusHostBleed = Math.Max(1, rank / 2);
+        int fetusHatchBaseDamage = 16 + rank * 4;
+        int fetusHatchBleed = 1 + Math.Max(1, rank / 3);
+        int fetusHatchMarksMin = rank >= 6 ? 1 : 0;
+        int fetusHatchMarksMax = rank >= 6 ? 2 : 0;
+
         string? entry = kind switch
         {
             ParasiteKind.BloodQi => host.Type switch
             {
+                CardType.Attack when
+                    host.TargetType == TargetType.AllEnemies =>
+                    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI_ATTACK_ALL.cardText",
                 CardType.Attack =>
                     "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI_ATTACK.cardText",
                 CardType.Skill =>
@@ -198,8 +177,18 @@ public static class XueDaoParasiteSystem
                 1 => "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.cardText",
                 _ => "GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.cardText",
             },
-            ParasiteKind.BloodFetus =>
-                "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS.cardText",
+            ParasiteKind.BloodFetus => host.Type switch
+            {
+                CardType.Attack when
+                    host.TargetType == TargetType.AllEnemies =>
+                    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS_ATTACK_ALL.cardText",
+                CardType.Attack =>
+                    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS_ATTACK.cardText",
+                CardType.Skill =>
+                    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS_SKILL.cardText",
+                _ =>
+                    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS_POWER.cardText",
+            },
             _ => null,
         };
 
@@ -211,18 +200,66 @@ public static class XueDaoParasiteSystem
         LocString text = new("cards", entry);
         text.Add("Rank", rank);
         text.Add("Stage", Math.Clamp(stage, 0, 3));
-        text.Add("TriggersRemaining", GetTriggersRemaining(host));
-        text.Add("TriggerCount", GetBloodQiTriggerPercentages(rank).Length);
-        text.Add("ParasiteValue", GetBloodQiBaseValue(rank));
-        text.Add("ParasiteBleed", GetBloodQiBleed(rank));
+        text.Add("TriggersRemaining", triggersRemaining);
+        text.Add("TriggerCount", bloodQiRates.Length);
+        text.Add("TriggerIndex", triggerIndex + 1);
+        text.Add("TriggerChance", triggerChance);
+        text.Add("HostType", GetHostTypeDisplay(host));
+        text.Add("ParasiteValue", bloodQiValue);
+        text.Add("ParasiteBleed", bloodQiBleed);
         text.Add("ParasitePowerGain", GetBloodQiPowerGain(rank));
+        text.Add("MoonBaseDamage", moonValues.BaseDamage);
+        text.Add("MoonEnergyScale", moonValues.EnergyScale);
+        text.Add("MoonSkullScale", moonSkullScale);
+        text.Add("MoonUpgradeBonus", upgraded ? 3 : 0);
+        text.Add(
+            "MoonDamageBeforeEnergy",
+            moonValues.BaseDamage + skull * moonSkullScale +
+                (upgraded ? 3 : 0)
+        );
+        text.Add("MoonBleed", moonValues.TotalBleed);
+        text.Add("MoonMarks", moonValues.TotalMarks);
+        text.Add("FetusHostValue", fetusHostValue);
+        text.Add("FetusHostBleed", fetusHostBleed);
+        text.Add("FetusHatchBaseDamage", fetusHatchBaseDamage);
+        text.Add("FetusHatchEnergyScale", 6);
+        text.Add("FetusHatchSkullScale", 4);
+        text.Add("FetusHatchDamageBeforeEnergy", fetusHatchBaseDamage + skull * 4);
+        text.Add("FetusHatchBleed", fetusHatchBleed);
+        text.Add("FetusHatchMarksMin", fetusHatchMarksMin);
+        text.Add("FetusHatchMarksMax", fetusHatchMarksMax);
         return text.GetFormattedText();
     }
 
-    internal static void MarkResolving(CardModel card, bool resolving) =>
-        ResolvingState[card] = resolving;
+    private static string GetHostTypeDisplay(CardModel host)
+    {
+        string entry = host.Type switch
+        {
+            CardType.Attack when host.TargetType == TargetType.AllEnemies =>
+                "GU_ZHEN_REN_CARD_PARASITE_HOST_ATTACK_ALL",
+            CardType.Attack => "GU_ZHEN_REN_CARD_PARASITE_HOST_ATTACK",
+            CardType.Skill => "GU_ZHEN_REN_CARD_PARASITE_HOST_SKILL",
+            CardType.Power => "GU_ZHEN_REN_CARD_PARASITE_HOST_POWER",
+            _ => "GU_ZHEN_REN_CARD_PARASITE_HOST_OTHER",
+        };
+        return new LocString("cards", entry).GetFormattedText();
+    }
 
-    internal static bool IsResolving(CardModel card) => ResolvingState[card];
+    internal static void MarkResolving(CardModel card, bool resolving)
+    {
+        if (resolving)
+        {
+            ResolvingStates.GetOrCreateValue(card).Value = true;
+        }
+        else
+        {
+            ResolvingStates.Remove(card);
+        }
+    }
+
+    internal static bool IsResolving(CardModel card) =>
+        ResolvingStates.TryGetValue(card, out ResolvingFlag? flag) &&
+        flag.Value;
 
     internal static async Task BreakIfExhaustedAsync(
         PlayerChoiceContext choiceContext,
@@ -389,12 +426,20 @@ public static class XueDaoParasiteSystem
                 break;
         }
 
-        KindState[host] = (int)kind;
-        RankState[host] = Math.Max(1, rank);
-        UpgradedState[host] = upgraded;
-        StageState[host] = stage;
-        TriggersCompletedState[host] = stage;
-        TriggersRemainingState[host] = Math.Max(0, remaining);
+        XueDaoParasiteEnchantment parasite =
+            XueDaoEnchantmentSlotPatch.AttachOrRefreshParasite(
+                host,
+                rank
+            );
+        parasite.Configure(
+            kind,
+            rank,
+            upgraded,
+            stage,
+            Math.Max(0, remaining),
+            stage
+        );
+        ClearLegacyState(host);
 
         if (!alreadyHadParasite)
         {
@@ -408,7 +453,6 @@ public static class XueDaoParasiteSystem
         }
 
         // 附着完成后把寄生关键词真正写入宿主卡牌。
-        RefreshHostKeywords(host);
 
         Entry.Logger.Info($"[血寄] {host.Id} 获得 {kind}，来源转数 {rank}，阶段 {stage}。");
     }
@@ -482,7 +526,7 @@ public static class XueDaoParasiteSystem
     {
         ParasiteKind kind = NormalizeLegacyKind(GetKind(host));
         int rank = GetRank(host);
-        bool upgraded = UpgradedState[host];
+        bool upgraded = GetParasiteEnchantment(host)?.SourceWasUpgraded ?? false;
         int stage = GetStage(host);
         CardModel effectSource = triggerSource ?? host;
         bool completed = false;
@@ -658,13 +702,20 @@ public static class XueDaoParasiteSystem
 
     private static bool Advance(CardModel host, int totalStages)
     {
-        int completed = Math.Min(totalStages, TriggersCompletedState[host] + 1);
-        TriggersCompletedState[host] = completed;
-        StageState[host] = completed;
-        TriggersRemainingState[host] = Math.Max(0, totalStages - completed);
+        XueDaoParasiteEnchantment? parasite =
+            GetParasiteEnchantment(host);
+        if (parasite == null)
+        {
+            return false;
+        }
+
+        int completed = Math.Min(
+            totalStages,
+            parasite.TriggersCompleted + 1
+        );
+        parasite.Advance(completed, totalStages);
 
         // 阶段推进（残月→盈月→满月）后刷新阶段关键词。
-        RefreshHostKeywords(host);
 
         return completed >= totalStages;
     }
@@ -846,16 +897,11 @@ public static class XueDaoParasiteSystem
         CardModel source
     )
     {
-        KindState[host] = (int)ParasiteKind.None;
-        RankState[host] = 0;
-        UpgradedState[host] = false;
-        StageState[host] = 0;
-        TriggersRemainingState[host] = 0;
-        TriggersCompletedState[host] = 0;
-        ResolvingState[host] = false;
+        XueDaoEnchantmentSlotPatch.RemoveParasite(host);
+        ClearLegacyState(host);
+        ResolvingStates.Remove(host);
 
         // 寄生解除后立即从卡牌上移除全部寄生关键词。
-        RefreshHostKeywords(host);
 
         if (host.Owner.Creature.GetPower<XueJiPower>() is { } power)
         {
@@ -867,5 +913,66 @@ public static class XueDaoParasiteSystem
                 source
             );
         }
+    }
+
+    private static XueDaoParasiteEnchantment? GetParasiteEnchantment(
+        CardModel card
+    )
+    {
+        return XueDaoEnchantmentSlotPatch.TryGetParasite(card) ??
+            TryMigrateLegacyParasite(card);
+    }
+
+    private static XueDaoParasiteEnchantment? TryMigrateLegacyParasite(
+        CardModel card
+    )
+    {
+        int rawKind = LegacyKindState[card];
+        if (!Enum.IsDefined(typeof(ParasiteKind), rawKind) ||
+            (ParasiteKind)rawKind == ParasiteKind.None ||
+            card.IsCanonical ||
+            !IsEligibleHost(card))
+        {
+            return null;
+        }
+
+        ParasiteKind kind = NormalizeLegacyKind((ParasiteKind)rawKind);
+        int rank = Math.Max(1, LegacyRankState[card]);
+        int stage = Math.Max(0, LegacyStageState[card]);
+        int remaining = Math.Max(
+            0,
+            LegacyTriggersRemainingState[card]
+        );
+        int completed = Math.Max(
+            0,
+            LegacyTriggersCompletedState[card]
+        );
+
+        XueDaoParasiteEnchantment parasite =
+            XueDaoEnchantmentSlotPatch.AttachOrRefreshParasite(card, rank);
+        parasite.Configure(
+            kind,
+            rank,
+            LegacyUpgradedState[card],
+            stage,
+            remaining,
+            completed
+        );
+        ClearLegacyState(card);
+
+        Entry.Logger.Info(
+            $"[血寄] 已将 {card.Id} 的旧版旁路状态迁移为原生附魔。"
+        );
+        return parasite;
+    }
+
+    private static void ClearLegacyState(CardModel card)
+    {
+        LegacyKindState[card] = (int)ParasiteKind.None;
+        LegacyRankState[card] = 0;
+        LegacyUpgradedState[card] = false;
+        LegacyStageState[card] = 0;
+        LegacyTriggersRemainingState[card] = 0;
+        LegacyTriggersCompletedState[card] = 0;
     }
 }

@@ -38,11 +38,19 @@
     <!-- Runtime localization files. Keep them beside the compiled mod DLL. -->
     <LocalizationJson Include="GuZhenRen\localization\zhs\LocalizationCompatibilityPatch.localization.json" />
     <LocalizationJson Include="GuZhenRen\localization\eng\LocalizationCompatibilityPatch.localization.json" />
+    <LocalizationJson Include="GuZhenRen\localization\zhs\enchantments.json" />
+    <LocalizationJson Include="GuZhenRen\localization\eng\enchantments.json" />
 
     <None Update="GuZhenRen\localization\zhs\LocalizationCompatibilityPatch.localization.json"
           CopyToOutputDirectory="PreserveNewest"
           CopyToPublishDirectory="PreserveNewest" />
     <None Update="GuZhenRen\localization\eng\LocalizationCompatibilityPatch.localization.json"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest" />
+    <None Update="GuZhenRen\localization\zhs\enchantments.json"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest" />
+    <None Update="GuZhenRen\localization\eng\enchantments.json"
           CopyToOutputDirectory="PreserveNewest"
           CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
@@ -89,6 +97,12 @@
           DestinationFolder="$(ModOutputDir)GuZhenRen\localization\zhs\"
           SkipUnchangedFiles="true" />
     <Copy SourceFiles="GuZhenRen\localization\eng\LocalizationCompatibilityPatch.localization.json"
+          DestinationFolder="$(ModOutputDir)GuZhenRen\localization\eng\"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="GuZhenRen\localization\zhs\enchantments.json"
+          DestinationFolder="$(ModOutputDir)GuZhenRen\localization\zhs\"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="GuZhenRen\localization\eng\enchantments.json"
           DestinationFolder="$(ModOutputDir)GuZhenRen\localization\eng\"
           SkipUnchangedFiles="true" />
   </Target>
