@@ -1,4 +1,4 @@
-using MegaCrit.Sts2.Core.Entities.Cards;
+﻿using MegaCrit.Sts2.Core.Entities.Cards;
 
 using STS2RitsuLib.Content;
 using STS2RitsuLib.Interop.AutoRegistration;
@@ -133,14 +133,6 @@ public sealed class GuZhenRenKeywords
             YaoHua1, YaoHua2, YaoHua3,
             YaoHua4, YaoHua5, YaoHua6,
             YaoHua7, YaoHua8, YaoHua9,
-        };
-
-    public static IReadOnlySet<CardKeyword> ParasiteKeywords { get; } =
-        new HashSet<CardKeyword>
-        {
-            XueQi, XueQi1, XueQi2, XueQi3,
-            YueXiang, CanYue, YingYue, ManYue,
-            XueTai, TaiDong, PoTai, FuHua, TunJi,
         };
 
     /// <summary>

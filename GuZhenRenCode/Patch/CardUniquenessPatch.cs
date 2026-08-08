@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+﻿﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
@@ -971,39 +971,7 @@ internal static class CardUniquenessPatch
         keywords.Remove(
             GuZhenRenKeywords.XianGu
         );
-        /*
-         * 寄生关键词：与真正写入卡牌 LocalKeywords 的词保持一致。
-         * 这里先清除快照中残留的寄生词（读档/克隆后 _keywords 可能与
-         * SavedAttachedState 不同步），再按当前寄生类型与阶段添加。
-         */
-        keywords.ExceptWith(
-            GuZhenRenKeywords.ParasiteKeywords
-        );
-        if (XueDaoParasiteSystem.HasParasite(__instance))
-        {
-            XueDaoParasiteSystem.ParasiteKind kind =
-                XueDaoParasiteSystem.GetKind(__instance);
-            int triggerCount =
-                kind ==
-                XueDaoParasiteSystem.ParasiteKind.BloodQi
-                    ? XueDaoParasiteSystem
-                        .GetBloodQiTriggerPercentages(
-                            XueDaoParasiteSystem
-                                .GetRank(__instance)
-                        )
-                        .Length
-                    : 0;
 
-            foreach (CardKeyword keyword in
-                     XueDaoParasiteSystem.GetParasiteKeywords(
-                         kind,
-                         XueDaoParasiteSystem.GetStage(__instance),
-                         triggerCount
-                     ))
-            {
-                keywords.Add(keyword);
-            }
-        }
 
         bool isXianGu =
             GuZhenRenCardRules.IsXianGu(__instance);

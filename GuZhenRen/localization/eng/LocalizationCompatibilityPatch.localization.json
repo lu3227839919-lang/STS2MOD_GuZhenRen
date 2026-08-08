@@ -166,6 +166,26 @@
   },
   "combatInterfaceLocalizationFallbacks": [
     {
+      "table": "enchantments",
+      "key": "GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.title",
+      "text": "Blood Parasite"
+    },
+    {
+      "table": "enchantments",
+      "key": "GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.description",
+      "text": "A parasite enchantment that persists, clones, and renders with its host without consuming the normal enchantment slot. Its kind, stage, and values are shown in the host card text."
+    },
+    {
+      "table": "enchantments",
+      "key": "GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.title",
+      "text": "Blood Parasite Composite"
+    },
+    {
+      "table": "enchantments",
+      "key": "GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.description",
+      "text": "Internal carrier for one normal enchantment and one Blood Parasite enchantment."
+    },
+    {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.title",
       "text": "Gu Storage Pile"
