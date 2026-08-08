@@ -69,7 +69,7 @@ public sealed class XueDaoCompositeEnchantment : ModEnchantmentTemplate
     public override bool ShowAmount => false;
 
     public override EnchantmentAssetProfile AssetProfile => new(
-        IconPath: $"{Entry.ResPath}/materials/ShaZhaoMaterialPile.svg"
+        IconPath: $"{Entry.ResPath}/images/enchantments/XueDaoCompositeEnchantment.png"
     );
 
     public override bool ShouldStartAtBottomOfDrawPile

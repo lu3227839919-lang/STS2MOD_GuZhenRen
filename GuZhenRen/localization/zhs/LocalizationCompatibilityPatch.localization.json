@@ -125,6 +125,18 @@
     "ShiHai3": {
       "title": "嗜骸 3",
       "description": "本牌可选择至多3张手牌中的遗骸进行消耗或吸收；具体收益见卡牌描述。遗骸由血道蛊牌击杀敌人或流血致死时获得；未使用的遗骸在战斗结束后保留至永久牌堆。"
+    },
+    "XuYing": {
+      "title": "虚影",
+      "description": "留在手牌且不能手动打出。打出非虚影攻击牌后，由力道结算器按稳定顺序判定显化。"
+    },
+    "LianLi": {
+      "title": "练力",
+      "description": "力道蛊每场战斗开始时封存；对应永久伴生牌首次结算时增加进度，满进度后解封。"
+    },
+    "NingYing": {
+      "title": "凝影",
+      "description": "再次催动已有对应虚影的兽力蛊时，提高其基础显化率，最高80%。"
     }
   },
   "cardDescriptionOverrides": {
@@ -334,6 +346,26 @@
       "table": "powers",
       "key": "GU_ZHEN_REN_POWER_JU_GUANG_POWER.description",
       "text": "下一张光道攻击的第一段伤害提高{Amount}点。多段攻击只获得一次加成。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_KU_LI_POWER.title",
+      "text": "苦力"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_KU_LI_POWER.description",
+      "text": "依据已损失生命比例获得0至4层苦境，提高常驻虚影的显化率与效果。重复催动苦力蛊可获得至多3层苦练，并进一步强化虚影效果；高转可重判失败显化、产生双影或在绝境中强制显化。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_ZI_LI_GENG_SHENG_POWER.title",
+      "text": "自力更生"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_ZI_LI_GENG_SHENG_POWER.description",
+      "text": "记录本回合显化的不同兽力与凝影，积蓄力气并按转数回复生命。重复催动自力更生蛊可获得至多3层强身；高转可将超额回复转化为格挡。"
     }
   ],
   "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "先选择1只符合条件的蛊牌。若选择凡蛊，本次最多可再选择2只凡蛊（共3只）；若选择仙蛊，本次最多可再选择1只仙蛊（共2只）。每只所选蛊各提升一转，五转升六转同样由升炼完成。选择0只并确认将取消；本休息点只能成功升炼一次。",

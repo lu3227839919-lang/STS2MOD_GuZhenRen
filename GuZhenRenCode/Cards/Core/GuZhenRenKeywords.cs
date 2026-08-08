@@ -47,6 +47,9 @@ namespace GuZhenRen.Cards;
 [RegisterOwnedCardKeyword(nameof(ZongEDu), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(YiChu), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(ZhuiJi), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
+[RegisterOwnedCardKeyword(nameof(XuYing), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
+[RegisterOwnedCardKeyword(nameof(LianLi), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
+[RegisterOwnedCardKeyword(nameof(NingYing), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 public sealed class GuZhenRenKeywords
 {
     public static readonly CardKeyword Unique = Create(nameof(Unique));
@@ -91,6 +94,9 @@ public sealed class GuZhenRenKeywords
     public static readonly CardKeyword ZongEDu = Create(nameof(ZongEDu));
     public static readonly CardKeyword YiChu = Create(nameof(YiChu));
     public static readonly CardKeyword ZhuiJi = Create(nameof(ZhuiJi));
+    public static readonly CardKeyword XuYing = Create(nameof(XuYing));
+    public static readonly CardKeyword LianLi = Create(nameof(LianLi));
+    public static readonly CardKeyword NingYing = Create(nameof(NingYing));
     /// <summary>
     /// 旧版本可能已经把这些展示关键词写进卡牌实例或多人快照。
     /// 保留对应 ID 仅用于清理；它们不再注册，也不会重新加入卡牌。
@@ -152,6 +158,7 @@ public sealed class GuZhenRenKeywords
             YueXiang, CanYue,
             YingYue, ManYue, XueTai, TaiDong, PoTai, FuHua,
             TunJi, ZongEDu, YiChu, ZhuiJi,
+            XuYing, LianLi, NingYing,
         };
 
     public static CardKeyword GetYaoHuaKeyword(int threshold) =>

@@ -562,13 +562,13 @@ internal static class ShaZhaoTuiYanSystem
         // 恢复流程会跳过封装材料，因此它既不能催动也不会自动恢复。
         Player player = material.Owner;
         CardPile materialPile =
-            GuCardPileSystem.MaterialPileType
+            GuCardPileSystem.GuSealedPileType
                 .GetPile(player);
         if (!ReferenceEquals(material.Pile, materialPile))
         {
             await GuCardPileSystem.MoveCardToPileAsync(
                 material,
-                GuCardPileSystem.MaterialPileType,
+                GuCardPileSystem.GuSealedPileType,
                 skipVisuals: false
             );
         }

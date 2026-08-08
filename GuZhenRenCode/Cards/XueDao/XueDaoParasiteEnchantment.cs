@@ -46,9 +46,19 @@ public sealed class XueDaoParasiteEnchantment : ModEnchantmentTemplate
     // extraCardText，避免直接附魔与复合附魔路径重复显示。
     public override bool HasExtraCardText => false;
 
-    public override EnchantmentAssetProfile AssetProfile => new(
-        IconPath: $"{Entry.ResPath}/materials/ShaZhaoMaterialPile.svg"
-    );
+    public override EnchantmentAssetProfile AssetProfile =>
+        Kind switch
+        {
+            XueDaoParasiteSystem.ParasiteKind.BloodMoon => new(
+                IconPath: $"{Entry.ResPath}/images/enchantments/XueDaoParasiteBloodMoonEnchantment.png"
+            ),
+            XueDaoParasiteSystem.ParasiteKind.BloodFetus => new(
+                IconPath: $"{Entry.ResPath}/images/enchantments/XueDaoParasiteBloodFetusEnchantment.png"
+            ),
+            _ => new(
+                IconPath: $"{Entry.ResPath}/images/enchantments/XueDaoParasiteBloodQiEnchantment.png"
+            ),
+        };
 
     internal XueDaoParasiteSystem.ParasiteKind Kind
     {

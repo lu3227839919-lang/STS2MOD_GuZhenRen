@@ -27,6 +27,7 @@ namespace GuZhenRen.Cards;
 
 [RegisterOwnedCardTag(nameof(BenMingGu))]
 [RegisterOwnedCardTag(nameof(XianGu))]
+[RegisterOwnedCardTag(nameof(XuYingCopy))]
 
 // 杀招与蛊屋。
 [RegisterOwnedCardTag(nameof(ShaZhao))]
@@ -73,6 +74,12 @@ public sealed class GuZhenRenTags
     /// </summary>
     public static readonly CardTag XianGu =
         Create(nameof(XianGu));
+
+    /// <summary>
+    /// 虚影复制标签。
+    /// </summary>
+    public static readonly CardTag XuYingCopy =
+        Create(nameof(XuYingCopy));
 
     /// <summary>
     /// 杀招标签。

@@ -2,6 +2,7 @@ using Godot;
 
 using GuZhenRen.Cards;
 using GuZhenRen.Cards.HeLian;
+using GuZhenRen.Cards.LiDao;
 using GuZhenRen.Characters;
 
 using MegaCrit.Sts2.Core.CardSelection;
@@ -426,6 +427,8 @@ public sealed class GuHeLianRestSiteOption
                 );
             }
         }
+
+        LiDaoCompanionSystem.RestoreMissingCompanions(result.Owner);
 
         if (playerHistory is null)
         {
