@@ -309,6 +309,12 @@ internal static class GuCardPileCombatPatch
                 reconciledCount++;
             }
 
+            // Even when the saved rank is already correct, a card created by
+            // network deserialization may still carry rank-one DynamicVars
+            // cloned from the canonical model. Always rebuild derived values
+            // before the card can be activated.
+            card.RefreshGuRankDerivedState();
+
             if (sourceRank > AbstractGuZhenRenCard.MinimumGuRank)
             {
                 elevatedCards.Add($"{card.Id}={sourceRank}转");

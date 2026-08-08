@@ -789,6 +789,25 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
     }
 
     /// <summary>
+    /// Rebuilds values derived from the saved Gu rank without changing the
+    /// rank itself. SavedAttachedState is filled after the canonical card has
+    /// been cloned, so the clone can already report the restored rank while
+    /// its DynamicVars still contain the canonical rank-one values.
+    /// </summary>
+    internal void RefreshGuRankDerivedState()
+    {
+        // Reading both properties also backfills the ordinary clone-bridge
+        // fields from SavedAttachedState after deserialization.
+        _baseGuRank = BaseGuRank;
+        _guRank = GuRank;
+        _initialGuRankAssigned = HasInitialGuRankAssignment;
+
+        OnGuRankLoaded();
+        RecalculateDerivedValues();
+        OnGuRankChanged();
+    }
+
+    /// <summary>
     /// 使用命中配方的全部合练材料初始化结果牌。
     ///
     /// 该入口位于公共蛊虫父类，因此声明配方的常规蛊虫牌
@@ -1011,6 +1030,17 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
     /// </summary>
     protected virtual void OnGuRankLoaded()
     {
+    }
+
+    /// <summary>
+    /// SavedProperties restores GuRankState after ToMutable has cloned the
+    /// canonical rank-one DynamicVars. Refresh immediately so network-loaded
+    /// deck cards have the same gameplay values as cards advanced locally.
+    /// </summary>
+    protected override void AfterDeserialized()
+    {
+        base.AfterDeserialized();
+        RefreshGuRankDerivedState();
     }
 
     // =====================================================================
