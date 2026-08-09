@@ -373,8 +373,8 @@ public sealed class KongQiaoRelic
     }
 
     /// <summary>
-    /// 一至九转的元气上限依次为 5、6、7、8、9、11、12、13、15；
-    /// 六转与九转因境界质变各额外增加 1 点。
+    /// 一至九转的元气上限依次为 5、5、6、6、7、7、8、8、9；
+    /// 每两转提升 1 点。
     /// </summary>
     public decimal ModifyMaxSecondaryResource(
         SecondaryResourceMaxContext context,
@@ -400,8 +400,8 @@ public sealed class KongQiaoRelic
 
     /// <summary>
     /// 原生能量重置完成后，第一回合把元气设为当前空窍转数的
-    /// 战斗初始量（下限：一转 4 ~ 九转 14）；从第二回合起按转数
-    /// 自动回复（一至二转 2、三至五转 3、六至七转 4、八至九转 5），
+    /// 战斗初始量（一转 4 ~ 九转 8）；从第二回合起按转数
+    /// 自动回复（一至二转 2、三至五转 3、六至九转 4），
     /// 且不超过转数上限。
     /// </summary>
     public override async Task AfterEnergyReset(Player player)
