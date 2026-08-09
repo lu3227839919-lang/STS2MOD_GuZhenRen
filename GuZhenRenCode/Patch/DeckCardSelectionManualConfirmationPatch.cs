@@ -1,5 +1,7 @@
 using System.Reflection;
 
+using GuZhenRen.Cards;
+
 using HarmonyLib;
 
 using MegaCrit.Sts2.Core.CardSelection;
@@ -19,7 +21,7 @@ namespace GuZhenRen.Patches;
 /// MaxSelect 后立即跳转。
 ///
 /// 本补丁只接管 RequireManualConfirmation=true 且 MinSelect < MaxSelect
-/// 的可变数量牌组选择，包括升炼的 0 至 2 张追加选择。
+/// 的可变数量牌组选择，包括升炼的 0 至 3 张追加选择。
 /// 固定数量选择继续使用原版预览确认流程。
 /// </summary>
 internal static class DeckCardSelectionManualConfirmationPatch
@@ -190,6 +192,44 @@ internal static class DeckCardSelectionManualConfirmationPatch
             return false;
         }
 
+        // 升炼追加选择共有 4 个槽位：凡蛊每只占 1 个（最多 4 只）、
+        // 仙蛊每只占 2 个（最多 2 只），凡仙可混合（如 1 只仙蛊＋2 只凡蛊）。
+        // 累计槽位超过 4 后拒绝再选；首选类别由提示文本变量标记。
+        if (!isAlreadySelected &&
+            IsGuRankUpAdditionalSelection(prefs))
+        {
+            bool firstIsMortal =
+                prefs.Prompt.Variables.TryGetValue(
+                    "GuRankUpFirstIsMortal",
+                    out object? firstFlag
+                ) &&
+                firstFlag is true;
+
+            int slotsUsed = firstIsMortal ? 1 : 2;
+
+            foreach (CardModel selected in selectedCards)
+            {
+                if (selected is AbstractGuZhenRenCard selectedGu)
+                {
+                    slotsUsed += IsMortalGu(selectedGu) ? 1 : 2;
+                }
+            }
+
+            int newCardSlots =
+                card is AbstractGuZhenRenCard guCard
+                    ? IsMortalGu(guCard) ? 1 : 2
+                    : 0;
+
+            if (slotsUsed + newCardSlots > 4)
+            {
+                refreshConfirmButtonVisibility.Invoke(
+                    __instance,
+                    null
+                );
+                return false;
+            }
+        }
+
         if (isAlreadySelected)
         {
             selectedCards.Remove(card);
@@ -201,7 +241,7 @@ internal static class DeckCardSelectionManualConfirmationPatch
             grid.HighlightCard(card);
         }
 
-        // 选择 0、1 或 2 张追加牌时都保持在选牌界面。
+        // 选择 0 至 3 张追加牌时都保持在选牌界面。
         // 不在达到 MaxSelect 时自动进入预览；由玩家点击确认按钮。
         refreshConfirmButtonVisibility.Invoke(
             __instance,
@@ -217,5 +257,30 @@ internal static class DeckCardSelectionManualConfirmationPatch
         _prefsField = null;
         _gridField = null;
         _refreshConfirmButtonVisibility = null;
+    }
+
+    /// <summary>
+    /// 通过提示文本标识升炼的追加选择，避免与其他可变数量选择混淆。
+    /// </summary>
+    private static bool IsGuRankUpAdditionalSelection(
+        CardSelectorPrefs prefs
+    )
+    {
+        return string.Equals(
+                prefs.Prompt.LocTable,
+                "rest_site_ui",
+                StringComparison.Ordinal
+            ) &&
+            string.Equals(
+                prefs.Prompt.LocEntryKey,
+                "OPTION_GU_ZHEN_REN_GU_RANK_UP" +
+                    ".secondMortalSelectionPrompt",
+                StringComparison.Ordinal
+            );
+    }
+
+    private static bool IsMortalGu(AbstractGuZhenRenCard gu)
+    {
+        return gu.GuRank < GuZhenRenCardRules.XianGuRank;
     }
 }

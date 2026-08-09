@@ -168,13 +168,13 @@
   },
   "restSiteLocalizationFallbacks": {
     "OPTION_GU_ZHEN_REN_GU_RANK_UP.name": "Gu Refinement",
-    "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "First select 1 eligible Gu Worm. If it is mortal, you may select up to 2 additional mortal Gu Worms (3 total); if it is immortal, you may select up to 1 additional immortal Gu Worm (2 total). Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",
-    "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Select the first Gu Worm to refine. Then select up to 2 more of the same kind; mortal Gu can total 3 and immortal Gu can total 2.",
+    "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "First select 1 eligible Gu Worm, then select up to 3 additional Gu Worms. Each refinement has 4 slots: a mortal Gu Worm takes 1 slot and an immortal Gu Worm takes 2 slots, so you can refine up to 4 mortal or 2 immortal Gu Worms (e.g. 1 immortal + 2 mortal). Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",
+    "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Select the first Gu Worm to refine. Then select up to 3 more Gu Worms; each mortal takes 1 slot and each immortal takes 2 slots, 4 slots in total.",
     "OPTION_GU_ZHEN_REN_HE_LIAN.name": "Gu Fusion",
     "OPTION_GU_ZHEN_REN_HE_LIAN.description": "First select a currently craftable Gu card, then select Gu Worm materials matching that target. Materials are consumed and the result is created only when both types and quantities match; failed attempts do not consume the use. Fusion can succeed once per rest site.",
     "OPTION_GU_ZHEN_REN_HE_LIAN.selectionPrompt": "Select materials matching the target Gu card, then confirm.",
     "OPTION_GU_ZHEN_REN_HE_LIAN.targetSelectionPrompt": "First select the Gu card to craft. Only materials that can match the target will be shown next.",
-    "OPTION_GU_ZHEN_REN_GU_RANK_UP.secondMortalSelectionPrompt": "Select additional Gu Worms of the same kind (up to 2 mortal or 1 immortal), or confirm with 0 selected."
+    "OPTION_GU_ZHEN_REN_GU_RANK_UP.secondMortalSelectionPrompt": "Select additional Gu Worms to refine (mortal takes 1 slot each, immortal takes 2 slots each, 4 slots total), or confirm with 0 selected."
   },
   "combatInterfaceLocalizationFallbacks": [
     {
@@ -368,7 +368,7 @@
       "text": "Tracks different beast manifestations and Condensation this turn, building strength and healing by rank. Repeated activations grant up to 3 conditioning stacks; high ranks turn excess healing into Block."
     }
   ],
-  "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "First select 1 eligible Gu Worm. If it is mortal, you may select up to 2 additional mortal Gu Worms (3 total); if it is immortal, you may select up to 1 additional immortal Gu Worm (2 total). Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",
-  "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Select the first Gu Worm to refine. Then select up to 2 more of the same kind; mortal Gu can total 3 and immortal Gu can total 2.",
-  "OPTION_GU_ZHEN_REN_GU_RANK_UP.secondMortalSelectionPrompt": "Select additional Gu Worms of the same kind (up to 2 mortal or 1 immortal), or confirm with 0 selected."
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "First select 1 eligible Gu Worm, then select up to 3 additional Gu Worms. Each refinement has 4 slots: a mortal Gu Worm takes 1 slot and an immortal Gu Worm takes 2 slots, so you can refine up to 4 mortal or 2 immortal Gu Worms (e.g. 1 immortal + 2 mortal). Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Select the first Gu Worm to refine. Then select up to 3 more Gu Worms; each mortal takes 1 slot and each immortal takes 2 slots, 4 slots in total.",
+  "OPTION_GU_ZHEN_REN_GU_RANK_UP.secondMortalSelectionPrompt": "Select additional Gu Worms to refine (mortal takes 1 slot each, immortal takes 2 slots each, 4 slots total), or confirm with 0 selected."
 }

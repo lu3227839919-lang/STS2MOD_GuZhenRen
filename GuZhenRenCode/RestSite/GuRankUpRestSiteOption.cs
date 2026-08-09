@@ -18,9 +18,11 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace GuZhenRen.RestSite;
 
 /// <summary>
-/// 篝火选项：凡蛊一次最多升炼 3 只，仙蛊一次最多升炼 2 只。
-/// 首次选择后，会再提供一次可选的同类蛊选择；若为仙蛊，
-/// 本次立即按单只结算。五转升六转同样由升炼完成。
+/// 篝火选项：每次升炼共有 4 个槽位，凡蛊各占 1 个、仙蛊各占 2 个，
+/// 最多可升炼 4 只凡蛊或 2 只仙蛊，凡仙可混合（如 1 只仙蛊＋2 只凡蛊）。
+/// 首次选择后，会再提供一次追加选择，最多 3 只（总计最多 4 只）；
+/// 槽位上限由 DeckCardSelectionManualConfirmationPatch 在选牌界面强制。
+/// 五转升六转同样由升炼完成。
 /// 选择 0 张并确认等同于取消；每个休息点只能成功使用一次。
 /// </summary>
 public sealed class GuRankUpRestSiteOption
@@ -163,23 +165,32 @@ public sealed class GuRankUpRestSiteOption
         List<AbstractGuZhenRenCard> selectedGuCards =
             [firstGu];
 
-        // 首选凡蛊时再选择至多两只凡蛊（总计三只）；首选仙蛊时
-        // 再选择至多一只仙蛊（总计两只）。
-        int additionalMaximum = IsMortalGu(firstGu) ? 2 : 1;
-        Func<CardModel, bool> additionalFilter = IsMortalGu(firstGu)
-            ? card =>
+        // 升炼共有 4 个槽位：凡蛊每只占 1 个（最多 4 只）、仙蛊每只占 2 个
+        // （最多 2 只），凡仙可混合。追加选择最多 3 只；槽位上限由选牌补丁
+        // 在点击时动态强制，此处只排除首选本身与不可升炼的蛊牌。
+        const int totalSlots = 4;
+        Func<CardModel, bool> additionalFilter =
+            card =>
                 !ReferenceEquals(card, firstGu) &&
-                IsEligibleMortalCard(card)
-            : card =>
-                !ReferenceEquals(card, firstGu) &&
-                IsEligibleImmortalCard(card);
+                IsEligibleCard(card);
 
         if (Owner.Deck.Cards.Any(additionalFilter))
         {
+            // 追加提示需携带首选类别标记（不可写在静态字段上，
+            // 否则变量会残留到后续休息点）。
+            LocString secondPrompt = new(
+                "rest_site_ui",
+                "OPTION_GU_ZHEN_REN_GU_RANK_UP.secondMortalSelectionPrompt"
+            );
+            secondPrompt.Add(
+                "GuRankUpFirstIsMortal",
+                IsMortalGu(firstGu)
+            );
+
             CardSelectorPrefs secondPrefs = new(
-                SecondMortalSelectionPrompt,
+                secondPrompt,
                 0,
-                additionalMaximum
+                totalSlots - 1
             )
             {
                 Cancelable = true,
@@ -200,7 +211,7 @@ public sealed class GuRankUpRestSiteOption
             foreach (AbstractGuZhenRenCard additionalGu in
                      secondSelection
                          .OfType<AbstractGuZhenRenCard>()
-                         .Take(additionalMaximum))
+                         .Take(totalSlots - 1))
             {
                 selectedGuCards.Add(additionalGu);
             }
@@ -302,20 +313,6 @@ public sealed class GuRankUpRestSiteOption
                 gu,
                 gu.GuRank + 1
             );
-    }
-
-    private static bool IsEligibleMortalCard(CardModel card)
-    {
-        return IsEligibleCard(card) &&
-            card is AbstractGuZhenRenCard gu &&
-            IsMortalGu(gu);
-    }
-
-    private static bool IsEligibleImmortalCard(CardModel card)
-    {
-        return IsEligibleCard(card) &&
-            card is AbstractGuZhenRenCard gu &&
-            !IsMortalGu(gu);
     }
 
     private static bool IsMortalGu(AbstractGuZhenRenCard gu)
