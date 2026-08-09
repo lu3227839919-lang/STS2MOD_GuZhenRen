@@ -359,10 +359,12 @@ public static class XueDaoParasiteSystem
         !card.IsCanonical &&
         (card.CanBeGeneratedInCombat ||
          // 力道伴生牌是永久普通牌，允许作为血道寄生宿主。
-         card is ILiDaoCompanionCard) &&
+         card is ILiDaoCompanionCard ||
+         // 血道衍生牌（刀翅血蝠/刀翅血蝠群/血蝠王）允许作为血道寄生宿主；
+         // 遗骸是状态牌，被下方类型条件排除。
+         card is AbstractXueDaoToken) &&
         card is not IGuWormCard &&
         card is not AbstractShaZhaoCard &&
-        card is not AbstractXueDaoToken &&
         card is not ShaZhaoTuiYan &&
         card.Type is CardType.Attack or CardType.Skill or CardType.Power;
 

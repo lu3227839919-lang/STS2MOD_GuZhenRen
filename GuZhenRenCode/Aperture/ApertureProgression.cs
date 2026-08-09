@@ -42,27 +42,27 @@ public static class ApertureProgression
 
     /// <summary>
     /// 空窍转数对应的元气容量上限。
-    /// 曲线 5、6、7、8、9、11、12、13、15；
-    /// 六转与九转为境界质变，各额外增加 1 点。
+    /// 曲线 5、5、6、6、7、7、8、8、9；
+    /// 每两转提升 1 点。
     /// </summary>
     private static readonly IReadOnlyDictionary<int, int>
         YuanQiCapacityByRank = new Dictionary<int, int>
         {
             [1] = 5,
-            [2] = 6,
-            [3] = 7,
-            [4] = 8,
-            [5] = 9,
-            [6] = 11,
-            [7] = 12,
-            [8] = 13,
-            [9] = 15,
+            [2] = 5,
+            [3] = 6,
+            [4] = 6,
+            [5] = 7,
+            [6] = 7,
+            [7] = 8,
+            [8] = 8,
+            [9] = 9,
         };
 
     /// <summary>
     /// 每回合元气回复（首回合固定发放 5 点，与转数无关）。
-    /// 一至二转 2、三至五转 3、六至七转 4、八至九转 5。
-    /// 九转回复不设超过 6 点，避免普通蛊与合练蛊难以消耗完元气。
+    /// 曲线 2、2、3、3、3、4、4、4、4：
+    /// 一至二转 2、三至五转 3、六至九转 4。
     /// </summary>
     public static int GetYuanQiRecovery(int rank)
     {
@@ -70,29 +70,27 @@ public static class ApertureProgression
         {
             <= 2 => 2,
             <= 5 => 3,
-            <= 7 => 4,
-            _ => 5,
+            _ => 4,
         };
     }
 
     /// <summary>
     /// 每场战斗开始时的空窍元气量（下限）。
-    /// 采用元气存储量推荐范围的下限：
-    /// 一转 4、二转 5、三转 6、四转 7、五转 8、
-    /// 六转 10、七转 11、八转 12、九转 14。
+    /// 曲线 4、4、5、5、6、6、7、7、8；
+    /// 每两转提升 1 点。
     /// </summary>
     private static readonly IReadOnlyDictionary<int, int>
         YuanQiStartAmountByRank = new Dictionary<int, int>
         {
             [1] = 4,
-            [2] = 5,
-            [3] = 6,
-            [4] = 7,
-            [5] = 8,
-            [6] = 10,
-            [7] = 11,
-            [8] = 12,
-            [9] = 14,
+            [2] = 4,
+            [3] = 5,
+            [4] = 5,
+            [5] = 6,
+            [6] = 6,
+            [7] = 7,
+            [8] = 7,
+            [9] = 8,
         };
 
     public static int GetYuanQiStartAmount(int rank)
