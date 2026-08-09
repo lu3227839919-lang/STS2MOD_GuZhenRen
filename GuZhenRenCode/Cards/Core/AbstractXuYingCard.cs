@@ -595,7 +595,7 @@ public abstract class AbstractXuYingCard
                 isExecuting: true
             );
 
-            await TriggerPhantomEffect(
+            await ExecutePhantomWithPlaybackAsync(
                 choiceContext,
                 cardPlay,
                 target
@@ -614,6 +614,45 @@ public abstract class AbstractXuYingCard
                     isExecuting: false
                 );
             }
+        }
+    }
+
+    /// <summary>
+    /// 以“打出→结算→回手”的流程执行虚影效果。
+    ///
+    /// 触发成功时先把虚影从手牌移出（带移动动画，模拟打出），
+    /// 效果结算后立即回到手牌；概率未触发时完全不进入此流程，
+    /// 保持静默、无任何触发提示。
+    /// </summary>
+    private async Task ExecutePhantomWithPlaybackAsync(
+        PlayerChoiceContext choiceContext,
+        CardPlay cardPlay,
+        Creature? target
+    )
+    {
+        await CardPileCmd.RemoveFromCombat(
+            this,
+            skipVisuals: false
+        );
+
+        try
+        {
+            await TriggerPhantomEffect(
+                choiceContext,
+                cardPlay,
+                target
+            );
+        }
+        finally
+        {
+            // 无论效果是否异常，虚影都回到手牌，保持常驻。
+            await CardPileCmd.Add(
+                this,
+                PileType.Hand,
+                CardPilePosition.Bottom,
+                clonedBy: null,
+                skipVisuals: false
+            );
         }
     }
 
@@ -645,7 +684,11 @@ public abstract class AbstractXuYingCard
             Creature? target = ResolvePhantomTarget(cardPlay.Target);
             executionAnnounced = true;
             OnPhantomExecutionStateChanged(isExecuting: true);
-            await TriggerPhantomEffect(choiceContext, cardPlay, target);
+            await ExecutePhantomWithPlaybackAsync(
+                choiceContext,
+                cardPlay,
+                target
+            );
             return true;
         }
         finally

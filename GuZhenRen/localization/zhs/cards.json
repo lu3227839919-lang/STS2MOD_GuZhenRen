@@ -176,7 +176,7 @@
     "GU_ZHEN_REN_CARD_JING_YUE_FAN_ZHAO.title": "镜月返照",
     "GU_ZHEN_REN_CARD_JING_YUE_FAN_ZHAO.description": "三阶段杀招，每次使用推进一阶段：镜相获得{Block:diff()}点格挡；月相造成{Damage:diff()}点伤害；六转以上返照获得一半格挡并对所有敌人造成一半伤害，并获得{GuangHui}点[gold]光辉[/gold]。",
     "GU_ZHEN_REN_CARD_XUE_QI_GU.selectionScreenPrompt": "选择一张无寄生的普通手牌植入血气。",
-    "GU_ZHEN_REN_CARD_XUE_YUE_GU.selectionScreenPrompt": "选择无寄生或拥有血气的普通手牌植入月相。",
+    "GU_ZHEN_REN_CARD_XUE_YUE_GU.selectionScreenPrompt": "选择一张普通手牌植入月相；拥有血气时从盈月开始。",
     "GU_ZHEN_REN_CARD_XUE_CHI_GU.title": "血池蛊",
     "GU_ZHEN_REN_CARD_XUE_CHI_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]恢复[/gold]{RecoveryTurnsCN}；\n获得{XueYuanPower:diff()}点[gold]血元[/gold]；每点[gold]溢出[/gold]转化为{OverflowBlock}点格挡。",
     "GU_ZHEN_REN_CARD_XUE_PI_GU.title": "血皮蛊",

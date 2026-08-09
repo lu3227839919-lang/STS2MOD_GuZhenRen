@@ -376,18 +376,24 @@ public static class XueDaoParasiteSystem
         }
 
         ParasiteKind current = NormalizeLegacyKind(GetKind(card));
+
+        // 血月/血胎为独立寄生体系：无需血气附魔作为前置，可直接植入
+        // 无寄生宿主；仍保留“吞寄”升级链（血气→盈月起点的月相、
+        // 血气/未满月月相→血胎）。禁止同级覆盖，血胎为寄生终点。
         if (current == ParasiteKind.None)
         {
-            return true;
+            return incomingKind != ParasiteKind.None;
         }
 
         return incomingKind switch
         {
             ParasiteKind.BloodQi => false,
-            ParasiteKind.BloodMoon => current == ParasiteKind.BloodQi,
+            ParasiteKind.BloodMoon =>
+                current != ParasiteKind.BloodMoon &&
+                current != ParasiteKind.BloodFetus,
             ParasiteKind.BloodFetus =>
-                current == ParasiteKind.BloodQi ||
-                (current == ParasiteKind.BloodMoon && GetStage(card) < 2),
+                current != ParasiteKind.BloodFetus &&
+                !(current == ParasiteKind.BloodMoon && GetStage(card) >= 2),
             _ => false,
         };
     }

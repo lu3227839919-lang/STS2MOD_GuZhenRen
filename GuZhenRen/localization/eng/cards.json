@@ -176,7 +176,7 @@
     "GU_ZHEN_REN_CARD_JING_YUE_FAN_ZHAO.title": "Mirror Moon Reflection",
     "GU_ZHEN_REN_CARD_JING_YUE_FAN_ZHAO.description": "Three-stage Sha Zhao, one stage per use: Mirror phase gains {Block:diff()} Block; Moon phase deals {Damage:diff()} damage; Reflection (rank 6+) gains half Block and deals half damage to all enemies, plus {GuangHui} [gold]Brilliance[/gold].",
     "GU_ZHEN_REN_CARD_XUE_QI_GU.selectionScreenPrompt": "Choose an unparasitized normal card to receive Blood Qi.",
-    "GU_ZHEN_REN_CARD_XUE_YUE_GU.selectionScreenPrompt": "Choose a normal card with no parasite or Blood Qi to receive Moon Phase.",
+    "GU_ZHEN_REN_CARD_XUE_YUE_GU.selectionScreenPrompt": "Choose a normal card to receive Moon Phase; hosts with Blood Qi start from the Waxing Moon.",
     "GU_ZHEN_REN_CARD_XUE_CHI_GU.title": "Blood Pool Gu",
     "GU_ZHEN_REN_CARD_XUE_CHI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Recover[/gold] {RecoveryTurns}. Gain {XueYuanPower:diff()} [gold]Blood Essence[/gold]; convert each [gold]Overflow[/gold] into {OverflowBlock} Block.",
     "GU_ZHEN_REN_CARD_XUE_PI_GU.title": "Blood Skin Gu",
