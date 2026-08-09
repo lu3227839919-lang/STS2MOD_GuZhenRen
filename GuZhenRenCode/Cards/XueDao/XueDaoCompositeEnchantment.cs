@@ -17,12 +17,11 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace GuZhenRen.Cards.XueDao;
 
 /// <summary>
-/// 只为“一个普通附魔 + 一个血寄附魔”提供的复合载体。
+/// “一个普通附魔 + 一个血寄附魔”的内置双槽载体。
 ///
-/// 原版 CardModel 只有一个 Enchantment 属性。本模型占用该物理属性，
-/// 但把普通附魔和血寄分别保存并转发，因此从玩法上血寄不消耗普通
-/// 附魔栏位。实现思路参考 RepeatableEnchantments，并限制在血寄宿主，
-/// 不会把全局规则改成任意附魔可重复。
+/// 原版 CardModel 只有一个 Enchantment 字段；本模型占用该物理字段，
+/// 将普通附魔和寄生分别保存、深拷贝并转发生命周期，因此玩法与界面上
+/// 仍是彼此独立的两个槽位，也兼容 0.9.0～0.9.7 的历史存档。
 /// </summary>
 [RegisterEnchantment]
 public sealed class XueDaoCompositeEnchantment : ModEnchantmentTemplate

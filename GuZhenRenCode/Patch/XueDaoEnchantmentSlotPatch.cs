@@ -338,6 +338,25 @@ internal static class XueDaoEnchantmentSlotPatch
         card.FinalizeUpgradeInternal();
     }
 
+    internal static void NotifyParasiteChanged(
+        XueDaoParasiteEnchantment parasite
+    )
+    {
+        parasite.RecalculateValues();
+        if (!parasite.HasCard)
+        {
+            return;
+        }
+
+        CardModel card = parasite.Card;
+        card.DynamicVars.RecalculateForUpgradeOrEnchant();
+        if (card.Enchantment is XueDaoCompositeEnchantment composite)
+        {
+            composite.RefreshCompositeStatus();
+        }
+        card.FinalizeUpgradeInternal();
+    }
+
     private static bool CanEnchantPrefix(
         EnchantmentModel __instance,
         CardModel card,

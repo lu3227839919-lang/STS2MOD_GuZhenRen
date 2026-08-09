@@ -11,6 +11,7 @@ src/
 steam/
 .vscode/
 build/
+artifacts/
 Slay the Spire 2/
 .obsidian/
 设计方案/

@@ -13,12 +13,22 @@
 
 | 项目 | 当前信息 |
 | --- | --- |
-| Mod 版本 | **0.9.7** |
+| Mod 版本 | **0.9.9** |
 | 适配游戏版本 | **0.110.0** |
-| 前置依赖 | **STS2-RitsuLib 0.5.11 或兼容版本** |
+| 前置依赖 | **STS2-RitsuLib 0.5.11+** |
 | 构建环境 | Godot 4.5.1 .NET / .NET 9 |
 | 本地化 | 简体中文、English |
 | 开发状态 | 持续开发中 |
+
+### 0.9.9 更新摘要
+
+- **内置寄生槽**：将独立寄生槽所需的保存、深拷贝、生命周期转发、附魔预览与双页签 UI 内置到蛊真人 Mod，不再需要 MultiEnchantmentMod。
+- **槽位相互独立**：清除普通附魔不会移除寄生；移除寄生会恢复普通附魔；复制、预览和特殊附魔逻辑继续识别普通附魔实例。
+
+### 0.9.8 更新摘要
+
+- **独立寄生槽**：接入 MultiEnchantmentMod，普通附魔保留在原槽，血气/血月/血胎寄生进入独立槽；两个槽位分别显示、保存、复制、触发和移除。
+- **旧档自动迁移**：0.9.0～0.9.7 的复合附魔载体在首次读取时拆分为两个真实槽位，保留普通附魔与寄生进度。
 
 ### 0.9.7 更新摘要
 
@@ -362,6 +372,22 @@ Copy-Item local.props.template local.props
 
 ### 构建命令
 
+推荐使用一键脚本。脚本会检查 .NET、Godot、游戏程序集和 STS2-RitsuLib，随后完成 C# 构建、PCK 导出、安装到游戏 `mods` 目录，并在 `artifacts` 目录生成可发布 ZIP：
+
+```powershell
+.\tools\Build-InstallPackage.ps1
+```
+
+若尚未配置 `local.props`，也可以直接指定路径：
+
+```powershell
+.\tools\Build-InstallPackage.ps1 `
+  -Sts2Dir "D:\SteamLibrary\steamapps\common\Slay the Spire 2" `
+  -GodotExe "D:\Tools\Godot\Godot_v4.5.1-stable_mono_win64.exe"
+```
+
+默认发布包为 `artifacts\GuZhenRen-0.9.9-Windows.zip`。
+
 完整构建、导出 PCK 并复制到游戏 Mod 目录：
 
 ```powershell
@@ -471,6 +497,7 @@ RitsuLib 版本
 - A separate Gu storage pile and Gu recovery pile
 - Rank 1–9 progression for Fang Yuan and Gu worms
 - Primeval essence, immortal essence, radiance, and blood essence resources
+- A built-in Blood Parasite slot independent from normal enchantments
 - Campfire upgrading and Gu fusion
 - Killer-move derivation during combat
 - Light Path, Earth Path, and a complete first Blood Path package
@@ -483,7 +510,7 @@ The current source implements 17 Gu worms and 6 killer moves. Version 0.6.0 exte
 
 | Item | Version |
 | --- | --- |
-| Mod | 0.6.0 |
+| Mod | 0.9.9 |
 | Slay the Spire 2 | 0.110.0 |
 | STS2-RitsuLib | 0.5.11 or compatible |
 | Build stack | Godot 4.5.1 .NET / .NET 9 |

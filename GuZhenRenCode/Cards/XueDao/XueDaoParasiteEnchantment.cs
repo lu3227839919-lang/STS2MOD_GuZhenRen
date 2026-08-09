@@ -13,9 +13,8 @@ namespace GuZhenRen.Cards.XueDao;
 /// 血道寄生的原生附魔模型。
 ///
 /// 种类、来源转数、阶段和触发次数全部作为 SavedProperty 跟随附魔
-/// 存档、克隆和多人序列化。普通附魔与血寄共存时，由
-/// XueDaoCompositeEnchantment 承载，因此血寄不会占用玩家可用的
-/// 普通附魔栏位。
+/// 存档、克隆和多人序列化。XueDaoCompositeEnchantment 将本模型
+/// 保存在内置寄生槽中，因此普通附魔和寄生可作为两个实例独立存在。
 /// </summary>
 [RegisterEnchantment]
 public sealed class XueDaoParasiteEnchantment : ModEnchantmentTemplate

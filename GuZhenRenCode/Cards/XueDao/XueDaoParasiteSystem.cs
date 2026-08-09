@@ -461,6 +461,7 @@ public static class XueDaoParasiteSystem
             Math.Max(0, remaining),
             stage
         );
+        XueDaoEnchantmentSlotPatch.NotifyParasiteChanged(parasite);
         ClearLegacyState(host);
 
         if (!alreadyHadParasite)
@@ -736,6 +737,7 @@ public static class XueDaoParasiteSystem
             parasite.TriggersCompleted + 1
         );
         parasite.Advance(completed, totalStages);
+        XueDaoEnchantmentSlotPatch.NotifyParasiteChanged(parasite);
 
         // 阶段推进（残月→盈月→满月）后刷新阶段关键词。
 
@@ -980,6 +982,7 @@ public static class XueDaoParasiteSystem
             remaining,
             completed
         );
+        XueDaoEnchantmentSlotPatch.NotifyParasiteChanged(parasite);
         ClearLegacyState(card);
 
         Entry.Logger.Info(
