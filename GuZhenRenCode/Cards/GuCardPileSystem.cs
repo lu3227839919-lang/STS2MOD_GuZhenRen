@@ -7,10 +7,8 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Random;
 using Godot;
 
-using STS2RitsuLib;
 using STS2RitsuLib.CardPiles;
 
 namespace GuZhenRen.Cards;
@@ -51,8 +49,12 @@ public static class GuCardPileSystem
     private const string RecoveryPileIconPath =
         "res://GuZhenRen/images/ui/QiPaiDui.png";
 
-    private const string OpeningDrawRngStreamId =
+    private const string OpeningDrawSelectionDomain =
         "gu_pile/opening_draw";
+
+    private const ulong StableHashOffsetBasis = 14695981039346656037UL;
+
+    private const ulong StableHashPrime = 1099511628211UL;
 
     /// <summary>The runtime pile type assigned by RitsuLib.</summary>
     public static PileType PileType { get; private set; }
@@ -285,7 +287,7 @@ public static class GuCardPileSystem
             owner,
             openingCandidates,
             ActivePileCapacity,
-            OpeningDrawRngStreamId
+            OpeningDrawSelectionDomain
         );
 
         OpeningEntryStates.Remove(owner);
@@ -300,11 +302,19 @@ public static class GuCardPileSystem
 
         if (guCards.Length > 0)
         {
+            string selectedCards = string.Join(
+                ", ",
+                openingCards.Select(card =>
+                    $"{card.Id}#" +
+                    GuZhenRenDeterminism.GetCardNetworkId(card)
+                )
+            );
             Entry.Logger.Info(
                 $"[蛊牌入场] 共 {guCards.Length} 张蛊牌；随机选取 " +
                 $"{openingCards.Length} 张进入蛊存放牌堆，" +
                 $"{openingCandidates.Length - openingCards.Length} 张留在恢复堆待命，" +
-                $"{guCards.Length - openingCandidates.Length} 张力道蛊进入蛊封存堆。"
+                $"{guCards.Length - openingCandidates.Length} 张力道蛊进入蛊封存堆；" +
+                $"确定性选择=[{selectedCards}]。"
             );
         }
     }
@@ -910,15 +920,19 @@ public static class GuCardPileSystem
     }
 
     /// <summary>
-    /// 使用按模组、玩家和用途隔离的确定性 RNG 随机抽取蛊牌。
-    /// 候选先按可保存属性稳定排序，确保多人端以相同顺序推进随机流。
-    /// 即使全部候选都能进入，也会随机排列入场顺序。
+    /// 使用不依赖可变 RNG 计数器的确定性洗牌抽取蛊牌。
+    ///
+    /// 多人 QuickSL 会在两端重建 Player 与战斗对象；模组玩家 RNG 的
+    /// 流位置并不属于原版战斗同步快照，因此即使候选顺序完全相同，
+    /// 重载后也可能抽出不同的五张牌。这里直接由同步的玩家网络 ID、
+    /// 楼层、候选卡牌属性与网络卡牌 ID 派生洗牌种子。相同战斗无论
+    /// 创建或重载多少次都会得到同一结果，同时不同楼层仍有不同排列。
     /// </summary>
     private static CardModel[] DrawRandomGuCards(
         Player owner,
         IEnumerable<CardModel> candidates,
         int maximumCount,
-        string rngStreamId
+        string selectionDomain
     )
     {
         CardModel[] pool = candidates
@@ -947,24 +961,119 @@ public static class GuCardPileSystem
 
         if (pool.Length > 1)
         {
-            Rng rng = RitsuLibFramework.GetModPlayerRng(
+            ulong selectionState = BuildSelectionSeed(
                 owner,
-                Entry.ModId,
-                rngStreamId
+                pool,
+                selectionDomain
             );
 
             for (int index = 0;
                  index < drawCount && index < pool.Length - 1;
                  index++)
             {
-                int selectedIndex =
-                    index + rng.NextInt(pool.Length - index);
+                int remaining = pool.Length - index;
+                int selectedIndex = index + (int)(
+                    NextDeterministicValue(ref selectionState) %
+                    (ulong)remaining
+                );
                 (pool[index], pool[selectedIndex]) =
                     (pool[selectedIndex], pool[index]);
             }
         }
 
         return pool.Take(drawCount).ToArray();
+    }
+
+    private static ulong BuildSelectionSeed(
+        Player owner,
+        IReadOnlyList<CardModel> pool,
+        string selectionDomain
+    )
+    {
+        ulong hash = StableHashOffsetBasis;
+        AddStableHash(ref hash, Entry.ModId);
+        AddStableHash(ref hash, selectionDomain);
+        AddStableHash(ref hash, owner.NetId);
+        AddStableHash(
+            ref hash,
+            unchecked((ulong)owner.RunState.TotalFloor)
+        );
+
+        foreach (CardModel card in pool)
+        {
+            AddStableHash(ref hash, card.Id.ToString());
+            AddStableHash(
+                ref hash,
+                GuZhenRenDeterminism.GetCardNetworkId(card)
+            );
+            AddStableHash(
+                ref hash,
+                unchecked((ulong)
+                    GuZhenRenDeterminism.GetDeckCardIndex(card))
+            );
+            AddStableHash(
+                ref hash,
+                unchecked((ulong)card.CurrentUpgradeLevel)
+            );
+            AddStableHash(
+                ref hash,
+                unchecked((ulong)(
+                    card is IGuRankProvider rankProvider
+                        ? rankProvider.GuRank
+                        : 0
+                ))
+            );
+        }
+
+        return hash;
+    }
+
+    private static void AddStableHash(
+        ref ulong hash,
+        string value
+    )
+    {
+        foreach (char character in value)
+        {
+            AddStableHash(ref hash, character);
+        }
+
+        // 字符串边界也参与哈希，避免 ["ab", "c"] 与 ["a", "bc"]
+        // 产生同一个输入序列。
+        AddStableHash(ref hash, char.MaxValue);
+    }
+
+    private static void AddStableHash(
+        ref ulong hash,
+        ulong value
+    )
+    {
+        unchecked
+        {
+            for (int byteIndex = 0;
+                 byteIndex < sizeof(ulong);
+                 byteIndex++)
+            {
+                hash ^= (byte)value;
+                hash *= StableHashPrime;
+                value >>= 8;
+            }
+        }
+    }
+
+    private static ulong NextDeterministicValue(ref ulong state)
+    {
+        // SplitMix64：这里只用作确定性排列，不承担安全随机用途。
+        unchecked
+        {
+            state += 0x9E3779B97F4A7C15UL;
+            ulong value = state;
+            value = (value ^ (value >> 30)) *
+                0xBF58476D1CE4E5B9UL;
+            value = (value ^ (value >> 27)) *
+                0x94D049BB133111EBUL;
+            return value ^ (value >> 31);
+        }
     }
 
     private static void EnsureInitialized()
