@@ -232,5 +232,15 @@
     "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS_POWER.cardText": "[purple]血寄·血胎（{Rank}转，{HostType}）：胎动{Stage}/3；下次打出时获得2点血元。孵化时额外造成总计{FetusHatchDamageBeforeEnergy}＋{FetusHatchEnergyScale}×本次消耗能量的伤害，并分配{FetusHatchBleed}层流血与{FetusHatchMarksMin}~{FetusHatchMarksMax}层血印；剩余{TriggersRemaining}次。[/purple]",
     "sha_zhao_material.title": "蛊封存堆",
     "sha_zhao_material.description": "杀招推演时被封存的材料。杀招使用/解体后材料会飞回蛊恢复堆并从零恢复；若组成的杀招是消耗牌，使用后材料同样返还，但恢复回合额外 +1。",
-    "sha_zhao_material.empty": "没有封存的材料。"
+    "sha_zhao_material.empty": "没有封存的材料。",
+    "GU_ZHEN_REN_CARD_XUN_DIAN_LIU_GUANG_GU.title": "迅电流光蛊",
+    "GU_ZHEN_REN_CARD_XUN_DIAN_LIU_GUANG_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]恢复[/gold]{RecoveryTurnsCN}；\n抽{Draw}张牌，然后丢弃{Discard}张牌。[gold]耀化 2[/gold]：改为选择至多{Swap}张其他可用蛊，与等量已完全恢复的待命蛊交换。没有合法交换时不消耗光辉。",
+    "GU_ZHEN_REN_CARD_XUN_DIAN_LIU_GUANG_GU.selectionScreenPrompt": "选择至多{MaxCount}张其他可用蛊送入待命。",
+    "GU_ZHEN_REN_CARD_XUN_DIAN_LIU_GUANG_GU.recoverySelectionPrompt": "选择等量已完全恢复的待命蛊加入蛊存放牌堆。",
+    "GU_ZHEN_REN_CARD_TAI_GUANG_GU.title": "太光蛊",
+    "GU_ZHEN_REN_CARD_TAI_GUANG_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，可催动{MaxUses}次，[gold]恢复[/gold]{RecoveryTurnsCN}；\n对所有敌人造成{Damage:diff()}点伤害，再各施加{ZhaoPoPower:diff()}层[gold]照破[/gold]。[gold]耀化 3[/gold]：本次伤害无视格挡，照破额外+1。",
+    "GU_ZHEN_REN_CARD_XUE_DI_ZI_GU.title": "血滴子",
+    "GU_ZHEN_REN_CARD_XUE_DI_ZI_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]恢复[/gold]{RecoveryTurnsCN}；\n对所有敌人造成{Damage:diff()}点伤害，再各施加{XueYinPower:diff()}层[gold]血印[/gold]；若仅有一个敌人，额外施加1层。获得一张同转[gold]血云噬身[/gold]。",
+    "GU_ZHEN_REN_CARD_XUE_YUN_SHI_SHEN.title": "血云噬身",
+    "GU_ZHEN_REN_CARD_XUE_YUN_SHI_SHEN.description": "对所有敌人造成{Damage:diff()}点伤害；对本次出牌前已有[gold]血印[/gold]的敌人额外攻击{ExtraHits}次，并施加{LiuXuePower:diff()}层[gold]流血[/gold]。每触发1个血印，使来源[gold]血滴子[/gold]的恢复加快1回合，本次至多{BreedCap}回合。"
 }

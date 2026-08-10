@@ -2,6 +2,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 
 using GuZhenRen.Cards;
+using GuZhenRen.Cards.GuangDao;
+using GuZhenRen.Cards.TuDao;
 using GuZhenRen.Characters;
 
 using HarmonyLib;
@@ -16,12 +18,16 @@ using STS2RitsuLib;
 namespace GuZhenRen.Patches;
 
 /// <summary>
-/// 为方源补齐 DARV / Dusty Tome 的自定义角色兼容。
+/// 为方源补齐先古遗民内容的自定义角色兼容。
 ///
 /// BaseLib 的 ITomeCard 扩展没有方源映射时，Dusty Tome 的 AncientCard
 /// 会保持为空，导致事件生成或领取遗物时崩溃。本补丁不再将 Dusty Tome
 /// 绑定到某张杀招，而是从合法蛊虫池中确定性随机一张蛊虫，沿用原版
 /// Dusty Tome 的普通升级流程，并在加入牌组后将其初始化为六转。
+///
+/// Large Capsule 会从角色主池强制查找基础 Strike / Defend。方源的主池
+/// 改为纯蛊虫池后不再包含这两类基础牌，因此分别改用攻击型起始蛊
+/// YueGuangGu 和格挡型起始蛊 YuPiGu。
 /// </summary>
 internal static class AncientCompatibilityPatch
 {
@@ -81,6 +87,18 @@ internal static class AncientCompatibilityPatch
             Type.EmptyTypes
         );
 
+        MethodInfo? largeCapsuleStrikeLookup = AccessTools.Method(
+            typeof(LargeCapsule),
+            "GetStrikeForCharacter",
+            [typeof(CharacterModel)]
+        );
+
+        MethodInfo? largeCapsuleDefendLookup = AccessTools.Method(
+            typeof(LargeCapsule),
+            "GetDefendForCharacter",
+            [typeof(CharacterModel)]
+        );
+
         Harmony harmony = new(HarmonyId);
 
         if (setupForPlayer != null)
@@ -137,9 +155,22 @@ internal static class AncientCompatibilityPatch
             );
         }
 
+        PatchLargeCapsuleLookup(
+            harmony,
+            largeCapsuleStrikeLookup,
+            nameof(LargeCapsuleStrikeLookupPrefix),
+            "GetStrikeForCharacter(CharacterModel)"
+        );
+        PatchLargeCapsuleLookup(
+            harmony,
+            largeCapsuleDefendLookup,
+            nameof(LargeCapsuleDefendLookupPrefix),
+            "GetDefendForCharacter(CharacterModel)"
+        );
+
         _initialized = true;
         Entry.Logger.Info(
-            "[先古遗民兼容] DARV 的 Dusty Tome 已改为随机给予一张六转蛊虫。"
+            "[先古遗民兼容] Dusty Tome 与 Large Capsule 的蛊虫兼容已启用。"
         );
     }
 
@@ -153,6 +184,61 @@ internal static class AncientCompatibilityPatch
         {
             _initialized = false;
         }
+    }
+
+    private static void PatchLargeCapsuleLookup(
+        Harmony harmony,
+        MethodInfo? target,
+        string prefixName,
+        string targetName
+    )
+    {
+        if (target == null)
+        {
+            Entry.Logger.Warn(
+                $"[先古遗民兼容] 未找到 LargeCapsule.{targetName}。"
+            );
+            return;
+        }
+
+        harmony.Patch(
+            target,
+            prefix: new HarmonyMethod(
+                typeof(AncientCompatibilityPatch),
+                prefixName
+            )
+            {
+                priority = Priority.First,
+            }
+        );
+    }
+
+    private static bool LargeCapsuleStrikeLookupPrefix(
+        CharacterModel __0,
+        ref CardModel __result
+    )
+    {
+        if (__0 is not GuZhenRenCharacter)
+        {
+            return true;
+        }
+
+        __result = ModelDb.Card<YueGuangGu>();
+        return false;
+    }
+
+    private static bool LargeCapsuleDefendLookupPrefix(
+        CharacterModel __0,
+        ref CardModel __result
+    )
+    {
+        if (__0 is not GuZhenRenCharacter)
+        {
+            return true;
+        }
+
+        __result = ModelDb.Card<YuPiGu>();
+        return false;
     }
 
     /// <summary>

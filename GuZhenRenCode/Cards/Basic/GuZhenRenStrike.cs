@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib.Interop.AutoRegistration;
@@ -25,6 +26,13 @@ public sealed class GuZhenRenStrike
 
     public override CardAssetProfile AssetProfile =>
         global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
+
+    // GuZhenRenCardPool is an auxiliary pool rather than the character's
+    // primary pool, so CardModel.Pool cannot discover it through
+    // ModelDb.AllCardPools. Return it explicitly to keep rendering and
+    // multiplayer combat from failing when this starter card is inspected.
+    public override CardPoolModel Pool =>
+        ModelDb.CardPool<GuZhenRenCardPool>();
 
     public GuZhenRenStrike()
         : base(

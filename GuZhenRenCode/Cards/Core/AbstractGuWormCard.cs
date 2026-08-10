@@ -113,6 +113,14 @@ public abstract class AbstractGuWormCard
             [
                 GuZhenRenKeywords.GetYaoHuaKeyword(2),
             ],
+            "XunDianLiuGuangGu" =>
+            [
+                GuZhenRenKeywords.GetYaoHuaKeyword(2),
+            ],
+            "TaiGuangGu" =>
+            [
+                GuZhenRenKeywords.GetYaoHuaKeyword(3),
+            ],
             "YueMangGu" when guWorm.GuRank >= 5 =>
             [
                 GuZhenRenKeywords.GetYaoHuaKeyword(2),

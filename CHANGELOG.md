@@ -2,6 +2,22 @@
 
 本项目的全部重要变更记录。版本号遵循 [SemVer](https://semver.org/lang/zh-CN/) 风格，规则见 [VERSIONING.md](VERSIONING.md)。历史版本大多未标注发布日期。
 
+## [0.9.15] - 2026-08-09
+
+### 新增
+- 太光蛊（光道）：对所有敌人造成伤害并施加照破；耀化3：本次伤害无视格挡、照破额外+1。
+- 迅电流光蛊（光道）：抽X张后丢弃X张；耀化2：改为选择至多X张其他可用蛊，与等量已完全恢复的待命蛊交换，无合法交换时不消耗光辉。
+- 血滴子蛊（血道）与衍生牌血云噬身：对所有敌人造成伤害并施加血印（单敌人额外+1）；血云噬身对出牌前已有血印的敌人额外攻击并施加流血，每触发1个血印使来源血滴子蛊恢复加快1回合（本次至多X）。`XueDaoPowerSystem` 新增 `GetXueYin`。
+
+### 调整
+- 角色主卡池改为纯蛊虫池（`ModCharacterTemplate<GuZhenRenGuCardPool, …>`）：原版商店与奖励直接产出蛊虫，不再重复拼接蛊池；仅当其他效果（AllStar、Kaleidoscope 等）完全替换有色候选时才补回已解锁蛊牌（走 `GetUnlockedCards`，尊重解锁与多人约束，奖励路径重放 `CardPoolFilter`）。
+- 先古遗民兼容：Large Capsule 的基础攻防查找（`GetStrikeForCharacter`/`GetDefendForCharacter`）对方源分别改为月光蛊/玉皮蛊。
+
+### Changes
+- Added 3 new Gu: Supreme Light Gu (Guang Dao; AoE damage + Expose; Illumination 3: damage ignores Block, +1 Expose), Lightning Flow Gu (Guang Dao; draw X then discard X; Illumination 2: exchange with standby Gu), and Blood Drop Gu (Xue Dao; AoE Blood Mark, +1 against a single enemy; grants the same-rank token Blood Cloud Devour—extra hits on enemies already marked and accelerates Blood Drop Gu's recovery per triggered mark, capped per play).
+- The character's primary card pool is now the pure Gu pool (`ModCharacterTemplate<GuZhenRenGuCardPool, …>`): shops and rewards read Gu cards directly; unlocked Gu are only re-appended when another effect fully replaces the colored candidates (respecting unlock state and multiplayer constraints, replaying the reward filter).
+- Ancient-relic compatibility: Large Capsule's strike/defend lookups now resolve to YueGuangGu / YuPiGu for Fang Yuan.
+
 ## [0.9.14] - 2026-08-09
 
 ### 调整

@@ -93,7 +93,7 @@ public abstract class AbstractBenMingGuCard : ModCardTemplate, IGuWormCard
     }
 
     /// <summary>
-    /// 本命蛊固定属于角色普通卡池，避免 CardModel.Pool 扫描 MockCardPool。
+    /// 本命蛊固定属于角色蛊虫卡池，避免 CardModel.Pool 扫描 MockCardPool。
     /// </summary>
     public override CardPoolModel Pool =>
         ModelDb.CardPool<GuZhenRenGuCardPool>();

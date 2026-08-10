@@ -250,6 +250,12 @@ public static class XueDaoPowerSystem
     ) => target.GetPowerInstances<LiuXuePower>()
         .FirstOrDefault(power => ReferenceEquals(power.Applier, applier));
 
+    public static XueYinPower? GetXueYin(
+        Creature target,
+        Creature applier
+    ) => target.GetPowerInstances<XueYinPower>()
+        .FirstOrDefault(power => ReferenceEquals(power.Applier, applier));
+
     public static async Task SetLiuXueAmount(
         PlayerChoiceContext choiceContext,
         CardModel sourceCard,

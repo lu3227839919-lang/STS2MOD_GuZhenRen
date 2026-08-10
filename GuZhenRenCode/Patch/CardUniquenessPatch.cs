@@ -347,11 +347,18 @@ internal static class CardUniquenessPatch
             );
 
         IEnumerable<CardModel> candidates = originalCandidates;
+
+        // 角色主池已经是蛊虫池，正常商店路径不再重复拼接。
+        // 只有其他效果把有色候选完全替换掉时，才补回已解锁蛊牌，
+        // 避免唯一性过滤后角色卡槽变成空槽。
         if (player.Character is GuZhenRenCharacter &&
-            !isColorlessMerchantPool)
+            !isColorlessMerchantPool &&
+            originalCandidates.All(static card =>
+                card.Pool is not GuZhenRenGuCardPool
+            ))
         {
             candidates = candidates.Concat(
-                ModelDb.CardPool<GuZhenRenGuCardPool>().AllCards
+                GetUnlockedGuCards(player)
             );
         }
 
@@ -377,6 +384,7 @@ internal static class CardUniquenessPatch
     }
 
     private static void RewardPoolPostfix(
+        CardCreationOptions __instance,
         Player player,
         ref IEnumerable<CardModel> __result
     )
@@ -388,16 +396,26 @@ internal static class CardUniquenessPatch
             return;
         }
 
-        IEnumerable<CardModel> candidates = __result;
+        CardModel[] originalCandidates = __result.ToArray();
+        IEnumerable<CardModel> candidates = originalCandidates;
 
-        // 角色主池只装普通操作牌；真正蛊虫注册在独立蛊池。
-        // 奖励候选必须显式合并蛊池，否则再经过“只允许蛊虫”过滤后
-        // 会稳定得到空列表。
-        if (player.Character is GuZhenRenCharacter)
+        // 默认奖励已经直接读取角色蛊虫池，不再重复拼接。AllStar、
+        // Kaleidoscope 等效果会显式替换卡池；此时才补回已解锁蛊牌，
+        // 并重放原始过滤器，避免旧逻辑绕过类型或稀有度限制。
+        if (player.Character is GuZhenRenCharacter &&
+            originalCandidates.All(static card =>
+                card.Pool is not GuZhenRenGuCardPool
+            ))
         {
-            candidates = candidates.Concat(
-                ModelDb.CardPool<GuZhenRenGuCardPool>().AllCards
-            );
+            IEnumerable<CardModel> fallback =
+                GetUnlockedGuCards(player);
+
+            if (__instance.CardPoolFilter is { } filter)
+            {
+                fallback = fallback.Where(filter);
+            }
+
+            candidates = candidates.Concat(fallback);
         }
 
         __result = candidates
@@ -415,6 +433,18 @@ internal static class CardUniquenessPatch
                 )
             )
             .ToArray();
+    }
+
+    private static IEnumerable<CardModel> GetUnlockedGuCards(
+        Player player
+    )
+    {
+        return ModelDb
+            .CardPool<GuZhenRenGuCardPool>()
+            .GetUnlockedCards(
+                player.UnlockState,
+                player.RunState.CardMultiplayerConstraint
+            );
     }
 
     private static void RewardResultsPostfix(

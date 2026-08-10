@@ -232,5 +232,15 @@
     "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS_POWER.cardText": "[purple]Blood Parasite · Blood Fetus (Rank {Rank}, {HostType}): Fetal Movement {Stage}/3; next play gains 2 Blood Essence. On hatching, also deal {FetusHatchDamageBeforeEnergy}+{FetusHatchEnergyScale}×energy spent total damage and distribute {FetusHatchBleed} Bleed plus {FetusHatchMarksMin}–{FetusHatchMarksMax} Blood Mark. {TriggersRemaining} trigger(s) remain.[/purple]",
     "sha_zhao_material.title": "Sealed Material Pile",
     "sha_zhao_material.description": "Materials sealed by Sha Zhao derivation. They fly back to the Gu recovery pile and recover from zero when the Sha Zhao is used or dismantled; if the Sha Zhao is an Exhaust card, materials are still returned after use, with +1 recovery turn.",
-    "sha_zhao_material.empty": "No sealed materials."
+    "sha_zhao_material.empty": "No sealed materials.",
+    "GU_ZHEN_REN_CARD_XUN_DIAN_LIU_GUANG_GU.title": "Lightning Flow Gu",
+    "GU_ZHEN_REN_CARD_XUN_DIAN_LIU_GUANG_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Recover[/gold] {RecoveryTurns}. Draw {Draw}, then discard {Discard}. [gold]Illumination 2[/gold]: instead, exchange up to {Swap} other usable Gu with the same number of fully recovered standby Gu. If no legal exchange exists, Radiance is not spent.",
+    "GU_ZHEN_REN_CARD_XUN_DIAN_LIU_GUANG_GU.selectionScreenPrompt": "Choose up to {MaxCount} other usable Gu to send to standby.",
+    "GU_ZHEN_REN_CARD_XUN_DIAN_LIU_GUANG_GU.recoverySelectionPrompt": "Choose the same number of fully recovered standby Gu to move into the active Gu pile.",
+    "GU_ZHEN_REN_CARD_TAI_GUANG_GU.title": "Supreme Light Gu",
+    "GU_ZHEN_REN_CARD_TAI_GUANG_GU.description": "[gold]Rank {Rank}[/gold]. {MaxUses} activations. [gold]Recover[/gold] {RecoveryTurns}. Deal {Damage:diff()} damage to ALL enemies, then apply {ZhaoPoPower:diff()} [gold]Expose[/gold] to each. [gold]Illumination 3[/gold]: this damage ignores Block and applies 1 more Expose.",
+    "GU_ZHEN_REN_CARD_XUE_DI_ZI_GU.title": "Blood Drop Gu",
+    "GU_ZHEN_REN_CARD_XUE_DI_ZI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Recover[/gold] {RecoveryTurns}. Deal {Damage:diff()} damage to ALL enemies, then apply {XueYinPower:diff()} [gold]Blood Mark[/gold] to each; if there is only one enemy, apply 1 more. Gain a same-rank [gold]Blood Cloud Devour[/gold].",
+    "GU_ZHEN_REN_CARD_XUE_YUN_SHI_SHEN.title": "Blood Cloud Devour",
+    "GU_ZHEN_REN_CARD_XUE_YUN_SHI_SHEN.description": "Deal {Damage:diff()} damage to ALL enemies. Enemies that had [gold]Blood Mark[/gold] before this play are hit {ExtraHits} additional time(s) and gain {LiuXuePower:diff()} [gold]Bleed[/gold]. For each Blood Mark triggered, accelerate the source [gold]Blood Drop Gu[/gold]'s recovery by 1 turn, up to {BreedCap} this play."
 }
