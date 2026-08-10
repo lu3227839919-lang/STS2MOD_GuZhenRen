@@ -641,7 +641,7 @@ public static class GuActivationModeSystem
             zIndex += parentCanvasItem.ZIndex;
             if (!parentCanvasItem.ZAsRelative)
             {
-                break;
+                
             }
 
             parent = parentCanvasItem.GetParent();
