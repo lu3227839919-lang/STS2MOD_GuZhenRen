@@ -7,6 +7,9 @@
 ### 调整
 - 升炼改为直接混合选择：删除"先选择1只蛊牌再追加选择"的两步机制，改为在单次选牌界面直接混合选择蛊牌（凡蛊每只占1槽、仙蛊每只占2槽，共4槽，凡仙可混合）；升炼描述与选牌提示中英文案同步更新。
 
+### Changes
+- Refinement now uses one direct mixed selection: removed the two-step "select 1 Gu card first, then add more" flow. Pick any mix of mortal and immortal Gu Worms in a single screen (a mortal takes 1 slot, an immortal takes 2 slots, 4 slots in total). The refinement description and selection prompt were updated in both languages.
+
 ## [0.9.12] - 2026-08-09
 
 ### 修复
