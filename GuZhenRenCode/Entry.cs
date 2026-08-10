@@ -51,6 +51,7 @@ public partial class Entry
         new(nameof(GuRankRewardPatch), GuRankRewardPatch.Initialize, GuRankRewardPatch.Uninitialize),
         new(nameof(GuWormUpgradePatch), GuWormUpgradePatch.Initialize, GuWormUpgradePatch.Uninitialize),
         new(nameof(CardUniquenessPatch), CardUniquenessPatch.Initialize, CardUniquenessPatch.Uninitialize),
+        new(nameof(EmptyCardRewardCompatibilityPatch), EmptyCardRewardCompatibilityPatch.Initialize, EmptyCardRewardCompatibilityPatch.Uninitialize),
         // 内置复合载体分别保存普通附魔与血寄，并显示成两个独立槽位。
         new(nameof(XueDaoEnchantmentSlotPatch), XueDaoEnchantmentSlotPatch.Initialize, XueDaoEnchantmentSlotPatch.Uninitialize),
         // 自定义关键词承担精简卡面说明的职责，所有卡牌界面都显示提示。

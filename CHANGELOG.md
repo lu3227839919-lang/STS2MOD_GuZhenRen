@@ -2,6 +2,14 @@
 
 本项目的全部重要变更记录。版本号遵循 [SemVer](https://semver.org/lang/zh-CN/) 风格，规则见 [VERSIONING.md](VERSIONING.md)。历史版本大多未标注发布日期。
 
+## [0.9.16] - 2026-08-11
+
+### 修复
+- 卡牌奖励在生成后被遗物等后续修饰清成空列表时，恢复修饰前的候选，避免出现无法正常选择的空奖励界面；仅当初次生成确实无候选时才由既有清理逻辑移除。同时兼容只有“跳过/重掷”等替代选项的空卡牌界面（默认焦点回退到替代选项），并对已无候选或替代选项的奖励安全结算，防止卡死。
+
+### Fixes
+- Card rewards that get emptied by later post-creation modifiers (e.g. relics) now restore the pre-modification candidates instead of showing an unusable empty reward screen; rewards with no candidates from the start are still cleaned up as before. Also supports empty card-reward UIs that only have alternatives (Skip/Reroll) by falling back to the first alternative as the default focus, and safely resolves rewards that have neither cards nor alternatives to prevent soft-locks.
+
 ## [0.9.15] - 2026-08-09
 
 ### 新增
