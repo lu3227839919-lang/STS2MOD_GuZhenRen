@@ -21,7 +21,7 @@ namespace GuZhenRen.Patches;
 /// MaxSelect 后立即跳转。
 ///
 /// 本补丁只接管 RequireManualConfirmation=true 且 MinSelect < MaxSelect
-/// 的可变数量牌组选择，包括升炼的 0 至 3 张追加选择。
+/// 的可变数量牌组选择，包括升炼的直接混合选择。
 /// 固定数量选择继续使用原版预览确认流程。
 /// </summary>
 internal static class DeckCardSelectionManualConfirmationPatch
@@ -192,20 +192,13 @@ internal static class DeckCardSelectionManualConfirmationPatch
             return false;
         }
 
-        // 升炼追加选择共有 4 个槽位：凡蛊每只占 1 个（最多 4 只）、
-        // 仙蛊每只占 2 个（最多 2 只），凡仙可混合（如 1 只仙蛊＋2 只凡蛊）。
-        // 累计槽位超过 4 后拒绝再选；首选类别由提示文本变量标记。
+        // 升炼共有 4 个槽位：凡蛊每只占 1 个（最多 4 只）、仙蛊每只占 2 个
+        // （最多 2 只），凡仙可混合（如 1 只仙蛊＋2 只凡蛊）。
+        // 玩家在单次选择中直接混合选牌，累计槽位超过 4 后拒绝再选。
         if (!isAlreadySelected &&
-            IsGuRankUpAdditionalSelection(prefs))
+            IsGuRankUpSelection(prefs))
         {
-            bool firstIsMortal =
-                prefs.Prompt.Variables.TryGetValue(
-                    "GuRankUpFirstIsMortal",
-                    out object? firstFlag
-                ) &&
-                firstFlag is true;
-
-            int slotsUsed = firstIsMortal ? 1 : 2;
+            int slotsUsed = 0;
 
             foreach (CardModel selected in selectedCards)
             {
@@ -241,7 +234,7 @@ internal static class DeckCardSelectionManualConfirmationPatch
             grid.HighlightCard(card);
         }
 
-        // 选择 0 至 3 张追加牌时都保持在选牌界面。
+        // 选择任意数量（0 至 4 槽位）时都保持在选牌界面。
         // 不在达到 MaxSelect 时自动进入预览；由玩家点击确认按钮。
         refreshConfirmButtonVisibility.Invoke(
             __instance,
@@ -260,9 +253,9 @@ internal static class DeckCardSelectionManualConfirmationPatch
     }
 
     /// <summary>
-    /// 通过提示文本标识升炼的追加选择，避免与其他可变数量选择混淆。
+    /// 通过提示文本标识升炼的选择界面，避免与其他可变数量选择混淆。
     /// </summary>
-    private static bool IsGuRankUpAdditionalSelection(
+    private static bool IsGuRankUpSelection(
         CardSelectorPrefs prefs
     )
     {
@@ -274,7 +267,7 @@ internal static class DeckCardSelectionManualConfirmationPatch
             string.Equals(
                 prefs.Prompt.LocEntryKey,
                 "OPTION_GU_ZHEN_REN_GU_RANK_UP" +
-                    ".secondMortalSelectionPrompt",
+                    ".selectionPrompt",
                 StringComparison.Ordinal
             );
     }

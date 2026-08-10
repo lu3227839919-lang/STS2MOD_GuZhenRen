@@ -20,7 +20,7 @@ namespace GuZhenRen.RestSite;
 /// <summary>
 /// 篝火选项：每次升炼共有 4 个槽位，凡蛊各占 1 个、仙蛊各占 2 个，
 /// 最多可升炼 4 只凡蛊或 2 只仙蛊，凡仙可混合（如 1 只仙蛊＋2 只凡蛊）。
-/// 首次选择后，会再提供一次追加选择，最多 3 只（总计最多 4 只）；
+/// 玩家在单次选牌界面直接混合选择，无需先选再追加；
 /// 槽位上限由 DeckCardSelectionManualConfirmationPatch 在选牌界面强制。
 /// 五转升六转同样由升炼完成。
 /// 选择 0 张并确认等同于取消；每个休息点只能成功使用一次。
@@ -41,12 +41,6 @@ public sealed class GuRankUpRestSiteOption
         new(
             "rest_site_ui",
             "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt"
-        );
-
-    private static readonly LocString SecondMortalSelectionPrompt =
-        new(
-            "rest_site_ui",
-            "OPTION_GU_ZHEN_REN_GU_RANK_UP.secondMortalSelectionPrompt"
         );
 
     private const string FallbackIconPath =
@@ -128,20 +122,25 @@ public sealed class GuRankUpRestSiteOption
             return false;
         }
 
-        CardSelectorPrefs firstPrefs = new(
+        // 升炼共有 4 个槽位：凡蛊每只占 1 个（最多 4 只）、仙蛊每只占 2 个
+        // （最多 2 只），凡仙可混合。玩家在单次选牌界面直接混合选择；
+        // 槽位上限由 DeckCardSelectionManualConfirmationPatch 在点击时动态强制。
+        const int totalSlots = 4;
+
+        CardSelectorPrefs prefs = new(
             SelectionPrompt,
             0,
-            1
+            totalSlots
         )
         {
             Cancelable = true,
             RequireManualConfirmation = true
         };
 
-        IEnumerable<CardModel> firstSelection =
+        IEnumerable<CardModel> selection =
             await CardSelectCmd.FromDeckGeneric(
                 player: Owner,
-                prefs: firstPrefs,
+                prefs: prefs,
                 filter: IsEligibleCard,
                 sortingOrder: card =>
                     card is AbstractGuZhenRenCard gu
@@ -149,72 +148,18 @@ public sealed class GuRankUpRestSiteOption
                         : int.MaxValue
             );
 
-        AbstractGuZhenRenCard? firstGu =
-            firstSelection
+        List<AbstractGuZhenRenCard> selectedGuCards =
+            selection
                 .OfType<AbstractGuZhenRenCard>()
-                .FirstOrDefault();
+                .Take(totalSlots)
+                .ToList();
 
-        if (firstGu == null)
+        if (selectedGuCards.Count == 0)
         {
             Entry.Logger.Info(
                 "本次篝火升炼未选择蛊牌，已取消。"
             );
             return false;
-        }
-
-        List<AbstractGuZhenRenCard> selectedGuCards =
-            [firstGu];
-
-        // 升炼共有 4 个槽位：凡蛊每只占 1 个（最多 4 只）、仙蛊每只占 2 个
-        // （最多 2 只），凡仙可混合。追加选择最多 3 只；槽位上限由选牌补丁
-        // 在点击时动态强制，此处只排除首选本身与不可升炼的蛊牌。
-        const int totalSlots = 4;
-        Func<CardModel, bool> additionalFilter =
-            card =>
-                !ReferenceEquals(card, firstGu) &&
-                IsEligibleCard(card);
-
-        if (Owner.Deck.Cards.Any(additionalFilter))
-        {
-            // 追加提示需携带首选类别标记（不可写在静态字段上，
-            // 否则变量会残留到后续休息点）。
-            LocString secondPrompt = new(
-                "rest_site_ui",
-                "OPTION_GU_ZHEN_REN_GU_RANK_UP.secondMortalSelectionPrompt"
-            );
-            secondPrompt.Add(
-                "GuRankUpFirstIsMortal",
-                IsMortalGu(firstGu)
-            );
-
-            CardSelectorPrefs secondPrefs = new(
-                secondPrompt,
-                0,
-                totalSlots - 1
-            )
-            {
-                Cancelable = true,
-                RequireManualConfirmation = true
-            };
-
-            IEnumerable<CardModel> secondSelection =
-                await CardSelectCmd.FromDeckGeneric(
-                    player: Owner,
-                    prefs: secondPrefs,
-                    filter: additionalFilter,
-                    sortingOrder: card =>
-                        card is AbstractGuZhenRenCard gu
-                            ? gu.GuRank
-                            : int.MaxValue
-                );
-
-            foreach (AbstractGuZhenRenCard additionalGu in
-                     secondSelection
-                         .OfType<AbstractGuZhenRenCard>()
-                         .Take(totalSlots - 1))
-            {
-                selectedGuCards.Add(additionalGu);
-            }
         }
 
         foreach (AbstractGuZhenRenCard selectedGu in
@@ -313,10 +258,5 @@ public sealed class GuRankUpRestSiteOption
                 gu,
                 gu.GuRank + 1
             );
-    }
-
-    private static bool IsMortalGu(AbstractGuZhenRenCard gu)
-    {
-        return gu.GuRank < GuZhenRenCardRules.XianGuRank;
     }
 }
