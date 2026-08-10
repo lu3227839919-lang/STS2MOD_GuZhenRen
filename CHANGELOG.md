@@ -2,6 +2,22 @@
 
 本项目的全部重要变更记录。版本号遵循 [SemVer](https://semver.org/lang/zh-CN/) 风格，规则见 [VERSIONING.md](VERSIONING.md)。历史版本大多未标注发布日期。
 
+## [0.9.14] - 2026-08-09
+
+### 调整
+- 力道蛊卡卡面精简：删除卡面描述中对被引用虚影卡的重复效果描述（显化率/伤害/格挡等），悬停预览已显示完整虚影卡面；苦力/自力更生/全力以赴蛊的虚影相关描述同步精简。
+- 血月蛊卡面删除伤害计算公式；月相附魔描述由"造成总计X＋Y×本次消耗能量的伤害"改为"造成X点伤害（每点能量+Y点）"。
+- 删除合练关键词：合练蛊卡面不再显示"合练"关键词标签（`GuZhenRenKeywords.HeLian` 定义、卡面标签与本地化条目同步清理），合练机制与篝火合练不受影响。
+- 虚影显化动画优化：改为手牌→出牌区→手牌的原生动画流程并显示"{Phantom}显化！"气泡提示；结算后通过带校验与内部回退的移牌流程保证虚影回手。
+- 蛊牌入场动画优化：首轮蛊牌入场改为原版起手抽牌完成后逐张播放，并按原生抽牌节奏（按加速档位）间隔入场，避免多组动画同时刷新界面。
+
+### Changes
+- Streamlined Li Dao Gu card faces: removed the repeated phantom-effect text (manifestation chance / damage / block) now that hover previews show the full phantom card; Bitter/ Self-Reliance/ All-Out Gu phantom-related text was trimmed accordingly.
+- Blood Moon Gu: removed the damage formula from its card face; the Moon Phase enchantment text now reads "deals X damage (plus Y per Energy spent)" instead of the formula.
+- Removed the Fusion keyword: fusion Gu cards no longer show the "Fusion" keyword tag (definition, card-face tag and localization entries cleaned up); the fusion mechanic and rest-site option are unaffected.
+- Phantom animation polish: manifestation now plays the native hand→play area→hand animation and shows a "{Phantom} manifests!" bubble; a validated move-back flow guarantees the phantom returns to hand after resolving.
+- Gu entry animation polish: opening Gu entry now plays card by card after the native opening draw, paced by the native draw cadence (per fast-mode tier) to avoid overlapping pile animations.
+
 ## [0.9.13] - 2026-08-09
 
 ### 调整

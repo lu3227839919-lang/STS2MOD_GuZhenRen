@@ -7,8 +7,6 @@
   "GU_ZHEN_REN_KEYWORD_CUI_DONG.description": "蛊虫牌可从蛊手牌直接打出；打完后进入恢复堆冷却。",
   "GU_ZHEN_REN_KEYWORD_HUI_FU.title": "恢复",
   "GU_ZHEN_REN_KEYWORD_HUI_FU.description": "蛊虫催动次数耗尽后进入恢复堆；经过标注回合数后返回蛊牌堆。",
-  "GU_ZHEN_REN_KEYWORD_HE_LIAN.title": "合练",
-  "GU_ZHEN_REN_KEYWORD_HE_LIAN.description": "消耗指定蛊虫材料炼成的新蛊。结果转数由配方决定，默认不进入普通奖励。",
   "GU_ZHEN_REN_KEYWORD_KE_XUE.title": "渴血",
   "GU_ZHEN_REN_KEYWORD_KE_XUE.description": "消耗牌面标注数量的血元，以施展或强化对应效果。",
   "GU_ZHEN_REN_KEYWORD_ZI_SHI.title": "自噬",

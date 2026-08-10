@@ -19,6 +19,7 @@
     "GU_ZHEN_REN_DAO_ZHOU_DAO.title": "宙道",
     "GU_ZHEN_REN_DAO_TU_DAO.title": "土道",
     "GU_ZHEN_REN_CARD_LI_DAO_REPLACE_PHANTOM.selectionScreenPrompt": "虚影容量已满。选择一张常驻虚影替换。",
+    "GU_ZHEN_REN_CARD_XU_YING_MANIFESTATION.combatMessage": "{Phantom}显化！",
     "GU_ZHEN_REN_CARD_BAI_ZHI_GU.title": "白豕蛊",
     "GU_ZHEN_REN_CARD_BAI_ZHI_GU.description": "[gold]{RankCN}转[/gold]，[gold]练力[/gold]{TrainingProgress}/{Training}；解封后[gold]恢复[/gold]{RecoveryTurnsCN}。催动：获得白豕虚影；已有时改为凝影。",
     "GU_ZHEN_REN_CARD_FEI_XIONG_ZHI_LI_GU.title": "飞熊之力蛊",

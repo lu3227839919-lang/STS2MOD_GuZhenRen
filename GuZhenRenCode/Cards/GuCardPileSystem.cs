@@ -4,9 +4,12 @@ using GuZhenRen.Cards.LiDao;
 using GuZhenRen.Multiplayer;
 
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Saves;
+using MegaCrit.Sts2.Core.Settings;
 using Godot;
 
 using STS2RitsuLib.CardPiles;
@@ -221,9 +224,9 @@ public static class GuCardPileSystem
     }
 
     /// <summary>
-    /// 战斗初始化时先把蛊牌暂存到恢复堆。第一轮原版抽牌开始时，
-    /// <see cref="BeginOpeningGuEntry"/> 会把它们以 RitsuLib 牌堆飞行动画
-    /// 送入 ExtraHand，使蛊牌入场与普通起手抽牌并行播放。
+    /// 战斗初始化时先把蛊牌暂存到恢复堆。第一轮原版抽牌完成后，
+    /// <see cref="BeginOpeningGuEntry"/> 会按原版抽牌节奏逐张把它们
+    /// 送入 ExtraHand，避免两组牌堆动画同时刷新界面。
     /// </summary>
     internal static void InitializeGuCardsForCombat(Player owner)
     {
@@ -320,8 +323,8 @@ public static class GuCardPileSystem
     }
 
     /// <summary>
-    /// 在首轮 <c>CardPileCmd.DrawInternal</c> 开始前启动蛊牌入场。
-    /// 返回的任务会与原版抽牌任务并行运行，并由 Harmony 后置包装共同等待。
+    /// 在首轮 <c>CardPileCmd.DrawInternal</c> 完成后启动蛊牌入场。
+    /// 每张牌都独立等待原生移牌动画，与原版逐张抽牌的执行顺序一致。
     /// </summary>
     internal static Task? BeginOpeningGuEntry(
         Player owner,
@@ -372,16 +375,27 @@ public static class GuCardPileSystem
             }
 
             Entry.Logger.Info(
-                $"[蛊牌入场] 与首轮抽牌同步播放 {cards.Length} 张蛊牌的恢复堆入场动画。"
+                $"[蛊牌入场] 原版起手抽牌完成后，逐张播放 " +
+                $"{cards.Length} 张蛊牌的恢复堆入场动画。"
             );
 
-            await CardPileCmd.Add(
-                cards,
-                PileType,
-                CardPilePosition.Bottom,
-                clonedBy: null,
-                skipVisuals: false
-            );
+            foreach (CardModel card in cards)
+            {
+                if (!ReferenceEquals(card.Pile, recoveryPile))
+                {
+                    continue;
+                }
+
+                CardPileAddResult result =
+                    await AddGuCardToActivePileSequentiallyAsync(card);
+
+                if (!result.success)
+                {
+                    throw new InvalidOperationException(
+                        $"蛊牌 {card.Id} 无法进入蛊存放牌堆。"
+                    );
+                }
+            }
         }
         catch (Exception exception)
         {
@@ -415,6 +429,40 @@ public static class GuCardPileSystem
         }
     }
 
+    /// <summary>
+    /// RitsuLib 的 ExtraHand 入场补丁会在创建卡牌节点后立即结束
+    /// <see cref="CardPileCmd.Add(CardModel, PileType, CardPilePosition, AbstractModel, bool)"/>
+    /// 返回的任务，因此仅逐张 await 仍会在同一帧启动全部蛊牌动画。
+    /// 原版手牌抽取会让每张牌的入场 Tween 按加速档位持续一小段时间；
+    /// 这里复用完全相同的间隔，使下一张蛊牌在下一段抽牌节奏中入场。
+    /// </summary>
+    private static async Task<CardPileAddResult>
+        AddGuCardToActivePileSequentiallyAsync(CardModel card)
+    {
+        CardPileAddResult result = await CardPileCmd.Add(
+            card,
+            PileType,
+            CardPilePosition.Bottom,
+            clonedBy: null,
+            skipVisuals: false
+        );
+
+        // 原版不会为其他玩家的手牌动画阻塞当前客户端。
+        if (result.success && LocalContext.IsMine(card))
+        {
+            float nativeHandEntryInterval =
+                SaveManager.Instance.PrefsSave.FastMode switch
+                {
+                    FastModeType.Instant => 0.01f,
+                    FastModeType.Fast => 0.1f,
+                    _ => 0.25f,
+                };
+            await Cmd.Wait(nativeHandEntryInterval);
+        }
+
+        return result;
+    }
+
     private static bool IsOpeningEntryPending(Player owner)
     {
         if (!OpeningEntryStates.TryGetValue(owner, out var state) ||
@@ -440,6 +488,7 @@ public static class GuCardPileSystem
         CardPile guSealedPile = GuSealedPileType.GetPile(owner);
         MoveActiveOverflowToRecovery(owner);
         int availableSlots = GetAvailableActiveSlots(owner);
+        HashSet<CardPile> changedPiles = [];
 
         foreach (CardPile sourcePile in new[]
         {
@@ -460,11 +509,13 @@ public static class GuCardPileSystem
             foreach (CardModel card in guCards)
             {
                 sourcePile.RemoveInternal(card, silent: true);
+                changedPiles.Add(sourcePile);
 
                 if (card is ILiDaoTrainingGuCard &&
                     !LiDaoTrainingSystem.IsUnsealed(card))
                 {
                     guSealedPile.AddInternal(card, silent: true);
+                    changedPiles.Add(guSealedPile);
                     continue;
                 }
 
@@ -473,6 +524,7 @@ public static class GuCardPileSystem
                     if (availableSlots > 0)
                     {
                         guPile.AddInternal(card, silent: true);
+                        changedPiles.Add(guPile);
                         availableSlots--;
                     }
                     else
@@ -480,6 +532,7 @@ public static class GuCardPileSystem
                         // 可用但超过五张上限：作为“已恢复待命”蛊保留，
                         // 不建立冷却时间戳。
                         recoveryPile.AddInternal(card, silent: true);
+                        changedPiles.Add(recoveryPile);
                     }
                 }
                 else
@@ -494,15 +547,15 @@ public static class GuCardPileSystem
                         );
                     }
                     recoveryPile.AddInternal(card, silent: true);
+                    changedPiles.Add(recoveryPile);
                 }
             }
-
-            sourcePile.InvokeContentsChanged();
         }
 
-        guPile.InvokeContentsChanged();
-        recoveryPile.InvokeContentsChanged();
-        guSealedPile.InvokeContentsChanged();
+        foreach (CardPile changedPile in changedPiles)
+        {
+            changedPile.InvokeContentsChanged();
+        }
     }
 
     /// <summary>
@@ -684,13 +737,10 @@ public static class GuCardPileSystem
             .Take(availableSlots)
             .ToArray();
 
-        await CardPileCmd.Add(
-            drawnCards,
-            PileType,
-            CardPilePosition.Bottom,
-            clonedBy: null,
-            skipVisuals: false
-        );
+        foreach (CardModel card in drawnCards)
+        {
+            await AddGuCardToActivePileSequentiallyAsync(card);
+        }
     }
 
     /// <summary>

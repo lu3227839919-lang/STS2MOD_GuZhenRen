@@ -19,6 +19,7 @@
     "GU_ZHEN_REN_DAO_ZHOU_DAO.title": "Time Path",
     "GU_ZHEN_REN_DAO_TU_DAO.title": "Earth Path",
     "GU_ZHEN_REN_CARD_LI_DAO_REPLACE_PHANTOM.selectionScreenPrompt": "Your phantom capacity is full. Choose a permanent phantom to replace.",
+    "GU_ZHEN_REN_CARD_XU_YING_MANIFESTATION.combatMessage": "{Phantom} manifests!",
     "GU_ZHEN_REN_CARD_BAI_ZHI_GU.title": "White Boar Gu",
     "GU_ZHEN_REN_CARD_BAI_ZHI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Train[/gold] {TrainingProgress}/{Training}; after unsealing, [gold]Recover[/gold] {RecoveryTurns}. Activate: gain White Boar Phantom; Condense it if already present.",
     "GU_ZHEN_REN_CARD_FEI_XIONG_ZHI_LI_GU.title": "Flying Bear Strength Gu",

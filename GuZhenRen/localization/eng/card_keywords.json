@@ -7,8 +7,6 @@
   "GU_ZHEN_REN_KEYWORD_CUI_DONG.description": "A Gu card must be used with an Activation card in hand.",
   "GU_ZHEN_REN_KEYWORD_HUI_FU.title": "Recovery",
   "GU_ZHEN_REN_KEYWORD_HUI_FU.description": "After all activations are spent, the Gu enters recovery and returns to the Gu pile after the listed number of turns.",
-  "GU_ZHEN_REN_KEYWORD_HE_LIAN.title": "Fusion",
-  "GU_ZHEN_REN_KEYWORD_HE_LIAN.description": "Consumes the specified Gu materials to refine a new Gu. Its rank follows the recipe and it is normally excluded from rewards.",
   "GU_ZHEN_REN_KEYWORD_KE_XUE.title": "Bloodthirst",
   "GU_ZHEN_REN_KEYWORD_KE_XUE.description": "Spend the listed amount of Blood Essence to use or empower the corresponding effect.",
   "GU_ZHEN_REN_KEYWORD_ZI_SHI.title": "Self-Devour",

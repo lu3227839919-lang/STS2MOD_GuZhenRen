@@ -16,7 +16,6 @@ namespace GuZhenRen.Cards;
 [RegisterOwnedCardKeyword(nameof(XianGu), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(CuiDong), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(HuiFu), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
-[RegisterOwnedCardKeyword(nameof(HeLian), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(KeXue), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(ZiShi), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(ShiHai1), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
@@ -56,7 +55,6 @@ public sealed class GuZhenRenKeywords
     public static readonly CardKeyword XianGu = Create(nameof(XianGu));
     public static readonly CardKeyword CuiDong = Create(nameof(CuiDong));
     public static readonly CardKeyword HuiFu = Create(nameof(HuiFu));
-    public static readonly CardKeyword HeLian = Create(nameof(HeLian));
     public static readonly CardKeyword KeXue = Create(nameof(KeXue));
     public static readonly CardKeyword ZiShi = Create(nameof(ZiShi));
     public static readonly CardKeyword ShiHai1 = Create(nameof(ShiHai1));
@@ -149,7 +147,7 @@ public sealed class GuZhenRenKeywords
         new HashSet<CardKeyword>
         {
             Unique, XianGu, CuiDong, HuiFu,
-            HeLian, KeXue, ZiShi,
+            KeXue, ZiShi,
             ShiHai1, ShiHai2, ShiHai3,
             YaoHua1, YaoHua2, YaoHua3,
             YaoHua4, YaoHua5, YaoHua6,

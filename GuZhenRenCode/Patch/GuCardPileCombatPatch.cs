@@ -352,38 +352,48 @@ internal static class GuCardPileCombatPatch
     }
 
     private static void DrawInternalPrefix(
-        Player player,
-        bool fromHandDraw,
-        out Task? __state
+        Player player
     )
     {
         GuCardPileSystem.MoveStrayGuCardsToVillage(player);
-        __state = GuCardPileSystem.BeginOpeningGuEntry(
+    }
+
+    private static void DrawInternalPostfix(
+        Player player,
+        bool fromHandDraw,
+        ref Task<IEnumerable<CardModel>> __result
+    )
+    {
+        if (!fromHandDraw ||
+            player.PlayerCombatState?.TurnNumber != 1)
+        {
+            return;
+        }
+
+        __result = AwaitDrawThenGuEntryAsync(
+            __result,
             player,
             fromHandDraw
         );
     }
 
-    private static void DrawInternalPostfix(
-        Task? __state,
-        ref Task<IEnumerable<CardModel>> __result
-    )
-    {
-        if (__state == null)
-        {
-            return;
-        }
-
-        __result = AwaitDrawAndGuEntryAsync(__result, __state);
-    }
-
     private static async Task<IEnumerable<CardModel>>
-        AwaitDrawAndGuEntryAsync(
+        AwaitDrawThenGuEntryAsync(
             Task<IEnumerable<CardModel>> drawTask,
-            Task guEntryTask
+            Player player,
+            bool fromHandDraw
         )
     {
-        await Task.WhenAll(drawTask, guEntryTask);
-        return await drawTask;
+        IEnumerable<CardModel> drawnCards = await drawTask;
+        Task? guEntryTask = GuCardPileSystem.BeginOpeningGuEntry(
+            player,
+            fromHandDraw
+        );
+        if (guEntryTask != null)
+        {
+            await guEntryTask;
+        }
+
+        return drawnCards;
     }
 }

@@ -71,7 +71,8 @@ namespace GuZhenRen.Cards;
 /// 攻击型虚影必须使用 FromCard(this) 构建攻击，
 /// VigorPower 会自动加伤并在攻击结束后消耗。
 ///
-/// 青色发光和虚影卡牌飞行动画仍保留为后续扩展点。
+/// 虚影显化时通过原生手牌→出牌区→手牌流程播放动画；
+/// 青色发光仍保留为后续扩展点。
 /// </summary>
 public abstract class AbstractXuYingCard
     : AbstractGuZhenRenCard,
@@ -595,7 +596,7 @@ public abstract class AbstractXuYingCard
                 isExecuting: true
             );
 
-            await ExecutePhantomWithPlaybackAsync(
+            await ExecutePhantomAndReturnToHandAsync(
                 choiceContext,
                 cardPlay,
                 target
@@ -618,25 +619,27 @@ public abstract class AbstractXuYingCard
     }
 
     /// <summary>
-    /// 以“打出→结算→回手”的流程执行虚影效果。
+    /// 执行虚影效果，并在结算后保证虚影仍在手牌中。
     ///
-    /// 触发成功时先把虚影从手牌移出（带移动动画，模拟打出），
-    /// 效果结算后立即回到手牌；概率未触发时完全不进入此流程，
-    /// 保持静默、无任何触发提示。
+    /// 不再在结算前调用 RemoveFromCombat：该命令会让卡牌
+    /// 离开战斗状态，之后的回手命令失败时，游戏内会表现为
+    /// 虚影显化后被消耗。
+    ///
+    /// 虚影在效果结算期间保持战斗注册；无论效果正常完成
+    /// 还是抛出异常，finally 都使用带校验与内部回退的移牌
+    /// 流程将其恢复到手牌。概率未触发时不进入此流程。
     /// </summary>
-    private async Task ExecutePhantomWithPlaybackAsync(
+    private async Task ExecutePhantomAndReturnToHandAsync(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay,
         Creature? target
     )
     {
-        await CardPileCmd.RemoveFromCombat(
-            this,
-            skipVisuals: false
-        );
-
         try
         {
+            ShowPhantomManifestationNotice();
+            await MovePhantomToPlayPileAsync();
+
             await TriggerPhantomEffect(
                 choiceContext,
                 cardPlay,
@@ -645,15 +648,57 @@ public abstract class AbstractXuYingCard
         }
         finally
         {
-            // 无论效果是否异常，虚影都回到手牌，保持常驻。
-            await CardPileCmd.Add(
+            await GuCardPileSystem.MoveCardToPileAsync(
                 this,
                 PileType.Hand,
-                CardPilePosition.Bottom,
-                clonedBy: null,
                 skipVisuals: false
             );
         }
+    }
+
+    /// <summary>
+    /// 将虚影与当前触发牌一同放入出牌区。
+    ///
+    /// AddDuringManualCardPlay 会立即更新牌堆状态，但不等待
+    /// 非能力牌的入场 Tween；多张虚影连续显化时，不会在
+    /// 加速模式下因逐张等待动画而出现额外停顿。
+    ///
+    /// 动画初始化失败不得阻止虚影效果；finally 仍会
+    /// 将虚影校正回手牌。
+    /// </summary>
+    private async Task MovePhantomToPlayPileAsync()
+    {
+        try
+        {
+            await CardPileCmd.AddDuringManualCardPlay(this);
+        }
+        catch (Exception exception)
+        {
+            Entry.Logger.Warn(
+                $"[虚影] 出牌动画初始化失败，继续结算：" +
+                $"card={Id}, error={exception.Message}"
+            );
+        }
+    }
+
+    /// <summary>
+    /// 显示不阻塞结算的虚影显化提示。
+    /// </summary>
+    private void ShowPhantomManifestationNotice()
+    {
+        LocString notice = new(
+            "cards",
+            "GU_ZHEN_REN_CARD_XU_YING_MANIFESTATION.combatMessage"
+        );
+        notice.Add(
+            "Phantom",
+            TitleLocString.GetFormattedText()
+        );
+        ThinkCmd.Play(
+            notice,
+            Owner.Creature,
+            secondsToDisplay: 1.5d
+        );
     }
 
     internal async Task<bool> TriggerFromControllerAsync(
@@ -684,7 +729,7 @@ public abstract class AbstractXuYingCard
             Creature? target = ResolvePhantomTarget(cardPlay.Target);
             executionAnnounced = true;
             OnPhantomExecutionStateChanged(isExecuting: true);
-            await ExecutePhantomWithPlaybackAsync(
+            await ExecutePhantomAndReturnToHandAsync(
                 choiceContext,
                 cardPlay,
                 target

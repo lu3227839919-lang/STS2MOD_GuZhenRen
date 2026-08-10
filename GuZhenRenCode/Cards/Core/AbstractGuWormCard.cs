@@ -1,5 +1,4 @@
 using GuZhenRen.Aperture;
-using GuZhenRen.Cards.HeLian;
 using GuZhenRen.Cards.Interfaces;
 using GuZhenRen.Combat;
 
@@ -48,11 +47,6 @@ public abstract class AbstractGuWormCard
         foreach (CardKeyword keyword in GetMechanicKeywords(guWorm))
         {
             yield return keyword;
-        }
-
-        if (guWorm is AbstractHeLianGuCard)
-        {
-            yield return GuZhenRenKeywords.HeLian;
         }
     }
 
