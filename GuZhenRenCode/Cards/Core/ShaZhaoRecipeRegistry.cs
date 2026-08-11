@@ -163,7 +163,7 @@ public static class ShaZhaoRecipeRegistry
     }
 
     /// <summary>
-    /// 返回当前蛊存放牌堆材料足以完成的杀招结果类型。
+    /// 返回当前蛊手牌材料足以完成的杀招结果类型。
     /// </summary>
     public static IReadOnlyList<Type> GetCraftableResultTypes(
         IEnumerable<CardModel> availableMaterials

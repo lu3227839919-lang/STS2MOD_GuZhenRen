@@ -6,7 +6,7 @@
   "GU_ZHEN_REN_KEYWORD_CUI_DONG.title": "Activation",
   "GU_ZHEN_REN_KEYWORD_CUI_DONG.description": "A Gu card must be used with an Activation card in hand.",
   "GU_ZHEN_REN_KEYWORD_HUI_FU.title": "Cooldown",
-  "GU_ZHEN_REN_KEYWORD_HUI_FU.description": "After all activations are spent, the Gu enters cooldown and cannot be used. It returns to the Gu pile once the listed number of turns has passed.",
+  "GU_ZHEN_REN_KEYWORD_HUI_FU.description": "After all activations are spent, the Gu enters the Gu Cooldown Pile and cannot be used. When the listed cooldown finishes, it returns to the Gu Storage Pile and then enters the Gu Hand in cooldown-completion order.",
   "GU_ZHEN_REN_KEYWORD_KE_XUE.title": "Bloodthirst",
   "GU_ZHEN_REN_KEYWORD_KE_XUE.description": "Spend the listed amount of Blood Essence to use or empower the corresponding effect.",
   "GU_ZHEN_REN_KEYWORD_ZI_SHI.title": "Self-Devour",

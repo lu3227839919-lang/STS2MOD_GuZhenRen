@@ -8,11 +8,11 @@
     },
     "CuiDong": {
       "title": "Activation",
-      "description": "Gu cards can be played directly from the Gu Hand; they enter the cooldown pile after use."
+      "description": "Gu cards can be played directly from the Gu Hand. After all available activations are spent, they enter the Gu Cooldown Pile."
     },
     "HuiFu": {
       "title": "Cooldown",
-      "description": "After all activations are spent, the Gu enters cooldown and cannot be used. It returns to the Gu pile once the listed number of turns has passed."
+      "description": "After all activations are spent, the Gu enters the Gu Cooldown Pile and cannot be used. When cooldown finishes, it returns to the Gu Storage Pile and then enters the Gu Hand in cooldown-completion order."
     },
     "HeLian": {
       "title": "Fusion",
@@ -199,17 +199,17 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.title",
-      "text": "Gu Storage Pile"
+      "text": "Gu Hand"
     },
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "Stores up to 5 currently usable Gu Worms. When space is available, cooled Gu are drawn in cooldown order from the Gu Cooldown Pile. Killer Move deduction can use only materials in this pile."
+      "text": "The Gu Hand holds up to 5 usable Gu Worms. When space is available, Gu enter from the Gu Storage Pile in cooldown-completion order. Killer Move deduction can use only materials in the Gu Hand."
     },
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.empty",
-      "text": "There are no Gu Worms available in the Gu Storage Pile."
+      "text": "The Gu Hand is empty."
     },
     {
       "table": "static_hover_tips",
@@ -223,13 +223,28 @@
     },
     {
       "table": "static_hover_tips",
+      "key": "{GuCardStoragePileId}.title",
+      "text": "Gu Storage Pile"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardStoragePileId}.description",
+      "text": "Stores fully cooled Gu waiting to enter the Gu Hand. When the Gu Hand has room, they enter in cooldown-completion order. Left-click to inspect."
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardStoragePileId}.empty",
+      "text": "The Gu Storage Pile is empty."
+    },
+    {
+      "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.title",
       "text": "Gu Cooldown Pile"
     },
     {
       "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.description",
-      "text": "Stores cooling Gu and cooled Gu waiting because the Gu Hand is full. At turn start, vacancies are filled at random. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move using materials only from the Gu Hand."
+      "text": "Stores only Gu that are still cooling down. After all activations are spent, a Gu enters this pile; when cooldown completes it returns to the Gu Storage Pile. Left-click to inspect."
     },
     {
       "table": "static_hover_tips",

@@ -6,7 +6,7 @@
   "GU_ZHEN_REN_KEYWORD_CUI_DONG.title": "催动",
   "GU_ZHEN_REN_KEYWORD_CUI_DONG.description": "蛊虫牌可从蛊手牌直接打出；打完后进入冷却堆。",
   "GU_ZHEN_REN_KEYWORD_HUI_FU.title": "冷却",
-  "GU_ZHEN_REN_KEYWORD_HUI_FU.description": "蛊虫催动次数耗尽后进入冷却，期间无法使用；经过标注的回合数后冷却完成，返回蛊牌堆。",
+  "GU_ZHEN_REN_KEYWORD_HUI_FU.description": "蛊虫催动次数耗尽后进入蛊冷却堆，期间无法使用；经过标注的回合数后冷却完成，先返回蛊存放牌堆，再按冷却完成顺序进入蛊手牌。",
   "GU_ZHEN_REN_KEYWORD_KE_XUE.title": "渴血",
   "GU_ZHEN_REN_KEYWORD_KE_XUE.description": "消耗牌面标注数量的血元，以施展或强化对应效果。",
   "GU_ZHEN_REN_KEYWORD_ZI_SHI.title": "自噬",

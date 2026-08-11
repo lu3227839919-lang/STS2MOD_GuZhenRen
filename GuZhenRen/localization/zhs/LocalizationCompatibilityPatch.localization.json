@@ -8,11 +8,11 @@
     },
     "CuiDong": {
       "title": "催动",
-      "description": "蛊虫牌可从蛊手牌直接打出；打完后进入冷却堆。"
+      "description": "蛊虫牌可从蛊手牌直接打出；可用催动次数耗尽后进入蛊冷却堆。"
     },
     "HuiFu": {
       "title": "冷却",
-      "description": "蛊虫催动次数耗尽后进入冷却，期间无法使用；经过标注的回合数后冷却完成，返回蛊牌堆。"
+      "description": "蛊虫催动次数耗尽后进入蛊冷却堆，期间无法使用；经过标注的回合数后冷却完成，先返回蛊存放牌堆，再按冷却完成顺序进入蛊手牌。"
     },
     "HeLian": {
       "title": "合练",
@@ -199,17 +199,17 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.title",
-      "text": "蛊存放牌堆"
+      "text": "蛊手牌"
     },
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "存放当前可用的蛊虫牌，最多5张。存在空位时，会从蛊冷却堆中按冷却顺序抽取已冷却完毕的蛊。杀招推演只可使用本牌堆中的材料。"
+      "text": "蛊手牌最多5张。存在空位时，按冷却完成顺序从蛊存放牌堆补入可用蛊虫；杀招推演只可使用蛊手牌中的材料。"
     },
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.empty",
-      "text": "蛊存放牌堆中没有可用的蛊虫。"
+      "text": "蛊手牌为空。"
     },
     {
       "table": "static_hover_tips",
@@ -223,13 +223,28 @@
     },
     {
       "table": "static_hover_tips",
+      "key": "{GuCardStoragePileId}.title",
+      "text": "蛊存放牌堆"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardStoragePileId}.description",
+      "text": "专门存放已经冷却完毕、等待进入蛊手牌的蛊。蛊手牌存在空位时，按冷却完成顺序补入。左键查看。"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardStoragePileId}.empty",
+      "text": "蛊存放牌堆为空。"
+    },
+    {
+      "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.title",
       "text": "蛊冷却堆"
     },
     {
       "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.description",
-      "text": "存放冷却中的蛊，以及因蛊存放牌堆已满而待命的已冷却完毕的蛊。回合开始有空位时随机补入存放牌堆。左键查看；右键花费1点能量开始杀招推演，材料仅从蛊存放牌堆选择。"
+      "text": "只存放正在冷却的蛊。催动次数耗尽后进入此处；冷却完成后返回蛊存放牌堆。左键查看。"
     },
     {
       "table": "static_hover_tips",

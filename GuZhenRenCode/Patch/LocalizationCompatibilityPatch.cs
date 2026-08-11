@@ -466,6 +466,11 @@ internal static partial class LocalizationCompatibilityPatch
                     StringComparison.Ordinal
                 )
                 .Replace(
+                    "{GuCardStoragePileId}",
+                    GuCardPileSystem.StoragePileId,
+                    StringComparison.Ordinal
+                )
+                .Replace(
                     "{GuCardRecoveryPileId}",
                     GuCardPileSystem.RecoveryPileId,
                     StringComparison.Ordinal

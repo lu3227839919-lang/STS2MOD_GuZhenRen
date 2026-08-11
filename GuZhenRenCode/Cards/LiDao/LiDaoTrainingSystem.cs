@@ -107,7 +107,7 @@ public static class LiDaoTrainingSystem
         PileType destination = activeCount <
             GuCardPileSystem.ActivePileCapacity
                 ? GuCardPileSystem.PileType
-                : GuCardPileSystem.RecoveryPileType;
+                : GuCardPileSystem.StoragePileType;
 
         await GuCardPileSystem.MoveCardToPileAsync(
             sealedGu,

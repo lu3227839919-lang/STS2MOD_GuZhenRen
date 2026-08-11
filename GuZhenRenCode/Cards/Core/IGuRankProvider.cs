@@ -32,8 +32,8 @@ public interface IGuWormCard : IGuRankProvider
     int YuanQiCost => 1;
 
     /// <summary>
-    /// 同一张蛊虫在进入蛊存放牌堆后总共可催动的次数。
-    /// 剩余次数跨回合保留；耗尽后进入蛊恢复堆，恢复时重新充满。
+    /// 同一张蛊虫在进入蛊手牌后总共可催动的次数。
+    /// 剩余次数跨回合保留；耗尽后进入蛊冷却堆，冷却完成时重新充满。
     /// </summary>
     int MaxUses => 1;
 

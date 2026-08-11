@@ -33,11 +33,13 @@ using STS2RitsuLib.Utils;
 namespace GuZhenRen.Cards;
 
 /// <summary>
-/// 将“杀招推演”绑定到蛊恢复牌堆右键操作。
+/// 杀招推演与主动解体。
 ///
-/// 牌堆点击只负责发起请求；实际选择、扣费和结算由 RitsuLib 的托管
-/// 联机行动在所有端同步执行。推演先选择可制作的杀招，再从蛊存放牌堆
-/// 中选择该杀招允许的材料，不要求玩家记忆材料配方。
+/// 推演入口为“杀招推演”系统牌（不绑定任何牌堆的右键操作）；
+/// 主动解体绑定在手牌中已绑定材料的杀招卡上（右键，1 费，
+/// 材料返回并额外增加 1 回合冷却，随后杀招消耗）。牌堆点击只负责
+/// 发起请求；实际选择、扣费和结算由 RitsuLib 的托管联机行动在所有
+/// 端同步执行，不要求玩家记忆材料配方。
 /// </summary>
 internal static class ShaZhaoTuiYanSystem
 {
@@ -565,7 +567,7 @@ internal static class ShaZhaoTuiYanSystem
         MaterialBoundShaZhaoState[material] =
             shaZhao.Id.ToString();
 
-        // 材料从蛊存放堆/恢复堆移入蛊封存堆（可见牌堆，位于原版
+        // 材料从蛊手牌移入蛊封存堆（可见牌堆，位于原版
         // 消耗牌堆上方）：使用原版消耗牌动画（飞行动画）移动；
         // 恢复流程会跳过封装材料，因此它既不能催动也不会自动恢复。
         Player player = material.Owner;

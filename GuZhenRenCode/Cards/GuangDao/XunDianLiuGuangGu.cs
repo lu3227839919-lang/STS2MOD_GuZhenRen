@@ -199,7 +199,8 @@ public sealed class XunDianLiuGuangGu : AbstractGuWormCard
         {
             await GuCardPileSystem.MoveCardToPileAsync(
                 card,
-                GuCardPileSystem.RecoveryPileType
+                GuCardPileSystem.StoragePileType,
+                skipVisuals: false
             );
         }
 
@@ -207,7 +208,8 @@ public sealed class XunDianLiuGuangGu : AbstractGuWormCard
         {
             await GuCardPileSystem.MoveCardToPileAsync(
                 card,
-                GuCardPileSystem.PileType
+                GuCardPileSystem.PileType,
+                skipVisuals: false
             );
         }
     }
@@ -227,7 +229,7 @@ public sealed class XunDianLiuGuangGu : AbstractGuWormCard
             .ToArray();
 
     private CardModel[] GetStandbySwapCandidates() =>
-        GuCardPileSystem.RecoveryPileType
+        GuCardPileSystem.StoragePileType
             .GetPile(Owner)
             .Cards
             .Where(card =>

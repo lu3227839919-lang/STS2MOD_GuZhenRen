@@ -17,8 +17,8 @@ using STS2RitsuLib.CardPiles;
 namespace GuZhenRen.Cards;
 
 /// <summary>
-/// 蛊虫专用战斗区域。可用蛊虫显示在 RitsuLib ExtraHand 蛊手牌中，
-/// 耗尽的蛊虫进入蛊恢复堆；它们不会长期进入原版普通手牌。
+/// 蛊虫专用战斗区域。可用蛊虫显示在 RitsuLib ExtraHand 蛊手牌中；
+/// 已冷却蛊在蛊存放牌堆等待，耗尽的蛊虫进入蛊冷却堆。
 /// </summary>
 public static class GuCardPileSystem
 {
@@ -26,12 +26,18 @@ public static class GuCardPileSystem
 
     public const string LocalId = "gu_cards";
 
+    public const string StorageLocalId = "gu_storage";
+
     public const string RecoveryLocalId = "gu_discard";
 
-    /// <summary>Fully-qualified RitsuLib card-pile ID used by localization.</summary>
+    /// <summary>Fully-qualified RitsuLib card-pile ID for the Gu Hand.</summary>
     public const string PileId = "GU_ZHEN_REN_CARDPILE_GU_CARDS";
 
-    /// <summary>Fully-qualified RitsuLib ID for the recovering Gu pile.</summary>
+    /// <summary>Fully-qualified RitsuLib ID for cooled Gu waiting to enter the Gu Hand.</summary>
+    public const string StoragePileId =
+        "GU_ZHEN_REN_CARDPILE_GU_STORAGE";
+
+    /// <summary>Fully-qualified RitsuLib ID for Gu cards that are still cooling down.</summary>
     public const string RecoveryPileId =
         "GU_ZHEN_REN_CARDPILE_GU_DISCARD";
 
@@ -39,7 +45,7 @@ public static class GuCardPileSystem
 
     /// <summary>
     /// 蛊封存堆：力道蛊与杀招封装材料共用的战斗内封存牌堆。
-    /// 封存的蛊既不占用蛊存放堆也不占用蛊恢复堆。
+    /// 封存的蛊既不占用蛊手牌/存放牌堆，也不占用蛊冷却堆。
     /// </summary>
     public const string GuSealedLocalId = "gu_sealed";
 
@@ -49,8 +55,11 @@ public static class GuCardPileSystem
     private const string GuSealedPileIconPath =
         "res://GuZhenRen/materials/ShaZhaoMaterialPile.svg";
 
+    private const string StoragePileIconPath =
+        "res://GuZhenRen/images/ui/GuChunFangPaiDui.png";
+
     private const string RecoveryPileIconPath =
-        "res://GuZhenRen/images/ui/QiPaiDui.png";
+        "res://GuZhenRen/images/ui/GuLengQuePaiDui.png";
 
     private const string OpeningDrawSelectionDomain =
         "gu_pile/opening_draw";
@@ -59,10 +68,13 @@ public static class GuCardPileSystem
 
     private const ulong StableHashPrime = 1099511628211UL;
 
-    /// <summary>The runtime pile type assigned by RitsuLib.</summary>
+    /// <summary>The runtime ExtraHand pile used as the Gu Hand.</summary>
     public static PileType PileType { get; private set; }
 
-    /// <summary>The runtime pile type used by Gu cards with no uses left.</summary>
+    /// <summary>The visible storage pile for fully cooled Gu waiting to enter the Gu Hand.</summary>
+    public static PileType StoragePileType { get; private set; }
+
+    /// <summary>The runtime pile type used only by Gu cards that are cooling down.</summary>
     public static PileType RecoveryPileType { get; private set; }
 
     public static PileType DiscardPileType => RecoveryPileType;
@@ -106,7 +118,7 @@ public static class GuCardPileSystem
             ModCardPileRegistry registry =
                 ModCardPileRegistry.For(Entry.ModId);
 
-            // 蛊存放堆以 RitsuLib ExtraHand 形式常驻显示。卡牌节点始终可见，
+            // 蛊手牌以 RitsuLib ExtraHand 形式常驻显示。卡牌节点始终可见，
             // 但只有普通手牌中存在可用“催动”时才能开始原生出牌/目标选择。
             ModCardPileDefinition definition =
                 registry.RegisterOwned(
@@ -124,7 +136,26 @@ public static class GuCardPileSystem
                     }
                 );
 
-            // 恢复堆仍放在原版弃牌堆左侧。
+            // 新增蛊存放牌堆：只存放已冷却完毕、正在等待进入蛊手牌的蛊。
+            // BottomLeftPrimary 是 RitsuLib 从原版抽牌堆向右延伸的第一槽，
+            // 因此无需硬编码屏幕坐标即可紧邻原版抽牌堆。
+            ModCardPileDefinition storageDefinition =
+                registry.RegisterOwned(
+                    StorageLocalId,
+                    new ModCardPileSpec
+                    {
+                        Scope = ModCardPileScope.CombatOnly,
+                        Style = ModCardPileUiStyle.BottomLeft,
+                        IconPath = StoragePileIconPath,
+                        Anchor = new ModCardPileAnchor(
+                            ModCardPileAnchorKind.BottomLeftPrimary,
+                            Vector2.Zero
+                        ),
+                        CardShouldBeVisible = true,
+                    }
+                );
+
+            // 蛊冷却堆仍放在原版弃牌堆左侧，并且只保留真正处于冷却中的蛊。
             ModCardPileDefinition recoveryDefinition =
                 registry.RegisterOwned(
                     RecoveryLocalId,
@@ -142,6 +173,7 @@ public static class GuCardPileSystem
                 );
 
             PileType = definition.PileType;
+            StoragePileType = storageDefinition.PileType;
             RecoveryPileType = recoveryDefinition.PileType;
 
             // 蛊封存堆：力道蛊与杀招封装材料共用一个牌堆，使用
@@ -208,9 +240,7 @@ public static class GuCardPileSystem
         else
         {
             GuCardUsageRules.ResetUses(card);
-            targetPile = GetAvailableActiveSlots(owner) > 0
-                ? PileType
-                : RecoveryPileType;
+            targetPile = StoragePileType;
         }
 
         CardPileAddResult result =
@@ -224,9 +254,9 @@ public static class GuCardPileSystem
     }
 
     /// <summary>
-    /// 战斗初始化时先把蛊牌暂存到恢复堆。第一轮原版抽牌完成后，
+    /// 战斗初始化时先把可用蛊牌放入蛊存放牌堆。第一轮原版抽牌完成后，
     /// <see cref="BeginOpeningGuEntry"/> 会按原版抽牌节奏逐张把它们
-    /// 送入 ExtraHand，避免两组牌堆动画同时刷新界面。
+    /// 送入蛊手牌 ExtraHand，避免两组牌堆动画同时刷新界面。
     /// </summary>
     internal static void InitializeGuCardsForCombat(Player owner)
     {
@@ -234,6 +264,7 @@ public static class GuCardPileSystem
 
         EnsureInitialized();
 
+        CardPile storagePile = StoragePileType.GetPile(owner);
         CardPile recoveryPile = RecoveryPileType.GetPile(owner);
         CardPile guSealedPile = GuSealedPileType.GetPile(owner);
         CardPile[] combatPiles =
@@ -242,6 +273,7 @@ public static class GuCardPileSystem
             PileType.Discard.GetPile(owner),
             PileType.Hand.GetPile(owner),
             PileType.GetPile(owner),
+            storagePile,
             recoveryPile,
             guSealedPile,
         ];
@@ -264,7 +296,7 @@ public static class GuCardPileSystem
             else
             {
                 GuCardUsageRules.ResetUses(card);
-                targetPile = recoveryPile;
+                targetPile = storagePile;
             }
 
             CardPile? sourcePile = card.Pile;
@@ -314,8 +346,8 @@ public static class GuCardPileSystem
             );
             Entry.Logger.Info(
                 $"[蛊牌入场] 共 {guCards.Length} 张蛊牌；随机选取 " +
-                $"{openingCards.Length} 张进入蛊存放牌堆，" +
-                $"{openingCandidates.Length - openingCards.Length} 张留在恢复堆待命，" +
+                $"{openingCards.Length} 张进入蛊手牌，" +
+                $"{openingCandidates.Length - openingCards.Length} 张留在蛊存放牌堆待命，" +
                 $"{guCards.Length - openingCandidates.Length} 张力道蛊进入蛊封存堆；" +
                 $"确定性选择=[{selectedCards}]。"
             );
@@ -358,11 +390,11 @@ public static class GuCardPileSystem
         OpeningEntryState state
     )
     {
-        CardPile recoveryPile = RecoveryPileType.GetPile(owner);
+        CardPile storagePile = StoragePileType.GetPile(owner);
         CardModel[] cards = state.Cards
             .Where(card =>
                 card is IGuWormCard &&
-                ReferenceEquals(card.Pile, recoveryPile)
+                ReferenceEquals(card.Pile, storagePile)
             )
             .Take(GetAvailableActiveSlots(owner))
             .ToArray();
@@ -376,12 +408,12 @@ public static class GuCardPileSystem
 
             Entry.Logger.Info(
                 $"[蛊牌入场] 原版起手抽牌完成后，逐张播放 " +
-                $"{cards.Length} 张蛊牌的恢复堆入场动画。"
+                $"{cards.Length} 张蛊牌的存放堆→蛊手牌原生移牌动画。"
             );
 
             foreach (CardModel card in cards)
             {
-                if (!ReferenceEquals(card.Pile, recoveryPile))
+                if (!ReferenceEquals(card.Pile, storagePile))
                 {
                     continue;
                 }
@@ -392,7 +424,7 @@ public static class GuCardPileSystem
                 if (!result.success)
                 {
                     throw new InvalidOperationException(
-                        $"蛊牌 {card.Id} 无法进入蛊存放牌堆。"
+                        $"蛊牌 {card.Id} 无法进入蛊手牌。"
                     );
                 }
             }
@@ -406,16 +438,16 @@ public static class GuCardPileSystem
             CardPile guPile = PileType.GetPile(owner);
             foreach (CardModel card in cards)
             {
-                if (!ReferenceEquals(card.Pile, recoveryPile))
+                if (!ReferenceEquals(card.Pile, storagePile))
                 {
                     continue;
                 }
 
-                recoveryPile.RemoveInternal(card, silent: true);
+                storagePile.RemoveInternal(card, silent: true);
                 guPile.AddInternal(card, silent: true);
             }
 
-            recoveryPile.InvokeContentsChanged();
+            storagePile.InvokeContentsChanged();
             guPile.InvokeContentsChanged();
         }
         finally
@@ -483,11 +515,10 @@ public static class GuCardPileSystem
 
         EnsureInitialized();
 
-        CardPile guPile = PileType.GetPile(owner);
+        CardPile storagePile = StoragePileType.GetPile(owner);
         CardPile recoveryPile = RecoveryPileType.GetPile(owner);
         CardPile guSealedPile = GuSealedPileType.GetPile(owner);
-        MoveActiveOverflowToRecovery(owner);
-        int availableSlots = GetAvailableActiveSlots(owner);
+        MoveActiveOverflowToStorageOrRecovery(owner);
         HashSet<CardPile> changedPiles = [];
 
         foreach (CardPile sourcePile in new[]
@@ -519,21 +550,13 @@ public static class GuCardPileSystem
                     continue;
                 }
 
-                if (GuCardUsageRules.CanUse(card))
+                if (GuCardUsageRules.CanUse(card) &&
+                    !GuCardUsageRules.HasRecoverySchedule(card))
                 {
-                    if (availableSlots > 0)
-                    {
-                        guPile.AddInternal(card, silent: true);
-                        changedPiles.Add(guPile);
-                        availableSlots--;
-                    }
-                    else
-                    {
-                        // 可用但超过五张上限：作为“已恢复待命”蛊保留，
-                        // 不建立冷却时间戳。
-                        recoveryPile.AddInternal(card, silent: true);
-                        changedPiles.Add(recoveryPile);
-                    }
+                    // 已可用的蛊统一进入蛊存放牌堆，由回合开始的补牌流程
+                    // 按冷却完成顺序送入蛊手牌。
+                    storagePile.AddInternal(card, silent: true);
+                    changedPiles.Add(storagePile);
                 }
                 else
                 {
@@ -648,40 +671,52 @@ public static class GuCardPileSystem
 
         EnsureInitialized();
 
-        // 第一回合的起手入场与原版抽牌并行。此时不得让恢复流程先把
-        // 待命蛊塞满存放堆，否则稍后的入场动画会突破五张上限。
+        // 第一回合的起手入场与原版抽牌并行。此时不得额外补蛊手牌，
+        // 否则稍后的起手入场动画会突破五张上限。
         if (IsOpeningEntryPending(owner))
         {
             return;
         }
 
         CardPile recoveryPile = RecoveryPileType.GetPile(owner);
-        CardModel[] allRecoveringCards =
-            recoveryPile.Cards
-                .Where(static card => card is IGuWormCard)
-                // 被杀招封装的材料不进入恢复循环。
-                .Where(card =>
-                    !ShaZhaoTuiYanSystem.IsMaterialSealed(card)
-                )
-                .ToArray();
+        CardPile storagePile = StoragePileType.GetPile(owner);
+        CardModel[] coolingCards = recoveryPile.Cards
+            .Where(static card => card is IGuWormCard)
+            // 被杀招封装的材料不进入恢复循环。
+            .Where(card =>
+                !ShaZhaoTuiYanSystem.IsMaterialSealed(card)
+            )
+            .ToArray();
 
-        if (allRecoveringCards.Length == 0)
+        // 兼容旧存档：旧版恢复堆可能混有“已恢复但因蛊手牌已满而待命”
+        // 的蛊。新版将它们迁移到专门的蛊存放牌堆，不重新开始冷却。
+        CardModel[] legacyReadyCards = coolingCards
+            .Where(card =>
+                GuCardUsageRules.CanUse(card) &&
+                !GuCardUsageRules.HasRecoverySchedule(card)
+            )
+            .OrderBy(GuCardUsageRules.GetRecoveryCompletedTurn)
+            .ThenBy(GuZhenRenDeterminism.GetCardNetworkId)
+            .ToArray();
+
+        foreach (CardModel card in legacyReadyCards)
         {
-            return;
+            await MoveCardToPileAsync(
+                card,
+                StoragePileType,
+                skipVisuals: false
+            );
         }
 
-        // 兼容旧存档：没有逐牌时间戳的恢复牌，从当前回合重新开始冷却，
-        // 避免在加载后被错误地立即刷新。
-        foreach (CardModel card in allRecoveringCards)
-        {
-            // 没有冷却时间戳且已有可用次数，表示该牌已经恢复，只因
-            // 五张上限暂存在恢复堆。它无需再次开始冷却或重复触发恢复效果。
-            if (GuCardUsageRules.CanUse(card) &&
-                !GuCardUsageRules.HasRecoverySchedule(card))
-            {
-                continue;
-            }
+        CardModel[] activelyCoolingCards = recoveryPile.Cards
+            .Where(static card => card is IGuWormCard)
+            .Where(card =>
+                !ShaZhaoTuiYanSystem.IsMaterialSealed(card)
+            )
+            .ToArray();
 
+        foreach (CardModel card in activelyCoolingCards)
+        {
             if (!GuCardUsageRules.HasRecoverySchedule(card))
             {
                 GuCardUsageRules.ScheduleRecovery(card, turnNumber);
@@ -691,16 +726,15 @@ public static class GuCardPileSystem
                 .HandleRecoveryTurnStartAsync(card, turnNumber);
         }
 
-        CardModel[] recoveredCards = allRecoveringCards
+        CardModel[] recoveredCards = activelyCoolingCards
             .Where(card =>
                 GuCardUsageRules.IsRecoveryReady(card, turnNumber)
             )
+            .OrderBy(card =>
+                GuCardUsageRules.GetRecoveryCompletedTurn(card)
+            )
+            .ThenBy(GuZhenRenDeterminism.GetCardNetworkId)
             .ToArray();
-
-        if (recoveredCards.Length == 0)
-        {
-            return;
-        }
 
         foreach (CardModel card in recoveredCards)
         {
@@ -710,34 +744,30 @@ public static class GuCardPileSystem
                 turnNumber
             );
             await GuRecoveryEffectSystem.HandleRecoveredAsync(card);
+
+            // 冷却完成先回到“蛊存放牌堆”。使用 CardPileCmd 的原生
+            // 飞行动画，而不是直接改 CardPile 内部列表。
+            await MoveCardToPileAsync(
+                card,
+                StoragePileType,
+                skipVisuals: false
+            );
         }
 
-        CardModel[] readyCards = recoveryPile.Cards
+        CardModel[] readyCards = storagePile.Cards
             .Where(card =>
                 card is IGuWormCard &&
                 GuCardUsageRules.CanUse(card) &&
-                !GuCardUsageRules.HasRecoverySchedule(card)
+                !GuCardUsageRules.HasRecoverySchedule(card) &&
+                !ShaZhaoTuiYanSystem.IsMaterialSealed(card)
             )
-            .ToArray();
-
-        int availableSlots = GetAvailableActiveSlots(owner);
-        if (availableSlots <= 0 || readyCards.Length == 0)
-        {
-            return;
-        }
-
-        // 不再随机抽取：按恢复完成回合先后给予空位（先恢复完的先上场）。
-        // 同一回合恢复的多张蛊用网络卡牌 ID 稳定定序，保证跨端一致。
-        CardModel[] drawnCards = readyCards
-            .OrderBy(
-                card =>
-                    GuCardUsageRules.GetRecoveryCompletedTurn(card)
-            )
+            // 先冷却完成的先进入蛊手牌；同回合完成时用网络 ID 稳定定序。
+            .OrderBy(GuCardUsageRules.GetRecoveryCompletedTurn)
             .ThenBy(GuZhenRenDeterminism.GetCardNetworkId)
-            .Take(availableSlots)
+            .Take(GetAvailableActiveSlots(owner))
             .ToArray();
 
-        foreach (CardModel card in drawnCards)
+        foreach (CardModel card in readyCards)
         {
             await AddGuCardToActivePileSequentiallyAsync(card);
         }
@@ -935,11 +965,12 @@ public static class GuCardPileSystem
 
     /// <summary>
     /// 兼容旧存档或其他模组直接移动蛊牌的情况，保证存放堆绝不超过
-    /// 五张。可用的溢出蛊作为已恢复待命牌保留；耗尽牌继续正常冷却。
+    /// 五张。可用的溢出蛊回到蛊存放牌堆；耗尽牌继续进入蛊冷却堆。
     /// </summary>
-    private static void MoveActiveOverflowToRecovery(Player owner)
+    private static void MoveActiveOverflowToStorageOrRecovery(Player owner)
     {
         CardPile guPile = PileType.GetPile(owner);
+        CardPile storagePile = StoragePileType.GetPile(owner);
         CardPile recoveryPile = RecoveryPileType.GetPile(owner);
         CardModel[] overflowCards = guPile.Cards
             .Where(static card => card is IGuWormCard)
@@ -952,21 +983,38 @@ public static class GuCardPileSystem
         }
 
         int currentTurn = owner.PlayerCombatState?.TurnNumber ?? 1;
+        bool storageChanged = false;
+        bool recoveryChanged = false;
         foreach (CardModel card in overflowCards)
         {
             guPile.RemoveInternal(card, silent: true);
 
-            if (!GuCardUsageRules.CanUse(card) &&
+            if (GuCardUsageRules.CanUse(card) &&
                 !GuCardUsageRules.HasRecoverySchedule(card))
+            {
+                storagePile.AddInternal(card, silent: true);
+                storageChanged = true;
+                continue;
+            }
+
+            if (!GuCardUsageRules.HasRecoverySchedule(card))
             {
                 GuCardUsageRules.ScheduleRecovery(card, currentTurn);
             }
 
             recoveryPile.AddInternal(card, silent: true);
+            recoveryChanged = true;
         }
 
         guPile.InvokeContentsChanged();
-        recoveryPile.InvokeContentsChanged();
+        if (storageChanged)
+        {
+            storagePile.InvokeContentsChanged();
+        }
+        if (recoveryChanged)
+        {
+            recoveryPile.InvokeContentsChanged();
+        }
     }
 
     /// <summary>

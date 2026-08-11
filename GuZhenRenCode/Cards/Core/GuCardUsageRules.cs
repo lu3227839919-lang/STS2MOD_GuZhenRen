@@ -84,6 +84,9 @@ public static class GuCardUsageRules
         {
             SpentActivationsState[card] = 0;
             RecoveryReadyTurnState[card] = 0;
+            // 新战斗/新一次冷却周期不继承上一次的“完成顺序”。
+            // 真正冷却完成时会由 MarkRecoveryCompleted 写入本轮次。
+            RecoveryCompletedTurnState[card] = 0;
             PreparedPayments.Remove(card);
 
             if (card is IGuRecoveryEffectSource recoverySource)
@@ -297,6 +300,10 @@ public static class GuCardUsageRules
         if (existing <= 0 || readyTurn < existing)
         {
             RecoveryReadyTurnState[card] = readyTurn;
+            if (existing <= 0)
+            {
+                RecoveryCompletedTurnState[card] = 0;
+            }
         }
     }
 
@@ -319,6 +326,7 @@ public static class GuCardUsageRules
         int delay = Math.Max(1, guCard.RecoveryDelayTurns) + extraTurns;
         RecoveryReadyTurnState[card] =
             Math.Max(1, depletedOnTurn) + delay;
+        RecoveryCompletedTurnState[card] = 0;
     }
 
     public static bool HasRecoverySchedule(CardModel card) =>
