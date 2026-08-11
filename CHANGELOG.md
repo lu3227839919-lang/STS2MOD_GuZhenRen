@@ -2,6 +2,30 @@
 
 本项目的全部重要变更记录。版本号遵循 [SemVer](https://semver.org/lang/zh-CN/) 风格，规则见 [VERSIONING.md](VERSIONING.md)。历史版本大多未标注发布日期。
 
+## [0.9.17] - 2026-08-11
+
+### 新增
+- 配方大全：顶栏新增配方大全按钮与配方浏览器，展示杀招推演与合炼的全部配方、材料与最低转数要求（仅冒险进行中显示，在地图按钮旁动态排布）。`HeLianRecipeRegistry` 新增 `GetRecipeDetails` 接口。
+- 卡图统一：太光蛊、迅电流光蛊、血滴子蛊、血云噬身改用 `GuZhenRen/images/cards` 下的独立同名卡图。
+
+### 调整
+- 蛊虫"恢复"机制术语统一改为"冷却"：卡牌描述、关键词（恢复→冷却，卡面重新显示关键词标签与悬浮说明）与牌堆提示（蛊恢复堆→蛊冷却堆）中英文同步更新。
+- 元气能量图标改用角色能量图标 `energy_big.png`，删除原元气专用图标 `energy2_big.png`/`energy2_text.png`。
+
+### 修复
+- 配方大全遮罩点击关闭时引用不存在方法的编译错误（`AcceptEvent` → `_backdrop.AcceptEvent`）。
+
+### Added
+- Recipe Compendium: a new top-bar button and recipe browser showing all Killer Move and Fusion recipes, materials and minimum material ranks (visible only during a run, laid out dynamically next to the map button). `HeLianRecipeRegistry` gains a `GetRecipeDetails` API.
+- Unified card art: TaiGuangGu, XunDianLiuGuangGu, XueDiZiGu and XueYunShiShen now use their own same-named art under `GuZhenRen/images/cards`.
+
+### Changed
+- The Gu "Recovery" mechanic is renamed to "Cooldown" across card text, keyword labels (with a hover tooltip) and pile tooltips (Gu Recovery Pile -> Gu Cooldown Pile), in both languages.
+- Yuan Qi energy icon now reuses `energy_big.png`; the dedicated `energy2_big.png`/`energy2_text.png` icons are removed.
+
+### Fixed
+- Fixed a compile error in the Recipe Compendium overlay's backdrop click-to-close handler (`AcceptEvent` -> `_backdrop.AcceptEvent`).
+
 ## [0.9.16] - 2026-08-11
 
 ### 修复

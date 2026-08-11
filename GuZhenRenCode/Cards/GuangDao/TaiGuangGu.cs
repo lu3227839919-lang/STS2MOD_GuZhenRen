@@ -45,10 +45,9 @@ public sealed class TaiGuangGu : AbstractGuWormCard
         new PowerVar<ZhaoPoPower>(1m),
     ];
 
-    // 暂用月光蛊卡图，避免缺图时出现空白卡面。
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: CardImageCatalog.GetResourcePath(typeof(YueGuangGu))
-    );
+    // 使用 images/cards/TaiGuangGu.png 同名卡图。
+    public override CardAssetProfile AssetProfile =>
+        CardImageCatalog.Create(typeof(TaiGuangGu));
 
     public TaiGuangGu()
         : base(0, CardType.Attack, CardRarity.Rare, TargetType.AllEnemies)

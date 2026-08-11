@@ -43,10 +43,9 @@ public sealed class XueDiZiGu : AbstractGuWormCard
         new DynamicVar(BreedCapVar, 1m),
     ];
 
-    // 暂用血翅蛊卡图，避免缺图时出现空白卡面。
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: CardImageCatalog.GetResourcePath(typeof(XueChiGu))
-    );
+    // 使用 images/cards/XueDiZiGu.png 同名卡图。
+    public override CardAssetProfile AssetProfile =>
+        CardImageCatalog.Create(typeof(XueDiZiGu));
 
     public XueDiZiGu()
         : base(0, CardType.Attack, CardRarity.Rare, TargetType.AllEnemies)
@@ -172,10 +171,9 @@ public sealed class XueYunShiShen : AbstractXueDaoToken
         new DynamicVar(BreedCapVar, 1m),
     ];
 
-    // 暂用刀翅血蝠衍生牌卡图，避免缺图时出现空白卡面。
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: CardImageCatalog.GetResourcePath(typeof(DaoChiXueFu))
-    );
+    // 使用 images/cards/XueYunShiShen.png 同名卡图。
+    public override CardAssetProfile AssetProfile =>
+        CardImageCatalog.Create(typeof(XueYunShiShen));
 
     public XueYunShiShen()
         : base(1, CardType.Attack, CardRarity.Token, TargetType.AllEnemies)

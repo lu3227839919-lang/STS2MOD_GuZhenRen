@@ -26,10 +26,10 @@ public static class YuanQiSystem
         "res://GuZhenRen/scenes/ui/nodes/GuZhenRen_energy_counter2.tscn";
 
     public const string LargeIconPath =
-        "res://GuZhenRen/images/characters/energy2_big.png";
+        "res://GuZhenRen/images/characters/energy_big.png";
 
     public const string SmallIconPath =
-        "res://GuZhenRen/images/characters/energy2_text.png";
+        "res://GuZhenRen/images/characters/energy_text.png";
 
     private static readonly SecondaryResourceCounterStyle
         MultiplayerCounterStyle =

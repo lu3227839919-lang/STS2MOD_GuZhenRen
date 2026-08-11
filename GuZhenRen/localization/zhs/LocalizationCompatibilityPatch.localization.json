@@ -8,11 +8,11 @@
     },
     "CuiDong": {
       "title": "催动",
-      "description": "蛊虫牌可从蛊手牌直接打出；打完后进入恢复堆冷却。"
+      "description": "蛊虫牌可从蛊手牌直接打出；打完后进入冷却堆。"
     },
     "HuiFu": {
-      "title": "恢复",
-      "description": "蛊虫催动次数耗尽后进入恢复堆；经过标注回合数后返回蛊牌堆。"
+      "title": "冷却",
+      "description": "蛊虫催动次数耗尽后进入冷却，期间无法使用；经过标注的回合数后冷却完成，返回蛊牌堆。"
     },
     "HeLian": {
       "title": "合练",
@@ -147,15 +147,15 @@
     "GU_ZHEN_REN_CARD_BAI_LI_XIAN_YUAN.description": "作为仙元保留在手中。等于两张红枣仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
     "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description": "作为仙元保留在手中。等于两张白荔仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
     "GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "蛊虫容量已达{Capacity}张。选择一张现有蛊虫替换，以获得[gold]{NewCard}[/gold]。",
-    "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]恢复[/gold]{RecoveryTurnsCN}；\n[gold]渴血[/gold]{BloodCost}、[gold]自噬[/gold]。选择1张普通手牌植入[gold]血气[/gold]。",
-    "GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]合练[/gold]，[gold]恢复[/gold]{RecoveryTurnsCN}；\n[gold]渴血[/gold]2：植入[gold]月相[/gold]。三阶段[gold]总额度[/gold]——流血{CrescentBleed}/{WaxingBleed}/{FullBleed}；血印{CrescentMarks}/{WaxingMarks}/{FullMarks}。",
-    "GU_ZHEN_REN_CARD_XUE_CHI_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]恢复[/gold]{RecoveryTurnsCN}；\n获得{XueYuanPower:diff()}点[gold]血元[/gold]；每点[gold]溢出[/gold]转化为{OverflowBlock}点格挡。",
-    "GU_ZHEN_REN_CARD_XUE_PI_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]恢复[/gold]{RecoveryTurnsCN}；\n获得{Block:diff()}点格挡；[gold]渴血[/gold]1：额外获得{EmpoweredBlock}点。每层[gold]血颅[/gold]使格挡+2。",
-    "GU_ZHEN_REN_CARD_XUE_LU_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]恢复[/gold]{RecoveryTurnsCN}；\n获得{Block:diff()}点格挡；[gold]嗜骸 {MaxAbsorb}[/gold]：每张获得1层[gold]血颅[/gold]，满层时改为回复{Heal:diff()}点生命。",
-    "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]恢复[/gold]{RecoveryTurnsCN}；\n获得同转[gold]刀翅血蝠[/gold]；[gold]嗜骸 2[/gold]：改为获得[gold]刀翅血蝠群[/gold]。",
-    "GU_ZHEN_REN_CARD_XUE_TAI_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]合练[/gold]，[gold]恢复[/gold]{RecoveryTurnsCN}；\n[gold]渴血[/gold]2、[gold]自噬[/gold]：植入[gold]血胎[/gold]，可[gold]吞寄[/gold]；3点[gold]胎动[/gold]后[gold]孵化[/gold]。",
-    "GU_ZHEN_REN_CARD_XUE_FU_WANG_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]恢复[/gold]{RecoveryTurnsCN}；\n[gold]嗜骸 2[/gold]：获得同转[gold]血蝠王[/gold]；每张+2次攻击，2张时获得[gold]追击[/gold]。结算[gold]血颅[/gold]。",
-    "GU_ZHEN_REN_CARD_XUE_HE_JIA_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]恢复[/gold]{RecoveryTurnsCN}；\n[gold]血河[/gold]：血元低于4时获得{LowBloodGain}点血元与{LowBlock}点格挡；否则[gold]渴血[/gold]2，获得{HighBlock}点格挡，下回合再获得一半。每层[gold]血颅[/gold]使格挡+2。",
+    "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n[gold]渴血[/gold]{BloodCost}、[gold]自噬[/gold]。选择1张普通手牌植入[gold]血气[/gold]。",
+    "GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]合练[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n[gold]渴血[/gold]2：植入[gold]月相[/gold]。三阶段[gold]总额度[/gold]——流血{CrescentBleed}/{WaxingBleed}/{FullBleed}；血印{CrescentMarks}/{WaxingMarks}/{FullMarks}。",
+    "GU_ZHEN_REN_CARD_XUE_CHI_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n获得{XueYuanPower:diff()}点[gold]血元[/gold]；每点[gold]溢出[/gold]转化为{OverflowBlock}点格挡。",
+    "GU_ZHEN_REN_CARD_XUE_PI_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n获得{Block:diff()}点格挡；[gold]渴血[/gold]1：额外获得{EmpoweredBlock}点。每层[gold]血颅[/gold]使格挡+2。",
+    "GU_ZHEN_REN_CARD_XUE_LU_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n获得{Block:diff()}点格挡；[gold]嗜骸 {MaxAbsorb}[/gold]：每张获得1层[gold]血颅[/gold]，满层时改为回复{Heal:diff()}点生命。",
+    "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n获得同转[gold]刀翅血蝠[/gold]；[gold]嗜骸 2[/gold]：改为获得[gold]刀翅血蝠群[/gold]。",
+    "GU_ZHEN_REN_CARD_XUE_TAI_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]合练[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n[gold]渴血[/gold]2、[gold]自噬[/gold]：植入[gold]血胎[/gold]，可[gold]吞寄[/gold]；3点[gold]胎动[/gold]后[gold]孵化[/gold]。",
+    "GU_ZHEN_REN_CARD_XUE_FU_WANG_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n[gold]嗜骸 2[/gold]：获得同转[gold]血蝠王[/gold]；每张+2次攻击，2张时获得[gold]追击[/gold]。结算[gold]血颅[/gold]。",
+    "GU_ZHEN_REN_CARD_XUE_HE_JIA_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n[gold]血河[/gold]：血元低于4时获得{LowBloodGain}点血元与{LowBlock}点格挡；否则[gold]渴血[/gold]2，获得{HighBlock}点格挡，下回合再获得一半。每层[gold]血颅[/gold]使格挡+2。",
     "GU_ZHEN_REN_CARD_WAN_HAI_GUI_CHAO.description": "[gold]嗜骸 3[/gold]。形成{Damage:diff()}＋每张{DamagePerRemains}点的总伤害池并分配给所有敌人；获得{Block:diff()}＋每张{BlockPerRemains}点格挡。",
     "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.extraCardText": "附魔·月相（{Rank}转·残月）：剩余{TriggersRemaining}次触发；打出宿主后推进。",
     "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.extraCardText": "附魔·月相（{Rank}转·盈月）：剩余{TriggersRemaining}次触发；打出宿主后推进。",
@@ -204,7 +204,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "存放当前可用的蛊虫牌，最多5张。存在空位时，会从蛊恢复堆中按恢复顺序抽取已经恢复的蛊。杀招推演只可使用本牌堆中的材料。"
+      "text": "存放当前可用的蛊虫牌，最多5张。存在空位时，会从蛊冷却堆中按冷却顺序抽取已冷却完毕的蛊。杀招推演只可使用本牌堆中的材料。"
     },
     {
       "table": "static_hover_tips",
@@ -224,17 +224,17 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.title",
-      "text": "蛊恢复堆"
+      "text": "蛊冷却堆"
     },
     {
       "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.description",
-      "text": "存放冷却中的蛊，以及因蛊存放牌堆已满而待命的已恢复蛊。回合开始有空位时随机补入存放牌堆。左键查看；右键花费1点能量开始杀招推演，材料仅从蛊存放牌堆选择。"
+      "text": "存放冷却中的蛊，以及因蛊存放牌堆已满而待命的已冷却完毕的蛊。回合开始有空位时随机补入存放牌堆。左键查看；右键花费1点能量开始杀招推演，材料仅从蛊存放牌堆选择。"
     },
     {
       "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.empty",
-      "text": "蛊恢复堆为空。"
+      "text": "蛊冷却堆为空。"
     },
     {
       "table": "powers",

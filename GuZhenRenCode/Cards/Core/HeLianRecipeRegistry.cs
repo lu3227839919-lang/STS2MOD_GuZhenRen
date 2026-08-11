@@ -389,6 +389,28 @@ public static class HeLianRecipeRegistry
             .ToArray();
     }
 
+    /// <summary>
+    /// 获取全部配方及其材料最低转数要求。
+    /// 配方大全使用此接口展示完整条件；既有调用方仍可继续使用
+    /// GetRecipes() 的兼容返回值。
+    /// </summary>
+    public static IReadOnlyList<(
+        Type ResultCardType,
+        IReadOnlyList<Type> MaterialCardTypes,
+        int MinimumMaterialRank
+    )> GetRecipeDetails()
+    {
+        return Recipes.Value
+            .Select(recipe =>
+                (
+                    recipe.ResultCardType,
+                    recipe.MaterialCardTypes,
+                    recipe.MinimumMaterialRank
+                )
+            )
+            .ToArray();
+    }
+
     private static IReadOnlyList<Recipe>
         DiscoverRecipes()
     {

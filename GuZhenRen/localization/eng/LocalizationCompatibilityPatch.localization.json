@@ -8,11 +8,11 @@
     },
     "CuiDong": {
       "title": "Activation",
-      "description": "Gu cards can be played directly from the Gu Hand; they enter the recovery pile after use."
+      "description": "Gu cards can be played directly from the Gu Hand; they enter the cooldown pile after use."
     },
     "HuiFu": {
-      "title": "Recovery",
-      "description": "After all activations are spent, the Gu enters recovery and returns to the Gu pile after the listed number of turns."
+      "title": "Cooldown",
+      "description": "After all activations are spent, the Gu enters cooldown and cannot be used. It returns to the Gu pile once the listed number of turns has passed."
     },
     "HeLian": {
       "title": "Fusion",
@@ -147,15 +147,15 @@
     "GU_ZHEN_REN_CARD_BAI_LI_XIAN_YUAN.description": "Retain as immortal essence. Equals two Red Date essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
     "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description": "Retain as immortal essence. Equals two White Litchi essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
     "GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "Your {Capacity}-card Gu capacity is full. Choose an existing Gu Worm to replace to obtain [gold]{NewCard}[/gold].",
-    "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Recover[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] {BloodCost}, [gold]Self-Devour[/gold]. Choose 1 normal card in your hand and implant [gold]Blood Qi[/gold].",
-    "GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Fusion[/gold]; [gold]Recover[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] 2: implant [gold]Moon Phase[/gold]. Three-stage [gold]Shared Pools[/gold]—Bleed {CrescentBleed}/{WaxingBleed}/{FullBleed}; Marks {CrescentMarks}/{WaxingMarks}/{FullMarks}.",
-    "GU_ZHEN_REN_CARD_XUE_CHI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Recover[/gold] {RecoveryTurns}. Gain {XueYuanPower:diff()} [gold]Blood Essence[/gold]; convert each [gold]Overflow[/gold] into {OverflowBlock} Block.",
-    "GU_ZHEN_REN_CARD_XUE_PI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Recover[/gold] {RecoveryTurns}. Gain {Block:diff()} Block; [gold]Bloodthirst[/gold] 1: gain {EmpoweredBlock} more. Each [gold]Blood Skull[/gold] adds 2 Block.",
-    "GU_ZHEN_REN_CARD_XUE_LU_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Recover[/gold] {RecoveryTurns}. Gain {Block:diff()} Block; [gold]Devour Remains {MaxAbsorb}[/gold]: each grants 1 [gold]Blood Skull[/gold], or heals {Heal:diff()} HP at the cap.",
-    "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Recover[/gold] {RecoveryTurns}. Add a same-rank [gold]Blade-Wing Blood Bat[/gold]; [gold]Devour Remains 2[/gold]: add a [gold]Blade-Wing Blood Bat Swarm[/gold] instead.",
-    "GU_ZHEN_REN_CARD_XUE_TAI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Fusion[/gold]; [gold]Recover[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] 2, [gold]Self-Devour[/gold]: implant [gold]Blood Fetus[/gold], which can [gold]Devour Parasite[/gold] and [gold]Hatches[/gold] after 3 [gold]Fetal Movement[/gold].",
-    "GU_ZHEN_REN_CARD_XUE_FU_WANG_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Recover[/gold] {RecoveryTurns}. [gold]Devour Remains 2[/gold]: add a same-rank [gold]Blood Bat King[/gold]; each adds 2 hits, and 2 grants [gold]Pursuit[/gold]. Resolve [gold]Blood Skull[/gold].",
-    "GU_ZHEN_REN_CARD_XUE_HE_JIA_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Recover[/gold] {RecoveryTurns}. [gold]Blood River[/gold]: below 4 Essence, gain {LowBloodGain} Essence and {LowBlock} Block; otherwise [gold]Bloodthirst[/gold] 2 for {HighBlock} Block, then half next turn. Each [gold]Blood Skull[/gold] adds 2 Block.",
+    "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] {BloodCost}, [gold]Self-Devour[/gold]. Choose 1 normal card in your hand and implant [gold]Blood Qi[/gold].",
+    "GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Fusion[/gold]; [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] 2: implant [gold]Moon Phase[/gold]. Three-stage [gold]Shared Pools[/gold]—Bleed {CrescentBleed}/{WaxingBleed}/{FullBleed}; Marks {CrescentMarks}/{WaxingMarks}/{FullMarks}.",
+    "GU_ZHEN_REN_CARD_XUE_CHI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. Gain {XueYuanPower:diff()} [gold]Blood Essence[/gold]; convert each [gold]Overflow[/gold] into {OverflowBlock} Block.",
+    "GU_ZHEN_REN_CARD_XUE_PI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. Gain {Block:diff()} Block; [gold]Bloodthirst[/gold] 1: gain {EmpoweredBlock} more. Each [gold]Blood Skull[/gold] adds 2 Block.",
+    "GU_ZHEN_REN_CARD_XUE_LU_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. Gain {Block:diff()} Block; [gold]Devour Remains {MaxAbsorb}[/gold]: each grants 1 [gold]Blood Skull[/gold], or heals {Heal:diff()} HP at the cap.",
+    "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. Add a same-rank [gold]Blade-Wing Blood Bat[/gold]; [gold]Devour Remains 2[/gold]: add a [gold]Blade-Wing Blood Bat Swarm[/gold] instead.",
+    "GU_ZHEN_REN_CARD_XUE_TAI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Fusion[/gold]; [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] 2, [gold]Self-Devour[/gold]: implant [gold]Blood Fetus[/gold], which can [gold]Devour Parasite[/gold] and [gold]Hatches[/gold] after 3 [gold]Fetal Movement[/gold].",
+    "GU_ZHEN_REN_CARD_XUE_FU_WANG_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Devour Remains 2[/gold]: add a same-rank [gold]Blood Bat King[/gold]; each adds 2 hits, and 2 grants [gold]Pursuit[/gold]. Resolve [gold]Blood Skull[/gold].",
+    "GU_ZHEN_REN_CARD_XUE_HE_JIA_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Blood River[/gold]: below 4 Essence, gain {LowBloodGain} Essence and {LowBlock} Block; otherwise [gold]Bloodthirst[/gold] 2 for {HighBlock} Block, then half next turn. Each [gold]Blood Skull[/gold] adds 2 Block.",
     "GU_ZHEN_REN_CARD_WAN_HAI_GUI_CHAO.description": "[gold]Devour Remains 3[/gold]. Split a {Damage:diff()} + {DamagePerRemains} per Remains damage pool among all enemies. Gain {Block:diff()} + {BlockPerRemains} Block per Remains.",
     "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.extraCardText": "Enchantment · Moon Phase (Rank {Rank} · Crescent): {TriggersRemaining} trigger(s) remain; advances after the host is played.",
     "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.extraCardText": "Enchantment · Moon Phase (Rank {Rank} · Waxing): {TriggersRemaining} trigger(s) remain; advances after the host is played.",
@@ -204,7 +204,7 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardPileId}.description",
-      "text": "Stores up to 5 currently usable Gu Worms. When space is available, recovered Gu are drawn in recovery order from the Gu Recovery Pile. Killer Move deduction can use only materials in this pile."
+      "text": "Stores up to 5 currently usable Gu Worms. When space is available, cooled Gu are drawn in cooldown order from the Gu Cooldown Pile. Killer Move deduction can use only materials in this pile."
     },
     {
       "table": "static_hover_tips",
@@ -224,17 +224,17 @@
     {
       "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.title",
-      "text": "Gu Recovery Pile"
+      "text": "Gu Cooldown Pile"
     },
     {
       "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.description",
-      "text": "Stores cooling Gu and recovered Gu waiting because the Gu Hand is full. At turn start, vacancies are filled at random. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move using materials only from the Gu Hand."
+      "text": "Stores cooling Gu and cooled Gu waiting because the Gu Hand is full. At turn start, vacancies are filled at random. Left-click to inspect; right-click and spend 1 Energy to deduce a Killer Move using materials only from the Gu Hand."
     },
     {
       "table": "static_hover_tips",
       "key": "{GuCardRecoveryPileId}.empty",
-      "text": "The Gu Recovery Pile is empty."
+      "text": "The Gu Cooldown Pile is empty."
     },
     {
       "table": "powers",

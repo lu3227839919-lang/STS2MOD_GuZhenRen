@@ -50,10 +50,9 @@ public sealed class XunDianLiuGuangGu : AbstractGuWormCard
         new DynamicVar(SwapVar, 1m),
     ];
 
-    // 暂用现有流光蛊卡图，避免缺图时出现空白卡面。
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: CardImageCatalog.GetResourcePath(typeof(LiuGuangGu))
-    );
+    // 使用 images/cards/XunDianLiuGuangGu.png 同名卡图。
+    public override CardAssetProfile AssetProfile =>
+        CardImageCatalog.Create(typeof(XunDianLiuGuangGu));
 
     public XunDianLiuGuangGu()
         : base(0, CardType.Skill, CardRarity.Rare, TargetType.Self)

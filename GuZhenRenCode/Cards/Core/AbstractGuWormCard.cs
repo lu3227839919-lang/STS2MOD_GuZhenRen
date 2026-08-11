@@ -22,10 +22,9 @@ public abstract class AbstractGuWormCard
     public override bool CanBeGeneratedInCombat => false;
 
     /// <summary>
-    /// 所有蛊虫只显示会影响操作的催动与恢复说明。
-    ///
-    /// 六转以上额外显示仙蛊。各蛊虫自己的机制词由类型映射
-    /// 追加；Distinct 保证派生类再次追加同一关键词时不会重复显示。
+    /// 所有蛊虫统一显示“恢复”关键词标签，悬浮提示会专门说明恢复
+    /// 机制的作用；再按当前转数附加各蛊虫自己的机制词。Distinct
+    /// 保证派生类再次追加同一关键词时不会重复显示。
     /// </summary>
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         base.CanonicalKeywords
@@ -44,6 +43,11 @@ public abstract class AbstractGuWormCard
         AbstractGuWormCard guWorm
     )
     {
+        // 恢复是蛊虫共有机制：卡面统一显示“恢复”标签，悬浮提示
+        // 专门说明催动耗尽后进入恢复、期间无法使用、回合数结束后
+        // 回到蛊牌堆。
+        yield return GuZhenRenKeywords.HuiFu;
+
         foreach (CardKeyword keyword in GetMechanicKeywords(guWorm))
         {
             yield return keyword;

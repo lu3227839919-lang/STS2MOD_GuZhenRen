@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dw68gpp3hanxv"
-path="res://.godot/imported/energy2_big.png-2294a674d70b7dede4fe3bb2f5c9fc52.ctex"
+uid="uid://bu4o2n2g2h64t"
+path="res://.godot/imported/recipe_compendium_icon.png-bfc852a77f2f632ec8df634f2cf87e9f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://GuZhenRen/images/characters/energy2_big.png"
-dest_files=["res://.godot/imported/energy2_big.png-2294a674d70b7dede4fe3bb2f5c9fc52.ctex"]
+source_file="res://GuZhenRen/images/ui/recipe_compendium_icon.png"
+dest_files=["res://.godot/imported/recipe_compendium_icon.png-bfc852a77f2f632ec8df634f2cf87e9f.ctex"]
 
 [params]
 

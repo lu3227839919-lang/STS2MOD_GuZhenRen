@@ -1,13 +1,15 @@
 {
   "GU_ZHEN_REN_CARDPILE_GU_CARDS.title": "蛊手牌",
-  "GU_ZHEN_REN_CARDPILE_GU_CARDS.description": "蛊存放牌堆最多5张。存在空位时，从蛊恢复堆中按恢复顺序抽取已经恢复的蛊；杀招推演只能使用本牌堆中的蛊。蛊虫牌可从本牌堆直接打出。",
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.description": "蛊存放牌堆最多5张。存在空位时，从蛊冷却堆中按冷却顺序抽取已冷却完毕的蛊；杀招推演只能使用本牌堆中的蛊。蛊虫牌可从本牌堆直接打出。",
   "GU_ZHEN_REN_CARDPILE_GU_CARDS.empty": "蛊手牌为空。",
-  "GU_ZHEN_REN_CARDPILE_GU_DISCARD.title": "蛊恢复堆",
-  "GU_ZHEN_REN_CARDPILE_GU_DISCARD.description": "存放冷却中的蛊，以及因蛊存放牌堆已满而待命的已恢复蛊。回合开始有空位时随机补入存放牌堆。左键查看。",
-  "GU_ZHEN_REN_CARDPILE_GU_DISCARD.empty": "蛊恢复堆为空。",
+  "GU_ZHEN_REN_CARDPILE_GU_DISCARD.title": "蛊冷却堆",
+  "GU_ZHEN_REN_CARDPILE_GU_DISCARD.description": "存放冷却中的蛊，以及因蛊存放牌堆已满而待命的已冷却完毕的蛊。回合开始有空位时随机补入存放牌堆。左键查看。",
+  "GU_ZHEN_REN_CARDPILE_GU_DISCARD.empty": "蛊冷却堆为空。",
   "GU_ZHEN_REN_CARDPILE_GU_SEALED.title": "蛊封存堆",
-  "GU_ZHEN_REN_CARDPILE_GU_SEALED.description": "存放本场战斗尚未练成的力道蛊，以及已经被杀招封装的蛊虫。打出对应的永久伴生牌可为力道蛊积累练力进度，进度满后解封进入蛊牌堆；杀招消耗或主动解体后，材料会返回蛊恢复堆。",
+  "GU_ZHEN_REN_CARDPILE_GU_SEALED.description": "存放本场战斗尚未练成的力道蛊，以及已经被杀招封装的蛊虫。打出对应的永久伴生牌可为力道蛊积累练力进度，进度满后解封进入蛊牌堆；杀招消耗或主动解体后，材料会返回蛊冷却堆。",
   "GU_ZHEN_REN_CARDPILE_GU_SEALED.empty": "蛊封存堆为空。",
   "GU_ZHEN_REN_CARDPILE_GU_CARDS.selectionPrompt": "选择与已选杀招目标匹配的蛊虫材料，然后点击确认。",
-  "GU_ZHEN_REN_CARDPILE_GU_CARDS.targetSelectionPrompt": "先选择要推演的杀招。随后只显示能够匹配该杀招的材料。"
+  "GU_ZHEN_REN_CARDPILE_GU_CARDS.targetSelectionPrompt": "先选择要推演的杀招。随后只显示能够匹配该杀招的材料。",
+  "GU_ZHEN_REN_RECIPE_COMPENDIUM.title": "配方大全",
+  "GU_ZHEN_REN_RECIPE_COMPENDIUM.description": "查看杀招推演与蛊虫合练的完整配方。"
 }

@@ -4,6 +4,7 @@ using GuZhenRen.Aperture;
 using GuZhenRen.Cards;
 using GuZhenRen.Combat;
 using GuZhenRen.Patches;
+using GuZhenRen.Ui;
 
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Modding;
@@ -62,6 +63,7 @@ public partial class Entry
         new(nameof(MerchantInventoryCompatibilityPatch), MerchantInventoryCompatibilityPatch.Initialize, MerchantInventoryCompatibilityPatch.Uninitialize),
         new(nameof(AncientCompatibilityPatch), AncientCompatibilityPatch.Initialize, AncientCompatibilityPatch.Uninitialize),
         new(nameof(ShaZhaoTuiYanSystem), ShaZhaoTuiYanSystem.Initialize, ShaZhaoTuiYanSystem.Uninitialize),
+        new(nameof(RecipeCompendiumSystem), RecipeCompendiumSystem.Initialize, RecipeCompendiumSystem.Uninitialize),
     ];
 
     private static bool _contentRegistered;
