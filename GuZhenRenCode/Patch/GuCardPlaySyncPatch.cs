@@ -11,13 +11,15 @@ using MegaCrit.Sts2.Core.Models;
 namespace GuZhenRen.Patches;
 
 /// <summary>
-/// 多人同步热修复：RitsuLib ExtraHand 在发起端（房主）选择蛊牌时会把
+/// 多人同步热修复：RitsuLib ExtraHand 在发起端选择蛊牌时会把
 /// 蛊牌从自定义蛊牌堆临时移入原版 Hand，这个移牌只发生在发起端本地。
 /// 客户端执行同一 PlayCardAction 时蛊牌仍位于自定义蛊牌堆，会在原版
 /// 出牌动作的牌堆校验处直接空执行，造成主客机状态分叉。
 ///
 /// 本补丁在各端执行 PlayCardAction 之前，把仍位于自定义蛊牌堆的蛊牌
-/// 幂等补移到 Hand，让牌堆校验在两端一致通过。
+/// 幂等补移到 Hand，让牌堆校验在两端一致通过；同时在原版 checksum
+/// 计算期间临时隐藏发起端尚未确认的本地 Hand 变更，避免队友并发动作
+/// 把目标选择中的临时状态捕获为永久分歧。
 /// </summary>
 internal static class GuCardPlaySyncPatch
 {
@@ -29,6 +31,9 @@ internal static class GuCardPlaySyncPatch
     private static int _executingActionCount;
 
     private static MethodInfo? _toCardModelMethod;
+
+    private const string ChecksumTrackerTypeName =
+        "MegaCrit.Sts2.Core.Multiplayer.Game.ChecksumTracker";
 
     internal static void Initialize()
     {
@@ -46,24 +51,51 @@ internal static class GuCardPlaySyncPatch
                 "ExecuteAction"
             );
 
-        Harmony harmony = new(HarmonyId);
-        harmony.Patch(
-            executeAction,
-            prefix: new HarmonyMethod(
-                typeof(GuCardPlaySyncPatch),
-                nameof(ExecuteActionPrefix)
-            ),
-            postfix: new HarmonyMethod(
-                typeof(GuCardPlaySyncPatch),
-                nameof(ExecuteActionPostfix)
-            ),
-            finalizer: new HarmonyMethod(
-                typeof(GuCardPlaySyncPatch),
-                nameof(ExecuteActionFinalizer)
-            )
-        );
+        MethodInfo obtainAndTrackChecksum =
+            ResolveObtainAndTrackChecksumMethod();
 
-        _initialized = true;
+        Harmony harmony = new(HarmonyId);
+        try
+        {
+            harmony.Patch(
+                executeAction,
+                prefix: new HarmonyMethod(
+                    typeof(GuCardPlaySyncPatch),
+                    nameof(ExecuteActionPrefix)
+                ),
+                postfix: new HarmonyMethod(
+                    typeof(GuCardPlaySyncPatch),
+                    nameof(ExecuteActionPostfix)
+                ),
+                finalizer: new HarmonyMethod(
+                    typeof(GuCardPlaySyncPatch),
+                    nameof(ExecuteActionFinalizer)
+                )
+            );
+
+            harmony.Patch(
+                obtainAndTrackChecksum,
+                prefix: new HarmonyMethod(
+                    typeof(GuCardPlaySyncPatch),
+                    nameof(ChecksumPrefix)
+                ),
+                postfix: new HarmonyMethod(
+                    typeof(GuCardPlaySyncPatch),
+                    nameof(ChecksumPostfix)
+                ),
+                finalizer: new HarmonyMethod(
+                    typeof(GuCardPlaySyncPatch),
+                    nameof(ChecksumFinalizer)
+                )
+            );
+
+            _initialized = true;
+        }
+        catch
+        {
+            harmony.UnpatchAll(HarmonyId);
+            throw;
+        }
     }
 
     internal static void Uninitialize()
@@ -87,6 +119,60 @@ internal static class GuCardPlaySyncPatch
     /// </summary>
     internal static bool IsCardActionExecuting =>
         Volatile.Read(ref _executingActionCount) > 0;
+
+    private static void ChecksumPrefix(
+        out GuActivationModeSystem.PendingChecksumScope? __state
+    )
+    {
+        __state = null;
+
+        try
+        {
+            __state =
+                GuActivationModeSystem.NormalizePendingCardForChecksum();
+        }
+        catch (Exception exception)
+        {
+            Entry.Logger.Warn(
+                $"[蛊牌同步] checksum 前状态归一化失败：" +
+                $"{exception.Message}"
+            );
+        }
+    }
+
+    private static void ChecksumPostfix(
+        GuActivationModeSystem.PendingChecksumScope? __state
+    )
+    {
+        RestorePendingCardAfterChecksum(__state);
+    }
+
+    private static Exception? ChecksumFinalizer(
+        Exception? __exception,
+        GuActivationModeSystem.PendingChecksumScope? __state
+    )
+    {
+        // Postfix 与 finalizer 都可能到达这里；scope.Dispose() 幂等。
+        RestorePendingCardAfterChecksum(__state);
+        return __exception;
+    }
+
+    private static void RestorePendingCardAfterChecksum(
+        GuActivationModeSystem.PendingChecksumScope? state
+    )
+    {
+        try
+        {
+            state?.Dispose();
+        }
+        catch (Exception exception)
+        {
+            Entry.Logger.Warn(
+                $"[蛊牌同步] checksum 后恢复 pending 蛊牌失败：" +
+                $"{exception.Message}"
+            );
+        }
+    }
 
     private static void ExecuteActionPrefix(
         PlayCardAction __instance
@@ -205,5 +291,40 @@ internal static class GuCardPlaySyncPatch
             netCard,
             null
         ) as CardModel;
+    }
+
+    private static MethodInfo ResolveObtainAndTrackChecksumMethod()
+    {
+        Type checksumTrackerType =
+            AccessTools.TypeByName(ChecksumTrackerTypeName) ??
+            throw new TypeLoadException(
+                $"Could not resolve {ChecksumTrackerTypeName}."
+            );
+
+        MethodInfo? method = checksumTrackerType
+            .GetMethods(
+                BindingFlags.Instance |
+                BindingFlags.Public |
+                BindingFlags.NonPublic
+            )
+            .SingleOrDefault(candidate =>
+            {
+                if (candidate.Name != "ObtainAndTrackChecksum")
+                {
+                    return false;
+                }
+
+                ParameterInfo[] parameters =
+                    candidate.GetParameters();
+                return parameters.Length == 2 &&
+                    parameters[0].ParameterType == typeof(string) &&
+                    parameters[1].ParameterType ==
+                        typeof(GameAction);
+            });
+
+        return method ?? throw new MissingMethodException(
+            ChecksumTrackerTypeName,
+            "ObtainAndTrackChecksum(string, GameAction)"
+        );
     }
 }

@@ -2,6 +2,14 @@
 
 本项目的全部重要变更记录。版本号遵循 [SemVer](https://semver.org/lang/zh-CN/) 风格，规则见 [VERSIONING.md](VERSIONING.md)。历史版本大多未标注发布日期。
 
+## [0.9.18] - 2026-08-11
+
+### 修复
+- 多人模式下蛊牌同步的 checksum 竞态：发起端通过 RitsuLib ExtraHand 选择蛊牌时蛊牌会临时移入原版手牌（仅本地），若队友并发动作此时完成，原版 checksum 会把该临时状态捕获为永久分歧。现于 checksum 计算前后对 pending 蛊牌静默归一化到蛊牌堆并在结束后幂等恢复，不触发 `ContentsChanged`，避免打断目标选择或刷新 ExtraHand UI。
+
+### Fixes
+- Fixed a multiplayer checksum race in Gu card sync: while the host is targeting a Gu card via RitsuLib's ExtraHand (the card is temporarily moved into the vanilla hand, locally only), a teammate action completing at that moment could be captured by the vanilla checksum as a permanent divergence. The pending Gu card is now silently normalized back to the Gu pile during checksum computation and idempotently restored afterwards, without firing `ContentsChanged` so targeting and the ExtraHand UI are not disturbed.
+
 ## [0.9.17] - 2026-08-11
 
 ### 新增

@@ -82,6 +82,55 @@ public static class GuActivationModeSystem
     private static CardModel? _pendingCard;
 
     /// <summary>
+    /// checksum 计算期间把仅在发起端提前进入 Hand 的 pending 蛊牌
+    /// 静默还原到蛊牌堆。作用域结束后再恢复原版 Hand；整个过程不触发
+    /// ContentsChanged，避免打断仍在进行的目标选择或刷新 ExtraHand UI。
+    /// </summary>
+    internal sealed class PendingChecksumScope : IDisposable
+    {
+        private readonly CardModel _card;
+
+        private readonly CardPile _handPile;
+
+        private readonly CardPile _guPile;
+
+        private int _disposed;
+
+        internal PendingChecksumScope(
+            CardModel card,
+            CardPile handPile,
+            CardPile guPile
+        )
+        {
+            _card = card;
+            _handPile = handPile;
+            _guPile = guPile;
+        }
+
+        public void Dispose()
+        {
+            if (Interlocked.Exchange(ref _disposed, 1) != 0)
+            {
+                return;
+            }
+
+            lock (SyncRoot)
+            {
+                // 若 checksum 期间状态已被其他结算合法推进，不覆盖新
+                // 状态；正常路径中卡仍在临时蛊牌堆，且仍是当前 pending。
+                if (!ReferenceEquals(_pendingCard, _card) ||
+                    !ReferenceEquals(_card.Pile, _guPile))
+                {
+                    return;
+                }
+
+                _guPile.RemoveInternal(_card, silent: true);
+                _handPile.AddInternal(_card, silent: true);
+            }
+        }
+    }
+
+    /// <summary>
     /// 只有本地玩家且资源可支付时，当前蛊手牌中的蛊虫才能被点击
     /// （UI 选择入口）。
     /// </summary>
@@ -209,6 +258,53 @@ public static class GuActivationModeSystem
         Entry.Logger.Info(
             $"[蛊牌] 已选择蛊牌 {card.Id}，等待目标确认。"
         );
+    }
+
+    /// <summary>
+    /// RitsuLib ExtraHand 会在本地目标确认前把被选蛊牌放入原版 Hand，
+    /// 其他端则要等同步 PlayCardAction 执行时才补移。若队友动作此时
+    /// 完成，原版 checksum 会捕获这个仅本地存在的临时状态。
+    ///
+    /// 本方法只在 checksum 的同步调用栈中静默调整后端牌堆；返回的
+    /// 作用域负责幂等恢复。未处于该竞态时返回 null。
+    /// </summary>
+    internal static PendingChecksumScope?
+        NormalizePendingCardForChecksum()
+    {
+        lock (SyncRoot)
+        {
+            CardModel? pending = _pendingCard;
+            CardPile? handPile = pending?.Pile;
+            if (pending == null ||
+                handPile?.Type != PileType.Hand ||
+                pending is not IGuWormCard)
+            {
+                return null;
+            }
+
+            CardPile guPile =
+                GuCardPileSystem.PileType.GetPile(pending.Owner);
+            if (ReferenceEquals(handPile, guPile))
+            {
+                return null;
+            }
+
+            // 不调用 InvokeContentsChanged：这里只修正 checksum 观察到的
+            // 后端状态，目标选择 UI 仍持有同一 CardModel/holder。
+            handPile.RemoveInternal(pending, silent: true);
+            guPile.AddInternal(pending, silent: true);
+
+            Entry.Logger.Info(
+                $"[蛊牌同步] checksum 前临时还原 pending 蛊牌 " +
+                $"{pending.Id} 到蛊牌堆。"
+            );
+
+            return new PendingChecksumScope(
+                pending,
+                handPile,
+                guPile
+            );
+        }
     }
 
     private static void ClearPendingActivation(CardModel card)
