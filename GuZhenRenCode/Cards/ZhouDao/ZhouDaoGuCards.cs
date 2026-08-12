@@ -1,3 +1,4 @@
+using GuZhenRen.Cards.HeLian;
 using GuZhenRen.Characters;
 using GuZhenRen.Combat;
 using GuZhenRen.Powers.ZhouDao;
@@ -64,6 +65,8 @@ public abstract class AbstractZhouDaoCompanionGuCard :
 }
 
 [RegisterCard(typeof(GuZhenRenGuCardPool))]
+// 三转以上日蛊 ×1 + 三转以上月蛊 ×1 → 光阴荏苒蛊
+[HeLianRecipe(typeof(RiGu), typeof(YueGu), MinimumMaterialRank = 3)]
 public sealed class GuangYinRenRanGu : AbstractZhouDaoCompanionGuCard
 {
     public override Type CompanionCardType => typeof(GuangYinRenRan);
@@ -517,6 +520,8 @@ public sealed class HuiSuGu : AbstractZhouDaoGuCard
 }
 
 [RegisterCard(typeof(GuZhenRenGuCardPool))]
+// 六转以上回溯蛊 ×1 + 六转以上年蛊 ×1 → 宙锚仙蛊
+[HeLianRecipe(typeof(HuiSuGu), typeof(NianGu), MinimumMaterialRank = 6)]
 public sealed class ZhouMaoXianGu : AbstractZhouDaoCompanionGuCard
 {
     public override int MinimumAvailableGuRank => 6;
