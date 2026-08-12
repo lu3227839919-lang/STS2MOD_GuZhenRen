@@ -22,8 +22,7 @@ namespace GuZhenRen.Powers.GuangDao;
 /// </summary>
 [RegisterPower]
 public sealed class ZheGuangPower : ModPowerTemplate
-{
-    private sealed class EarlyResolutionState
+{    private sealed class EarlyResolutionState
     {
         public int PlayIndex = -1;
         public bool Resolved;

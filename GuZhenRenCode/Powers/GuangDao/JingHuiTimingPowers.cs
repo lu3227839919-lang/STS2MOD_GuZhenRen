@@ -15,8 +15,7 @@ namespace GuZhenRen.Powers.GuangDao;
 /// </summary>
 [RegisterPower]
 public sealed class JingHuiReservePower : ModPowerTemplate
-{
-    public override PowerType Type => PowerType.Buff;
+{    public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Single;
 
@@ -59,8 +58,7 @@ public sealed class JingHuiReservePower : ModPowerTemplate
 /// </summary>
 [RegisterPower]
 public sealed class JingHuiBreakPower : ModPowerTemplate
-{
-    public override PowerType Type => PowerType.Buff;
+{    public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Single;
 

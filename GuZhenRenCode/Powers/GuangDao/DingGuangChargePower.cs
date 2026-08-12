@@ -20,8 +20,7 @@ namespace GuZhenRen.Powers.GuangDao;
 /// </summary>
 [RegisterPower]
 public sealed class DingGuangChargePower : ModPowerTemplate
-{
-    public override PowerType Type => PowerType.Buff;
+{    public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Counter;
 
