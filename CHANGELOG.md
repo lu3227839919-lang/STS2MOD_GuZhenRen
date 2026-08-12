@@ -2,6 +2,30 @@
 
 本项目的全部重要变更记录。版本号遵循 [SemVer](https://semver.org/lang/zh-CN/) 风格，规则见 [VERSIONING.md](VERSIONING.md)。历史版本大多未标注发布日期。
 
+## [0.9.19] - 2026-08-11
+
+### 新增
+- 配方大全详情页：点击配方可查看对应蛊虫的详情页——蛊虫介绍、流派/稀有度/催动消耗元信息，以及转数选择器；切换转数时卡面、描述与伴生/衍生牌预览同步更新（`RecipeCompendiumOverlay` 重构为列表/详情双视图，宣纸底纹配色）。`LoadRecipes` 改为返回卡片模型字典以支持按类型查找与预览。
+- 虚影卡框独立配色：`GuZhenRenXuYingCardPool.PoolFrameMaterial` 改用淡紫色 HSV 材质，与普通卡黑框灰底区分。
+
+### 调整
+- 更新方源角色立绘 `FangYuan_idle.png`。
+
+### 修复
+- 起手蛊牌入场期间出牌交互竞态：起手蛊牌逐张进入 `ExtraHand` 时牌面节点可能已可见但 `CardPileCmd` 入场事务未完成，此时开始 RitsuLib 的 Hand 临时迁移会与入场迁移交错，导致卡牌留在封存堆并锁住后续蛊牌选择；现于全部起手蛊牌入场完成前统一禁用交互（`IsOpeningEntryPending` 改为 `internal` 供 `GuActivationModeSystem` 查询）。
+- 幽灵选择状态：出牌登记改由 RitsuLib `ModExtraHandPlayCoordinator.TryBegin` 成功回调（postfix）确认，避免资格检查通过但事务未开始即登记 pending；`SweepStalePending` 改为只要 pending 卡不在原版 Hand 即清理，覆盖取消回蛊手牌、异常退回封存堆或已进入其他牌堆等场景。
+
+### Added
+- Recipe Compendium detail page: clicking a recipe opens a detail view with the Gu's introduction, path/rarity/Yuan Qi cost meta, and a rank selector — switching ranks live-updates the card face, description, and companion/generated card previews (`RecipeCompendiumOverlay` rebuilt as list/detail dual views with a rice-paper backdrop palette). `LoadRecipes` now returns a card-model dictionary for type lookup and previews.
+- Phantom pool frame palette: `GuZhenRenXuYingCardPool.PoolFrameMaterial` uses a dedicated light-purple HSV material, distinct from the normal cards' black frame.
+
+### Changed
+- Updated Fang Yuan's idle portrait `FangYuan_idle.png`.
+
+### Fixed
+- Opening-hand entry race: while opening Gu cards are entering `ExtraHand` one by one, the card node may already be visible while the `CardPileCmd` entry transaction is incomplete; starting RitsuLib's temporary Hand migration in this window interleaved with the entry migration and could leave cards stuck in the sealed pile, locking subsequent Gu selection. Interaction is now disabled until all opening Gu cards have finished entering (`IsOpeningEntryPending` made `internal` for `GuActivationModeSystem`).
+- Ghost pending state: play registration now happens in a postfix on RitsuLib's `ModExtraHandPlayCoordinator.TryBegin` success, so a pending is only recorded once the play transaction actually started; `SweepStalePending` now clears any pending whose card is no longer in the vanilla Hand, covering cancel-back-to-Gu-hand, abnormal return to the sealed pile, and cards moved to other piles.
+
 ## [0.9.18] - 2026-08-11
 
 ### 修复
