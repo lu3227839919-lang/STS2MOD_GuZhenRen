@@ -555,6 +555,10 @@ public sealed class ZhouMaoXianGu : AbstractZhouDaoCompanionGuCard
 }
 
 [RegisterCard(typeof(GuZhenRenGuCardPool))]
+// 八转以上年蛊 ×1 + 八转以上光阴荏苒蛊 ×1 → 似水流年仙蛊
+[HeLianRecipe(typeof(NianGu), typeof(GuangYinRenRanGu), MinimumMaterialRank = 8)]
+// 或 八转以上年蛊 ×1 + 八转以上日蛊 ×1 + 八转以上月蛊 ×1 → 似水流年仙蛊
+[HeLianRecipe(typeof(NianGu), typeof(RiGu), typeof(YueGu), MinimumMaterialRank = 8)]
 public sealed class SiShuiLiuNianXianGu : AbstractZhouDaoCompanionGuCard
 {
     public override int MinimumAvailableGuRank => 8;
