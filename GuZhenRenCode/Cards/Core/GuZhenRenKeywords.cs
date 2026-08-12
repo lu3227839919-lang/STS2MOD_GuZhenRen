@@ -1,4 +1,4 @@
-﻿using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Cards;
 
 using STS2RitsuLib.Content;
 using STS2RitsuLib.Interop.AutoRegistration;
@@ -49,6 +49,10 @@ namespace GuZhenRen.Cards;
 [RegisterOwnedCardKeyword(nameof(XuYing), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(LianLi), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(NingYing), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
+[RegisterOwnedCardKeyword(nameof(NianHua), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
+[RegisterOwnedCardKeyword(nameof(SuiMan), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
+[RegisterOwnedCardKeyword(nameof(HuanBu), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
+[RegisterOwnedCardKeyword(nameof(XiYing), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 public sealed class GuZhenRenKeywords
 {
     public static readonly CardKeyword Unique = Create(nameof(Unique));
@@ -95,6 +99,10 @@ public sealed class GuZhenRenKeywords
     public static readonly CardKeyword XuYing = Create(nameof(XuYing));
     public static readonly CardKeyword LianLi = Create(nameof(LianLi));
     public static readonly CardKeyword NingYing = Create(nameof(NingYing));
+    public static readonly CardKeyword NianHua = Create(nameof(NianHua));
+    public static readonly CardKeyword SuiMan = Create(nameof(SuiMan));
+    public static readonly CardKeyword HuanBu = Create(nameof(HuanBu));
+    public static readonly CardKeyword XiYing = Create(nameof(XiYing));
     /// <summary>
     /// 旧版本可能已经把这些展示关键词写进卡牌实例或多人快照。
     /// 保留对应 ID 仅用于清理；它们不再注册，也不会重新加入卡牌。
@@ -157,6 +165,7 @@ public sealed class GuZhenRenKeywords
             YingYue, ManYue, XueTai, TaiDong, PoTai, FuHua,
             TunJi, ZongEDu, YiChu, ZhuiJi,
             XuYing, LianLi, NingYing,
+            NianHua, SuiMan, HuanBu, XiYing,
         };
 
     public static CardKeyword GetYaoHuaKeyword(int threshold) =>

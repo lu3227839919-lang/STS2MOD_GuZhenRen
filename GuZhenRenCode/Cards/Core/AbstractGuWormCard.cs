@@ -111,7 +111,23 @@ public abstract class AbstractGuWormCard
         IGuWormCard guWorm
     )
     {
-        return guWorm.GetType().Name switch
+        List<CardKeyword> common = [];
+        if (guWorm is AbstractGuZhenRenCard ranked &&
+            ranked.CurrentDao == AbstractGuZhenRenCard.Dao.ZhouDao)
+        {
+            common.Add(GuZhenRenKeywords.NianHua);
+            common.Add(GuZhenRenKeywords.SuiMan);
+            if (guWorm.GetType().Name == "HuanBuGu")
+            {
+                common.Add(GuZhenRenKeywords.HuanBu);
+            }
+            if (guWorm.GetType().Name == "HuiSuGu")
+            {
+                common.Add(GuZhenRenKeywords.XiYing);
+            }
+        }
+
+        IEnumerable<CardKeyword> specific = guWorm.GetType().Name switch
         {
             "YueGuangGu" =>
             [
@@ -175,5 +191,7 @@ public abstract class AbstractGuWormCard
             ],
             _ => [],
         };
+
+        return common.Concat(specific);
     }
 }

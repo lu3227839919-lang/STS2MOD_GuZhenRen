@@ -332,6 +332,41 @@ public static class GuCardUsageRules
     public static bool HasRecoverySchedule(CardModel card) =>
         card is IGuWormCard && RecoveryReadyTurnState[card] > 0;
 
+    /// <summary>取得当前计划恢复回合；未安排恢复时返回0。</summary>
+    public static int GetRecoveryReadyTurn(CardModel card)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        return card is IGuWormCard ? RecoveryReadyTurnState[card] : 0;
+    }
+
+    /// <summary>
+    /// 将已安排的恢复回合向前推进。允许推进到当前回合，供宙道
+    /// 【岁满】在战斗中立即完成最后一回合恢复。
+    /// </summary>
+    public static int ReduceRecoveryReadyTurn(
+        CardModel card,
+        int turns,
+        int currentTurn
+    )
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        if (turns <= 0 || card is not IGuWormCard)
+        {
+            return GetRecoveryReadyTurn(card);
+        }
+
+        int currentReady = RecoveryReadyTurnState[card];
+        if (currentReady <= 0)
+        {
+            return 0;
+        }
+
+        int minimumReady = Math.Max(1, currentTurn);
+        int nextReady = Math.Max(minimumReady, currentReady - turns);
+        RecoveryReadyTurnState[card] = nextReady;
+        return nextReady;
+    }
+
     public static bool IsRecoveryReady(
         CardModel card,
         int currentTurn

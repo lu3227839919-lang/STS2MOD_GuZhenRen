@@ -1,3 +1,4 @@
+using GuZhenRen.Aperture;
 using GuZhenRen.Cards.HeLian;
 using GuZhenRen.Characters;
 
@@ -93,6 +94,14 @@ public static class GuZhenRenCardRules
         CardModel candidate
     )
     {
+        if (candidate is AbstractGuZhenRenCard rankedGu &&
+            candidate is IGuWormCard &&
+            ApertureSystem.GetState(receivingPlayer).Rank <
+                rankedGu.MinimumAvailableGuRank)
+        {
+            return false;
+        }
+
         return CanEnterPermanentDeck(
             runState,
             receivingPlayer,
@@ -114,6 +123,14 @@ public static class GuZhenRenCardRules
         CardModel candidate
     )
     {
+        if (candidate is AbstractGuZhenRenCard rankedGu &&
+            candidate is IGuWormCard &&
+            ApertureSystem.GetState(receivingPlayer).Rank <
+                rankedGu.MinimumAvailableGuRank)
+        {
+            return false;
+        }
+
         if (!CanEnterPermanentDeck(
                 runState,
                 receivingPlayer,
@@ -207,6 +224,16 @@ public static class GuZhenRenCardRules
 
         if (receivingPlayer.Character is GuZhenRenCharacter &&
             candidate is not IGuWormCard)
+        {
+            return false;
+        }
+
+        // 高转限定蛊不会在空窍尚未达到其最低转数时进入奖励。
+        // 否则奖励赋阶会把一转角色直接强制抬到该蛊最低转数。
+        if (candidate is AbstractGuZhenRenCard rankedGu &&
+            candidate is IGuWormCard &&
+            ApertureSystem.GetState(receivingPlayer).Rank <
+                rankedGu.MinimumAvailableGuRank)
         {
             return false;
         }

@@ -504,6 +504,12 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
     }
 
     /// <summary>
+    /// 该蛊虫允许出现/初始化的最低转数。默认一转；
+    /// 原著中只有高转形态的蛊可以覆写为三、五、六或八转。
+    /// </summary>
+    public virtual int MinimumAvailableGuRank => MinimumGuRank;
+
+    /// <summary>
     /// 当前蛊卡能够达到的最高转数。
     ///
     /// 默认最高九转；特殊蛊卡可以重写此属性。
@@ -512,14 +518,12 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
 
     private int NormalizeGuRank(int rank)
     {
-        return Math.Clamp(
-            rank,
+        int minimum = Math.Clamp(
+            MinimumAvailableGuRank,
             MinimumGuRank,
-            Math.Max(
-                MinimumGuRank,
-                MaxGuRank
-            )
+            Math.Max(MinimumGuRank, MaxGuRank)
         );
+        return Math.Clamp(rank, minimum, Math.Max(minimum, MaxGuRank));
     }
 
     private void MarkInitialGuRankAssigned()
@@ -1243,8 +1247,8 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
         }
 
         int effectiveMinRank = Math.Clamp(
-            minRank,
-            1,
+            Math.Max(minRank, MinimumAvailableGuRank),
+            MinimumAvailableGuRank,
             MaxGuRank
         );
         int effectiveMaxRank = Math.Clamp(

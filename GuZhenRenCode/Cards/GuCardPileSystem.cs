@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 
 using GuZhenRen.Cards.LiDao;
 using GuZhenRen.Multiplayer;
+using GuZhenRen.Powers.ZhouDao;
 
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Context;
@@ -758,6 +759,10 @@ public static class GuCardPileSystem
                 StoragePileType,
                 skipVisuals: false
             );
+            await ZhouDaoPowerSystem.NotifyGuRecoveredAsync(
+                card,
+                acceleratedBySuiMan: false
+            );
         }
 
         CardModel[] readyCards = storagePile.Cards
@@ -777,6 +782,63 @@ public static class GuCardPileSystem
         {
             await AddGuCardToActivePileSequentiallyAsync(card);
         }
+    }
+
+
+    /// <summary>
+    /// 宙道【岁满】将一只正在恢复的蛊向前推进指定回合；若推进后
+    /// 已在当前回合就绪，则立即完成恢复，并在有空位时返回蛊手牌。
+    /// </summary>
+    internal static async Task<bool> AccelerateRecoveryAsync(
+        Player owner,
+        CardModel card,
+        int turnNumber,
+        int turns = 1
+    )
+    {
+        ArgumentNullException.ThrowIfNull(owner);
+        ArgumentNullException.ThrowIfNull(card);
+        EnsureInitialized();
+
+        CardPile recoveryPile = RecoveryPileType.GetPile(owner);
+        if (card is not IGuWormCard ||
+            !ReferenceEquals(card.Pile, recoveryPile) ||
+            !GuCardUsageRules.HasRecoverySchedule(card) ||
+            ShaZhaoTuiYanSystem.IsMaterialSealed(card))
+        {
+            return false;
+        }
+
+        int nextReady = GuCardUsageRules.ReduceRecoveryReadyTurn(
+            card,
+            turns,
+            turnNumber
+        );
+        if (nextReady <= 0 || nextReady > turnNumber)
+        {
+            return true;
+        }
+
+        GuCardUsageRules.ResetUses(card);
+        GuCardUsageRules.MarkRecoveryCompleted(card, turnNumber);
+        await GuRecoveryEffectSystem.HandleRecoveredAsync(card);
+        await MoveCardToPileAsync(
+            card,
+            StoragePileType,
+            skipVisuals: false
+        );
+        await ZhouDaoPowerSystem.NotifyGuRecoveredAsync(
+            card,
+            acceleratedBySuiMan: true
+        );
+
+        if (GetAvailableActiveSlots(owner) > 0 &&
+            ReferenceEquals(card.Pile, StoragePileType.GetPile(owner)))
+        {
+            await AddGuCardToActivePileSequentiallyAsync(card);
+        }
+
+        return true;
     }
 
     /// <summary>
