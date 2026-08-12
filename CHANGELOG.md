@@ -2,6 +2,38 @@
 
 本项目的全部重要变更记录。版本号遵循 [SemVer](https://semver.org/lang/zh-CN/) 风格，规则见 [VERSIONING.md](VERSIONING.md)。历史版本大多未标注发布日期。
 
+## [0.10.0] - 2026-08-12
+
+### 新增
+- 宙道（时光道）：光阴荏苒蛊、年蛊、日蛊、月蛊、缓步蛊、三更蛊、回溯蛊 7 张常规蛊 + 宙锚仙蛊、似水流年仙蛊 2 张仙蛊；光阴荏苒/年年岁岁/宙锚/似水流年 4 张伴生能力牌；年流/年流+ 2 张昔影 token。
+- 年华系统与关键词：`ZhouDaoPowerSystem`（年华获取/岁满/昔影结算）、`ZhouDaoCompanionSystem`（伴生能力与蛊虫同步）、`ZhouDaoCardState`（缓步/回溯状态）；新增 `NianHua`/`SuiMan`/`HuanBu`/`XiYing` 关键词（卡面标签 + 描述高亮）。
+- 宙道卡图：9 张蛊牌同名卡图 + 年流 token 卡图；伴生牌与年流+ 显式复用对应蛊牌/年流卡图。
+- Power 图标：为年华、光阴荏苒、年年岁岁、似水流年、三更、月蛊延迟、缓步、宙锚、万骸归潮余甲等 Power 新增 `images/power` 图标（64x64 + 256x256）；可见型 Power 配置 `AssetProfile`，隐藏/监听型省略。
+- 审计工具：`tools/audit_card_images.py`、`tools/audit_power_images.py` 卡图/图标审计脚本。
+
+### 调整
+- 角色初始血量 70 → 50。
+
+### 修复
+- 玩家实例重建后 `GetPlayerSlotIndex(Player)` 按对象引用查找返回 -1，导致选牌同步选择 ID 访问越界；现于引用失效且同 NetId 玩家存在时回退到网络身份槽位。
+- 蛊牌转数奖励下限改用 `MinimumAvailableGuRank`，避免奖励转数低于卡牌可用的最低转数。
+- 起手蛊牌入场竞态：入场事务未完成时禁用出牌交互，避免卡牌锁在封存堆。
+
+### Added
+- Zhou Dao (Time Path): GuangYinRenRanGu, NianGu, RiGu, YueGu, HuanBuGu, SanGengGu, HuiSuGu + ZhouMaoXianGu, SiShuiLiuNianXianGu; companion cards (GuangYinRenRan/NianNianSuiSui/ZhouMao/SiShuiLiuNian); XiYing tokens (NianLiu/NianLiuPlus).
+- Nian Hua system & keywords: `ZhouDaoPowerSystem`, `ZhouDaoCompanionSystem`, `ZhouDaoCardState`; new `NianHua`/`SuiMan`/`HuanBu`/`XiYing` keywords.
+- Zhou Dao card art (9 Gu + NianLiu token); companion cards reuse their source Gu art.
+- Power icons for NianHua, companion powers, SanGeng, YueGuDelay, HuanBu, ZhouMao, WanHaiGuiChaoRetainBlock etc. (64x64 + 256x256); visible powers configure `AssetProfile`, hidden/listener powers omitted.
+- Audit tools: `tools/audit_card_images.py`, `tools/audit_power_images.py`.
+
+### Changed
+- Character starting HP 70 -> 50.
+
+### Fixed
+- `GetPlayerSlotIndex(Player)` returning -1 after player instance rebuild; falls back to NetId slot when the same-net player still exists.
+- Gu rank reward floor now uses `MinimumAvailableGuRank`.
+- Opening-hand entry race: interaction disabled until the entry transaction completes.
+
 ## [0.9.19] - 2026-08-11
 
 ### 新增
