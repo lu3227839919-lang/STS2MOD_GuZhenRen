@@ -137,6 +137,22 @@
     "NingYing": {
       "title": "凝影",
       "description": "再次催动已有对应虚影的兽力蛊时，提高其基础显化率，最高80%。"
+    },
+    "NianHua": {
+      "title": "年华",
+      "description": "宙道资源，上限9点。达到9点时立即触发岁满，然后年华归零；一次获得的溢出年华会在岁满后继续结算。"
+    },
+    "SuiMan": {
+      "title": "岁满",
+      "description": "年华达到9点时：选择一只恢复中的蛊虫，使其剩余恢复时间减少1回合；所有敌人的限时负面状态延长1回合。"
+    },
+    "HuanBu": {
+      "title": "缓步",
+      "description": "敌人一次攻击行动共享固定减伤额度；多段攻击不会让每一段都重复获得完整减伤。缓步按回合衰减，可被岁满延长。"
+    },
+    "XiYing": {
+      "title": "昔影",
+      "description": "回溯蛊生成的临时普通牌复制。昔影具有消耗，不能再次成为回溯目标；打出后按回溯蛊转数获得年华。"
     }
   },
   "cardDescriptionOverrides": {
@@ -380,6 +396,96 @@
       "table": "powers",
       "key": "GU_ZHEN_REN_POWER_ZI_LI_GENG_SHENG_POWER.description",
       "text": "记录本回合显化的不同兽力与凝影，积蓄力气并按转数回复生命。重复催动自力更生蛊可获得至多3层强身；高转可将超额回复转化为格挡。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_NIAN_HUA_POWER.title",
+      "text": "年华"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_NIAN_HUA_POWER.description",
+      "text": "当前拥有{Amount}/9点年华。达到9点时触发岁满。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_GUANG_YIN_REN_RAN_POWER.title",
+      "text": "光阴荏苒"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_GUANG_YIN_REN_RAN_POWER.description",
+      "text": "蛊虫完成恢复时获得年华，效果随对应蛊虫转数提升。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_NIAN_NIAN_SUI_SUI_POWER.title",
+      "text": "年年岁岁"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_NIAN_NIAN_SUI_SUI_POWER.description",
+      "text": "回合流逝时持续获得年华，效果随对应年蛊转数提升。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_ZHOU_MAO_POWER.title",
+      "text": "宙锚"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_ZHOU_MAO_POWER.description",
+      "text": "岁满后保留一部分年华进度，高转可周期性抽牌。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_SI_SHUI_LIU_NIAN_POWER.title",
+      "text": "似水流年"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_SI_SHUI_LIU_NIAN_POWER.description",
+      "text": "每回合第一次岁满时生成年流。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_SAN_GENG_POWER.title",
+      "text": "三更"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_SAN_GENG_POWER.description",
+      "text": "接下来{Amount}次获得年华时，额外获得1点年华。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_HUAN_BU_POWER.title",
+      "text": "缓步"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_HUAN_BU_POWER.description",
+      "text": "每次攻击行动的总伤害最多降低固定额度；剩余{Amount}回合。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_YUE_GU_DELAY_POWER.title",
+      "text": "月积"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_YUE_GU_DELAY_POWER.description",
+      "text": "月蛊安排的年华将在后续回合开始时兑现。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XI_YING_WATCHER_POWER.title",
+      "text": "昔影回响"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XI_YING_WATCHER_POWER.description",
+      "text": "监听昔影的隐性效果。"
     }
   ],
   "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "直接选择本次升炼的蛊牌，凡仙可混合。本次升炼共有4个槽位：凡蛊每只占1个、仙蛊每只占2个，最多可升炼4只凡蛊或2只仙蛊（如1只仙蛊＋2只凡蛊）。每只所选蛊各提升一转，五转升六转同样由升炼完成。选择0只并确认将取消；本休息点只能成功升炼一次。",

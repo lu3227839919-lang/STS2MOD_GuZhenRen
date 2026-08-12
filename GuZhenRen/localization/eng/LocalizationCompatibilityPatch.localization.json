@@ -137,6 +137,22 @@
     "NingYing": {
       "title": "Condense Phantom",
       "description": "Activating a beast-strength Gu whose Phantom is already present raises its base manifestation chance, up to 80%."
+    },
+    "NianHua": {
+      "title": "Years",
+      "description": "Time Path resource, max 9. Reaching 9 immediately triggers Year Complete, then resets to 0; overflow continues afterward."
+    },
+    "SuiMan": {
+      "title": "Year Complete",
+      "description": "At 9 Years, choose a recovering Gu to reduce its remaining recovery by 1 turn, and extend all duration-based enemy debuffs by 1 turn."
+    },
+    "HuanBu": {
+      "title": "Slow Steps",
+      "description": "An enemy attack shares one fixed damage-reduction budget across all hits. It ticks down by turns and can be extended by Year Complete."
+    },
+    "XiYing": {
+      "title": "Past Echo",
+      "description": "A temporary copy created by Backtrack Gu. It Exhausts, cannot be Backtracked again, and grants Years when played."
     }
   },
   "cardDescriptionOverrides": {
@@ -380,6 +396,96 @@
       "table": "powers",
       "key": "GU_ZHEN_REN_POWER_ZI_LI_GENG_SHENG_POWER.description",
       "text": "Tracks different beast manifestations and Condensation this turn, building strength and healing by rank. Repeated activations grant up to 3 conditioning stacks; high ranks turn excess healing into Block."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_NIAN_HUA_POWER.title",
+      "text": "Years"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_NIAN_HUA_POWER.description",
+      "text": "You have {Amount}/9 Years. Reaching 9 triggers Year Complete."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_GUANG_YIN_REN_RAN_POWER.title",
+      "text": "Passing Time"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_GUANG_YIN_REN_RAN_POWER.description",
+      "text": "Finishing Gu recovery grants Years; scales with the linked Gu rank."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_NIAN_NIAN_SUI_SUI_POWER.title",
+      "text": "Year after Year"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_NIAN_NIAN_SUI_SUI_POWER.description",
+      "text": "Passing turns steadily grants Years; scales with Year Gu rank."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_ZHOU_MAO_POWER.title",
+      "text": "Time Anchor"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_ZHOU_MAO_POWER.description",
+      "text": "Retain some Years after Year Complete; higher ranks periodically draw cards."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_SI_SHUI_LIU_NIAN_POWER.title",
+      "text": "Years Flow Like Water"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_SI_SHUI_LIU_NIAN_POWER.description",
+      "text": "The first Year Complete each turn creates a Year Flow."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_SAN_GENG_POWER.title",
+      "text": "Third Watch"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_SAN_GENG_POWER.description",
+      "text": "Your next {Amount} Year-gain events gain 1 extra Year."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_HUAN_BU_POWER.title",
+      "text": "Slow Steps"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_HUAN_BU_POWER.description",
+      "text": "Each attack action loses up to a fixed total amount of damage. {Amount} turns remain."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_YUE_GU_DELAY_POWER.title",
+      "text": "Stored Month"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_YUE_GU_DELAY_POWER.description",
+      "text": "Years scheduled by Month Gu will arrive at future turn starts."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XI_YING_WATCHER_POWER.title",
+      "text": "Past Echo Watcher"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_XI_YING_WATCHER_POWER.description",
+      "text": "Hidden watcher for Past Echo cards."
     }
   ],
   "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "Select Gu Worms to refine in one go, mixing mortal and immortal freely. Each refinement has 4 slots: a mortal Gu Worm takes 1 slot and an immortal Gu Worm takes 2 slots, so you can refine up to 4 mortal or 2 immortal Gu Worms (e.g. 1 immortal + 2 mortal). Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",
