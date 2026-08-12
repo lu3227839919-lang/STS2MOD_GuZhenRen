@@ -1,14 +1,19 @@
 using Godot;
 
+using GuZhenRen.Cards;
 using GuZhenRen.Cards.HeLian;
+using GuZhenRen.Cards.LiDao;
 using GuZhenRen.Cards.ShaZhao;
 using GuZhenRen.Characters;
 
 using MegaCrit.Sts2.Core.Assets;
+using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes;
+using MegaCrit.Sts2.Core.Nodes.Cards;
+using MegaCrit.Sts2.Core.Nodes.Cards.Holders;
 using MegaCrit.Sts2.Core.Nodes.CommonUi;
 using MegaCrit.Sts2.Core.Nodes.TopBar;
 using MegaCrit.Sts2.Core.Runs;
@@ -31,13 +36,15 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
     private const string FallbackMapIconPath =
         "res://images/atlases/ui_atlas.sprites/top_bar/top_bar_map.tres";
     private const float TopBarButtonGap = 14f;
-    private static readonly Color Cream = StsColors.cream;
-    private static readonly Color Gold = StsColors.gold;
-    private static readonly Color Cyan = StsColors.blue;
-    private static readonly Color Muted = new("b8c0c0");
-    private static readonly Color PanelColor = new("263a42");
-    private static readonly Color RowColor = new("344950");
-    private static readonly Color BorderColor = new("8d9b98");
+    private static readonly Color Cream = new("eee3c7");
+    private static readonly Color Gold = new("d0a45e");
+    private static readonly Color Cyan = new("69a6a8");
+    private static readonly Color Ink = new("e7dfcb");
+    private static readonly Color Muted = new("9aa3a1");
+    private static readonly Color PanelColor = new("151d21");
+    private static readonly Color RowColor = new("202b30");
+    private static readonly Color BorderColor = new("73634f");
+    private static readonly Color Cinnabar = new("c36d5a");
 
     private ColorRect _backdrop = null!;
     private PanelContainer _dialog = null!;
@@ -46,8 +53,21 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
     private LineEdit _search = null!;
     private Label _summary = null!;
     private VBoxContainer _recipeRows = null!;
+    private VBoxContainer _listView = null!;
+    private VBoxContainer _detailView = null!;
+    private Control _previewHost = null!;
+    private Label _detailTitle = null!;
+    private Label _detailMeta = null!;
+    private RichTextLabel _detailDescription = null!;
+    private HFlowContainer _rankButtons = null!;
+    private HFlowContainer _relatedCards = null!;
+    private NPreviewCardHolder? _previewCardHolder;
+    private Type? _selectedCardType;
+    private int _selectedRank = 1;
 
     private IReadOnlyList<RecipeViewModel> _recipes = [];
+    private IReadOnlyDictionary<Type, CardModel> _cardModels =
+        new Dictionary<Type, CardModel>();
     private RecipeCategory _selectedCategory = RecipeCategory.ShaZhao;
     private RecipeCompendiumTopBarButton? _topBarButton;
     private NTopBarMapButton? _mapButton;
@@ -99,7 +119,8 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
             return;
         }
 
-        CloseDialog();
+        if (_detailView.Visible) ShowRecipeList();
+        else CloseDialog();
         GetViewport().SetInputAsHandled();
     }
 
@@ -140,6 +161,18 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
         );
         _backdrop.AddChild(_dialog);
 
+        TextureRect paperTexture = new()
+        {
+            Name = "XuanPaperTexture",
+            Texture = CreateXuanPaperTexture(),
+            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+            StretchMode = TextureRect.StretchModeEnum.Tile,
+            MouseFilter = Control.MouseFilterEnum.Ignore,
+            Modulate = new Color(1f, 1f, 1f, 0.72f),
+        };
+        _dialog.AddChild(paperTexture);
+        paperTexture.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
+
         MarginContainer margin = new()
         {
             Name = "DialogMargin",
@@ -160,11 +193,19 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
         margin.AddChild(body);
 
         body.AddChild(BuildHeader());
-        body.AddChild(BuildTabsAndSearch());
+        _listView = new VBoxContainer
+        {
+            Name = "RecipeListView",
+            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+            SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+        };
+        _listView.AddThemeConstantOverride("separation", 16);
+        body.AddChild(_listView);
+        _listView.AddChild(BuildTabsAndSearch());
 
         _summary = CreateLabel(string.Empty, 18, Muted);
         _summary.Name = "RecipeSummary";
-        body.AddChild(_summary);
+        _listView.AddChild(_summary);
 
         ScrollContainer scroll = new()
         {
@@ -174,7 +215,7 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
             HorizontalScrollMode =
                 ScrollContainer.ScrollMode.Disabled,
         };
-        body.AddChild(scroll);
+        _listView.AddChild(scroll);
 
         _recipeRows = new VBoxContainer
         {
@@ -193,7 +234,10 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
             Muted
         );
         footer.HorizontalAlignment = HorizontalAlignment.Center;
-        body.AddChild(footer);
+        _listView.AddChild(footer);
+        _detailView = BuildDetailView();
+        _detailView.Visible = false;
+        body.AddChild(_detailView);
     }
 
     private Control BuildHeader()
@@ -254,9 +298,9 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
             TooltipText = T("关闭", "Close"),
         };
         close.AddThemeFontSizeOverride("font_size", 22);
-        close.AddThemeColorOverride("font_color", Cream);
+        close.AddThemeColorOverride("font_color", Ink);
         close.AddThemeColorOverride("font_hover_color", Gold);
-        close.AddThemeColorOverride("font_pressed_color", StsColors.lightGray);
+        close.AddThemeColorOverride("font_pressed_color", Cinnabar);
         close.Pressed += CloseDialog;
         header.AddChild(close);
 
@@ -302,6 +346,8 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
             FocusMode = Control.FocusModeEnum.All,
         };
         _search.AddThemeFontSizeOverride("font_size", 19);
+        _search.AddThemeColorOverride("font_color", Ink);
+        _search.AddThemeColorOverride("font_placeholder_color", Muted);
         _search.TextChanged += _ => RebuildVisibleRows();
         row.AddChild(_search);
 
@@ -321,7 +367,7 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
             FocusMode = Control.FocusModeEnum.All,
         };
         button.AddThemeFontSizeOverride("font_size", 20);
-        button.AddThemeColorOverride("font_color", Cream);
+        button.AddThemeColorOverride("font_color", Ink);
         button.AddThemeColorOverride("font_hover_color", Gold);
         button.AddThemeColorOverride("font_pressed_color", Gold);
         button.AddThemeStyleboxOverride("normal", CreateTabStyle(false));
@@ -329,6 +375,112 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
         button.AddThemeStyleboxOverride("pressed", CreateTabStyle(true));
         button.AddThemeStyleboxOverride("focus", CreateTabStyle(true));
         button.Pressed += () => SelectCategory(category);
+        return button;
+    }
+
+    private VBoxContainer BuildDetailView()
+    {
+        VBoxContainer detail = new()
+        {
+            Name = "GuDetailView",
+            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+            SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+        };
+        detail.AddThemeConstantOverride("separation", 14);
+
+        HBoxContainer toolbar = new();
+        Button back = CreateInkButton(T("← 返回配方", "← Back to recipes"));
+        back.CustomMinimumSize = new Vector2(180f, 44f);
+        back.Pressed += ShowRecipeList;
+        toolbar.AddChild(back);
+        toolbar.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill });
+        toolbar.AddChild(CreateLabel(
+            T("选择转数，卡面与说明将同步变化", "Choose a rank to update the card and text"), 17, Muted));
+        detail.AddChild(toolbar);
+
+        HBoxContainer columns = new()
+        {
+            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+            SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+        };
+        columns.AddThemeConstantOverride("separation", 34);
+        detail.AddChild(columns);
+        _previewHost = new Control
+        {
+            Name = "CardPreviewHost",
+            CustomMinimumSize = new Vector2(350f, 500f),
+            SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter,
+            SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+            ClipContents = true,
+        };
+        columns.AddChild(_previewHost);
+
+        VBoxContainer copy = new()
+        {
+            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+            SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+        };
+        copy.AddThemeConstantOverride("separation", 12);
+        columns.AddChild(copy);
+        _detailTitle = CreateLabel(string.Empty, 34, Gold);
+        _detailTitle.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        copy.AddChild(_detailTitle);
+        _detailMeta = CreateLabel(string.Empty, 18, Cyan);
+        _detailMeta.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        copy.AddChild(_detailMeta);
+        copy.AddChild(CreateLabel(T("蛊虫介绍", "Gu introduction"), 23, Cinnabar));
+        _detailDescription = new RichTextLabel
+        {
+            Name = "GuDescription",
+            BbcodeEnabled = true,
+            FitContent = true,
+            ScrollActive = false,
+            CustomMinimumSize = new Vector2(0f, 145f),
+            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+            MouseFilter = Control.MouseFilterEnum.Ignore,
+        };
+        _detailDescription.AddThemeFontSizeOverride("normal_font_size", 20);
+        _detailDescription.AddThemeColorOverride("default_color", Ink);
+        copy.AddChild(_detailDescription);
+        copy.AddChild(CreateLabel(T("预览转数", "Preview rank"), 21, Cinnabar));
+        _rankButtons = new HFlowContainer
+        {
+            Name = "RankSelector",
+            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+        };
+        _rankButtons.AddThemeConstantOverride("h_separation", 7);
+        _rankButtons.AddThemeConstantOverride("v_separation", 7);
+        copy.AddChild(_rankButtons);
+
+        copy.AddChild(CreateLabel(T("伴生牌与衍生牌", "Companion & generated cards"), 21, Cinnabar));
+        _relatedCards = new HFlowContainer
+        {
+            Name = "RelatedCardPreviews",
+            CustomMinimumSize = new Vector2(0f, 205f),
+            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+        };
+        _relatedCards.AddThemeConstantOverride("h_separation", 12);
+        _relatedCards.AddThemeConstantOverride("v_separation", 10);
+        copy.AddChild(_relatedCards);
+        return detail;
+    }
+
+    private static Button CreateInkButton(string text)
+    {
+        Button button = new()
+        {
+            Text = text,
+            FocusMode = Control.FocusModeEnum.All,
+            CustomMinimumSize = new Vector2(92f, 40f),
+        };
+        button.AddThemeFontSizeOverride("font_size", 19);
+        button.AddThemeColorOverride("font_color", Ink);
+        button.AddThemeColorOverride("font_hover_color", Cinnabar);
+        button.AddThemeColorOverride("font_pressed_color", Gold);
+        button.AddThemeStyleboxOverride("normal", CreateSmallButtonStyle(false));
+        button.AddThemeStyleboxOverride("hover", CreateSmallButtonStyle(true));
+        button.AddThemeStyleboxOverride("pressed", CreateSmallButtonStyle(true));
+        button.AddThemeStyleboxOverride("focus", CreateSmallButtonStyle(true));
         return button;
     }
 
@@ -343,7 +495,7 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
 
         try
         {
-            _recipes = LoadRecipes();
+            (_recipes, _cardModels) = LoadRecipes();
         }
         catch (Exception exception)
         {
@@ -351,9 +503,11 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
                 "读取配方大全失败：" + exception
             );
             _recipes = [];
+            _cardModels = new Dictionary<Type, CardModel>();
         }
 
         _search.Text = string.Empty;
+        ShowRecipeList();
         _backdrop.Visible = true;
         SelectCategory(_selectedCategory);
         _topBarButton?.RefreshOpenState();
@@ -369,6 +523,7 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
         }
 
         _backdrop.Visible = false;
+        ClearCardPreview();
         _topBarButton?.RefreshOpenState();
         _anchorScanCountdown = 0d;
     }
@@ -414,7 +569,7 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
                  ))
             )
             .OrderBy(recipe => recipe.ResultName, StringComparer.CurrentCulture)
-            .ThenBy(recipe => recipe.Formula, StringComparer.CurrentCulture)
+            .ThenBy(recipe => recipe.SearchText, StringComparer.CurrentCulture)
             .ToArray();
 
         int categoryCount = _recipes.Count(recipe =>
@@ -487,10 +642,24 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
         result.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         contents.AddChild(result);
 
-        Label formula = CreateLabel(recipe.Formula, 21, Cream);
-        formula.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-        formula.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        HFlowContainer formula = new() { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
+        formula.AddThemeConstantOverride("h_separation", 5);
+        formula.AddThemeConstantOverride("v_separation", 6);
         contents.AddChild(formula);
+        if (recipe.IsGenericBeastRecipe)
+        {
+            formula.AddChild(CreateLabel(T("任意三种不同兽力蛊", "Any three different beast-strength Gu"), 21, Ink));
+        }
+        else
+        {
+            for (int index = 0; index < recipe.MaterialTypes.Count; index++)
+            {
+                if (index > 0) formula.AddChild(CreateLabel(" + ", 21, Muted));
+                formula.AddChild(CreateCardNameControl(recipe.MaterialTypes[index]));
+            }
+        }
+        formula.AddChild(CreateLabel("  →  ", 21, Cinnabar));
+        formula.AddChild(CreateCardNameControl(recipe.ResultType));
 
         if (recipe.MinimumMaterialRank > 1)
         {
@@ -505,6 +674,201 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
         }
 
         return panel;
+    }
+
+    private Control CreateCardNameControl(Type cardType)
+    {
+        if (!_cardModels.TryGetValue(cardType, out CardModel? card) || card is not IGuWormCard)
+        {
+            return CreateLabel(_cardModels.TryGetValue(cardType, out card) ? card.Title : cardType.Name, 21, Ink);
+        }
+        Button button = CreateInkButton(card.Title);
+        button.TooltipText = T("查看蛊虫介绍与各转卡牌", "View Gu details and rank previews");
+        button.Pressed += () => ShowCardDetail(cardType);
+        return button;
+    }
+
+    private void ShowCardDetail(Type cardType)
+    {
+        if (!_cardModels.TryGetValue(cardType, out CardModel? canonical) ||
+            canonical is not AbstractGuZhenRenCard guCard || canonical is not IGuWormCard) return;
+
+        _selectedCardType = cardType;
+        _selectedRank = Math.Clamp(guCard.GuRank, 1, guCard.MaxGuRank);
+        foreach (Node child in _rankButtons.GetChildren()) { _rankButtons.RemoveChild(child); child.QueueFree(); }
+        for (int rank = 1; rank <= guCard.MaxGuRank; rank++)
+        {
+            int selected = rank;
+            Button rankButton = CreateInkButton(T($"{ToChineseRank(rank)}转", $"Rank {rank}"));
+            rankButton.ToggleMode = true;
+            rankButton.ButtonPressed = rank == _selectedRank;
+            rankButton.Pressed += () => SelectPreviewRank(selected);
+            _rankButtons.AddChild(rankButton);
+        }
+        _listView.Visible = false;
+        _detailView.Visible = true;
+        RefreshCardDetail();
+    }
+
+    private void SelectPreviewRank(int rank)
+    {
+        _selectedRank = rank;
+        int currentRank = 1;
+        foreach (Node child in _rankButtons.GetChildren())
+            if (child is Button button) button.ButtonPressed = currentRank++ == rank;
+        RefreshCardDetail();
+    }
+
+    private void RefreshCardDetail()
+    {
+        if (_selectedCardType == null || !_cardModels.TryGetValue(_selectedCardType, out CardModel? canonical) ||
+            canonical.ToMutable() is not AbstractGuZhenRenCard preview) return;
+        preview.InitializeGuRankFromSource(_selectedRank);
+        _detailTitle.Text = preview.Title;
+        string dao = preview.CurrentDao is { } value ? GetDaoName(value) : T("无流派", "No path");
+        IGuWormCard worm = (IGuWormCard)preview;
+        _detailMeta.Text = T(
+            $"{ToChineseRank(preview.GuRank)}转 · {dao} · {GetRarityName(preview.Rarity)} · 催动消耗 {worm.YuanQiCost} 元气",
+            $"Rank {preview.GuRank} · {dao} · {preview.Rarity} · {worm.YuanQiCost} Yuan Qi");
+        _detailDescription.Text = FormatDescriptionBbcode(
+            preview.GetDescriptionForPile(PileType.None)
+        );
+
+        ClearCardPreview();
+        NCard? cardNode = NCard.Create(preview);
+        if (cardNode == null) return;
+        _previewCardHolder = NPreviewCardHolder.Create(cardNode, true, false);
+        if (_previewCardHolder == null) { cardNode.QueueFree(); return; }
+        _previewCardHolder.SetCardScale(Vector2.One * 0.72f);
+        _previewCardHolder.Position = new Vector2(
+            _previewHost.CustomMinimumSize.X * 0.5f,
+            _previewHost.CustomMinimumSize.Y * 0.43f
+        );
+        _previewHost.AddChild(_previewCardHolder);
+        cardNode.UpdateVisuals(PileType.None, CardPreviewMode.Normal);
+        RebuildRelatedCardPreviews(preview);
+    }
+
+    private void RebuildRelatedCardPreviews(AbstractGuZhenRenCard source)
+    {
+        ClearRelatedCardPreviews();
+        List<(string Kind, CardModel Card)> related = [];
+        HashSet<Type> includedTypes = [];
+
+        if (source is ILiDaoTrainingGuCard trainingGu)
+        {
+            CardModel companion = ModelDb.GetById<CardModel>(
+                ModelDb.GetId(trainingGu.CompanionCardType)
+            ).ToMutable();
+            if (companion is AbstractGuZhenRenCard rankedCompanion)
+            {
+                rankedCompanion.InitializeGuRankFromSource(source.GuRank);
+            }
+            related.Add((T("伴生牌", "Companion"), companion));
+            includedTypes.Add(companion.GetType());
+        }
+
+        if (source is AbstractGuWormCard wormCard)
+        {
+            foreach (CardModel generated in wormCard.GetCarouselCards())
+            {
+                if (!includedTypes.Add(generated.GetType())) continue;
+                if (generated is AbstractGuZhenRenCard rankedGenerated)
+                {
+                    rankedGenerated.InitializeGuRankFromSource(source.GuRank);
+                }
+                related.Add((T("衍生牌", "Generated"), generated));
+            }
+        }
+
+        if (related.Count == 0)
+        {
+            _relatedCards.AddChild(CreateLabel(
+                T("此转数暂无伴生牌或衍生牌。", "No companion or generated cards at this rank."),
+                17,
+                Muted
+            ));
+            return;
+        }
+
+        foreach ((string kind, CardModel card) in related)
+        {
+            _relatedCards.AddChild(BuildRelatedCardPreview(kind, card));
+        }
+    }
+
+    private Control BuildRelatedCardPreview(string kind, CardModel card)
+    {
+        PanelContainer panel = new()
+        {
+            CustomMinimumSize = new Vector2(142f, 205f),
+        };
+        panel.AddThemeStyleboxOverride("panel", CreateRelatedCardStyle());
+        VBoxContainer body = new();
+        body.AddThemeConstantOverride("separation", 2);
+        panel.AddChild(body);
+
+        Label kindLabel = CreateLabel(kind, 14, Cyan);
+        kindLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        body.AddChild(kindLabel);
+
+        Control host = new()
+        {
+            CustomMinimumSize = new Vector2(138f, 160f),
+            ClipContents = true,
+        };
+        body.AddChild(host);
+
+        NCard? cardNode = NCard.Create(card);
+        NPreviewCardHolder? holder = cardNode == null
+            ? null
+            : NPreviewCardHolder.Create(cardNode, true, false);
+        if (holder != null)
+        {
+            holder.SetCardScale(Vector2.One * 0.34f);
+            holder.Position = new Vector2(69f, 79f);
+            host.AddChild(holder);
+            cardNode!.UpdateVisuals(PileType.None, CardPreviewMode.Normal);
+        }
+        else
+        {
+            cardNode?.QueueFree();
+        }
+
+        Label title = CreateLabel(card.Title, 14, Cream);
+        title.HorizontalAlignment = HorizontalAlignment.Center;
+        title.TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis;
+        title.TooltipText = card.Title;
+        body.AddChild(title);
+        return panel;
+    }
+
+    private void ShowRecipeList()
+    {
+        ClearCardPreview();
+        _selectedCardType = null;
+        _detailView.Visible = false;
+        _listView.Visible = true;
+    }
+
+    private void ClearCardPreview()
+    {
+        if (_previewCardHolder != null && GodotObject.IsInstanceValid(_previewCardHolder))
+        {
+            _previewHost.RemoveChild(_previewCardHolder);
+            _previewCardHolder.QueueFree();
+        }
+        _previewCardHolder = null;
+        ClearRelatedCardPreviews();
+    }
+
+    private void ClearRelatedCardPreviews()
+    {
+        foreach (Node child in _relatedCards.GetChildren())
+        {
+            _relatedCards.RemoveChild(child);
+            child.QueueFree();
+        }
     }
 
     private void OnBackdropGuiInput(InputEvent @event)
@@ -707,9 +1071,10 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
         return null;
     }
 
-    private static IReadOnlyList<RecipeViewModel> LoadRecipes()
+    private static (IReadOnlyList<RecipeViewModel> Recipes,
+        IReadOnlyDictionary<Type, CardModel> Cards) LoadRecipes()
     {
-        Dictionary<Type, string> cardNames = ModelDb
+        Dictionary<Type, CardModel> cards = ModelDb
             .CardPool<GuZhenRenGuCardPool>()
             .AllCards
             .Concat(
@@ -720,12 +1085,12 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
             .GroupBy(card => card.GetType())
             .ToDictionary(
                 group => group.Key,
-                group => group.First().Title
+                group => group.First()
             );
 
         string NameOf(Type type) =>
-            cardNames.TryGetValue(type, out string? name)
-                ? name
+            cards.TryGetValue(type, out CardModel? card)
+                ? card.Title
                 : type.Name;
 
         List<RecipeViewModel> recipes = [];
@@ -738,30 +1103,40 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
             recipes.Add(new RecipeViewModel(
                 RecipeCategory.ShaZhao,
                 resultName,
-                $"{materialText}  →  {resultName}",
+                resultType,
+                materials,
                 1,
-                $"{resultName} {materialText}"
+                $"{resultName} {materialText}",
+                false
             ));
         }
 
+        bool addedGenericBeastRecipe = false;
         foreach ((
                      Type resultType,
                      IReadOnlyList<Type> materials,
                      int minimumRank
                  ) in HeLianRecipeRegistry.GetRecipeDetails())
         {
+            bool isGenericBeastRecipe = resultType == typeof(BaiShouLiGu);
+            if (isGenericBeastRecipe && addedGenericBeastRecipe) continue;
+            addedGenericBeastRecipe |= isGenericBeastRecipe;
             string resultName = NameOf(resultType);
             string materialText = FormatMaterials(materials, NameOf);
             recipes.Add(new RecipeViewModel(
                 RecipeCategory.HeLian,
                 resultName,
-                $"{materialText}  →  {resultName}",
+                resultType,
+                materials,
                 minimumRank,
-                $"{resultName} {materialText} {minimumRank}"
+                isGenericBeastRecipe
+                    ? $"{resultName} 任意三种不同兽力蛊 {minimumRank}"
+                    : $"{resultName} {materialText} {minimumRank}",
+                isGenericBeastRecipe
             ));
         }
 
-        return recipes;
+        return (recipes, cards);
     }
 
     private static string FormatMaterials(
@@ -826,7 +1201,7 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
         return new StyleBoxFlat
         {
             BgColor = RowColor,
-            BorderColor = new Color("71888c"),
+            BorderColor = new Color("9a8062"),
             BorderWidthLeft = 2,
             BorderWidthTop = 1,
             BorderWidthRight = 2,
@@ -844,8 +1219,8 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
         return new StyleBoxFlat
         {
             BgColor = highlighted
-                ? new Color("40545a")
-                : new Color("1d3037"),
+                ? new Color("314249")
+                : new Color("202b30"),
             BorderColor = border,
             BorderWidthLeft = 2,
             BorderWidthTop = 2,
@@ -857,6 +1232,98 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
             CornerRadiusBottomRight = 4,
         };
     }
+
+    private static StyleBoxFlat CreateSmallButtonStyle(bool highlighted) => new()
+    {
+        BgColor = highlighted ? new Color("34464c") : new Color("202b30"),
+        BorderColor = highlighted ? Gold : new Color("6f6251"),
+        BorderWidthLeft = 1,
+        BorderWidthTop = 1,
+        BorderWidthRight = 1,
+        BorderWidthBottom = 1,
+        CornerRadiusTopLeft = 4,
+        CornerRadiusTopRight = 4,
+        CornerRadiusBottomLeft = 4,
+        CornerRadiusBottomRight = 4,
+    };
+
+    private static StyleBoxFlat CreateRelatedCardStyle() => new()
+    {
+        BgColor = new Color("11181b"),
+        BorderColor = new Color("59686a"),
+        BorderWidthLeft = 1,
+        BorderWidthTop = 1,
+        BorderWidthRight = 1,
+        BorderWidthBottom = 1,
+        CornerRadiusTopLeft = 5,
+        CornerRadiusTopRight = 5,
+        CornerRadiusBottomLeft = 5,
+        CornerRadiusBottomRight = 5,
+    };
+
+    private static Texture2D CreateXuanPaperTexture()
+    {
+        const int size = 192;
+        Image image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
+        Color paper = new("172126");
+        Color fiber = new("80715b");
+        for (int y = 0; y < size; y++)
+        for (int x = 0; x < size; x++)
+        {
+            uint hash = (uint)x * 374761393u + (uint)y * 668265263u;
+            hash = (hash ^ (hash >> 13)) * 1274126177u;
+            float grain = (hash & 255) / 255f;
+            float strand = MathF.Abs(MathF.Sin(y * 0.31f + x * 0.027f));
+            float amount = grain > 0.972f ? 0.12f : (strand > 0.994f ? 0.055f : 0.009f * grain);
+            image.SetPixel(x, y, paper.Lerp(fiber, amount));
+        }
+        return ImageTexture.CreateFromImage(image);
+    }
+
+    private static string FormatDescriptionBbcode(string text) => text
+        .Replace("[gold]", "[color=#d0a45e]", StringComparison.Ordinal)
+        .Replace("[/gold]", "[/color]", StringComparison.Ordinal)
+        .Replace("[blue]", "[color=#69a6a8]", StringComparison.Ordinal)
+        .Replace("[/blue]", "[/color]", StringComparison.Ordinal)
+        .Replace("[pink]", "[color=#d58aaa]", StringComparison.Ordinal)
+        .Replace("[/pink]", "[/color]", StringComparison.Ordinal)
+        .Replace("[purple]", "[color=#aa8bc4]", StringComparison.Ordinal)
+        .Replace("[/purple]", "[/color]", StringComparison.Ordinal)
+        .Replace("[sine]", string.Empty, StringComparison.Ordinal)
+        .Replace("[/sine]", string.Empty, StringComparison.Ordinal);
+
+    private static string GetDaoName(AbstractGuZhenRenCard.Dao dao) => dao switch
+    {
+        AbstractGuZhenRenCard.Dao.GuangDao => T("光道", "Light Path"),
+        AbstractGuZhenRenCard.Dao.YanDao => T("炎道", "Fire Path"),
+        AbstractGuZhenRenCard.Dao.LiDao => T("力道", "Strength Path"),
+        AbstractGuZhenRenCard.Dao.JinDao => T("金道", "Metal Path"),
+        AbstractGuZhenRenCard.Dao.TouDao => T("偷道", "Theft Path"),
+        AbstractGuZhenRenCard.Dao.MuDao => T("木道", "Wood Path"),
+        AbstractGuZhenRenCard.Dao.ShiDao => T("食道", "Food Path"),
+        AbstractGuZhenRenCard.Dao.ShaDao => T("杀道", "Killing Path"),
+        AbstractGuZhenRenCard.Dao.GuDao => T("骨道", "Bone Path"),
+        AbstractGuZhenRenCard.Dao.LuDao => T("律道", "Rule Path"),
+        AbstractGuZhenRenCard.Dao.ZhiDao => T("智道", "Wisdom Path"),
+        AbstractGuZhenRenCard.Dao.BianHuaDao => T("变化道", "Transformation Path"),
+        AbstractGuZhenRenCard.Dao.YinYangDao => T("阴阳道", "Yin-Yang Path"),
+        AbstractGuZhenRenCard.Dao.JianDao => T("剑道", "Sword Path"),
+        AbstractGuZhenRenCard.Dao.XueDao => T("血道", "Blood Path"),
+        AbstractGuZhenRenCard.Dao.YunDao => T("运道", "Luck Path"),
+        AbstractGuZhenRenCard.Dao.FengDao => T("风道", "Wind Path"),
+        AbstractGuZhenRenCard.Dao.ZhouDao => T("宙道", "Time Path"),
+        AbstractGuZhenRenCard.Dao.TuDao => T("土道", "Earth Path"),
+        _ => dao.ToString(),
+    };
+
+    private static string GetRarityName(CardRarity rarity) => rarity switch
+    {
+        CardRarity.Common => T("普通", "Common"),
+        CardRarity.Uncommon => T("罕见", "Uncommon"),
+        CardRarity.Rare => T("稀有", "Rare"),
+        CardRarity.Basic => T("基础", "Basic"),
+        _ => rarity.ToString(),
+    };
 
     private static string T(string zhs, string eng)
     {
@@ -890,9 +1357,11 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
     private sealed record RecipeViewModel(
         RecipeCategory Category,
         string ResultName,
-        string Formula,
+        Type ResultType,
+        IReadOnlyList<Type> MaterialTypes,
         int MinimumMaterialRank,
-        string SearchText
+        string SearchText,
+        bool IsGenericBeastRecipe
     );
 
 }
