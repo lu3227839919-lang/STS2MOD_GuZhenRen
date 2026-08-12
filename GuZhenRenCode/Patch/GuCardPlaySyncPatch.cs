@@ -5,8 +5,10 @@ using GuZhenRen.Cards;
 using HarmonyLib;
 
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Runs;
 
 namespace GuZhenRen.Patches;
 
@@ -54,6 +56,16 @@ internal static class GuCardPlaySyncPatch
         MethodInfo obtainAndTrackChecksum =
             ResolveObtainAndTrackChecksumMethod();
 
+        MethodInfo getPlayerSlotIndex =
+            AccessTools.DeclaredMethod(
+                typeof(RunState),
+                nameof(RunState.GetPlayerSlotIndex),
+                [typeof(Player)]
+            ) ?? throw new MissingMethodException(
+                typeof(RunState).FullName,
+                $"{nameof(RunState.GetPlayerSlotIndex)}(Player)"
+            );
+
         Harmony harmony = new(HarmonyId);
         try
         {
@@ -89,6 +101,14 @@ internal static class GuCardPlaySyncPatch
                 )
             );
 
+            harmony.Patch(
+                getPlayerSlotIndex,
+                postfix: new HarmonyMethod(
+                    typeof(GuCardPlaySyncPatch),
+                    nameof(GetPlayerSlotIndexPostfix)
+                )
+            );
+
             _initialized = true;
         }
         catch
@@ -119,6 +139,39 @@ internal static class GuCardPlaySyncPatch
     /// </summary>
     internal static bool IsCardActionExecuting =>
         Volatile.Read(ref _executingActionCount) > 0;
+
+    /// <summary>
+    /// SL 或第三方异步出牌钩子可能在选牌界面存续期间重建 Player。
+    /// PlayerChoiceSynchronizer 仍持有当前 RunState，但原版
+    /// GetPlayerSlotIndex(Player) 只按对象引用查找；旧实例因而返回 -1，
+    /// 随后 GetChoiceId 会用 -1 访问选择 ID 数组。
+    ///
+    /// NetId 才是多人协议中的稳定玩家身份。正常引用匹配时完全保留
+    /// 原版结果，仅在引用失效而同 NetId 玩家仍存在时回退到网络身份。
+    /// </summary>
+    private static void GetPlayerSlotIndexPostfix(
+        RunState __instance,
+        Player player,
+        ref int __result
+    )
+    {
+        if (__result >= 0 || player == null)
+        {
+            return;
+        }
+
+        int networkSlot = __instance.GetPlayerSlotIndex(player.NetId);
+        if (networkSlot < 0)
+        {
+            return;
+        }
+
+        __result = networkSlot;
+        Entry.Logger.Warn(
+            $"[玩家选择同步] Player 引用已失效，已按 NetId " +
+            $"{player.NetId} 恢复到槽位 {networkSlot}。"
+        );
+    }
 
     private static void ChecksumPrefix(
         out GuActivationModeSystem.PendingChecksumScope? __state
