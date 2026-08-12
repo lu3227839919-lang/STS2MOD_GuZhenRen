@@ -143,6 +143,15 @@ public static class GuActivationModeSystem
             return false;
         }
 
+        // 起手蛊牌逐张进入 ExtraHand 的过程中，牌面节点可能已经可见，
+        // 但整段 CardPileCmd 入场事务尚未完成。此时开始 RitsuLib 的
+        // Hand 临时迁移会与入场迁移交错，导致卡牌留在封存堆并锁住
+        // 后续蛊牌选择。因此在全部起手蛊牌入场完成前统一禁用交互。
+        if (GuCardPileSystem.IsOpeningEntryPending(card.Owner))
+        {
+            return false;
+        }
+
         lock (SyncRoot)
         {
             // 一个本地 pending 记录只能对应一个即将同步的出牌动作。
@@ -365,8 +374,8 @@ public static class GuActivationModeSystem
     /// RitsuLib 会把卡移回蛊牌堆，但本模组没有对应的取消 hook，
     /// _pendingCard 会残留——此后 CanSelect 只放行该牌、拦截其余全部
     /// 蛊牌，出现“摸过/点过的蛊牌必须先打出，其他蛊虫全部禁打”的
-    /// 卡死状态。这里检测到 pending 卡已回到蛊牌堆即清理，恢复正常
-    /// 选择；卡仍停留在 Hand 时（选择或排队进行中）保留。
+    /// 卡死状态。pending 只应在原版 Hand 中存活；一旦卡牌被取消回蛊
+    /// 手牌、异常退回封存堆，或已经进入其他牌堆，都应清理并恢复选择。
     /// </summary>
     internal static void SweepStalePending()
     {
@@ -381,7 +390,7 @@ public static class GuActivationModeSystem
             return;
         }
 
-        if (pending.Pile?.Type == GuCardPileSystem.PileType)
+        if (pending.Pile?.Type != PileType.Hand)
         {
             ClearPendingActivation(pending);
         }

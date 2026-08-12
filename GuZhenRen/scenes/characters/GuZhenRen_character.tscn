@@ -13,7 +13,8 @@ texture = ExtResource("1_hmdf0")
 
 [node name="Visuals" type="Sprite2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(0, -256)
+position = Vector2(0, -192)
+scale = Vector2(0.25, 0.25)
 texture = ExtResource("1_fangyuan")
 
 [node name="Bounds" type="Control" parent="."]

@@ -54,6 +54,22 @@ internal static class GuActivationModePatch
                 "_Process(double)"
             );
 
+        Type extraHandPlayCoordinator =
+            typeof(NModExtraHand).Assembly.GetType(
+                "STS2RitsuLib.CardPiles.ModExtraHandPlayCoordinator",
+                throwOnError: true
+            )!;
+
+        MethodInfo tryBeginExtraHandPlay =
+            AccessTools.DeclaredMethod(
+                extraHandPlayCoordinator,
+                "TryBegin",
+                [typeof(NModExtraHand), typeof(NHandCardHolder)]
+            ) ?? throw new MissingMethodException(
+                extraHandPlayCoordinator.FullName,
+                "TryBegin(NModExtraHand, NHandCardHolder)"
+            );
+
         MethodInfo onCombatEnded =
             AccessTools.DeclaredMethod(
                 typeof(NPlayerHand),
@@ -90,6 +106,14 @@ internal static class GuActivationModePatch
                 postfix: new HarmonyMethod(
                     typeof(GuActivationModePatch),
                     nameof(ExtraHandProcessPostfix)
+                )
+            );
+
+            harmony.Patch(
+                tryBeginExtraHandPlay,
+                postfix: new HarmonyMethod(
+                    typeof(GuActivationModePatch),
+                    nameof(ExtraHandPlayBeginPostfix)
                 )
             );
 
@@ -155,13 +179,29 @@ internal static class GuActivationModePatch
 
         __result = __result &&
             GuActivationModeSystem.CanSelect(holder.CardModel);
+    }
 
-        if (__result && holder.CardModel != null)
+    /// <summary>
+    /// CanStartCardPlay 只是资格检查，RitsuLib 随后的 TryBegin 仍可能因
+    /// 牌堆在同一交互帧发生变化而拒绝开始。只有 TryBegin 返回成功时，
+    /// 卡牌才已从蛊手牌原子移入 Hand；此时登记 pending 才不会留下
+    /// “资格检查通过但事务未开始”的幽灵选择状态。
+    /// </summary>
+    private static void ExtraHandPlayBeginPostfix(
+        NModExtraHand container,
+        NHandCardHolder holder,
+        bool __result
+    )
+    {
+        if (!__result ||
+            container.Definition.PileType !=
+                GuCardPileSystem.PileType ||
+            holder.CardModel == null)
         {
-            GuActivationModeSystem.MarkGuCardSelected(
-                holder.CardModel
-            );
+            return;
         }
+
+        GuActivationModeSystem.MarkGuCardSelected(holder.CardModel);
     }
 
     private static void ExtraHandProcessPostfix(

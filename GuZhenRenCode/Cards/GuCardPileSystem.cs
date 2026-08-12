@@ -495,10 +495,16 @@ public static class GuCardPileSystem
         return result;
     }
 
-    private static bool IsOpeningEntryPending(Player owner)
+    /// <summary>
+    /// 起手蛊牌仍在逐张进入 ExtraHand 时，牌面节点可能已经创建，但
+    /// CardPileCmd 的整段入场事务尚未完成。此窗口内不能开始手动出牌，
+    /// 否则 RitsuLib 的临时 Hand 迁移会与尚在执行的入场迁移交错。
+    /// </summary>
+    internal static bool IsOpeningEntryPending(Player owner)
     {
-        if (!OpeningEntryStates.TryGetValue(owner, out var state) ||
-            state.Completed)
+        ArgumentNullException.ThrowIfNull(owner);
+
+        if (!OpeningEntryStates.TryGetValue(owner, out var state))
         {
             return false;
         }
