@@ -369,6 +369,16 @@
     },
     {
       "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_WAN_HAI_GUI_CHAO_RETAIN_BLOCK_POWER.title",
+      "text": "Myriad Remains After-Armor"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_WAN_HAI_GUI_CHAO_RETAIN_BLOCK_POWER.description",
+      "text": "At the start of your next turn, gain {Amount} Block, then remove this effect."
+    },
+    {
+      "table": "powers",
       "key": "GU_ZHEN_REN_POWER_JU_GUANG_POWER.title",
       "text": "Shine"
     },

@@ -369,6 +369,16 @@
     },
     {
       "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_WAN_HAI_GUI_CHAO_RETAIN_BLOCK_POWER.title",
+      "text": "万骸归潮余甲"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_POWER_WAN_HAI_GUI_CHAO_RETAIN_BLOCK_POWER.description",
+      "text": "下回合开始时获得{Amount}点格挡，然后移除。"
+    },
+    {
+      "table": "powers",
       "key": "GU_ZHEN_REN_POWER_JU_GUANG_POWER.title",
       "text": "闪耀"
     },

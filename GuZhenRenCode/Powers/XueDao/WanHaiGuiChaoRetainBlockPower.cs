@@ -23,9 +23,9 @@ public sealed class WanHaiGuiChaoRetainBlockPower
 
     public override PowerAssetProfile AssetProfile => new(
         IconPath:
-            "res://GuZhenRen//images//power//XueQiRecoveryPower-64x64.png",
+            "res://GuZhenRen//images//power//WanHaiGuiChaoRetainBlockPower-64x64.png",
         BigIconPath:
-            "res://GuZhenRen/images/power/XueQiRecoveryPower-256x256.png"
+            "res://GuZhenRen//images//power//WanHaiGuiChaoRetainBlockPower-256x256.png"
     );
 
     public override async Task AfterEnergyReset(Player player)
