@@ -121,6 +121,7 @@ internal static class GuRankRewardPatch
             bool assigned = guCard.TryAssignRandomGuRankOnReward(
                 cardRng,
                 player.RunState.TotalFloor,
+                minRank: guCard.MinimumAvailableGuRank,
                 maxRank: maximumRewardRank
             );
 

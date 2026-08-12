@@ -32,7 +32,7 @@ public sealed class GuZhenRenCharacter : ModCharacterTemplate<GuZhenRenGuCardPoo
     public override CharacterGender Gender => CharacterGender.Neutral;
 
     // 初始血量和金币。
-    public override int StartingHp => 70;
+    public override int StartingHp => 50;
     public override int StartingGold => 99;
 
     // 古月方源每回合默认拥有 3 点原生能量。
