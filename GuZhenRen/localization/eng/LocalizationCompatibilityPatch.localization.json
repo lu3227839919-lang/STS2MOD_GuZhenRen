@@ -140,11 +140,11 @@
     },
     "NianHua": {
       "title": "Years",
-      "description": "Time Path resource, max 9. Reaching 9 immediately triggers Year Complete, then resets to 0; overflow continues afterward."
+      "description": "Time Path resource, max 6. Reaching 6 immediately triggers Year Complete, then resets to 0; overflow continues afterward."
     },
     "SuiMan": {
       "title": "Year Complete",
-      "description": "At 9 Years, choose a recovering Gu to reduce its remaining recovery by 1 turn, and extend all duration-based enemy debuffs by 1 turn."
+      "description": "At 6 Years, choose a recovering Gu to reduce its remaining recovery by 1 turn, and extend all duration-based enemy debuffs by 1 turn."
     },
     "HuanBu": {
       "title": "Slow Steps",
@@ -415,7 +415,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_POWER_NIAN_HUA_POWER.description",
-      "text": "You have {Amount}/9 Years. Reaching 9 triggers Year Complete."
+      "text": "You have {Amount}/6 Years. Reaching 6 triggers Year Complete."
     },
     {
       "table": "powers",

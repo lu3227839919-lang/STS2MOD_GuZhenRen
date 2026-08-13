@@ -46,7 +46,7 @@ public sealed class NianHuaPower : ModPowerTemplate
         IconPath: "res://GuZhenRen/images/power/NianHuaPower-64x64.png",
         BigIconPath: "res://GuZhenRen/images/power/NianHuaPower-256x256.png"
     );
-    public const int MaximumAmount = 9;
+    public const int MaximumAmount = 6;
 
     public override PowerType Type => PowerType.Buff;
     public override PowerStackType StackType => PowerStackType.Counter;
