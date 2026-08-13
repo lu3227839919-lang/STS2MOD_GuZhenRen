@@ -2,6 +2,24 @@
 
 本项目的全部重要变更记录。版本号遵循 [SemVer](https://semver.org/lang/zh-CN/) 风格，规则见 [VERSIONING.md](VERSIONING.md)。历史版本大多未标注发布日期。
 
+## [0.10.1] - 2026-08-13
+
+### 新增
+- 原版药水兼容（`GuPotionCompatibilityPatch`）：攻击药水、技能药水、能力药水对蛊真人起效——从蛊虫卡池随机提供 3 张临时蛊，转数按卡牌奖励规则随机赋定（含百兽力蛊随机固定兽力组合），并同步生成伴生牌；药水临时蛊不占五张常规蛊手牌容量（`SavedAttachedState` 附着，QuickSL 后行为保持），力道药水伴生牌可参与炼力。
+- 蛊虫升级桥接（`GuWormUpgradePatch` 重构）：原版升级效果（锻造/升级事件/升级药水）不再对蛊虫完全禁用——六转及以上蛊虫可由升级效果逐次升到七转及更高；五转蛊不能借升级突破到六转；全程不调用原生 `OnUpgrade`，避免蛊虫被误变成普通“+”牌。
+- 光阴荏苒蛊 Power 图标更新（缩小重制版）。
+
+### 修复
+- 百兽力蛊非合炼来源随机获得时，构造默认转数不再覆盖随机兽力组合——从五种兽力中不重复抽取三种固定到卡实例，选择界面与实际催动一致。
+
+### Added
+- Vanilla potion compatibility (`GuPotionCompatibilityPatch`): Attack/Skill/Power potions now work for GuZhenRen — 3 temporary Gu drawn from the Gu card pool with ranks assigned like card rewards (including random fixed BaiShouLiGu beast-strength composition) plus their companion cards; potion temporary Gu do not count toward the 5-card Gu hand cap (attached via `SavedAttachedState`, preserved through QuickSL); Li Dao potion companions can train.
+- Gu upgrade bridging (`GuWormUpgradePatch` rework): vanilla upgrade effects (Forge / upgrade events / upgrade potions) no longer exclude Gu entirely — Rank 6+ Gu can be raised one rank at a time to Rank 7 and beyond; Rank 5 Gu still cannot break into Rank 6; native `OnUpgrade` is never invoked, so Gu are not turned into vanilla “+” cards.
+- Updated GuangYinRenRan Power icon (re-scaled).
+
+### Fixed
+- BaiShouLiGu obtained randomly from non-HeLian sources no longer keeps its constructor default composition — 3 of 5 beast strengths are drawn without repetition and fixed to the card instance, matching the selection screen and actual activation.
+
 ## [0.10.0] - 2026-08-12
 
 ### 新增
