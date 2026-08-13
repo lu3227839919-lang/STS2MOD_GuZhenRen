@@ -53,6 +53,7 @@ public partial class Entry
         new(nameof(GuWormUpgradePatch), GuWormUpgradePatch.Initialize, GuWormUpgradePatch.Uninitialize),
         new(nameof(GuPotionCompatibilityPatch), GuPotionCompatibilityPatch.Initialize, GuPotionCompatibilityPatch.Uninitialize),
         new(nameof(CardUniquenessPatch), CardUniquenessPatch.Initialize, CardUniquenessPatch.Uninitialize),
+        new(nameof(HandCapacityExemptionPatch), HandCapacityExemptionPatch.Initialize, HandCapacityExemptionPatch.Uninitialize),
         new(nameof(EmptyCardRewardCompatibilityPatch), EmptyCardRewardCompatibilityPatch.Initialize, EmptyCardRewardCompatibilityPatch.Uninitialize),
         // 内置复合载体分别保存普通附魔与血寄，并显示成两个独立槽位。
         new(nameof(XueDaoEnchantmentSlotPatch), XueDaoEnchantmentSlotPatch.Initialize, XueDaoEnchantmentSlotPatch.Uninitialize),

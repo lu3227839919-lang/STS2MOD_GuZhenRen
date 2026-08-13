@@ -2,6 +2,24 @@
 
 本项目的全部重要变更记录。版本号遵循 [SemVer](https://semver.org/lang/zh-CN/) 风格，规则见 [VERSIONING.md](VERSIONING.md)。历史版本大多未标注发布日期。
 
+## [0.10.2] - 2026-08-13
+
+### 新增
+- 普通手牌容量豁免（`HandCapacityExemptionPatch`）：力道虚影与“杀招推演”系统牌仍实际位于原版手牌（保留全部显示、选取、保留与触发行为），但在计算普通手牌上限（10 张）时不计数。统一替换 `CardPileCmd` 的容量判定与“补到满手”类卡牌（`Anointed`/`CrashLanding`/`Dredge`/`NeowsFury`/`Pillage`/`Scrawl`）的差量计算，避免虚影/推演占位导致少补牌；杀招本体仍占手牌容量。
+
+### 修复
+- 力道伴生牌同步跳过 canonical 模板实例（`IsCanonical`），避免卡池/模板场景误触发伴生牌同步。
+- 百兽力蛊（继承 `AbstractHeLianGuCard`，不经过力道蛊公共父类的伴生牌同步逻辑）转数变化时显式调用 `LiDaoCompanionSystem.SyncCompanionsForGu`，确保百兽架势始终跟随百兽力蛊当前转数。
+- 休息点立绘缩放调整（1.25 → 0.75）。
+
+### Added
+- Hand-capacity exemption (`HandCapacityExemptionPatch`): Li Dao phantoms and the “Killer-Move Derivation” system card physically stay in the vanilla hand (keeping all display/select/retain/trigger behavior) but no longer count toward the 10-card hand limit. The vanilla capacity checks and “fill the hand” cards (`Anointed`/`CrashLanding`/`Dredge`/`NeowsFury`/`Pillage`/`Scrawl`) now count only capacity-consuming cards, so phantoms/derivations no longer reduce draw-to-full-hand; the killer move itself still counts toward the hand limit.
+
+### Fixed
+- Li Dao companion sync now skips canonical template instances (`IsCanonical`), preventing companion sync from firing on card-pool/template scenes.
+- BaiShouLiGu (inherits `AbstractHeLianGuCard` and bypasses the Li Dao common parent sync) now explicitly calls `LiDaoCompanionSystem.SyncCompanionsForGu` on rank change, so BaiShouJiaShi always follows the current rank.
+- Rest-site portrait scale adjusted (1.25 → 0.75).
+
 ## [0.10.1] - 2026-08-13
 
 ### 新增

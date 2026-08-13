@@ -188,9 +188,8 @@ public static class ApertureSystem
                 player
             );
 
-        await CardPileCmd.AddGeneratedCardToCombat(
+        await GuCardPileSystem.AddGeneratedCardToHand(
             derivation,
-            PileType.Hand,
             player
         );
 

@@ -163,7 +163,8 @@ public static class LiDaoCompanionSystem
     {
         ArgumentNullException.ThrowIfNull(guCard);
 
-        if (guCard is not ILiDaoTrainingGuCard trainingGu ||
+        if (guCard.IsCanonical ||
+            guCard is not ILiDaoTrainingGuCard trainingGu ||
             guCard.Owner is not { } owner ||
             MutationDepth.Value > 0)
         {
@@ -195,7 +196,8 @@ public static class LiDaoCompanionSystem
     {
         ArgumentNullException.ThrowIfNull(companion);
 
-        if (companion is not ILiDaoCompanionCard liDaoCompanion ||
+        if (companion.IsCanonical ||
+            companion is not ILiDaoCompanionCard liDaoCompanion ||
             companion.Owner is not { } owner ||
             MutationDepth.Value > 0)
         {

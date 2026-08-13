@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 using Godot;
 
@@ -791,7 +791,7 @@ internal static class ShaZhaoTuiYanSystem
         // 登记每场推演次数；八至九转补发第二张推演牌。
         await ApertureSystem.RegisterShaZhaoDerivationAsync(player);
 
-        // 杀招加入手牌（满手时入弃牌堆）。
+        // 杀招加入普通手牌；杀招本体仍占容量，只有“杀招推演”系统牌容量豁免。
         bool addedToHand =
             await GuCardPileSystem.AddGeneratedCardToHand(
                 shaZhao,

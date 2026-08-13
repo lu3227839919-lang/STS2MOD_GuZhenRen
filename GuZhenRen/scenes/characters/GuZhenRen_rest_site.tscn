@@ -7,7 +7,7 @@
 
 [node name="Visuals" type="Sprite2D" parent="."]
 position = Vector2(0, -96)
-scale = Vector2(1.25, 1.25)
+scale = Vector2(0.75, 0.75)
 texture = ExtResource("1_xg78g")
 
 [node name="Shadow" type="Sprite2D" parent="."]

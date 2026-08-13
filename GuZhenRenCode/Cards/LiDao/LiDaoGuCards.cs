@@ -577,6 +577,12 @@ public sealed class BaiShouLiGu :
     protected override void OnGuRankChanged()
     {
         base.OnGuRankChanged();
+
+        // 百兽力蛊继承 AbstractHeLianGuCard，而不是 AbstractLiDaoGuCard，
+        // 因此不会经过力道蛊公共父类的伴生牌转数同步逻辑。
+        // 在这里显式同步，确保百兽架势始终跟随百兽力蛊当前转数。
+        LiDaoCompanionSystem.SyncCompanionsForGu(this);
+
         RefreshRankValues();
     }
 

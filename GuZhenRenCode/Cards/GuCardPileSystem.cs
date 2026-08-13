@@ -926,6 +926,12 @@ public static class GuCardPileSystem
         ArgumentNullException.ThrowIfNull(card);
         ArgumentNullException.ThrowIfNull(owner);
 
+        if (HandCapacityExemptionPatch.IsCapacityExempt(card))
+        {
+            return await HandCapacityExemptionPatch
+                .AddGeneratedExemptToHandAsync(card, owner);
+        }
+
         CardPileAddResult result =
             await CardPileCmd.AddGeneratedCardToCombat(
                 card,
@@ -1061,6 +1067,16 @@ public static class GuCardPileSystem
         CardPile destination = targetPile.GetPile(card.Owner);
         if (ReferenceEquals(card.Pile, destination))
         {
+            return;
+        }
+
+        if (targetPile == PileType.Hand &&
+            HandCapacityExemptionPatch.IsCapacityExempt(card))
+        {
+            await HandCapacityExemptionPatch.MoveExemptToHandAsync(
+                card,
+                skipVisuals
+            );
             return;
         }
 
