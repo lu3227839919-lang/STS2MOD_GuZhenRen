@@ -129,7 +129,7 @@ $RitsuDll = Join-Path $ModsDir "STS2-RitsuLib\STS2-RitsuLib.dll"
 Assert-RequiredFile $RitsuDll "STS2-RitsuLib 0.5.11+ 运行时"
 
 $ManifestPath = Join-Path $ProjectRoot "GuZhenRen.json"
-$Manifest = Get-Content $ManifestPath -Raw | ConvertFrom-Json
+$Manifest = Get-Content $ManifestPath -Encoding UTF8 -Raw | ConvertFrom-Json
 $Version = [string]$Manifest.version
 $SolutionPath = Join-Path $ProjectRoot "GuZhenRen.sln"
 
