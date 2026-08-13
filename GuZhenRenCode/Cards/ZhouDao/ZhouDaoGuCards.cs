@@ -67,7 +67,7 @@ public abstract class AbstractZhouDaoCompanionGuCard :
 [RegisterCard(typeof(GuZhenRenGuCardPool))]
 // 三转以上日蛊 ×1 + 三转以上月蛊 ×1 → 光阴荏苒蛊
 [HeLianRecipe(typeof(RiGu), typeof(YueGu), MinimumMaterialRank = 3)]
-public sealed class GuangYinRenRanGu : AbstractZhouDaoCompanionGuCard
+public sealed class GuangYinRenRanGu : AbstractZhouDaoCompanionGuCard, ICardRewardExcluded
 {
     public override Type CompanionCardType => typeof(GuangYinRenRan);
 
@@ -522,7 +522,7 @@ public sealed class HuiSuGu : AbstractZhouDaoGuCard
 [RegisterCard(typeof(GuZhenRenGuCardPool))]
 // 六转以上回溯蛊 ×1 + 六转以上年蛊 ×1 → 宙锚仙蛊
 [HeLianRecipe(typeof(HuiSuGu), typeof(NianGu), MinimumMaterialRank = 6)]
-public sealed class ZhouMaoXianGu : AbstractZhouDaoCompanionGuCard
+public sealed class ZhouMaoXianGu : AbstractZhouDaoCompanionGuCard, ICardRewardExcluded
 {
     public override int MinimumAvailableGuRank => 6;
     public override Type CompanionCardType => typeof(ZhouMao);
@@ -559,7 +559,7 @@ public sealed class ZhouMaoXianGu : AbstractZhouDaoCompanionGuCard
 [HeLianRecipe(typeof(NianGu), typeof(GuangYinRenRanGu), MinimumMaterialRank = 8)]
 // 或 八转以上年蛊 ×1 + 八转以上日蛊 ×1 + 八转以上月蛊 ×1 → 似水流年仙蛊
 [HeLianRecipe(typeof(NianGu), typeof(RiGu), typeof(YueGu), MinimumMaterialRank = 8)]
-public sealed class SiShuiLiuNianXianGu : AbstractZhouDaoCompanionGuCard
+public sealed class SiShuiLiuNianXianGu : AbstractZhouDaoCompanionGuCard, ICardRewardExcluded
 {
     public override int MinimumAvailableGuRank => 8;
     public override Type CompanionCardType => typeof(SiShuiLiuNian);
