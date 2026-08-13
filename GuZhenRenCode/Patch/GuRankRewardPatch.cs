@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Reflection;
 
+using GuZhenRen.Cards.LiDao;
+
 using HarmonyLib;
 
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -76,26 +78,36 @@ internal static class GuRankRewardPatch
     )
     {
         Player player = __instance.Player;
+        AssignRandomRanksLikeReward(
+            __instance.Cards,
+            player,
+            forceAssignment: false
+        );
+    }
+
+    /// <summary>
+    /// 战斗内随机给予蛊虫时复用与卡牌奖励完全相同的随机流、楼层
+    /// 分布和仙蛊上限。forceAssignment 用于百兽力蛊等构造时已写入
+    /// 默认转数、但本次仍必须重新按奖励规则随机赋阶的卡牌。
+    /// </summary>
+    internal static void AssignRandomRanksLikeReward(
+        IEnumerable<CardModel> cards,
+        Player player,
+        bool forceAssignment
+    )
+    {
         Rng rng = RitsuLibFramework.GetModPlayerRng(
             player,
             Entry.ModId,
             RewardRngStreamId
         );
 
-        AssignRandomRanks(__instance.Cards, rng, player);
-    }
-
-    private static void AssignRandomRanks(
-        IEnumerable<CardModel> cards,
-        Rng rng,
-        Player player
-    )
-    {
         foreach (CardModel card in cards)
         {
             if (card is not AbstractGuZhenRenCard guCard ||
                 card is not IGuWormCard ||
-                !guCard.NeedsInitialGuRankAssignment)
+                (!forceAssignment &&
+                    !guCard.NeedsInitialGuRankAssignment))
             {
                 continue;
             }
@@ -118,12 +130,31 @@ internal static class GuRankRewardPatch
             }
 
             Rng cardRng = new(cardSeed);
-            bool assigned = guCard.TryAssignRandomGuRankOnReward(
-                cardRng,
-                player.RunState.TotalFloor,
-                minRank: guCard.MinimumAvailableGuRank,
-                maxRank: maximumRewardRank
-            );
+            bool assigned;
+            if (forceAssignment)
+            {
+                guCard.AssignRandomGuRankOnReward(
+                    cardRng,
+                    player.RunState.TotalFloor,
+                    minRank: guCard.MinimumAvailableGuRank,
+                    maxRank: maximumRewardRank
+                );
+                assigned = true;
+            }
+            else
+            {
+                assigned = guCard.TryAssignRandomGuRankOnReward(
+                    cardRng,
+                    player.RunState.TotalFloor,
+                    minRank: guCard.MinimumAvailableGuRank,
+                    maxRank: maximumRewardRank
+                );
+            }
+
+            if (card is BaiShouLiGu baiShouLiGu)
+            {
+                baiShouLiGu.AssignRandomComposition(cardRng);
+            }
 
             if (assigned)
             {

@@ -14,6 +14,7 @@ using MegaCrit.Sts2.Core.Settings;
 using Godot;
 
 using STS2RitsuLib.CardPiles;
+using STS2RitsuLib.Utils;
 
 namespace GuZhenRen.Cards;
 
@@ -88,6 +89,16 @@ public static class GuCardPileSystem
     public static PileType GuSealedPileType { get; private set; }
 
     private static readonly object SyncRoot = new();
+
+    /// <summary>
+    /// 攻击药水与能力药水生成的临时蛊不占五张常规蛊手牌容量。
+    /// 状态附着在战斗卡实例上，QuickSL 后仍能保持相同行为。
+    /// </summary>
+    private static readonly SavedAttachedState<CardModel, bool>
+        TemporaryCapacityBypassState = new(
+            Entry.ModId + ".temporary_gu_capacity_bypass",
+            static () => false
+        );
 
     private sealed class OpeningEntryState
     {
@@ -250,6 +261,67 @@ public static class GuCardPileSystem
                 targetPile,
                 owner
             );
+
+        return result.success;
+    }
+
+    /// <summary>
+    /// 把药水生成的临时蛊登记为战斗生成牌。需要炼力的力道蛊进入
+    /// 蛊封存堆；其他蛊统一遵守五张蛊手牌上限，满位时先进入蛊
+    /// 存放牌堆，待出现空位后按现有补牌流程进入蛊手牌。
+    /// </summary>
+    internal static async Task<bool> AddTemporaryGuToCombat(
+        CardModel card,
+        Player owner,
+        Player creator,
+        bool bypassCapacity
+    )
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        ArgumentNullException.ThrowIfNull(owner);
+        ArgumentNullException.ThrowIfNull(creator);
+
+        if (card is not IGuWormCard)
+        {
+            throw new ArgumentException(
+                "只有蛊虫牌可以进入临时蛊手牌流程。",
+                nameof(card)
+            );
+        }
+
+        EnsureInitialized();
+        PileType targetPile;
+        if (card is ILiDaoTrainingGuCard)
+        {
+            LiDaoTrainingSystem.ResetForCombat(card);
+            targetPile = GuSealedPileType;
+        }
+        else
+        {
+            GuCardUsageRules.ResetUses(card);
+            bool entersActivePile =
+                bypassCapacity || HasAvailableActiveSlot(owner);
+            targetPile = entersActivePile
+                ? PileType
+                : StoragePileType;
+        }
+
+        if (bypassCapacity && card is not ILiDaoTrainingGuCard)
+        {
+            TemporaryCapacityBypassState[card] = true;
+        }
+
+        CardPileAddResult result =
+            await CardPileCmd.AddGeneratedCardToCombat(
+                card,
+                targetPile,
+                creator
+            );
+
+        if (!result.success)
+        {
+            TemporaryCapacityBypassState.Remove(card);
+        }
 
         return result.success;
     }
@@ -1022,11 +1094,27 @@ public static class GuCardPileSystem
         }
     }
 
+    internal static bool HasAvailableActiveSlot(Player owner)
+    {
+        ArgumentNullException.ThrowIfNull(owner);
+        EnsureInitialized();
+        return GetAvailableActiveSlots(owner) > 0;
+    }
+
+    private static bool BypassesActivePileCapacity(CardModel card) =>
+        TemporaryCapacityBypassState.GetValueOrDefault(
+            card,
+            defaultValue: false
+        );
+
     private static int GetActiveGuCount(Player owner) =>
         PileType
             .GetPile(owner)
             .Cards
-            .Count(static card => card is IGuWormCard);
+            .Count(card =>
+                card is IGuWormCard &&
+                !BypassesActivePileCapacity(card)
+            );
 
     private static int GetAvailableActiveSlots(Player owner) =>
         Math.Max(0, ActivePileCapacity - GetActiveGuCount(owner));
@@ -1041,7 +1129,10 @@ public static class GuCardPileSystem
         CardPile storagePile = StoragePileType.GetPile(owner);
         CardPile recoveryPile = RecoveryPileType.GetPile(owner);
         CardModel[] overflowCards = guPile.Cards
-            .Where(static card => card is IGuWormCard)
+            .Where(card =>
+                card is IGuWormCard &&
+                !BypassesActivePileCapacity(card)
+            )
             .Skip(ActivePileCapacity)
             .ToArray();
 

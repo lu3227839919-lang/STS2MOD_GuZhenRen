@@ -27,6 +27,16 @@ public static class LiDaoTrainingSystem
             static () => false
         );
 
+    /// <summary>
+    /// 药水随机给予力道蛊时同时生成的临时伴生牌可以参与炼力；其他
+    /// 战斗内复制或随机生成的临时伴生牌仍然不计数。
+    /// </summary>
+    private static readonly SavedAttachedState<CardModel, bool>
+        TemporaryTrainingCompanionState = new(
+            Entry.ModId + ".li_dao.temporary_training_companion",
+            static () => false
+        );
+
     internal static void ResetForCombat(CardModel card)
     {
         if (card is not ILiDaoTrainingGuCard)
@@ -50,9 +60,18 @@ public static class LiDaoTrainingSystem
         !UnsealedState[card] &&
         card.Pile?.Type == GuCardPileSystem.GuSealedPileType;
 
+    internal static void MarkTemporaryCompanionCanTrain(
+        CardModel companion
+    )
+    {
+        ArgumentNullException.ThrowIfNull(companion);
+        TemporaryTrainingCompanionState[companion] = true;
+    }
+
     /// <summary>
-    /// 一张永久伴生牌完成其首次 CardPlay 后调用。临时生成牌没有
-    /// DeckVersion，Replay 后续段也不是 IsFirstInSeries，因此均不计数。
+    /// 一张永久伴生牌或药水专门生成的炼力伴生牌完成其首次 CardPlay
+    /// 后调用。普通临时生成牌没有 DeckVersion，Replay 后续段也不是
+    /// IsFirstInSeries，因此仍不计数。
     /// </summary>
     public static async Task TrainFromCompanionAsync(
         CardPlay cardPlay,
@@ -64,7 +83,8 @@ public static class LiDaoTrainingSystem
 
         CardModel companion = cardPlay.Card;
         if (!cardPlay.IsFirstInSeries ||
-            companion.DeckVersion == null ||
+            (companion.DeckVersion == null &&
+                !TemporaryTrainingCompanionState[companion]) ||
             companion.Owner.PlayerCombatState == null)
         {
             return;
@@ -99,13 +119,8 @@ public static class LiDaoTrainingSystem
         UnsealedState[sealedGu] = true;
         GuCardUsageRules.ResetUses(sealedGu);
 
-        int activeCount = GuCardPileSystem.PileType
-            .GetPile(companion.Owner)
-            .Cards
-            .Count(static card => card is IGuWormCard);
-
-        PileType destination = activeCount <
-            GuCardPileSystem.ActivePileCapacity
+        PileType destination = GuCardPileSystem
+            .HasAvailableActiveSlot(companion.Owner)
                 ? GuCardPileSystem.PileType
                 : GuCardPileSystem.StoragePileType;
 

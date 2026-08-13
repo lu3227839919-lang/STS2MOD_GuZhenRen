@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Random;
 using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib.Combat.SecondaryResources;
@@ -482,6 +483,34 @@ public sealed class BaiShouLiGu :
         }
 
         _composition = string.Join(',', kinds.Select(kind => (int)kind));
+        CompositionState[this] = _composition;
+    }
+
+    /// <summary>
+    /// 非合练来源随机获得百兽力蛊时，从五种兽力中不重复抽取三种并
+    /// 固定到该卡实例。状态参与保存和多人快照，选择界面与实际催动
+    /// 始终显示、使用同一组兽力虚影。
+    /// </summary>
+    internal void AssignRandomComposition(Rng rng)
+    {
+        ArgumentNullException.ThrowIfNull(rng);
+
+        List<LiDaoBeastKind> pool =
+            [.. Enum.GetValues<LiDaoBeastKind>()];
+        List<LiDaoBeastKind> selected = [];
+        while (selected.Count < 3)
+        {
+            int index = rng.NextInt(pool.Count);
+            selected.Add(pool[index]);
+            pool.RemoveAt(index);
+        }
+
+        _composition = string.Join(
+            ',',
+            selected
+                .OrderBy(kind => kind)
+                .Select(kind => (int)kind)
+        );
         CompositionState[this] = _composition;
     }
 
