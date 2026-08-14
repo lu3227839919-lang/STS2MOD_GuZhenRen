@@ -2,6 +2,16 @@
 
 本项目的全部重要变更记录。版本号遵循 [SemVer](https://semver.org/lang/zh-CN/) 风格，规则见 [VERSIONING.md](VERSIONING.md)。历史版本大多未标注发布日期。
 
+## [0.10.3] - 2026-08-14
+
+### 修复
+- 适配《杀戮尖塔 2》0.111 与 RitsuLib 0.5.12：`CardCmd.Exhaust` 兼容 `Task` 与 `Task<T>` 返回值（`CardExhaustCompat` 动态发现重载），血道寄生破胎监听（`XueDaoParasiteExhaustPatch`）为泛型返回重载生成泛型 postfix，找不到兼容重载时仅记录警告、不阻断模组初始化。
+- 出牌同步门控改按玩家粒度（`GuCardPlaySyncPatch`/`GuActivationModePatch`）：仅当蛊牌所属玩家自己的上一张牌仍在执行时禁止下一次蛊牌选择，队友的长动作（如等待弃牌选择）不再锁住本地蛊手牌。
+
+### Fixed
+- Adapted to StS2 0.111 and RitsuLib 0.5.12: `CardCmd.Exhaust` now accepts both `Task` and `Task<T>` return types (`CardExhaustCompat` discovers overloads dynamically); the blood-parasite break-on-exhaust listener (`XueDaoParasiteExhaustPatch`) builds a generic postfix for generic-return overloads and only warns (never blocks init) when no compatible overload is found.
+- The play-action sync gate is now per network player (`GuCardPlaySyncPatch`/`GuActivationModePatch`): only the card's own player is blocked from picking the next Gu while his previous card action is still executing; a teammate's long-running action (e.g. waiting for a discard choice) no longer locks the local Gu extra hand.
+
 ## [0.10.2] - 2026-08-13
 
 ### 新增

@@ -10,9 +10,9 @@ namespace GuZhenRen.Cards;
 /// <summary>
 /// 跨游戏 API 版本调用 CardCmd.Exhaust。
 ///
-/// 0.110.1 修改了 CardCmd.Exhaust 的参数签名。模组仍以 0.110.0
-/// 兼容面编译，因此不能在运行时硬绑定某一个重载。此适配器按参数类型
-/// 查找当前游戏实际提供的方法，并为新增的可选参数提供默认值。
+/// 0.110.1 及后续版本修改了 CardCmd.Exhaust 的参数签名和返回类型。
+/// 因此不能在编译期硬绑定某一个重载。此适配器按参数类型查找当前游戏
+/// 实际提供的方法，并为新增的可选参数提供默认值。
 /// </summary>
 internal static class CardExhaustCompat
 {
@@ -53,7 +53,7 @@ internal static class CardExhaustCompat
 
     /// <summary>
     /// 返回当前运行时所有能够安全挂载 Harmony Postfix 的 Exhaust 重载。
-    /// 只选择返回值恰好为 Task 且含 CardModel 参数的方法。
+    /// 只选择返回值为 Task 或 Task&lt;T&gt; 且含 CardModel 参数的方法。
     /// </summary>
     internal static IReadOnlyList<MethodInfo>
         FindPatchableMethods()
@@ -66,7 +66,7 @@ internal static class CardExhaustCompat
             )
             .Where(method =>
                 method.Name == nameof(CardCmd.Exhaust) &&
-                method.ReturnType == typeof(Task) &&
+                IsTaskReturnType(method.ReturnType) &&
                 method
                     .GetParameters()
                     .Any(parameter =>
@@ -129,7 +129,7 @@ internal static class CardExhaustCompat
                 )
                 .Where(method =>
                     method.Name == nameof(CardCmd.Exhaust) &&
-                    method.ReturnType == typeof(Task) &&
+                    IsTaskReturnType(method.ReturnType) &&
                     CanBuildArguments(method)
                 )
                 .OrderByDescending(ScoreMethod)
@@ -184,6 +184,9 @@ internal static class CardExhaustCompat
 
         return hasCard;
     }
+
+    private static bool IsTaskReturnType(Type returnType) =>
+        typeof(Task).IsAssignableFrom(returnType);
 
     private static int ScoreMethod(MethodInfo method)
     {

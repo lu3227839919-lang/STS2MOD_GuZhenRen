@@ -169,9 +169,14 @@ internal static class GuActivationModePatch
         }
 
         // ExtraHand 的原生流程会在网络动作真正执行前，先在发起端本地
-        // 把卡牌移入 Hand。上一张牌仍在执行时开始下一次选择，会让该
-        // 本地临时状态被上一动作的 checksum 捕获，而其他端仍在蛊牌堆。
-        if (GuCardPlaySyncPatch.IsCardActionExecuting)
+        // 把卡牌移入 Hand。仅当这张蛊牌所属玩家自己的上一张牌仍在执行
+        // 时禁止下一次选择；队友的出牌（尤其等待弃牌选择的长动作）不能
+        // 锁住方源的蛊手牌。跨玩家并发动作的 checksum 差异由
+        // NormalizePendingCardForChecksum 负责归一化。
+        if (holder.CardModel != null &&
+            GuCardPlaySyncPatch.IsCardActionExecuting(
+                holder.CardModel.Owner
+            ))
         {
             __result = false;
             return;

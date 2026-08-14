@@ -30,7 +30,14 @@ internal static class GuCardPlaySyncPatch
 
     private static bool _initialized;
 
-    private static int _executingActionCount;
+    private static readonly object ActionGateSync = new();
+
+    // PlayCardAction can stay alive for the whole duration of an in-card
+    // choice (for example, while another player is choosing cards to
+    // discard). Keep the gate per network player instead of globally so a
+    // teammate's unresolved choice does not disable the local Gu extra hand.
+    private static readonly Dictionary<ulong, int>
+        ExecutingActionCountsByOwner = new();
 
     private static MethodInfo? _toCardModelMethod;
 
@@ -126,7 +133,11 @@ internal static class GuCardPlaySyncPatch
         }
         finally
         {
-            Interlocked.Exchange(ref _executingActionCount, 0);
+            lock (ActionGateSync)
+            {
+                ExecutingActionCountsByOwner.Clear();
+            }
+
             _initialized = false;
         }
     }
@@ -137,8 +148,19 @@ internal static class GuCardPlaySyncPatch
     /// 提前移牌会污染上一动作结束时的多人校验。UI 入口据此暂时禁止
     /// 新的蛊牌选择；同步动作本身仍可正常排队和执行。
     /// </summary>
-    internal static bool IsCardActionExecuting =>
-        Volatile.Read(ref _executingActionCount) > 0;
+    internal static bool IsCardActionExecuting(Player player)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+
+        lock (ActionGateSync)
+        {
+            return ExecutingActionCountsByOwner.TryGetValue(
+                    player.NetId,
+                    out int count
+                ) &&
+                count > 0;
+        }
+    }
 
     /// <summary>
     /// SL 或第三方异步出牌钩子可能在选牌界面存续期间重建 Player。
@@ -228,10 +250,12 @@ internal static class GuCardPlaySyncPatch
     }
 
     private static void ExecuteActionPrefix(
-        PlayCardAction __instance
+        PlayCardAction __instance,
+        out ulong __state
     )
     {
-        Interlocked.Increment(ref _executingActionCount);
+        __state = __instance.Player.NetId;
+        AcquireActionGate(__state);
 
         try
         {
@@ -259,27 +283,35 @@ internal static class GuCardPlaySyncPatch
         }
     }
 
-    private static void ExecuteActionPostfix(ref Task __result)
+    private static void ExecuteActionPostfix(
+        ref Task __result,
+        ulong __state
+    )
     {
-        __result = AwaitActionAndReleaseGateAsync(__result);
+        __result = AwaitActionAndReleaseGateAsync(
+            __result,
+            __state
+        );
     }
 
     private static Exception? ExecuteActionFinalizer(
-        Exception? __exception
+        Exception? __exception,
+        ulong __state
     )
     {
         // async 异常由包装后的 Task finally 释放；这里只处理原方法在
         // 返回 Task 之前同步抛出的异常，避免 UI 永久被锁住。
         if (__exception != null)
         {
-            ReleaseActionGate();
+            ReleaseActionGate(__state);
         }
 
         return __exception;
     }
 
     private static async Task AwaitActionAndReleaseGateAsync(
-        Task actionTask
+        Task actionTask,
+        ulong ownerId
     )
     {
         try
@@ -288,18 +320,41 @@ internal static class GuCardPlaySyncPatch
         }
         finally
         {
-            ReleaseActionGate();
+            ReleaseActionGate(ownerId);
         }
     }
 
-    private static void ReleaseActionGate()
+    private static void AcquireActionGate(ulong ownerId)
     {
-        int remaining = Interlocked.Decrement(
-            ref _executingActionCount
-        );
-        if (remaining < 0)
+        lock (ActionGateSync)
         {
-            Interlocked.Exchange(ref _executingActionCount, 0);
+            ExecutingActionCountsByOwner.TryGetValue(
+                ownerId,
+                out int count
+            );
+            ExecutingActionCountsByOwner[ownerId] = count + 1;
+        }
+    }
+
+    private static void ReleaseActionGate(ulong ownerId)
+    {
+        lock (ActionGateSync)
+        {
+            if (!ExecutingActionCountsByOwner.TryGetValue(
+                    ownerId,
+                    out int count
+                ))
+            {
+                return;
+            }
+
+            if (count <= 1)
+            {
+                ExecutingActionCountsByOwner.Remove(ownerId);
+                return;
+            }
+
+            ExecutingActionCountsByOwner[ownerId] = count - 1;
         }
     }
 

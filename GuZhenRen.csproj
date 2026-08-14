@@ -12,13 +12,13 @@
     <NoWarn>$(NoWarn);MSB3270;CS0436</NoWarn>
 
     <GodotExportPreset>Windows Desktop</GodotExportPreset>
-    <Sts2ApiCompat>0.110.0</Sts2ApiCompat>
+    <Sts2ApiCompat>0.111.0</Sts2ApiCompat>
     <Sts2Dir Condition="'$(Sts2Dir)' == ''">$(MSBuildProgramFiles32)\Steam\steamapps\common\Slay the Spire 2</Sts2Dir>
     <Sts2DataDir Condition="'$(Sts2DataDir)' == ''">$(Sts2Dir)\data_sts2_windows_x86_64</Sts2DataDir>
     <ModOutputDir>$(Sts2Dir)\mods\$(MSBuildProjectName)\</ModOutputDir>
     <ModPckPath>$(ModOutputDir)$(MSBuildProjectName).pck</ModPckPath>
 
-    <RitsuLibVersion Condition="'$(RitsuLibVersion)' == ''">0.5.11</RitsuLibVersion>
+    <RitsuLibVersion Condition="'$(RitsuLibVersion)' == ''">0.5.12</RitsuLibVersion>
     <CopyModOnBuild Condition="'$(CopyModOnBuild)' == ''">true</CopyModOnBuild>
     <RunPckExport Condition="'$(RunPckExport)' == '' and '$(DesignTimeBuild)' != 'true'">true</RunPckExport>
     <RunPckExport Condition="'$(RunPckExport)' == ''">false</RunPckExport>
