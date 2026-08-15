@@ -13,17 +13,23 @@
 
 | 项目 | 当前信息 |
 | --- | --- |
-| Mod 版本 | **0.11.0** |
+| Mod 版本 | **0.12.0** |
 | 适配游戏版本 | **0.111.0** |
 | 前置依赖 | **STS2-RitsuLib 0.5.12+** |
 | 构建环境 | Godot 4.5.1 .NET / .NET 9 |
 | 本地化 | 简体中文、English |
 | 开发状态 | 持续开发中 |
 
+### 0.12.0 更新摘要
+
+- **Mod 改名 GuZhenRenPersonal**：mod id 定为 `GuZhenRenPersonal`，全部本地化键改为 `GU_ZHEN_REN_PERSONAL_` 前缀；资源目录与代码目录同步改名（`res://GuZhenRenPersonal`、`GuZhenRenPersonalCode`），命名空间 `GuZhenRen` 与类名保持不变。新 id 与旧版（`GuZhenRen`/`LuGuZhenRen`）存档/运行身份隔离，旧存档中的蛊真人角色不会继承。
+- **散装本地化全量表部署**：全部本地化表（eng/zhs 各 11 个 JSON）随 dll 一同部署到 `mods\GuZhenRenPersonal\GuZhenRenPersonal\localization\`，便于运行时加载与排错。
+- **卡图更新**：大量卡牌卡图刷新。
+
 ### 0.11.0 更新摘要
 
 - **力道转数规则内联重构**：删除集中查表 `LiDaoRankTable`/`LiDaoCompanionRankTable`，九转数值规则内联到各卡牌与虚影自带的 `XxxAtRank` 静态方法——数值与行为完全不变，仅调整代码结构，方便各卡独立调整。
-- **Mod 改名 LuGuZhenRen**：mod id 由 `GuZhenRen` 改为 `LuGuZhenRen`，全部本地化键改为 `LU_` 前缀；资源路径 `res://GuZhenRen` 保持不变。新 id 与旧版存档/运行身份隔离，已订阅旧版并更新后，旧存档中的蛊真人角色不会继承。
+- **Mod 改名 GuZhenRenPersonal**：mod id 定为 `GuZhenRenPersonal`，全部本地化键改为 `GU_ZHEN_REN_PERSONAL_` 前缀；资源路径 `res://GuZhenRen` 保持不变。新 id 与旧版（`GuZhenRen`/`LuGuZhenRen`）存档/运行身份隔离，旧存档中的蛊真人角色不会继承。
 
 ### 0.10.3 更新摘要
 
@@ -63,7 +69,7 @@
 
 - **新增配方大全**：顶栏新增配方大全按钮与配方浏览器，展示杀招推演与合炼的全部配方、材料与最低转数要求（仅冒险进行中显示，在地图按钮旁动态排布）。
 - **"恢复"统一为"冷却"**：蛊虫机制术语在卡牌描述、关键词与牌堆提示（蛊恢复堆→蛊冷却堆）中统一改为"冷却"，并在卡面重新显示对应关键词标签与悬浮说明。
-- **卡图统一**：太光蛊、迅电流光蛊、血滴子蛊、血云噬身改用 `GuZhenRen/images/cards` 下的独立同名卡图。
+- **卡图统一**：太光蛊、迅电流光蛊、血滴子蛊、血云噬身改用 `GuZhenRenPersonal/images/cards` 下的独立同名卡图。
 - **元气图标调整**：元气能量图标改用角色能量图标 `energy_big.png`，删除原元气专用图标 `energy2_*`。
 
 ### 0.9.16 更新摘要
@@ -133,7 +139,7 @@
 ### 0.9.3 更新摘要
 
 - **修复崩溃**：杀招推演、合炼选卡、刀翅血蝠蛊预览等选卡界面预览牌补全 Owner，避免战斗牌堆初始化时崩溃。
-- **修复打包**：PCK 打包排除源码目录（src/、GuZhenRenCode/ 等），避免源码与工程文件入包。
+- **修复打包**：PCK 打包排除源码目录（src/、GuZhenRenPersonalCode/ 等），避免源码与工程文件入包。
 - **兼容"艳丽围巾"**：先古之民遗物第 5 张牌免费效果已准备好时，蛊牌元气费用同步降为 0。
 
 ### 0.9.2 更新摘要
@@ -386,15 +392,15 @@ Replay 只在一次出牌序列的首段支付元气、仙元及相关资源，�
 准备以下文件：
 
 ```text
-GuZhenRen.dll
-GuZhenRen.pck
-GuZhenRen.json
+GuZhenRenPersonal.dll
+GuZhenRenPersonal.pck
+GuZhenRenPersonal.json
 ```
 
 将它们放入：
 
 ```text
-<Slay the Spire 2>/mods/GuZhenRen/
+<Slay the Spire 2>/mods/GuZhenRenPersonal/
 ```
 
 同时安装 STS2-RitsuLib，并确认加载顺序满足依赖关系。
@@ -470,25 +476,25 @@ Copy-Item local.props.template local.props
 
 ```powershell
 dotnet restore
-dotnet build GuZhenRen.sln
+dotnet build GuZhenRenPersonal.sln
 ```
 
 只验证 C# 编译，不导出 PCK：
 
 ```powershell
-dotnet build GuZhenRen.sln -p:RunPckExport=false
+dotnet build GuZhenRenPersonal.sln -p:RunPckExport=false
 ```
 
 不复制到游戏目录：
 
 ```powershell
-dotnet build GuZhenRen.sln -p:RunPckExport=false -p:CopyModOnBuild=false
+dotnet build GuZhenRenPersonal.sln -p:RunPckExport=false -p:CopyModOnBuild=false
 ```
 
 ## 项目结构
 
 ```text
-GuZhenRenCode/
+GuZhenRenPersonalCode/
 ├─ Aperture/        空窍状态、修为和转数推进
 ├─ Cards/           基础牌、蛊虫、仙元、合炼与杀招
 ├─ Characters/      角色与卡牌、遗物、药水池
@@ -498,7 +504,7 @@ GuZhenRenCode/
 ├─ Relics/          空窍起始遗物
 └─ RestSite/        升炼、合炼与篝火流程
 
-GuZhenRen/
+GuZhenRenPersonal/
 ├─ localization/    简体中文与英文文本
 ├─ materials/       卡框与材质
 ├─ scenes/          角色、篝火、商店与战斗 UI

@@ -10,12 +10,12 @@ config_version=5
 
 [application]
 
-config/name="GuZhenRen"
+config/name="GuZhenRenPersonal"
 config/features=PackedStringArray("4.5", "C#", "GL Compatibility")
 
 [dotnet]
 
-project/assembly_name="GuZhenRen"
+project/assembly_name="GuZhenRenPersonal"
 project/solution_directory="."
 
 [rendering]

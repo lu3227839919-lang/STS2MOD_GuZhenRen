@@ -1,0 +1,503 @@
+{
+  "schemaVersion": 1,
+  "language": "zhs",
+  "keywords": {
+    "XianGu": {
+      "title": "仙蛊",
+      "description": "六转及以上的蛊。每局所有玩家只能永久拥有一张同名仙蛊；此规则与[gold]唯一[/gold]关键词相互独立。"
+    },
+    "CuiDong": {
+      "title": "催动",
+      "description": "蛊虫牌可从蛊手牌直接打出；可用催动次数耗尽后进入蛊冷却堆。"
+    },
+    "HuiFu": {
+      "title": "冷却",
+      "description": "蛊虫催动次数耗尽后进入蛊冷却堆，期间无法使用；经过标注的回合数后冷却完成，先返回蛊存放牌堆，再按冷却完成顺序进入蛊手牌。"
+    },
+    "HeLian": {
+      "title": "合练",
+      "description": "消耗指定蛊虫材料炼成的新蛊。结果转数由配方决定，默认不进入普通奖励。"
+    },
+    "KeXue": {
+      "title": "渴血",
+      "description": "消耗牌面标注数量的血元，以施展或强化对应效果。"
+    },
+    "ZiShi": {
+      "title": "自噬",
+      "description": "渴血时血元不足，每缺1点，改为失去2点生命；至少保留1点生命。"
+    },
+    "XueQi": {
+      "title": "血气",
+      "description": "血气寄生按宿主类型转化为追加伤害与流血、格挡与血元，或直接获得血元；高转可触发多次。"
+    },
+    "YueXiang": {
+      "title": "月相",
+      "description": "血月寄生依次经历残月、盈月、满月。宿主每完整结算一次，月相推进一阶。"
+    },
+    "XueTai": {
+      "title": "血胎",
+      "description": "复合寄生。每次触发适应宿主牌型，并积累胎动；达到3点胎动时孵化。"
+    },
+    "TaiDong": {
+      "title": "胎动",
+      "description": "血胎的成熟进度，达到3点后孵化。吞噬已有寄生可继承胎动。"
+    },
+    "PoTai": {
+      "title": "破胎",
+      "description": "未成熟的寄生宿主进入消耗堆时，寄生消失并获得1点血元，不触发其剩余效果。"
+    },
+    "FuHua": {
+      "title": "孵化",
+      "description": "寄生完成最后一次触发时的结束结算，随后从宿主上移除。"
+    },
+    "TunJi": {
+      "title": "吞寄",
+      "description": "血胎覆盖血气或未满月的月相寄生，并继承1至2点胎动。"
+    },
+    "ZongEDu": {
+      "title": "总额度",
+      "description": "群体伤害、流血或血印是全场共享总数，平均分配给存活敌人；不会按敌人数复制。"
+    },
+    "CanYue": {
+      "title": "残月",
+      "description": "月相第一阶段。宿主结算后造成较低的总额度伤害与流血，然后推进至盈月。"
+    },
+    "YingYue": {
+      "title": "盈月",
+      "description": "月相第二阶段。宿主结算后造成中等总额度伤害、流血及可能的血印，然后推进至满月。"
+    },
+    "ManYue": {
+      "title": "满月",
+      "description": "月相最终阶段。宿主结算后造成最高总额度效果并孵化；六转以上返还血元，九转额外抽牌。"
+    },
+    "YiChu": {
+      "title": "溢出",
+      "description": "获得资源超过上限时，超出而未能获得的部分按卡牌规则转化为其他收益。"
+    },
+    "ZhuiJi": {
+      "title": "追击",
+      "description": "目标死亡后，尚未结算的剩余攻击会转移到其他存活敌人。"
+    },
+    "YaoHua1": {
+      "title": "耀化 1",
+      "description": "光辉不少于1点时，自动消耗1点光辉并触发本牌的耀化效果。"
+    },
+    "YaoHua2": {
+      "title": "耀化 2",
+      "description": "光辉不少于2点时，自动消耗2点光辉并触发本牌的耀化效果。"
+    },
+    "YaoHua3": {
+      "title": "耀化 3",
+      "description": "光辉不少于3点时，自动消耗3点光辉并触发本牌的耀化效果。"
+    },
+    "YaoHua4": {
+      "title": "耀化 4",
+      "description": "光辉不少于4点时，自动消耗4点光辉并触发本牌的耀化效果。"
+    },
+    "YaoHua5": {
+      "title": "耀化 5",
+      "description": "光辉不少于5点时，自动消耗5点光辉并触发本牌的耀化效果。"
+    },
+    "YaoHua6": {
+      "title": "耀化 6",
+      "description": "光辉不少于6点时，自动消耗6点光辉并触发本牌的耀化效果。"
+    },
+    "YaoHua7": {
+      "title": "耀化 7",
+      "description": "光辉不少于7点时，自动消耗7点光辉并触发本牌的耀化效果。"
+    },
+    "YaoHua8": {
+      "title": "耀化 8",
+      "description": "光辉不少于8点时，自动消耗8点光辉并触发本牌的耀化效果。"
+    },
+    "YaoHua9": {
+      "title": "耀化 9",
+      "description": "光辉不少于9点时，自动消耗9点光辉并触发本牌的耀化效果。"
+    },
+    "ShiHai1": {
+      "title": "嗜骸 1",
+      "description": "本牌可选择至多1张手牌中的遗骸进行消耗或吸收；具体收益见卡牌描述。遗骸由血道蛊牌击杀敌人或流血致死时获得；未使用的遗骸在战斗结束后保留至永久牌堆。"
+    },
+    "ShiHai2": {
+      "title": "嗜骸 2",
+      "description": "本牌可选择至多2张手牌中的遗骸进行消耗或吸收；具体收益见卡牌描述。遗骸由血道蛊牌击杀敌人或流血致死时获得；未使用的遗骸在战斗结束后保留至永久牌堆。"
+    },
+    "ShiHai3": {
+      "title": "嗜骸 3",
+      "description": "本牌可选择至多3张手牌中的遗骸进行消耗或吸收；具体收益见卡牌描述。遗骸由血道蛊牌击杀敌人或流血致死时获得；未使用的遗骸在战斗结束后保留至永久牌堆。"
+    },
+    "XuYing": {
+      "title": "虚影",
+      "description": "留在手牌且不能手动打出。打出非虚影攻击牌后，由力道结算器按稳定顺序判定显化。"
+    },
+    "LianLi": {
+      "title": "练力",
+      "description": "力道蛊每场战斗开始时封存；对应永久伴生牌首次结算时增加进度，满进度后解封。"
+    },
+    "NingYing": {
+      "title": "凝影",
+      "description": "再次催动已有对应虚影的兽力蛊时，提高其基础显化率，最高80%。"
+    },
+    "NianHua": {
+      "title": "年华",
+      "description": "宙道资源，上限6点。达到6点时立即触发岁满，然后年华归零；一次获得的溢出年华会在岁满后继续结算。"
+    },
+    "SuiMan": {
+      "title": "岁满",
+      "description": "年华达到6点时：选择一只恢复中的蛊虫，使其剩余恢复时间减少1回合；所有敌人的限时负面状态延长1回合。"
+    },
+    "HuanBu": {
+      "title": "缓步",
+      "description": "敌人一次攻击行动共享固定减伤额度；多段攻击不会让每一段都重复获得完整减伤。缓步按回合衰减，可被岁满延长。"
+    },
+    "XiYing": {
+      "title": "昔影",
+      "description": "回溯蛊生成的临时普通牌复制。昔影具有消耗，不能再次成为回溯目标；打出后按回溯蛊转数获得年华。"
+    }
+  },
+  "cardDescriptionOverrides": {
+    "GU_ZHEN_REN_PERSONAL_CARD_SHA_ZHAO_TUI_YAN.description": "保留。先选择可推演的杀招，再选择与其匹配的蛊虫材料。若成，消耗元气获得杀招；否则返还卡牌。",
+    "GU_ZHEN_REN_PERSONAL_CARD_BAI_SHI_GU.description": "获得{Dexterity:diff()}层临时[gold]敏捷[/gold]。{BlockRetentionTurns:cond:>0?接下来{BlockRetentionTurns}个回合，防御不会在你的回合开始时消失。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_QING_TI_XIAN_YUAN.description": "作为仙元保留在手中。可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
+    "GU_ZHEN_REN_PERSONAL_CARD_HONG_ZAO_XIAN_YUAN.description": "作为仙元保留在手中。等于两张青提仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
+    "GU_ZHEN_REN_PERSONAL_CARD_BAI_LI_XIAN_YUAN.description": "作为仙元保留在手中。等于两张红枣仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
+    "GU_ZHEN_REN_PERSONAL_CARD_HUANG_XING_XIAN_YUAN.description": "作为仙元保留在手中。等于两张白荔仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
+    "GU_ZHEN_REN_PERSONAL_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "蛊虫容量已达{Capacity}张。选择一张现有蛊虫替换，以获得[gold]{NewCard}[/gold]。",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_QI_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n[gold]渴血[/gold]{BloodCost}、[gold]自噬[/gold]。选择1张普通手牌植入[gold]血气[/gold]。",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_YUE_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]合练[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n[gold]渴血[/gold]2：植入[gold]月相[/gold]。三阶段[gold]总额度[/gold]——流血{CrescentBleed}/{WaxingBleed}/{FullBleed}；血印{CrescentMarks}/{WaxingMarks}/{FullMarks}。",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_CHI_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n获得{XueYuanPower:diff()}点[gold]血元[/gold]；每点[gold]溢出[/gold]转化为{OverflowBlock}点格挡。",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_PI_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n获得{Block:diff()}点格挡；[gold]渴血[/gold]1：额外获得{EmpoweredBlock}点。每层[gold]血颅[/gold]使格挡+2。",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_LU_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n获得{Block:diff()}点格挡；[gold]嗜骸 {MaxAbsorb}[/gold]：每张获得1层[gold]血颅[/gold]，满层时改为回复{Heal:diff()}点生命。",
+    "GU_ZHEN_REN_PERSONAL_CARD_DAO_CHI_XUE_FU_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n获得同转[gold]刀翅血蝠[/gold]；[gold]嗜骸 2[/gold]：改为获得[gold]刀翅血蝠群[/gold]。",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_TAI_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]合练[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n[gold]渴血[/gold]2、[gold]自噬[/gold]：植入[gold]血胎[/gold]，可[gold]吞寄[/gold]；3点[gold]胎动[/gold]后[gold]孵化[/gold]。",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_FU_WANG_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n[gold]嗜骸 2[/gold]：获得同转[gold]血蝠王[/gold]；每张+2次攻击，2张时获得[gold]追击[/gold]。结算[gold]血颅[/gold]。",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_HE_JIA_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n[gold]血河[/gold]：血元低于4时获得{LowBloodGain}点血元与{LowBlock}点格挡；否则[gold]渴血[/gold]2，获得{HighBlock}点格挡，下回合再获得一半。每层[gold]血颅[/gold]使格挡+2。",
+    "GU_ZHEN_REN_PERSONAL_CARD_WAN_HAI_GUI_CHAO.description": "[gold]嗜骸 3[/gold]。形成{Damage:diff()}＋每张{DamagePerRemains}点的总伤害池并分配给所有敌人；获得{Block:diff()}＋每张{BlockPerRemains}点格挡。",
+    "GU_ZHEN_REN_PERSONAL_CARD_PARASITE_CRESCENT_MOON.extraCardText": "附魔·月相（{Rank}转·残月）：剩余{TriggersRemaining}次触发；打出宿主后推进。",
+    "GU_ZHEN_REN_PERSONAL_CARD_PARASITE_WAXING_MOON.extraCardText": "附魔·月相（{Rank}转·盈月）：剩余{TriggersRemaining}次触发；打出宿主后推进。",
+    "GU_ZHEN_REN_PERSONAL_CARD_PARASITE_FULL_MOON.extraCardText": "附魔·月相（{Rank}转·满月）：剩余{TriggersRemaining}次触发；打出宿主后孵化。",
+    "GU_ZHEN_REN_PERSONAL_CARD_PARASITE_BLOOD_FETUS.extraCardText": "附魔·血胎（{Rank}转）：{Stage}/3点胎动，剩余{TriggersRemaining}次触发；3点时孵化。"
+  },
+  "characterNameOverrides": {
+    "title": "古月方源",
+    "titleObject": "古月方源"
+  },
+  "restSiteLocalizationFallbacks": {
+    "OPTION_GU_ZHEN_REN_PERSONAL_GU_RANK_UP.name": "升炼",
+    "OPTION_GU_ZHEN_REN_PERSONAL_GU_RANK_UP.description": "直接选择本次升炼的蛊牌，凡仙可混合。本次升炼共有4个槽位：凡蛊每只占1个、仙蛊每只占2个，最多可升炼4只凡蛊或2只仙蛊（如1只仙蛊＋2只凡蛊）。每只所选蛊各提升一转，五转升六转同样由升炼完成。选择0只并确认将取消；本休息点只能成功升炼一次。",
+    "OPTION_GU_ZHEN_REN_PERSONAL_GU_RANK_UP.selectionPrompt": "选择本次升炼的蛊牌（凡蛊每只占1槽、仙蛊每只占2槽，共4槽），凡仙可混合，也可以选择0只。",
+    "OPTION_GU_ZHEN_REN_PERSONAL_HE_LIAN.name": "合练",
+    "OPTION_GU_ZHEN_REN_PERSONAL_HE_LIAN.description": "先选择一张当前可合成的蛊牌，再选择与目标匹配的蛊虫材料。材料种类和数量完整匹配后才会消耗材料并获得结果；失败不会消耗本次机会。每个休息点只能成功合练一次。",
+    "OPTION_GU_ZHEN_REN_PERSONAL_HE_LIAN.selectionPrompt": "选择与目标蛊牌匹配的材料，然后点击确认。",
+    "OPTION_GU_ZHEN_REN_PERSONAL_HE_LIAN.targetSelectionPrompt": "先选择要合成的蛊牌。随后只显示能够匹配该目标的材料。"
+  },
+  "combatInterfaceLocalizationFallbacks": [
+    {
+      "table": "enchantments",
+      "key": "GU_ZHEN_REN_PERSONAL_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.title",
+      "text": "血寄"
+    },
+    {
+      "table": "enchantments",
+      "key": "GU_ZHEN_REN_PERSONAL_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.description",
+      "text": "寄生附魔。跟随宿主保存、克隆并显示；不会占用普通附魔栏位。具体种类、阶段与数值显示在宿主牌正文。"
+    },
+    {
+      "table": "enchantments",
+      "key": "GU_ZHEN_REN_PERSONAL_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.title",
+      "text": "血寄复合附魔"
+    },
+    {
+      "table": "enchantments",
+      "key": "GU_ZHEN_REN_PERSONAL_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.description",
+      "text": "内部载体：同时保存一项普通附魔和血寄附魔。"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardPileId}.title",
+      "text": "蛊手牌"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardPileId}.description",
+      "text": "蛊手牌最多5张。存在空位时，按冷却完成顺序从蛊存放牌堆补入可用蛊虫；杀招推演只可使用蛊手牌中的材料。"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardPileId}.empty",
+      "text": "蛊手牌为空。"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardPileId}.selectionPrompt",
+      "text": "选择与已选杀招目标匹配的蛊虫材料，然后点击确认。"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardPileId}.targetSelectionPrompt",
+      "text": "先选择要推演的杀招。随后只显示能够匹配该杀招的材料。"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardStoragePileId}.title",
+      "text": "蛊存放牌堆"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardStoragePileId}.description",
+      "text": "专门存放已经冷却完毕、等待进入蛊手牌的蛊。蛊手牌存在空位时，按冷却完成顺序补入。左键查看。"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardStoragePileId}.empty",
+      "text": "蛊存放牌堆为空。"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardRecoveryPileId}.title",
+      "text": "蛊冷却堆"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardRecoveryPileId}.description",
+      "text": "只存放正在冷却的蛊。催动次数耗尽后进入此处；冷却完成后返回蛊存放牌堆。左键查看。"
+    },
+    {
+      "table": "static_hover_tips",
+      "key": "{GuCardRecoveryPileId}.empty",
+      "text": "蛊冷却堆为空。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_GUANG_HUI_POWER.title",
+      "text": "光辉"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_GUANG_HUI_POWER.description",
+      "text": "角色资源，上限为9点。光辉不会在回合结束时消失；光道卡牌可以获得或消耗光辉。折光：上一张打出的标准类型牌与当前光道牌类型不同时，获得1点光辉（每回合至多3次）。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZHAO_PO_POWER.title",
+      "text": "照破"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZHAO_PO_POWER.description",
+      "text": "下一次受到攻击牌的单段伤害时，额外受到3点伤害并移除1层照破。多段攻击可以连续消耗多层。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_YUAN_POWER.title",
+      "text": "血元"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_YUAN_POWER.description",
+      "text": "角色个人资源，上限为12点。仅血道蛊牌及其专属减益能够获得或消耗血元。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_YIN_POWER.title",
+      "text": "血印"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_YIN_POWER.description",
+      "text": "受到施加者的血道蛊攻击牌伤害后，移除1层血印并额外失去3点生命。同一次CardPlay全场最多返还1点血元；重放视为新的CardPlay。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_LIU_XUE_POWER.title",
+      "text": "流血"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_LIU_XUE_POWER.description",
+      "text": "持有者回合结束时移除1层流血，使施加者获得1点血元，并使持有者受到3点伤害。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_QI_RECOVERY_POWER.title",
+      "text": "血气回生"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_QI_RECOVERY_POWER.description",
+      "text": "下回合开始时回复{Amount}点生命，然后移除此效果。"
+    },
+    {
+      "table": "secondary_resources",
+      "key": "GU_ZHEN_REN_PERSONAL_SECONDARY_RESOURCE_YUAN_QI.title",
+      "text": "元气"
+    },
+    {
+      "table": "secondary_resources",
+      "key": "GU_ZHEN_REN_PERSONAL_SECONDARY_RESOURCE_YUAN_QI.description",
+      "text": "储存在蛊师空窍中的元气。每场战斗开始时拥有当前空窍转数对应的元气量（一转4点~九转8点）；从第2回合起按转数每回合恢复2~4点（一至二转2、三至五转3、六至九转4）。元气上限随空窍转数提升：5/5/6/6/7/7/8/8/9。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_LU_POWER.title",
+      "text": "血颅"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_LU_POWER.description",
+      "text": "最多3层。每层强化血道寄生、血道防御及刀翅血蝠类多段攻击。血颅不提高资源产量。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_JI_POWER.title",
+      "text": "血寄"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_JI_POWER.description",
+      "text": "有{Amount}张牌带有尚未触发的血道寄生。宿主牌最后一次结算后触发寄生并移除此效果。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_HE_JIA_CARRY_POWER.title",
+      "text": "血河余甲"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_HE_JIA_CARRY_POWER.description",
+      "text": "下回合开始时获得{Amount}点格挡，然后移除。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_WAN_HAI_GUI_CHAO_RETAIN_BLOCK_POWER.title",
+      "text": "万骸归潮余甲"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_WAN_HAI_GUI_CHAO_RETAIN_BLOCK_POWER.description",
+      "text": "下回合开始时获得{Amount}点格挡，然后移除。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_JU_GUANG_POWER.title",
+      "text": "闪耀"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_JU_GUANG_POWER.description",
+      "text": "下一张光道攻击的第一段伤害提高{Amount}点。多段攻击只获得一次加成。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_KU_LI_POWER.title",
+      "text": "苦力"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_KU_LI_POWER.description",
+      "text": "依据已损失生命比例获得0至4层苦境，提高常驻虚影的显化率与效果。重复催动苦力蛊可获得至多3层苦练，并进一步强化虚影效果；高转可重判失败显化、产生双影或在绝境中强制显化。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZI_LI_GENG_SHENG_POWER.title",
+      "text": "自力更生"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZI_LI_GENG_SHENG_POWER.description",
+      "text": "记录本回合显化的不同兽力与凝影，积蓄力气并按转数回复生命。重复催动自力更生蛊可获得至多3层强身；高转可将超额回复转化为格挡。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_NIAN_HUA_POWER.title",
+      "text": "年华"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_NIAN_HUA_POWER.description",
+      "text": "当前拥有{Amount}/6点年华。达到6点时触发岁满。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_GUANG_YIN_REN_RAN_POWER.title",
+      "text": "光阴荏苒"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_GUANG_YIN_REN_RAN_POWER.description",
+      "text": "蛊虫完成恢复时获得年华，效果随对应蛊虫转数提升。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_NIAN_NIAN_SUI_SUI_POWER.title",
+      "text": "年年岁岁"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_NIAN_NIAN_SUI_SUI_POWER.description",
+      "text": "回合流逝时持续获得年华，效果随对应年蛊转数提升。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZHOU_MAO_POWER.title",
+      "text": "宙锚"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZHOU_MAO_POWER.description",
+      "text": "岁满后保留一部分年华进度，高转可周期性抽牌。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_SI_SHUI_LIU_NIAN_POWER.title",
+      "text": "似水流年"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_SI_SHUI_LIU_NIAN_POWER.description",
+      "text": "每回合第一次岁满时生成年流。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_SAN_GENG_POWER.title",
+      "text": "三更"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_SAN_GENG_POWER.description",
+      "text": "接下来{Amount}次获得年华时，额外获得1点年华。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_HUAN_BU_POWER.title",
+      "text": "缓步"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_HUAN_BU_POWER.description",
+      "text": "每次攻击行动的总伤害最多降低固定额度；剩余{Amount}回合。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_YUE_GU_DELAY_POWER.title",
+      "text": "月积"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_YUE_GU_DELAY_POWER.description",
+      "text": "月蛊安排的年华将在后续回合开始时兑现。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XI_YING_WATCHER_POWER.title",
+      "text": "昔影回响"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XI_YING_WATCHER_POWER.description",
+      "text": "监听昔影的隐性效果。"
+    }
+  ],
+  "OPTION_GU_ZHEN_REN_PERSONAL_GU_RANK_UP.description": "直接选择本次升炼的蛊牌，凡仙可混合。本次升炼共有4个槽位：凡蛊每只占1个、仙蛊每只占2个，最多可升炼4只凡蛊或2只仙蛊（如1只仙蛊＋2只凡蛊）。每只所选蛊各提升一转，五转升六转同样由升炼完成。选择0只并确认将取消；本休息点只能成功升炼一次。",
+  "OPTION_GU_ZHEN_REN_PERSONAL_GU_RANK_UP.selectionPrompt": "选择本次升炼的蛊牌（凡蛊每只占1槽、仙蛊每只占2槽，共4槽），凡仙可混合，也可以选择0只。"
+}

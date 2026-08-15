@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Power 图标审计:解析 GuZhenRenCode/Powers 下所有继承
+"""Power 图标审计:解析 GuZhenRenPersonalCode/Powers 下所有继承
 ModPowerTemplate 的具体能力类,检查 images/power/ 下对应
 64x64/256x256 图片是否存在。
 
@@ -16,11 +16,11 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 ROOT = os.path.abspath(
     sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), "..")
 )
-CODE = os.path.join(ROOT, "GuZhenRenCode", "Powers")
+CODE = os.path.join(ROOT, "GuZhenRenPersonalCode", "Powers")
 IMG = os.path.join(ROOT, "GuZhenRen", "images", "power")
 
 if not os.path.isdir(CODE) or not os.path.isdir(IMG):
-    print(f"错误:找不到 GuZhenRenCode/Powers 或 GuZhenRen/images/power({ROOT})")
+    print(f"错误:找不到 GuZhenRenPersonalCode/Powers 或 GuZhenRenPersonal/images/power({ROOT})")
     sys.exit(2)
 
 class_re = re.compile(

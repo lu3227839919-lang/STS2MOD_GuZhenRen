@@ -2,6 +2,22 @@
 
 本项目的全部重要变更记录。版本号遵循 [SemVer](https://semver.org/lang/zh-CN/) 风格，规则见 [VERSIONING.md](VERSIONING.md)。历史版本大多未标注发布日期。
 
+## [0.12.0] - 2026-08-15
+
+### 重构
+- Mod 改名 `GuZhenRenPersonal`：mod id 定为 `GuZhenRenPersonal`，全部本地化键改为 `GU_ZHEN_REN_PERSONAL_` 前缀；资源目录与代码目录同步改名（`res://GuZhenRenPersonal`、`GuZhenRenPersonalCode`），命名空间 `GuZhenRen` 与类名不变。新 id 与旧版（`GuZhenRen`/`LuGuZhenRen`）存档/运行身份隔离，旧存档中的蛊真人角色不继承。
+- 散装本地化全量表部署：全部本地化表（eng/zhs 各 11 个 JSON）随 dll 部署到 `mods\GuZhenRenPersonal\GuZhenRenPersonal\localization\`。
+
+### 调整
+- 卡图更新：大量卡牌卡图刷新。
+
+### Refactor
+- Renamed the mod to `GuZhenRenPersonal`: mod id is now `GuZhenRenPersonal`, all localization keys use the `GU_ZHEN_REN_PERSONAL_` prefix, and the asset/code folders were renamed accordingly (`res://GuZhenRenPersonal`, `GuZhenRenPersonalCode`); namespaces and class names are unchanged. The new id is isolated from the old identities (`GuZhenRen`/`LuGuZhenRen`) — existing saves do not carry over.
+- Full localization tables (11 JSON per language) now ship beside the DLL under `mods\GuZhenRenPersonal\GuZhenRenPersonal\localization\`.
+
+### Adjustments
+- Card art refreshed for many cards.
+
 ## [0.11.0] - 2026-08-15
 
 ### 重构

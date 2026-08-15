@@ -2,14 +2,14 @@
 """蛊真人卡牌卡图审计脚本。
 
 模拟运行时 CardImageCatalog.ValidateAssembly 的判定逻辑,静态分析
-GuZhenRenCode/ 下所有 C# 卡牌类,检查 GuZhenRen/images/cards/{类名}.png
+GuZhenRenPersonalCode/ 下所有 C# 卡牌类,检查 GuZhenRenPersonal/images/cards/{类名}.png
 是否齐全。
 
 判定规则(与 CardImageCatalog.ValidateAssembly 一致):
 - 非抽象类
 - 命名空间以 GuZhenRen 开头
 - 继承链顶端是 CardModel 或 ModCardTemplate(RitsuLib 外部根)
-- 类名必须有同名 PNG:res://GuZhenRen/images/cards/{CardTypeName}.png
+- 类名必须有同名 PNG:res://GuZhenRenPersonal/images/cards/{CardTypeName}.png
 
 共享图片(可选配置):某些卡牌类有意复用其它类的卡图(如宙道伴生牌
 复用对应蛊牌的图、年流+ 复用年流的图),这类不算缺图。两种来源:
@@ -38,7 +38,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 ROOT = os.path.abspath(
     sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), "..")
 )
-CODE = os.path.join(ROOT, "GuZhenRenCode")
+CODE = os.path.join(ROOT, "GuZhenRenPersonalCode")
 IMG = os.path.join(ROOT, "GuZhenRen", "images", "cards")
 
 # 设计上确定的共享图片(尚未在代码中显式写 AssetProfile 时用)
@@ -49,7 +49,7 @@ IMG = os.path.join(ROOT, "GuZhenRen", "images", "cards")
 SHARED_IMAGES = {}
 
 if not os.path.isdir(CODE) or not os.path.isdir(IMG):
-    print(f"错误:仓库根目录无效({ROOT})——找不到 GuZhenRenCode/ 或 GuZhenRen/images/cards/")
+    print(f"错误:仓库根目录无效({ROOT})——找不到 GuZhenRenPersonalCode/ 或 GuZhenRenPersonal/images/cards/")
     sys.exit(2)
 
 ns_re = re.compile(r"^\s*namespace\s+([\w.]+)\s*\{?", re.MULTILINE)

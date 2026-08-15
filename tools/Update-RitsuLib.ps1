@@ -75,7 +75,7 @@ else {
 Write-Host "读取 RitsuLib 发布信息：$releaseUri"
 $headers = @{
     "Accept" = "application/vnd.github+json"
-    "User-Agent" = "GuZhenRen-RitsuLib-Updater"
+    "User-Agent" = "GuZhenRenPersonal-RitsuLib-Updater"
     "X-GitHub-Api-Version" = "2022-11-28"
 }
 $release = Invoke-RestMethod -Uri $releaseUri -Headers $headers

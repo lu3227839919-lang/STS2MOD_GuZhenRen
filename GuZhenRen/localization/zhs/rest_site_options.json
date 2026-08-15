@@ -1,9 +1,0 @@
-{
-  "OPTION_LU_GU_ZHEN_REN_GU_RANK_UP.name": "升炼",
-  "OPTION_LU_GU_ZHEN_REN_GU_RANK_UP.description": "直接选择本次升炼的蛊牌，凡仙可混合。本次升炼共有4个槽位：凡蛊每只占1个、仙蛊每只占2个，最多可升炼4只凡蛊或2只仙蛊（如1只仙蛊＋2只凡蛊）。每只所选蛊各提升一转，五转升六转同样由升炼完成。选择0只并确认将取消；本休息点只能成功升炼一次。",
-  "OPTION_LU_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "选择本次升炼的蛊牌（凡蛊每只占1槽、仙蛊每只占2槽，共4槽），凡仙可混合，也可以选择0只。",
-  "OPTION_LU_GU_ZHEN_REN_HE_LIAN.name": "合练",
-  "OPTION_LU_GU_ZHEN_REN_HE_LIAN.description": "先选择一张当前可合成的蛊牌，再选择与目标匹配的蛊虫材料。材料种类和数量完整匹配后才会消耗材料并获得结果；失败不会消耗本次机会。每个休息点只能成功合练一次。",
-  "OPTION_LU_GU_ZHEN_REN_HE_LIAN.selectionPrompt": "选择与目标蛊牌匹配的材料，然后点击确认。",
-  "OPTION_LU_GU_ZHEN_REN_HE_LIAN.targetSelectionPrompt": "先选择要合成的蛊牌。随后只显示能够匹配该目标的材料。"
-}

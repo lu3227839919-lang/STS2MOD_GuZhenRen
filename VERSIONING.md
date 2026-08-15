@@ -87,8 +87,8 @@ CHANGELOG 条目结构：
 
 发布 `x.y.z` 前逐项确认：
 
-1. [ ] `dotnet build GuZhenRen.csproj` 编译通过（0 错误）
-2. [ ] 三处版本号一致：`GuZhenRen.json` 的 `version`、`README.md` 的「Mod 版本」、即将打的 tag
+1. [ ] `dotnet build GuZhenRenPersonal.csproj` 编译通过（0 错误）
+2. [ ] 三处版本号一致：`GuZhenRenPersonal.json` 的 `version`、`README.md` 的「Mod 版本」、即将打的 tag
 3. [ ] `update_note/PATCH_NOTES_x.y.z_*.md` 已编写
 4. [ ] `CHANGELOG.md` 已追加 `[x.y.z]` 条目
 5. [ ] 合并 `dev` → `main`（fast-forward）并推送

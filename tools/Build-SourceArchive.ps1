@@ -7,13 +7,13 @@ $ErrorActionPreference = "Stop"
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
 
 if ([string]::IsNullOrWhiteSpace($OutputPath)) {
-    $ManifestPath = Join-Path $ProjectRoot "GuZhenRen.json"
+    $ManifestPath = Join-Path $ProjectRoot "GuZhenRenPersonal.json"
     $Manifest = Get-Content $ManifestPath -Raw | ConvertFrom-Json
-    $OutputPath = Join-Path $ProjectRoot ("GuZhenRen-source-{0}.zip" -f $Manifest.version)
+    $OutputPath = Join-Path $ProjectRoot ("GuZhenRenPersonal-source-{0}.zip" -f $Manifest.version)
 }
 
 $ResolvedOutput = [System.IO.Path]::GetFullPath($OutputPath)
-$TempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("GuZhenRen-source-" + [Guid]::NewGuid().ToString("N"))
+$TempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("GuZhenRenPersonal-source-" + [Guid]::NewGuid().ToString("N"))
 
 $ExcludedDirectoryNames = @(
     ".godot", ".idea", ".vs", ".build", ".vscode",

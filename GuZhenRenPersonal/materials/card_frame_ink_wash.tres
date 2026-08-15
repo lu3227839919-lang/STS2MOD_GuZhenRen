@@ -1,0 +1,18 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://GuZhenRenPersonal/shaders/card_frame_ink_wash.gdshader" id="1_shader"]
+
+[resource]
+resource_local_to_scene = true
+shader = ExtResource("1_shader")
+shader_parameter/ink_color = Color(0.035, 0.045, 0.043, 1)
+shader_parameter/deep_wash_color = Color(0.12, 0.095, 0.035, 1)
+shader_parameter/jade_wash_color = Color(0.48, 0.34, 0.08, 1)
+shader_parameter/paper_color = Color(0.78, 0.69, 0.42, 1)
+shader_parameter/cinnabar_color = Color(0.62, 0.30, 0.035, 1)
+shader_parameter/contrast = 1.16
+shader_parameter/paper_grain = 0.09
+shader_parameter/wash_strength = 0.26
+shader_parameter/outline_strength = 0.72
+shader_parameter/dry_brush_strength = 0.16
+shader_parameter/seal_strength = 0.82

@@ -1,0 +1,21 @@
+{
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.aromaPrinciple": "[sine][blue]以蛊炼道，以身问长生。[/blue][/sine]",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.banter.alive.endTurnPing": "此回合已了。",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.banter.dead.endTurnPing": "暂且退去。",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.cardsModifierDescription": "蛊真人卡牌现在会出现在奖励和商店中。",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.cardsModifierTitle": "蛊真人卡牌",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.defeatMessage": "长生之路，尚未走完。",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.description": "操使蛊虫、升炼转数，并将各道道痕化为战力的修行者。",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.eventDeathPrevention": "空窍未灭，道途未绝。",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.flavor": "以蛊为器，以念为火，只为踏出凡俗之外。",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.goldMonologue": "资源亦不过是炼蛊之材。",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.possessiveAdjective": "他的",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.pronounObject": "他",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.pronounPossessive": "他的",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.pronounSubject": "他",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.selectMessage": "炼蛊启程。",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.title": "蛊真人",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.titleObject": "蛊真人",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.unlockText": "使用[pink]{Prerequisite}[/pink]完成一局游戏以解锁该角色。",
+  "GU_ZHEN_REN_PERSONAL_CHARACTER_GU_ZHEN_REN_CHARACTER.victoryMessage": "长生路上，再进一步。"
+}

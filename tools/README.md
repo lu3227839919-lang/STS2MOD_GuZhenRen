@@ -6,8 +6,8 @@
 
 **用途**:检查哪些卡牌缺少同名卡图 PNG,以及哪些 PNG 是代码中无对应类的孤儿资源。
 
-**原理**:模拟运行时 `CardImageCatalog.ValidateAssembly`(GuZhenRenCode/Cards/Core/CardImageCatalog.cs)的判定逻辑——
-- 静态解析 `GuZhenRenCode/` 下全部 C# 类(支持跨行基类声明)
+**原理**:模拟运行时 `CardImageCatalog.ValidateAssembly`(GuZhenRenPersonalCode/Cards/Core/CardImageCatalog.cs)的判定逻辑——
+- 静态解析 `GuZhenRenPersonalCode/` 下全部 C# 类(支持跨行基类声明)
 - 判定条件:非抽象 + 命名空间 `GuZhenRen` 开头 + 继承链顶端为 `CardModel` 或 `ModCardTemplate`(RitsuLib 外部根)
 - 检查 `GuZhenRen/images/cards/{类名}.png` 是否存在
 
@@ -31,7 +31,7 @@ python tools/audit_card_images.py D:\...\STS2_GuZhenRen   # 其它克隆
 
 **用途**:检查哪些 Power(能力)缺少图标,以及哪些 `images/power/` 图片是孤儿资源。
 
-**原理**:解析 `GuZhenRenCode/Powers/` 下所有 `ModPowerTemplate` 子类的
+**原理**:解析 `GuZhenRenPersonalCode/Powers/` 下所有 `ModPowerTemplate` 子类的
 `AssetProfile`(IconPath/BigIconPath),检查 `images/power/` 下对应 PNG 是否存在。
 未写 `AssetProfile` 的 Power 按默认命名规则 `{类名}-64x64.png`/`-256x256.png` 兜底检查。
 

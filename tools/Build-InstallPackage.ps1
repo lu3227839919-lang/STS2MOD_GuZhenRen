@@ -128,12 +128,12 @@ $ModsDir = Join-Path $ResolvedSts2Dir "mods"
 $RitsuDll = Join-Path $ModsDir "STS2-RitsuLib\STS2-RitsuLib.dll"
 Assert-RequiredFile $RitsuDll "STS2-RitsuLib 0.5.11+ 运行时"
 
-$ManifestPath = Join-Path $ProjectRoot "GuZhenRen.json"
+$ManifestPath = Join-Path $ProjectRoot "GuZhenRenPersonal.json"
 $Manifest = Get-Content $ManifestPath -Encoding UTF8 -Raw | ConvertFrom-Json
 $Version = [string]$Manifest.version
-$SolutionPath = Join-Path $ProjectRoot "GuZhenRen.sln"
+$SolutionPath = Join-Path $ProjectRoot "GuZhenRenPersonal.sln"
 
-Write-Host "构建 GuZhenRen $Version ($Configuration)"
+Write-Host "构建 GuZhenRenPersonal $Version ($Configuration)"
 Write-Host "游戏目录：$ResolvedSts2Dir"
 Write-Host "Godot：$ResolvedGodotExe"
 $BuildArguments = @(
@@ -152,11 +152,11 @@ if ($LASTEXITCODE -ne 0) {
     throw "dotnet build 失败，退出代码 $LASTEXITCODE。"
 }
 
-$ModDir = Join-Path $ModsDir "GuZhenRen"
+$ModDir = Join-Path $ModsDir "GuZhenRenPersonal"
 $RequiredArtifacts = @(
-    (Join-Path $ModDir "GuZhenRen.dll"),
-    (Join-Path $ModDir "GuZhenRen.pck"),
-    (Join-Path $ModDir "GuZhenRen.json")
+    (Join-Path $ModDir "GuZhenRenPersonal.dll"),
+    (Join-Path $ModDir "GuZhenRenPersonal.pck"),
+    (Join-Path $ModDir "GuZhenRenPersonal.json")
 )
 foreach ($Artifact in $RequiredArtifacts) {
     Assert-RequiredFile $Artifact "构建产物"
@@ -164,7 +164,7 @@ foreach ($Artifact in $RequiredArtifacts) {
 
 $ArtifactDir = Join-Path $ProjectRoot "artifacts"
 if ([string]::IsNullOrWhiteSpace($OutputPath)) {
-    $OutputPath = Join-Path $ArtifactDir ("GuZhenRen-{0}-Windows.zip" -f $Version)
+    $OutputPath = Join-Path $ArtifactDir ("GuZhenRenPersonal-{0}-Windows.zip" -f $Version)
 }
 $ResolvedOutputPath = [System.IO.Path]::GetFullPath($OutputPath)
 $OutputDirectory = Split-Path $ResolvedOutputPath -Parent
@@ -181,7 +181,7 @@ try {
         Copy-Item $Artifact $StagingDir -Force
     }
 
-    $LocalizationDir = Join-Path $ModDir "GuZhenRen"
+    $LocalizationDir = Join-Path $ModDir "GuZhenRenPersonal"
     if (Test-Path $LocalizationDir -PathType Container) {
         Copy-Item $LocalizationDir $StagingDir -Recurse -Force
     }

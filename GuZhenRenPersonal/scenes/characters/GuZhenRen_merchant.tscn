@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://u5ls4hn8nb2j"]
+
+[ext_resource type="Texture2D" uid="uid://d0ruu5j6iyy0s" path="res://GuZhenRenPersonal/images/characters/GuZhenRen_character_select.png" id="1_character"]
+
+[node name="GuZhenRenCharacterMerchant" type="Node2D"]
+
+[node name="Visuals" type="Sprite2D" parent="."]
+position = Vector2(0, -96)
+scale = Vector2(1.25, 1.25)
+texture = ExtResource("1_character")
