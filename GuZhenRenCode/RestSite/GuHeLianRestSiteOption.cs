@@ -436,8 +436,6 @@ public sealed class GuHeLianRestSiteOption
             }
         }
 
-        LiDaoCompanionSystem.RestoreMissingCompanions(result.Owner);
-
         if (playerHistory is null)
         {
             return;

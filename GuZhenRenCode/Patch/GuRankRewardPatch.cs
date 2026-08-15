@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
+using GuZhenRen.Cards.HeLian;
 using GuZhenRen.Cards.LiDao;
 
 using HarmonyLib;

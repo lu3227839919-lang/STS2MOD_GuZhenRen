@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Threading;
 
+using GuZhenRen.Cards.HeLian;
 using GuZhenRen.Multiplayer;
 using GuZhenRen.Powers.LiDao;
 

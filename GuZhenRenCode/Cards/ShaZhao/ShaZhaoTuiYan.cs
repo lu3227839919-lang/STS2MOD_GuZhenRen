@@ -1,6 +1,4 @@
 using GuZhenRen.Cards;
-using GuZhenRen.Characters;
-
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Models;
@@ -19,8 +17,8 @@ namespace GuZhenRen.Cards.ShaZhao;
 /// 手牌，本牌随后消耗。取消、配方无效或资源不足时本牌回到手牌，
 /// 不产生任何惩罚。
 /// </summary>
-[RegisterCard(typeof(GuZhenRenShaZhaoDerivationCardPool))]
-public sealed class ShaZhaoTuiYan : ModCardTemplate
+[RegisterCard(typeof(GuZhenRen.Characters.GuZhenRenCardPool))]
+public sealed class ShaZhaoTuiYan : AbstractGuZhenRenGeneratedCard
 {
     public ShaZhaoTuiYan()
         : base(
@@ -32,9 +30,6 @@ public sealed class ShaZhaoTuiYan : ModCardTemplate
         )
     {
     }
-
-    public override CardPoolModel Pool =>
-        ModelDb.CardPool<GuZhenRenShaZhaoDerivationCardPool>();
 
     /// <summary>
     /// 保留：取消推演后继续留在手牌。

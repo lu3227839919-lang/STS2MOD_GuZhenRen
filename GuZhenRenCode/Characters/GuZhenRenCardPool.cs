@@ -6,9 +6,10 @@ namespace GuZhenRen.Characters;
 public sealed class GuZhenRenCardPool : TypeListCardPoolModel
 {
     /// <summary>
-    /// Auxiliary Gu Zhen Ren card pool for non-Gu starter and generated cards.
-    /// The character's primary card pool is GuZhenRenGuCardPool; phantom cards
-    /// and killer-move cards are registered in their dedicated pools instead.
+    /// Auxiliary Gu Zhen Ren card pool for starter, companion, and derivative
+    /// cards. Generated cards are registered here so the ordinary Gu pool can
+    /// contain only real Gu-insects and HeLian results; phantom, immortal-
+    /// essence, and killer-move cards keep their own specialized pools.
     /// </summary>
     // Title 和 EnergyColorName 是池子的稳定标识，不是玩家看到的角色名。
     // 自定义角色卡、遗物、药水池保持同一个 EnergyColorName，方便实验室和文本统一读取能量图标。

@@ -2,7 +2,7 @@ using MegaCrit.Sts2.Core.Models;
 
 namespace GuZhenRen.Cards.ZhouDao;
 
-/// <summary>带有永久普通牌伴生能力的宙道蛊。</summary>
+/// <summary>进入战斗时会在抽牌堆生成伴生能力牌的宙道蛊。</summary>
 public interface IZhouDaoCompanionGuCard : IGuWormCard
 {
     Type CompanionCardType { get; }

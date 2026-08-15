@@ -28,8 +28,8 @@ public static class LiDaoTrainingSystem
         );
 
     /// <summary>
-    /// 药水随机给予力道蛊时同时生成的临时伴生牌可以参与炼力；其他
-    /// 战斗内复制或随机生成的临时伴生牌仍然不计数。
+    /// 战斗开始生成的伴生牌与药水随机给予力道蛊时生成的伴生牌可以
+    /// 参与炼力；其他战斗内复制或随机生成的临时伴生牌仍然不计数。
     /// </summary>
     private static readonly SavedAttachedState<CardModel, bool>
         TemporaryTrainingCompanionState = new(
@@ -60,7 +60,7 @@ public static class LiDaoTrainingSystem
         !UnsealedState[card] &&
         card.Pile?.Type == GuCardPileSystem.GuSealedPileType;
 
-    internal static void MarkTemporaryCompanionCanTrain(
+    internal static void MarkCompanionCanTrain(
         CardModel companion
     )
     {
@@ -69,9 +69,9 @@ public static class LiDaoTrainingSystem
     }
 
     /// <summary>
-    /// 一张永久伴生牌或药水专门生成的炼力伴生牌完成其首次 CardPlay
-    /// 后调用。普通临时生成牌没有 DeckVersion，Replay 后续段也不是
-    /// IsFirstInSeries，因此仍不计数。
+    /// 一张系统生成的炼力伴生牌完成其首次 CardPlay 后调用。
+    /// 普通临时生成牌没有授权标记，Replay 后续段也不是
+    /// IsFirstInSeries，因此均不计数。
     /// </summary>
     public static async Task TrainFromCompanionAsync(
         CardPlay cardPlay,
@@ -83,8 +83,7 @@ public static class LiDaoTrainingSystem
 
         CardModel companion = cardPlay.Card;
         if (!cardPlay.IsFirstInSeries ||
-            (companion.DeckVersion == null &&
-                !TemporaryTrainingCompanionState[companion]) ||
+            !TemporaryTrainingCompanionState[companion] ||
             companion.Owner.PlayerCombatState == null)
         {
             return;

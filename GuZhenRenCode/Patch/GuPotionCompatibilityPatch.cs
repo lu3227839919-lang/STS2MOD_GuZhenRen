@@ -1,6 +1,7 @@
 using System.Reflection;
 
 using GuZhenRen.Cards;
+using GuZhenRen.Cards.HeLian;
 using GuZhenRen.Cards.LiDao;
 using GuZhenRen.Cards.ZhouDao;
 using GuZhenRen.Characters;
@@ -343,7 +344,7 @@ internal static class GuPotionCompatibilityPatch
 
         if (guCard is ILiDaoTrainingGuCard)
         {
-            LiDaoTrainingSystem.MarkTemporaryCompanionCanTrain(
+            LiDaoTrainingSystem.MarkCompanionCanTrain(
                 companion
             );
         }

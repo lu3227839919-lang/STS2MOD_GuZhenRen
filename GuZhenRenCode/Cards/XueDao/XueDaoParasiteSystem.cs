@@ -358,7 +358,7 @@ public static class XueDaoParasiteSystem
     public static bool IsEligibleHost(CardModel card) =>
         !card.IsCanonical &&
         (card.CanBeGeneratedInCombat ||
-         // 力道伴生牌是永久普通牌，允许作为血道寄生宿主。
+         // 力道伴生牌虽为战斗生成牌，仍允许作为血道寄生宿主。
          card is ILiDaoCompanionCard ||
          // 血道衍生牌（刀翅血蝠/刀翅血蝠群/血蝠王）允许作为血道寄生宿主；
          // 遗骸是状态牌，被下方类型条件排除。

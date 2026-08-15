@@ -5,8 +5,10 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace GuZhenRen.Characters;
 
 /// <summary>
-/// 杀招推演系统牌的隐藏卡池：不出现在任何奖励/掉落/卡牌库中，
-/// 只由空窍三转后的战斗开始流程生成。
+/// 旧版杀招推演系统牌的隐藏卡池兼容类型。
+/// 当前杀招推演牌已经通过 AbstractGuZhenRenGeneratedCard 注册到
+/// GuZhenRenGuCardPool；保留此类型是为了兼容旧存档/旧资源索引，
+/// 不再向其中注册新卡。
 /// </summary>
 public sealed class GuZhenRenShaZhaoDerivationCardPool
     : TypeListCardPoolModel

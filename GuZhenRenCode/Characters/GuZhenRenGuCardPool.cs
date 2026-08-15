@@ -4,8 +4,10 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace GuZhenRen.Characters;
 
 /// <summary>
-/// Card pool for Gu Zhen Ren's Gu-insect cards.
-/// Phantom cards and killer-move cards intentionally use their own pools.
+/// Card pool for Gu Zhen Ren's ordinary Gu-insect and HeLian Gu cards.
+/// Combat-generated companions and derivative cards live in the auxiliary
+/// GuZhenRenCardPool instead, while phantom, immortal-essence, and killer-move
+/// cards keep their own specialized pools.
 /// </summary>
 public sealed class GuZhenRenGuCardPool : TypeListCardPoolModel
 {

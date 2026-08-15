@@ -1,6 +1,8 @@
 using System.Reflection;
 
 using GuZhenRen.Cards;
+using GuZhenRen.Cards.LiDao;
+using GuZhenRen.Cards.ZhouDao;
 using GuZhenRen.Multiplayer;
 
 using HarmonyLib;
@@ -17,7 +19,9 @@ namespace GuZhenRen.Patches;
 
 /// <summary>
 /// Moves every Gu card cloned into a combat draw pile into the dedicated Gu
-/// pile before the first draw.  This keeps Gu cards out of normal hand draws.
+/// pile before the first draw. Companion cards are generated into the native
+/// draw pile before the native opening draw, with their order randomized
+/// together with the existing cards.
 /// </summary>
 internal static class GuCardPileCombatPatch
 {
@@ -115,6 +119,10 @@ internal static class GuCardPileCombatPatch
 
         harmony.Patch(
             startCombat,
+            prefix: new HarmonyMethod(
+                typeof(GuCardPileCombatPatch),
+                nameof(NetCombatCardDbStartCombatPrefix)
+            ),
             postfix: new HarmonyMethod(
                 typeof(GuCardPileCombatPatch),
                 nameof(NetCombatCardDbStartCombatPostfix)
@@ -153,6 +161,17 @@ internal static class GuCardPileCombatPatch
         out GuRankSnapshot __state
     )
     {
+        int removedCompanionCount =
+            RemoveLegacyPermanentCompanions(__instance);
+        if (removedCompanionCount > 0)
+        {
+            Entry.Logger.Info(
+                $"[伴生牌迁移] 已从永久牌组清理 " +
+                $"{removedCompanionCount} 张旧版伴生牌；" +
+                "本场及后续战斗将改为战斗内生成。"
+            );
+        }
+
         // 修复旧存档以及升转发生在不同重复实例上的多人状态：战斗克隆
         // 前先把同名蛊牌的转数多重集固定到原生 NetDeckCard 槽位。
         int canonicalizedCount =
@@ -179,6 +198,33 @@ internal static class GuCardPileCombatPatch
         };
     }
 
+    /// <summary>
+    /// 旧版本会把伴生牌写入永久牌组。战斗克隆前执行一次确定性迁移，
+    /// 防止旧牌与新生成牌重复，并让旧存档也遵守“伴生牌仅存在于战斗”
+    /// 的新规则。
+    /// </summary>
+    private static int RemoveLegacyPermanentCompanions(Player player)
+    {
+        CardModel[] legacyCompanions = player.Deck.Cards
+            .Where(static card =>
+                card is ILiDaoCompanionCard or IZhouDaoCompanionCard)
+            .ToArray();
+
+        if (legacyCompanions.Length == 0)
+        {
+            return 0;
+        }
+
+        foreach (CardModel companion in legacyCompanions)
+        {
+            player.Deck.RemoveInternal(companion, silent: true);
+            player.RunState.RemoveCard(companion);
+        }
+
+        player.Deck.InvokeContentsChanged();
+        return legacyCompanions.Length;
+    }
+
     private static void PopulateCombatStatePostfix(
         Player __instance,
         GuRankSnapshot __state
@@ -188,9 +234,55 @@ internal static class GuCardPileCombatPatch
     }
 
     /// <summary>
-    /// 必须等原生 NetCombatCardDb 为全部战斗克隆建立编号后，再规范化
-    /// 重复蛊牌并搬入自定义牌堆。旧时序在编号建立前就按无效的
-    /// uint.MaxValue 排序，导致同一网络编号在两端携带不同转数。
+    /// 在原生网络编号建立与首次抽牌之前，把伴生牌生成到抽牌堆。
+    /// 生成完成后会重新随机整副抽牌堆，避免现有牌总是固定先于伴生牌。
+    /// </summary>
+    private static void NetCombatCardDbStartCombatPrefix(
+        IReadOnlyList<Player> players
+    )
+    {
+        foreach (Player player in players)
+        {
+            int liDaoCount =
+                LiDaoCompanionSystem.GenerateForCombat(player);
+            int zhouDaoCount =
+                ZhouDaoCompanionSystem.GenerateForCombat(player);
+            int generatedCount = liDaoCount + zhouDaoCount;
+
+            if (player.PlayerCombatState is { }
+                && player.Creature.CombatState is CombatState combatState)
+            {
+                CardPile drawPile = PileType.Draw.GetPile(player);
+                bool hasCompanionInDrawPile = drawPile.Cards.Any(
+                    static card =>
+                        card is ILiDaoCompanionCard or IZhouDaoCompanionCard
+                );
+
+                if (generatedCount > 0 || hasCompanionInDrawPile)
+                {
+                    drawPile.RandomizeOrderInternal(
+                        player,
+                        player.RunState.Rng.Shuffle,
+                        combatState
+                    );
+                }
+
+                if (generatedCount > 0)
+                {
+                    Entry.Logger.Info(
+                        $"[伴生牌入场] 首次抽牌前已在抽牌堆生成 " +
+                        $"{generatedCount} 张伴生牌（力道 {liDaoCount}，" +
+                        $"宙道 {zhouDaoCount}），并与现有牌重新混洗。"
+                    );
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 必须等原生 NetCombatCardDb 为全部战斗克隆（含刚生成的伴生牌）
+    /// 建立编号后，再规范化重复蛊牌并搬入自定义牌堆。旧时序在编号
+    /// 建立前就按无效的 uint.MaxValue 排序，会让两端携带不同转数。
     /// </summary>
     private static void NetCombatCardDbStartCombatPostfix(
         IReadOnlyList<Player> players

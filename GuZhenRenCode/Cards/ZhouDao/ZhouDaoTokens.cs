@@ -12,11 +12,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace GuZhenRen.Cards.ZhouDao;
 
 public abstract class AbstractZhouDaoToken :
-    AbstractGuZhenRenCard,
-    ICardRewardExcluded
+    AbstractGuZhenRenGeneratedCard
 {
-    public override CardPoolModel Pool => ModelDb.CardPool<GuZhenRenCardPool>();
-    public override bool CanBeGeneratedInCombat => false;
     public override int MaxUpgradeLevel => 0;
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         [CardKeyword.Exhaust, GuZhenRenKeywords.NianHua, GuZhenRenKeywords.SuiMan];
@@ -28,31 +25,4 @@ public abstract class AbstractZhouDaoToken :
     }
 }
 
-[RegisterCard(typeof(GuZhenRenCardPool))]
-public sealed class NianLiu : AbstractZhouDaoToken
-{
-    protected override async Task OnPlay(
-        PlayerChoiceContext choiceContext,
-        CardPlay cardPlay
-    )
-    {
-        await ZhouDaoPowerSystem.GainNianHua(choiceContext, this, 2);
-    }
-}
 
-[RegisterCard(typeof(GuZhenRenCardPool))]
-public sealed class NianLiuPlus : AbstractZhouDaoToken
-{
-    // 与年流共用同一张卡图。
-    public override CardAssetProfile AssetProfile =>
-        CardImageCatalog.Create(typeof(NianLiu));
-
-    protected override async Task OnPlay(
-        PlayerChoiceContext choiceContext,
-        CardPlay cardPlay
-    )
-    {
-        await ZhouDaoPowerSystem.GainNianHua(choiceContext, this, 3);
-        await CardPileCmd.Draw(choiceContext, 1, Owner);
-    }
-}

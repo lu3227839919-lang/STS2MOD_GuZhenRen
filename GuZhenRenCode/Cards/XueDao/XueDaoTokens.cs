@@ -16,14 +16,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace GuZhenRen.Cards.XueDao;
 
 public abstract class AbstractXueDaoToken
-    : AbstractGuZhenRenCard,
-      ICardRewardExcluded
+    : AbstractGuZhenRenGeneratedCard
 {
-    public override CardPoolModel Pool =>
-        ModelDb.CardPool<GuZhenRenCardPool>();
-
-    public override bool CanBeGeneratedInCombat => false;
-
     protected AbstractXueDaoToken(
         int baseCost,
         CardType type,
@@ -40,52 +34,6 @@ public abstract class AbstractXueDaoToken
 /// 立即消耗消失；未被使用的遗骸在战斗结束后保留到永久牌堆（最多4张），
 /// 也可被血颅蛊、刀翅血蝠蛊及相关杀招主动消耗。
 /// </summary>
-[RegisterCard(typeof(GuZhenRenCardPool))]
-public sealed class YiHai : AbstractXueDaoToken
-{
-    protected override IEnumerable<DynamicVar> CanonicalVars =>
-        [new PowerVar<XueYuanPower>(2m)];
-
-    public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        [CardKeyword.Retain];
-
-    public YiHai()
-        : base(
-            0,
-            CardType.Status,
-            CardRarity.Status,
-            TargetType.Self
-        )
-    {
-    }
-
-    protected override async Task OnPlay(
-        PlayerChoiceContext choiceContext,
-        CardPlay cardPlay
-    )
-    {
-        await XueDaoPowerSystem.GainXueYuanFromCardEffect(
-            choiceContext,
-            this,
-            DynamicVars[typeof(XueYuanPower).Name].IntValue
-        );
-
-        // 遗骸使用后立即消失（进入消耗堆），不可在永久牌堆中复用；
-        // 未使用的遗骸作为非消耗牌在战斗结束后保留至永久牌堆。
-        // 遗骸若是永久牌组卡的战斗克隆体（DeckVersion 指向 Deck 原件），
-        // 消耗时同步从永久牌组删除原件，确保“打出即永久消耗”，
-        // 与原版 SwipePower/DeprecatedCard 的取骸/移除先例一致。
-        await XueDaoCardSystem.ConsumeRemainCard(
-            choiceContext,
-            this
-        );
-    }
-
-    protected override void OnUpgrade()
-    {
-    }
-}
-
 public abstract class AbstractBloodBatToken : AbstractXueDaoToken
 {
     private const string HitsVar = "Hits";
@@ -242,53 +190,3 @@ public abstract class AbstractBloodBatToken : AbstractXueDaoToken
     }
 }
 
-[RegisterCard(typeof(GuZhenRenCardPool))]
-public sealed class DaoChiXueFu : AbstractBloodBatToken
-{
-    protected override int ExtraBaseHits => 0;
-
-    protected override bool TransfersOnKill => false;
-
-    public DaoChiXueFu() : base(1)
-    {
-    }
-}
-
-[RegisterCard(typeof(GuZhenRenCardPool))]
-public sealed class DaoChiXueFuQun : AbstractBloodBatToken
-{
-    protected override int ExtraBaseHits => 2;
-
-    protected override bool TransfersOnKill => true;
-
-    public DaoChiXueFuQun() : base(2)
-    {
-    }
-}
-
-[RegisterCard(typeof(GuZhenRenCardPool))]
-public sealed class XueFuWang : AbstractBloodBatToken
-{
-    private const string ConsumedRemainsVar = "ConsumedRemains";
-
-    protected override IEnumerable<DynamicVar> CanonicalVars =>
-        base.CanonicalVars.Concat(
-            [new DynamicVar(ConsumedRemainsVar, 0m)]
-        );
-
-    protected override int ExtraBaseHits =>
-        DynamicVars[ConsumedRemainsVar].IntValue * 2;
-
-    protected override bool TransfersOnKill =>
-        DynamicVars[ConsumedRemainsVar].IntValue >= 2;
-
-    public XueFuWang() : base(2)
-    {
-    }
-
-    internal void ConfigureConsumedRemains(int amount)
-    {
-        DynamicVars[ConsumedRemainsVar].BaseValue =
-            Math.Clamp(amount, 0, 2);
-    }
-}
