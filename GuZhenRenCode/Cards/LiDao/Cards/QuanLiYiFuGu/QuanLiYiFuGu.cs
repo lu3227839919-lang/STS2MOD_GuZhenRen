@@ -54,7 +54,42 @@ public sealed class QuanLiYiFuGu : AbstractLiDaoGuCard
         RefreshRankValues();
     }
 
+    internal static int ForcedPhantomLimitAtRank(
+        int rank,
+        int availableCount
+    ) => rank switch
+    {
+        <= 1 => Math.Min(1, availableCount),
+        2 => Math.Min(2, availableCount),
+        _ => availableCount,
+    };
+
+    internal static bool UsesRandomSubsetAtRank(int rank) => rank <= 2;
+
+    internal static float PermanentChanceGainAtRank(int rank) => rank switch
+    {
+        8 => 0.03f,
+        >= 9 => 0.05f,
+        _ => 0f,
+    };
+
+    internal static int RecoveryAccelerationAtRank(int rank) =>
+        rank >= 9 ? 1 : 0;
+
     private void RefreshRankValues() =>
         DynamicVars["EffectPercent"].BaseValue =
-            LiDaoRankTable.FullForcePercent(GuRank);
+            EffectPercentAtRank(GuRank);
+
+    internal static int EffectPercentAtRank(int rank) => rank switch
+    {
+        <= 2 => 100,
+        3 => 80,
+        4 => 90,
+        5 => 100,
+        6 => 110,
+        7 => 120,
+        8 => 130,
+        _ => 140,
+    };
+
 }

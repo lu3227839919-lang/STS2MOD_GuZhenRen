@@ -29,18 +29,18 @@ public sealed class GuRankUpRestSiteOption
     : ModRestSiteOptionTemplate
 {
     internal const string OptionIdentifier =
-        "GU_ZHEN_REN_GU_RANK_UP";
+        "LU_GU_ZHEN_REN_GU_RANK_UP";
 
     private static readonly LocString DescriptionText =
         new(
             "rest_site_ui",
-            "OPTION_GU_ZHEN_REN_GU_RANK_UP.description"
+            "OPTION_LU_GU_ZHEN_REN_GU_RANK_UP.description"
         );
 
     private static readonly LocString SelectionPrompt =
         new(
             "rest_site_ui",
-            "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt"
+            "OPTION_LU_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt"
         );
 
     private const string FallbackIconPath =

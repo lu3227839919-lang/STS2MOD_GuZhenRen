@@ -41,19 +41,19 @@ public abstract class AbstractShaZhaoCard
 
     private static readonly SavedAttachedState<CardModel, string>
         OrderedMaterialTypeNamesState = new(
-            "gu_zhen_ren.sha_zhao.material_type_names",
+            "lu_gu_zhen_ren.sha_zhao.material_type_names",
             static () => string.Empty
         );
 
     private static readonly SavedAttachedState<CardModel, int[]>
         OrderedMaterialRanksState = new(
-            "gu_zhen_ren.sha_zhao.material_ranks",
+            "lu_gu_zhen_ren.sha_zhao.material_ranks",
             static () => []
         );
 
     private static readonly SavedAttachedState<CardModel, int>
         HouseState = new(
-            "gu_zhen_ren.sha_zhao.house",
+            "lu_gu_zhen_ren.sha_zhao.house",
             static () => (int)GuHouse.None
         );
 
@@ -402,19 +402,19 @@ public abstract class AbstractShaZhaoCard
 
     private static readonly SavedAttachedState<CardModel, string>
         BoundMaterialIdsState = new(
-            "gu_zhen_ren.sha_zhao.bound_material_ids",
+            "lu_gu_zhen_ren.sha_zhao.bound_material_ids",
             static () => string.Empty
         );
 
     private static readonly SavedAttachedState<CardModel, int>
         SpentUsesState = new(
-            "gu_zhen_ren.sha_zhao.spent_uses",
+            "lu_gu_zhen_ren.sha_zhao.spent_uses",
             static () => 0
         );
 
     private static readonly SavedAttachedState<CardModel, int>
         StageState = new(
-            "gu_zhen_ren.sha_zhao.stage",
+            "lu_gu_zhen_ren.sha_zhao.stage",
             static () => 0
         );
 

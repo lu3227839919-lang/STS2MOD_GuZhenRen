@@ -50,12 +50,28 @@ public sealed class NiuJiaoDing : AbstractLiDaoCompanionCard
         RefreshRankValues();
     }
 
+    private static int DamageAtRank(int rank) => rank switch
+    {
+        <= 1 => 6, 2 => 7, 3 => 8, 4 => 9, 5 => 10,
+        6 => 11, 7 => 12, 8 => 14, _ => 16,
+    };
+
+    private static int BlockAtRank(int rank) => rank switch
+    {
+        <= 1 => 3, 2 => 3, 3 => 4, 4 => 5, 5 => 6,
+        6 => 7, 7 => 8, 8 => 10, _ => 11,
+    };
+
+    private static int FirstTimeBonusAtRank(int rank) => rank >= 8 ? 3 : 0;
+
+    private static int PhantomLinkBonusAtRank(int rank) => rank >= 9 ? 5 : 0;
+
     protected override void RefreshRankValues()
     {
         DynamicVars.Damage.BaseValue =
-            LiDaoCompanionRankTable.NiuJiaoDingDamage(GuRank) + _upDamage;
+            DamageAtRank(GuRank) + _upDamage;
         DynamicVars.Block.BaseValue =
-            LiDaoCompanionRankTable.NiuJiaoDingBlock(GuRank) + _upBlock;
+            BlockAtRank(GuRank) + _upBlock;
     }
 
     protected override void AddExtraArgsToDescription(
@@ -67,12 +83,12 @@ public sealed class NiuJiaoDing : AbstractLiDaoCompanionCard
         description.Add("FirstTimeRange", rank >= 8 ? 1 : 0);
         description.Add(
             "FirstTimeBonus",
-            LiDaoCompanionRankTable.NiuJiaoDingFirstTimeBonus(rank)
+            FirstTimeBonusAtRank(rank)
         );
         description.Add("PhantomLinkRange", rank >= 9 ? 1 : 0);
         description.Add(
             "PhantomLinkBonus",
-            LiDaoCompanionRankTable.NiuJiaoDingPhantomLinkBonus(rank)
+            PhantomLinkBonusAtRank(rank)
         );
     }
 
@@ -92,14 +108,12 @@ public sealed class NiuJiaoDing : AbstractLiDaoCompanionCard
         decimal block = DynamicVars.Block.BaseValue;
         if (rank >= 8 && TryClaimFirstTime())
         {
-            block += LiDaoCompanionRankTable
-                .NiuJiaoDingFirstTimeBonus(rank);
+            block += FirstTimeBonusAtRank(rank);
         }
         if (rank >= 9 &&
             LiDaoPhantomSystem.HasManifestedThisTurn(Owner))
         {
-            block += LiDaoCompanionRankTable
-                .NiuJiaoDingPhantomLinkBonus(rank);
+            block += PhantomLinkBonusAtRank(rank);
         }
 
         await CreatureCmd.GainBlock(

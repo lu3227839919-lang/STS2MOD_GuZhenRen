@@ -39,12 +39,30 @@ public sealed class JiaoShuai : AbstractLiDaoCompanionCard
         RefreshRankValues();
     }
 
+    private static int DamageAtRank(int rank) => rank switch
+    {
+        <= 1 => 4, 2 => 5, 3 => 4, 4 => 5, 5 => 5,
+        6 => 6, 7 => 6, 8 => 7, _ => 8,
+    };
+
+    private static int HitsAtRank(int rank) => rank switch
+    {
+        <= 4 => 2,
+        <= 7 => 3,
+        _ => 4,
+    };
+
+    private static int LastHitBonusAtRank(int rank) =>
+        rank is 3 or 4 ? 2 : 0;
+
+    private static bool PursuesAtRank(int rank) => rank >= 7;
+
     protected override void RefreshRankValues()
     {
         DynamicVars.Damage.BaseValue =
-            LiDaoCompanionRankTable.JiaoShuaiDamage(GuRank) + _upDamage;
+            DamageAtRank(GuRank) + _upDamage;
         DynamicVars["Hits"].BaseValue =
-            LiDaoCompanionRankTable.JiaoShuaiHits(GuRank);
+            HitsAtRank(GuRank);
     }
 
     protected override void AddExtraArgsToDescription(
@@ -56,7 +74,7 @@ public sealed class JiaoShuai : AbstractLiDaoCompanionCard
         description.Add("LastHitRange", rank is >= 3 and <= 4 ? 1 : 0);
         description.Add(
             "LastHitBonus",
-            LiDaoCompanionRankTable.JiaoShuaiLastHitBonus(rank)
+            LastHitBonusAtRank(rank)
         );
         description.Add("PursuitRange", rank >= 7 ? 1 : 0);
     }
@@ -69,8 +87,8 @@ public sealed class JiaoShuai : AbstractLiDaoCompanionCard
         int rank = GuRank;
         int hits = DynamicVars["Hits"].IntValue;
         decimal baseDamage = DynamicVars.Damage.BaseValue;
-        int lastHitBonus = LiDaoCompanionRankTable.JiaoShuaiLastHitBonus(rank);
-        bool pursues = LiDaoCompanionRankTable.JiaoShuaiPursues(rank);
+        int lastHitBonus = LastHitBonusAtRank(rank);
+        bool pursues = PursuesAtRank(rank);
 
         Creature? current = cardPlay.Target;
         for (int hit = 0; hit < hits; hit++)

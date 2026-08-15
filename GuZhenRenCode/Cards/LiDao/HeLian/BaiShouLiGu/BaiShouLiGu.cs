@@ -93,7 +93,18 @@ public sealed class BaiShouLiGu :
     )
     {
         LiDaoBeastKind[] kinds = materials
-            .Select(LiDaoRankTable.GetBeastKind)
+            .Select(static card => card switch
+            {
+                BaiZhiGu => LiDaoBeastKind.BaiZhi,
+                FeiXiongZhiLiGu => LiDaoBeastKind.FeiXiong,
+                ELiGu => LiDaoBeastKind.E,
+                QingNiuLaoLiGu => LiDaoBeastKind.QingNiu,
+                ShiGuiLiGu => LiDaoBeastKind.ShiGui,
+                _ => throw new ArgumentException(
+                    $"{card.GetType().Name} 不是基础兽力蛊。",
+                    nameof(materials)
+                ),
+            })
             .Distinct()
             .OrderBy(kind => kind)
             .ToArray();
@@ -189,11 +200,37 @@ public sealed class BaiShouLiGu :
         RefreshRankValues();
     }
 
+    internal static int ChanceAtRank(int rank) => rank switch
+    {
+        <= 1 => 25, 2 => 28, 3 => 30, 4 => 33, 5 => 35,
+        6 => 38, 7 => 40, 8 => 45, _ => 50,
+    };
+
+    internal static int EffectPercentAtRank(int rank) => rank switch
+    {
+        <= 1 => 60, 2 => 70, 3 => 80, 4 => 85, 5 => 90,
+        _ => 100,
+    };
+
+    internal static bool AvoidRepeatManifestAtRank(int rank) => rank >= 7;
+
+    internal static int SecondManifestChanceAtRank(int rank) => rank switch
+    {
+        8 => 35,
+        >= 9 => 100,
+        _ => 0,
+    };
+
+    internal static int CondenseInternalBonusPercentAtRank(
+        int rank,
+        int condenseCount
+    ) => rank >= 6 ? Math.Min(3, condenseCount / 2) * 10 : 0;
+
     private void RefreshRankValues()
     {
         DynamicVars["Chance"].BaseValue =
-            LiDaoRankTable.BaiShouChance(GuRank);
+            ChanceAtRank(GuRank);
         DynamicVars["EffectPercent"].BaseValue =
-            LiDaoRankTable.BaiShouEffectPercent(GuRank);
+            EffectPercentAtRank(GuRank);
     }
 }

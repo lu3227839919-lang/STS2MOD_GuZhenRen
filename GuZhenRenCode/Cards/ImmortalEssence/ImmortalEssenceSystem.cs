@@ -38,7 +38,7 @@ public static class ImmortalEssenceSystem
 
     private static readonly SavedAttachedState<CardModel, int>
         RemainingUnitsState = new(
-            "gu_zhen_ren.immortal_essence_remaining_units",
+            "lu_gu_zhen_ren.immortal_essence_remaining_units",
             () => -1
         );
 

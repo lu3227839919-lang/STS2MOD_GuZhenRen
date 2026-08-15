@@ -22,7 +22,6 @@ public sealed class KuLiGu : AbstractLiDaoGuCard
 {
     public override int TrainingRequired => GuRank >= 5 ? 1 : 2;
     public override Type CompanionCardType => typeof(KuLian);
-    public override int RecoveryDelayTurns => LiDaoRankTable.Recovery(GuRank);
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [new DynamicVar("ChancePerHardship", 2m)];
@@ -43,16 +42,54 @@ public sealed class KuLiGu : AbstractLiDaoGuCard
         RefreshRankValues();
     }
 
-    private void RefreshRankValues() =>
-        DynamicVars["ChancePerHardship"].BaseValue = GuRank switch
+    internal static int ChancePerHardshipAtRank(int rank) => rank switch
+    {
+        <= 1 => 2,
+        2 => 3,
+        3 => 4,
+        <= 5 => 5,
+        6 => 6,
+        7 => 7,
+        8 => 8,
+        _ => 10,
+    };
+
+    internal static bool CanRetryAllFailedAtRank(int rank, int hardship) =>
+        rank >= 6 && hardship >= 2;
+
+    internal static bool CanCreateDoubleShadowAtRank(int rank, int hardship) =>
+        rank >= 8 && hardship >= 4;
+
+    internal static bool CanDesperationBurstAtRank(int rank, int hardship) =>
+        rank >= 9 && hardship >= 4;
+
+    internal static decimal HardshipEffectBonusAtRank(
+        int rank,
+        int hardship
+    )
+    {
+        if (rank == 3)
         {
-            1 => 2,
-            2 => 3,
-            3 => 4,
-            <= 5 => 5,
-            6 => 6,
-            7 => 7,
-            8 => 8,
-            _ => 10,
+            return hardship >= 3 ? 0.05m : 0m;
+        }
+        if (rank == 4)
+        {
+            return hardship >= 3 ? 0.08m : 0m;
+        }
+
+        decimal perHardship = rank switch
+        {
+            5 => 0.03m,
+            6 => 0.04m,
+            7 => 0.05m,
+            8 => 0.06m,
+            >= 9 => 0.07m,
+            _ => 0m,
         };
+        return hardship * perHardship;
+    }
+
+    private void RefreshRankValues() =>
+        DynamicVars["ChancePerHardship"].BaseValue =
+            ChancePerHardshipAtRank(GuRank);
 }

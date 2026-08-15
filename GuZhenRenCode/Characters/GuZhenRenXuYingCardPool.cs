@@ -18,7 +18,7 @@ public sealed class GuZhenRenXuYingCardPool
     /// 卡池的稳定标识。
     /// </summary>
     public override string Title =>
-        "GuZhenRenXuYing";
+        Entry.ModId + "XuYing";
 
     /// <summary>
     /// 与蛊真人普通卡共用能量颜色标识。
@@ -27,7 +27,7 @@ public sealed class GuZhenRenXuYingCardPool
     /// 这里保留路径仅作为通用 UI 的资源后备。
     /// </summary>
     public override string EnergyColorName =>
-        "GuZhenRen";
+        Entry.ModId;
 
     public override string? BigEnergyIconPath =>
         $"{Entry.ResPath}/images/characters/energy_big.png";

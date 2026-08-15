@@ -5,7 +5,7 @@ namespace GuZhenRen.Characters;
 
 public sealed class GuZhenRenPotionPool : TypeListPotionPoolModel
 {
-    public override string EnergyColorName => "GuZhenRen";
+    public override string EnergyColorName => Entry.ModId;
     public override Color LabOutlineColor => GuZhenRenCharacter.ThemeColor;
 
     // 即使模板暂时没有示例药水，也先把角色药水池结构留好。

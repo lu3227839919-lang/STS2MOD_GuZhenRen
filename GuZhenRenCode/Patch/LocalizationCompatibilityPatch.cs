@@ -904,14 +904,14 @@ internal static partial class LocalizationCompatibilityPatch
             if (!fallbacks.TryGetValue(
                     (
                         "secondary_resources",
-                        "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.title"
+                        "LU_GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.title"
                     ),
                     out string? title
                 ) ||
                 !fallbacks.TryGetValue(
                     (
                         "secondary_resources",
-                        "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.description"
+                        "LU_GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.description"
                     ),
                     out string? description
                 ))
@@ -1049,7 +1049,7 @@ internal static partial class LocalizationCompatibilityPatch
 
             if (separator <= 0 ||
                 !entryKey[..separator].Contains(
-                    "GU_ZHEN_REN_CHARACTER",
+                    "LU_GU_ZHEN_REN_CHARACTER",
                     StringComparison.Ordinal
                 ) ||
                 !CharacterNameOverrides.TryGetValue(

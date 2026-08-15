@@ -120,7 +120,7 @@ public abstract class AbstractBenMingGuCard : ModCardTemplate, IGuWormCard
              *
              * 应当保证在所有 Mod 中唯一。
              */
-            "gu_zhen_ren.ben_ming_gu_rank",
+            "lu_gu_zhen_ren.ben_ming_gu_rank",
 
             /*
              * 新卡牌第一次读取状态时的默认值。

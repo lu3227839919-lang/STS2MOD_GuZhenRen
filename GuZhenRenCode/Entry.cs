@@ -20,9 +20,9 @@ namespace GuZhenRen;
 [ModInitializer(nameof(Initialize))]
 public partial class Entry
 {
-    public const string ModId = "GuZhenRen";
+    public const string ModId = "LuGuZhenRen";
 
-    public const string ResPath = $"res://{ModId}";
+    public const string ResPath = "res://GuZhenRen";
 
     public static Logger Logger { get; } =
         RitsuLibFramework.CreateLogger(ModId);

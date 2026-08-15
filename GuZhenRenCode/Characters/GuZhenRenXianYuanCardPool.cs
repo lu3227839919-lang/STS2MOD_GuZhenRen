@@ -10,9 +10,9 @@ namespace GuZhenRen.Characters;
 /// </summary>
 public sealed class GuZhenRenXianYuanCardPool : TypeListCardPoolModel
 {
-    public override string Title => "GuZhenRenXianYuan";
+    public override string Title => Entry.ModId + "XianYuan";
 
-    public override string EnergyColorName => "GuZhenRen";
+    public override string EnergyColorName => Entry.ModId;
 
     public override string? BigEnergyIconPath =>
         $"{Entry.ResPath}/images/characters/energy_big.png";

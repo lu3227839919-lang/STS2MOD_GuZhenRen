@@ -156,60 +156,60 @@
     }
   },
   "cardDescriptionOverrides": {
-    "GU_ZHEN_REN_CARD_SHA_ZHAO_TUI_YAN.description": "Retain. First choose a craftable Killer Move, then choose matching Gu Worm materials. If successful, pay the derivation essence to gain the Killer Move; otherwise the card returns to your hand.",
-    "GU_ZHEN_REN_CARD_BAI_SHI_GU.description": "Gain {Dexterity:diff()} temporary [gold]Dexterity[/gold]. {BlockRetentionTurns:cond:>0?For the next {BlockRetentionTurns} turn(s), your Block is not removed at the start of your turn.|}",
-    "GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description": "Retain as immortal essence. Provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
-    "GU_ZHEN_REN_CARD_HONG_ZAO_XIAN_YUAN.description": "Retain as immortal essence. Equals two Green Grape essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
-    "GU_ZHEN_REN_CARD_BAI_LI_XIAN_YUAN.description": "Retain as immortal essence. Equals two Red Date essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
-    "GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description": "Retain as immortal essence. Equals two White Litchi essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
-    "GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "Your {Capacity}-card Gu capacity is full. Choose an existing Gu Worm to replace to obtain [gold]{NewCard}[/gold].",
-    "GU_ZHEN_REN_CARD_XUE_QI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] {BloodCost}, [gold]Self-Devour[/gold]. Choose 1 normal card in your hand and implant [gold]Blood Qi[/gold].",
-    "GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Fusion[/gold]; [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] 2: implant [gold]Moon Phase[/gold]. Three-stage [gold]Shared Pools[/gold]—Bleed {CrescentBleed}/{WaxingBleed}/{FullBleed}; Marks {CrescentMarks}/{WaxingMarks}/{FullMarks}.",
-    "GU_ZHEN_REN_CARD_XUE_CHI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. Gain {XueYuanPower:diff()} [gold]Blood Essence[/gold]; convert each [gold]Overflow[/gold] into {OverflowBlock} Block.",
-    "GU_ZHEN_REN_CARD_XUE_PI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. Gain {Block:diff()} Block; [gold]Bloodthirst[/gold] 1: gain {EmpoweredBlock} more. Each [gold]Blood Skull[/gold] adds 2 Block.",
-    "GU_ZHEN_REN_CARD_XUE_LU_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. Gain {Block:diff()} Block; [gold]Devour Remains {MaxAbsorb}[/gold]: each grants 1 [gold]Blood Skull[/gold], or heals {Heal:diff()} HP at the cap.",
-    "GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. Add a same-rank [gold]Blade-Wing Blood Bat[/gold]; [gold]Devour Remains 2[/gold]: add a [gold]Blade-Wing Blood Bat Swarm[/gold] instead.",
-    "GU_ZHEN_REN_CARD_XUE_TAI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Fusion[/gold]; [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] 2, [gold]Self-Devour[/gold]: implant [gold]Blood Fetus[/gold], which can [gold]Devour Parasite[/gold] and [gold]Hatches[/gold] after 3 [gold]Fetal Movement[/gold].",
-    "GU_ZHEN_REN_CARD_XUE_FU_WANG_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Devour Remains 2[/gold]: add a same-rank [gold]Blood Bat King[/gold]; each adds 2 hits, and 2 grants [gold]Pursuit[/gold]. Resolve [gold]Blood Skull[/gold].",
-    "GU_ZHEN_REN_CARD_XUE_HE_JIA_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Blood River[/gold]: below 4 Essence, gain {LowBloodGain} Essence and {LowBlock} Block; otherwise [gold]Bloodthirst[/gold] 2 for {HighBlock} Block, then half next turn. Each [gold]Blood Skull[/gold] adds 2 Block.",
-    "GU_ZHEN_REN_CARD_WAN_HAI_GUI_CHAO.description": "[gold]Devour Remains 3[/gold]. Split a {Damage:diff()} + {DamagePerRemains} per Remains damage pool among all enemies. Gain {Block:diff()} + {BlockPerRemains} Block per Remains.",
-    "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.extraCardText": "Enchantment · Moon Phase (Rank {Rank} · Crescent): {TriggersRemaining} trigger(s) remain; advances after the host is played.",
-    "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.extraCardText": "Enchantment · Moon Phase (Rank {Rank} · Waxing): {TriggersRemaining} trigger(s) remain; advances after the host is played.",
-    "GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.extraCardText": "Enchantment · Moon Phase (Rank {Rank} · Full): {TriggersRemaining} trigger(s) remain; hatches after the host is played.",
-    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS.extraCardText": "Enchantment · Blood Fetus (Rank {Rank}): {Stage}/3 Fetal Movement, {TriggersRemaining} trigger(s) remain; hatches at 3."
+    "LU_GU_ZHEN_REN_CARD_SHA_ZHAO_TUI_YAN.description": "Retain. First choose a craftable Killer Move, then choose matching Gu Worm materials. If successful, pay the derivation essence to gain the Killer Move; otherwise the card returns to your hand.",
+    "LU_GU_ZHEN_REN_CARD_BAI_SHI_GU.description": "Gain {Dexterity:diff()} temporary [gold]Dexterity[/gold]. {BlockRetentionTurns:cond:>0?For the next {BlockRetentionTurns} turn(s), your Block is not removed at the start of your turn.|}",
+    "LU_GU_ZHEN_REN_CARD_QING_TI_XIAN_YUAN.description": "Retain as immortal essence. Provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
+    "LU_GU_ZHEN_REN_CARD_HONG_ZAO_XIAN_YUAN.description": "Retain as immortal essence. Equals two Green Grape essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
+    "LU_GU_ZHEN_REN_CARD_BAI_LI_XIAN_YUAN.description": "Retain as immortal essence. Equals two Red Date essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
+    "LU_GU_ZHEN_REN_CARD_HUANG_XING_XIAN_YUAN.description": "Retain as immortal essence. Equals two White Litchi essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
+    "LU_GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "Your {Capacity}-card Gu capacity is full. Choose an existing Gu Worm to replace to obtain [gold]{NewCard}[/gold].",
+    "LU_GU_ZHEN_REN_CARD_XUE_QI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] {BloodCost}, [gold]Self-Devour[/gold]. Choose 1 normal card in your hand and implant [gold]Blood Qi[/gold].",
+    "LU_GU_ZHEN_REN_CARD_XUE_YUE_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Fusion[/gold]; [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] 2: implant [gold]Moon Phase[/gold]. Three-stage [gold]Shared Pools[/gold]—Bleed {CrescentBleed}/{WaxingBleed}/{FullBleed}; Marks {CrescentMarks}/{WaxingMarks}/{FullMarks}.",
+    "LU_GU_ZHEN_REN_CARD_XUE_CHI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. Gain {XueYuanPower:diff()} [gold]Blood Essence[/gold]; convert each [gold]Overflow[/gold] into {OverflowBlock} Block.",
+    "LU_GU_ZHEN_REN_CARD_XUE_PI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. Gain {Block:diff()} Block; [gold]Bloodthirst[/gold] 1: gain {EmpoweredBlock} more. Each [gold]Blood Skull[/gold] adds 2 Block.",
+    "LU_GU_ZHEN_REN_CARD_XUE_LU_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. Gain {Block:diff()} Block; [gold]Devour Remains {MaxAbsorb}[/gold]: each grants 1 [gold]Blood Skull[/gold], or heals {Heal:diff()} HP at the cap.",
+    "LU_GU_ZHEN_REN_CARD_DAO_CHI_XUE_FU_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. Add a same-rank [gold]Blade-Wing Blood Bat[/gold]; [gold]Devour Remains 2[/gold]: add a [gold]Blade-Wing Blood Bat Swarm[/gold] instead.",
+    "LU_GU_ZHEN_REN_CARD_XUE_TAI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Fusion[/gold]; [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] 2, [gold]Self-Devour[/gold]: implant [gold]Blood Fetus[/gold], which can [gold]Devour Parasite[/gold] and [gold]Hatches[/gold] after 3 [gold]Fetal Movement[/gold].",
+    "LU_GU_ZHEN_REN_CARD_XUE_FU_WANG_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Devour Remains 2[/gold]: add a same-rank [gold]Blood Bat King[/gold]; each adds 2 hits, and 2 grants [gold]Pursuit[/gold]. Resolve [gold]Blood Skull[/gold].",
+    "LU_GU_ZHEN_REN_CARD_XUE_HE_JIA_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Blood River[/gold]: below 4 Essence, gain {LowBloodGain} Essence and {LowBlock} Block; otherwise [gold]Bloodthirst[/gold] 2 for {HighBlock} Block, then half next turn. Each [gold]Blood Skull[/gold] adds 2 Block.",
+    "LU_GU_ZHEN_REN_CARD_WAN_HAI_GUI_CHAO.description": "[gold]Devour Remains 3[/gold]. Split a {Damage:diff()} + {DamagePerRemains} per Remains damage pool among all enemies. Gain {Block:diff()} + {BlockPerRemains} Block per Remains.",
+    "LU_GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.extraCardText": "Enchantment · Moon Phase (Rank {Rank} · Crescent): {TriggersRemaining} trigger(s) remain; advances after the host is played.",
+    "LU_GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.extraCardText": "Enchantment · Moon Phase (Rank {Rank} · Waxing): {TriggersRemaining} trigger(s) remain; advances after the host is played.",
+    "LU_GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.extraCardText": "Enchantment · Moon Phase (Rank {Rank} · Full): {TriggersRemaining} trigger(s) remain; hatches after the host is played.",
+    "LU_GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS.extraCardText": "Enchantment · Blood Fetus (Rank {Rank}): {Stage}/3 Fetal Movement, {TriggersRemaining} trigger(s) remain; hatches at 3."
   },
   "characterNameOverrides": {
     "title": "Gu Yue Fang Yuan",
     "titleObject": "Gu Yue Fang Yuan"
   },
   "restSiteLocalizationFallbacks": {
-    "OPTION_GU_ZHEN_REN_GU_RANK_UP.name": "Gu Refinement",
-    "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "Select Gu Worms to refine in one go, mixing mortal and immortal freely. Each refinement has 4 slots: a mortal Gu Worm takes 1 slot and an immortal Gu Worm takes 2 slots, so you can refine up to 4 mortal or 2 immortal Gu Worms (e.g. 1 immortal + 2 mortal). Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",
-    "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Select Gu Worms to refine (mortal takes 1 slot each, immortal takes 2 slots each, 4 slots total), mixing mortal and immortal freely. You may also confirm with 0 selected.",
-    "OPTION_GU_ZHEN_REN_HE_LIAN.name": "Gu Fusion",
-    "OPTION_GU_ZHEN_REN_HE_LIAN.description": "First select a currently craftable Gu card, then select Gu Worm materials matching that target. Materials are consumed and the result is created only when both types and quantities match; failed attempts do not consume the use. Fusion can succeed once per rest site.",
-    "OPTION_GU_ZHEN_REN_HE_LIAN.selectionPrompt": "Select materials matching the target Gu card, then confirm.",
-    "OPTION_GU_ZHEN_REN_HE_LIAN.targetSelectionPrompt": "First select the Gu card to craft. Only materials that can match the target will be shown next."
+    "OPTION_LU_GU_ZHEN_REN_GU_RANK_UP.name": "Gu Refinement",
+    "OPTION_LU_GU_ZHEN_REN_GU_RANK_UP.description": "Select Gu Worms to refine in one go, mixing mortal and immortal freely. Each refinement has 4 slots: a mortal Gu Worm takes 1 slot and an immortal Gu Worm takes 2 slots, so you can refine up to 4 mortal or 2 immortal Gu Worms (e.g. 1 immortal + 2 mortal). Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",
+    "OPTION_LU_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Select Gu Worms to refine (mortal takes 1 slot each, immortal takes 2 slots each, 4 slots total), mixing mortal and immortal freely. You may also confirm with 0 selected.",
+    "OPTION_LU_GU_ZHEN_REN_HE_LIAN.name": "Gu Fusion",
+    "OPTION_LU_GU_ZHEN_REN_HE_LIAN.description": "First select a currently craftable Gu card, then select Gu Worm materials matching that target. Materials are consumed and the result is created only when both types and quantities match; failed attempts do not consume the use. Fusion can succeed once per rest site.",
+    "OPTION_LU_GU_ZHEN_REN_HE_LIAN.selectionPrompt": "Select materials matching the target Gu card, then confirm.",
+    "OPTION_LU_GU_ZHEN_REN_HE_LIAN.targetSelectionPrompt": "First select the Gu card to craft. Only materials that can match the target will be shown next."
   },
   "combatInterfaceLocalizationFallbacks": [
     {
       "table": "enchantments",
-      "key": "GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.title",
+      "key": "LU_GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.title",
       "text": "Blood Parasite"
     },
     {
       "table": "enchantments",
-      "key": "GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.description",
+      "key": "LU_GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.description",
       "text": "A parasite enchantment that persists, clones, and renders with its host without consuming the normal enchantment slot. Its kind, stage, and values are shown in the host card text."
     },
     {
       "table": "enchantments",
-      "key": "GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.title",
+      "key": "LU_GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.title",
       "text": "Blood Parasite Composite"
     },
     {
       "table": "enchantments",
-      "key": "GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.description",
+      "key": "LU_GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.description",
       "text": "Internal carrier for one normal enchantment and one Blood Parasite enchantment."
     },
     {
@@ -269,235 +269,235 @@
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_GUANG_HUI_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_GUANG_HUI_POWER.title",
       "text": "Brilliance"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_GUANG_HUI_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_GUANG_HUI_POWER.description",
       "text": "A character resource capped at 9. Brilliance does not disappear at end of turn; Light Path cards can gain or spend it. Refraction: when the previous standard card you played has a different type, a Light Path card gains 1 Brilliance (up to 3 per turn)."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_ZHAO_PO_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_ZHAO_PO_POWER.title",
       "text": "Illumination Break"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_ZHAO_PO_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_ZHAO_PO_POWER.description",
       "text": "The next time a single hit from an Attack card deals damage, take 3 additional damage and remove 1 Illumination Break. Multi-hit attacks can consume multiple stacks."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_XUE_YUAN_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_XUE_YUAN_POWER.title",
       "text": "Blood Essence"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_XUE_YUAN_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_XUE_YUAN_POWER.description",
       "text": "A personal character resource capped at 12. Only Blood Path Gu cards and their exclusive debuffs can gain or spend Blood Essence."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_XUE_YIN_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_XUE_YIN_POWER.title",
       "text": "Blood Mark"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_XUE_YIN_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_XUE_YIN_POWER.description",
       "text": "After taking unblocked damage from the applier’s Blood Path Gu Attack, remove 1 Blood Mark and lose 3 additional HP. Across the battlefield, each CardPlay grants at most 1 Blood Essence; Replay starts a new CardPlay."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_LIU_XUE_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_LIU_XUE_POWER.title",
       "text": "Bleed"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_LIU_XUE_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_LIU_XUE_POWER.description",
       "text": "At the end of the owner’s turn, remove 1 Bleed, grant the applier 1 Blood Essence, and deal 3 damage to the owner."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_XUE_QI_RECOVERY_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_XUE_QI_RECOVERY_POWER.title",
       "text": "Blood Qi Recovery"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_XUE_QI_RECOVERY_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_XUE_QI_RECOVERY_POWER.description",
       "text": "At the start of your next turn, heal {Amount} HP, then remove this effect."
     },
     {
       "table": "secondary_resources",
-      "key": "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.title",
+      "key": "LU_GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.title",
       "text": "Primeval Essence"
     },
     {
       "table": "secondary_resources",
-      "key": "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.description",
+      "key": "LU_GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.description",
       "text": "Primeval essence stored in a Gu Master's aperture. Begin each combat with the amount granted by your aperture rank (rank 1: 4, rank 9: 8); from turn 2 onward, restore 2-4 each turn by rank (1-2: 2, 3-5: 3, 6-9: 4). Maximum essence rises with aperture rank: 5/5/6/6/7/7/8/8/9."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_XUE_LU_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_XUE_LU_POWER.title",
       "text": "Blood Skull"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_XUE_LU_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_XUE_LU_POWER.description",
       "text": "Up to 3 stacks. Each strengthens Blood Path parasites, defenses, and Blade-Wing Blood Bat multi-hit attacks, but does not increase resource generation."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_XUE_JI_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_XUE_JI_POWER.title",
       "text": "Blood Parasite"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_XUE_JI_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_XUE_JI_POWER.description",
       "text": "{Amount} card(s) carry an unresolved Blood Path parasite. The parasite triggers after the host’s final play and is then removed."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_XUE_HE_JIA_CARRY_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_XUE_HE_JIA_CARRY_POWER.title",
       "text": "Blood River After-Armor"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_XUE_HE_JIA_CARRY_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_XUE_HE_JIA_CARRY_POWER.description",
       "text": "At the start of your next turn, gain {Amount} Block, then remove this effect."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_WAN_HAI_GUI_CHAO_RETAIN_BLOCK_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_WAN_HAI_GUI_CHAO_RETAIN_BLOCK_POWER.title",
       "text": "Myriad Remains After-Armor"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_WAN_HAI_GUI_CHAO_RETAIN_BLOCK_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_WAN_HAI_GUI_CHAO_RETAIN_BLOCK_POWER.description",
       "text": "At the start of your next turn, gain {Amount} Block, then remove this effect."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_JU_GUANG_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_JU_GUANG_POWER.title",
       "text": "Shine"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_JU_GUANG_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_JU_GUANG_POWER.description",
       "text": "The first hit of your next Light Path Attack deals {Amount} more damage. Multi-hit attacks gain this bonus only once."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_KU_LI_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_KU_LI_POWER.title",
       "text": "Bitter Strength"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_KU_LI_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_KU_LI_POWER.description",
       "text": "Gain 0–4 Hardship from missing HP, increasing permanent Phantom manifestation chance and effect. Repeated activations grant up to 3 training stacks. High ranks can retry a failed manifestation, create a double shadow, or force one in desperation."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_ZI_LI_GENG_SHENG_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_ZI_LI_GENG_SHENG_POWER.title",
       "text": "Self-Reliance"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_ZI_LI_GENG_SHENG_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_ZI_LI_GENG_SHENG_POWER.description",
       "text": "Tracks different beast manifestations and Condensation this turn, building strength and healing by rank. Repeated activations grant up to 3 conditioning stacks; high ranks turn excess healing into Block."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_NIAN_HUA_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_NIAN_HUA_POWER.title",
       "text": "Years"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_NIAN_HUA_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_NIAN_HUA_POWER.description",
       "text": "You have {Amount}/6 Years. Reaching 6 triggers Year Complete."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_GUANG_YIN_REN_RAN_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_GUANG_YIN_REN_RAN_POWER.title",
       "text": "Passing Time"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_GUANG_YIN_REN_RAN_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_GUANG_YIN_REN_RAN_POWER.description",
       "text": "Finishing Gu recovery grants Years; scales with the linked Gu rank."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_NIAN_NIAN_SUI_SUI_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_NIAN_NIAN_SUI_SUI_POWER.title",
       "text": "Year after Year"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_NIAN_NIAN_SUI_SUI_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_NIAN_NIAN_SUI_SUI_POWER.description",
       "text": "Passing turns steadily grants Years; scales with Year Gu rank."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_ZHOU_MAO_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_ZHOU_MAO_POWER.title",
       "text": "Time Anchor"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_ZHOU_MAO_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_ZHOU_MAO_POWER.description",
       "text": "Retain some Years after Year Complete; higher ranks periodically draw cards."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_SI_SHUI_LIU_NIAN_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_SI_SHUI_LIU_NIAN_POWER.title",
       "text": "Years Flow Like Water"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_SI_SHUI_LIU_NIAN_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_SI_SHUI_LIU_NIAN_POWER.description",
       "text": "The first Year Complete each turn creates a Year Flow."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_SAN_GENG_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_SAN_GENG_POWER.title",
       "text": "Third Watch"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_SAN_GENG_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_SAN_GENG_POWER.description",
       "text": "Your next {Amount} Year-gain events gain 1 extra Year."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_HUAN_BU_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_HUAN_BU_POWER.title",
       "text": "Slow Steps"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_HUAN_BU_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_HUAN_BU_POWER.description",
       "text": "Each attack action loses up to a fixed total amount of damage. {Amount} turns remain."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_YUE_GU_DELAY_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_YUE_GU_DELAY_POWER.title",
       "text": "Stored Month"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_YUE_GU_DELAY_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_YUE_GU_DELAY_POWER.description",
       "text": "Years scheduled by Month Gu will arrive at future turn starts."
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_XI_YING_WATCHER_POWER.title",
+      "key": "LU_GU_ZHEN_REN_POWER_XI_YING_WATCHER_POWER.title",
       "text": "Past Echo Watcher"
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_POWER_XI_YING_WATCHER_POWER.description",
+      "key": "LU_GU_ZHEN_REN_POWER_XI_YING_WATCHER_POWER.description",
       "text": "Hidden watcher for Past Echo cards."
     }
   ],
-  "OPTION_GU_ZHEN_REN_GU_RANK_UP.description": "Select Gu Worms to refine in one go, mixing mortal and immortal freely. Each refinement has 4 slots: a mortal Gu Worm takes 1 slot and an immortal Gu Worm takes 2 slots, so you can refine up to 4 mortal or 2 immortal Gu Worms (e.g. 1 immortal + 2 mortal). Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",
-  "OPTION_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Select Gu Worms to refine (mortal takes 1 slot each, immortal takes 2 slots each, 4 slots total), mixing mortal and immortal freely. You may also confirm with 0 selected."
+  "OPTION_LU_GU_ZHEN_REN_GU_RANK_UP.description": "Select Gu Worms to refine in one go, mixing mortal and immortal freely. Each refinement has 4 slots: a mortal Gu Worm takes 1 slot and an immortal Gu Worm takes 2 slots, so you can refine up to 4 mortal or 2 immortal Gu Worms (e.g. 1 immortal + 2 mortal). Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",
+  "OPTION_LU_GU_ZHEN_REN_GU_RANK_UP.selectionPrompt": "Select Gu Worms to refine (mortal takes 1 slot each, immortal takes 2 slots each, 4 slots total), mixing mortal and immortal freely. You may also confirm with 0 selected."
 }

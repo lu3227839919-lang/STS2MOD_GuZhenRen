@@ -27,14 +27,14 @@ public static class GuCardUsageRules
 
     private static readonly SavedAttachedState<CardModel, int>
         SpentActivationsState = new(
-            "gu_zhen_ren.gu_spent_activations",
+            "lu_gu_zhen_ren.gu_spent_activations",
             () => 0
         );
 
     // 0 表示尚未进入恢复；其他值是可恢复的回合编号。
     private static readonly SavedAttachedState<CardModel, int>
         RecoveryReadyTurnState = new(
-            "gu_zhen_ren.gu_recovery_ready_turn",
+            "lu_gu_zhen_ren.gu_recovery_ready_turn",
             () => 0
         );
 
@@ -42,7 +42,7 @@ public static class GuCardUsageRules
     // 用于恢复完成后按先后顺序给予蛊手牌空位（先恢复完的先上场）。
     private static readonly SavedAttachedState<CardModel, int>
         RecoveryCompletedTurnState = new(
-            "gu_zhen_ren.gu_recovery_completed_turn",
+            "lu_gu_zhen_ren.gu_recovery_completed_turn",
             () => 0
         );
 

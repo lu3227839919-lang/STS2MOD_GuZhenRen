@@ -155,7 +155,7 @@ internal static class GuDeckCapacityReplacementPatch
 
         LocString prompt = new(
             "cards",
-            "GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt"
+            "LU_GU_ZHEN_REN_CARD_REPLACE_GU_WORM.selectionScreenPrompt"
         );
         prompt.Add(
             "Capacity",

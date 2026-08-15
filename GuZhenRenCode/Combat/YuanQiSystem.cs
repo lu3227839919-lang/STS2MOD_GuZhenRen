@@ -55,8 +55,8 @@ public static class YuanQiSystem
             turnStartPolicy: SecondaryResourceTurnStartPolicy.None,
             persistencePolicy: SecondaryResourcePersistencePolicy.Combat,
             locTable: "secondary_resources",
-            titleKey: "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.title",
-            descriptionKey: "GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.description",
+            titleKey: "LU_GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.title",
+            descriptionKey: "LU_GU_ZHEN_REN_SECONDARY_RESOURCE_YUAN_QI.description",
             smallIconPath: SmallIconPath,
             largeIconPath: LargeIconPath
         );

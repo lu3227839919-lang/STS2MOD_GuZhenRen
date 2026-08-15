@@ -234,7 +234,7 @@ public static class ZhouDaoPowerSystem
 
         LocString prompt = new(
             "cards",
-            "GU_ZHEN_REN_ZHOU_DAO.suiManSelectionPrompt"
+            "LU_GU_ZHEN_REN_ZHOU_DAO.suiManSelectionPrompt"
         );
         IEnumerable<CardModel> selected = await CardSelectCmd.FromSimpleGrid(
             choiceContext,

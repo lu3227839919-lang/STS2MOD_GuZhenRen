@@ -169,7 +169,7 @@ public sealed class XunDianLiuGuangGu : AbstractGuWormCard
 
         LocString inboundPrompt = new(
             "cards",
-            "GU_ZHEN_REN_CARD_XUN_DIAN_LIU_GUANG_GU.recoverySelectionPrompt"
+            "LU_GU_ZHEN_REN_CARD_XUN_DIAN_LIU_GUANG_GU.recoverySelectionPrompt"
         );
         CardModel[] inbound = (
             await CardSelectCmd.FromSimpleGrid(

@@ -90,11 +90,11 @@ internal sealed partial class RecipeCompendiumTopBarButton : NTopBarButton
         HoverTip hoverTip = new(
             new LocString(
                 "static_hover_tips",
-                "GU_ZHEN_REN_RECIPE_COMPENDIUM.title"
+                "LU_GU_ZHEN_REN_RECIPE_COMPENDIUM.title"
             ),
             new LocString(
                 "static_hover_tips",
-                "GU_ZHEN_REN_RECIPE_COMPENDIUM.description"
+                "LU_GU_ZHEN_REN_RECIPE_COMPENDIUM.description"
             )
         );
         NHoverTipSet? tipSet =

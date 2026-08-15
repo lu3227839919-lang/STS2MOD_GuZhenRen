@@ -22,7 +22,6 @@ public sealed class ELiGu : AbstractLiDaoBeastGuCard<EXuYing>
 {
     public override int TrainingRequired => GuRank >= 6 ? 1 : 2;
     public override Type CompanionCardType => typeof(JiaoShuai);
-    public override int RecoveryDelayTurns => LiDaoRankTable.Recovery(GuRank);
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
@@ -39,11 +38,35 @@ public sealed class ELiGu : AbstractLiDaoBeastGuCard<EXuYing>
         RefreshRankValues();
     }
 
+    internal static int ChanceAtRank(int rank) => rank switch
+    {
+        <= 1 => 25, 2 => 27, 3 => 30, 4 => 32, 5 => 35,
+        6 => 38, 7 => 40, 8 => 43, _ => 45,
+    };
+
+    internal static int DamageAtRank(int rank) => rank switch
+    {
+        <= 1 => 3, 2 => 4, 3 => 4, 4 => 5, 5 => 5,
+        6 => 6, 7 => 7, 8 => 8, _ => 8,
+    };
+
+    internal static int HitsAtRank(int rank) => rank switch
+    {
+        <= 4 => 2,
+        <= 7 => 3,
+        _ => 4,
+    };
+
+    internal static int HitBonusAtRank(int rank, int hitIndex) =>
+        rank == 3 && hitIndex == 1 ? 2 : 0;
+
+    internal static bool PursuesAtRank(int rank) => rank >= 7;
+
     private void RefreshRankValues()
     {
         DynamicVars["Chance"].BaseValue =
-            LiDaoRankTable.EChance(GuRank);
-        DynamicVars.Damage.BaseValue = LiDaoRankTable.EDamage(GuRank);
-        DynamicVars["Hits"].BaseValue = LiDaoRankTable.EHits(GuRank);
+            ChanceAtRank(GuRank);
+        DynamicVars.Damage.BaseValue = DamageAtRank(GuRank);
+        DynamicVars["Hits"].BaseValue = HitsAtRank(GuRank);
     }
 }

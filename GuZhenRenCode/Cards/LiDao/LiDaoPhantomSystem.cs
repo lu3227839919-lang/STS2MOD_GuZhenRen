@@ -263,14 +263,12 @@ public static class LiDaoPhantomSystem
     )
     {
         List<AbstractLiDaoXuYing> selected = permanent.ToList();
-        int maximum = fullForce.GuRank switch
-        {
-            <= 1 => Math.Min(1, selected.Count),
-            2 => Math.Min(2, selected.Count),
-            _ => selected.Count,
-        };
+        int maximum = QuanLiYiFuGu.ForcedPhantomLimitAtRank(
+            fullForce.GuRank,
+            selected.Count
+        );
 
-        if (fullForce.GuRank <= 2)
+        if (QuanLiYiFuGu.UsesRandomSubsetAtRank(fullForce.GuRank))
         {
             selected = SelectRandomSubset(
                 cardPlay.Player,
@@ -282,7 +280,7 @@ public static class LiDaoPhantomSystem
 
         HashSet<LiDaoBeastKind> manifested = [];
         decimal multiplier =
-            LiDaoRankTable.FullForcePercent(fullForce.GuRank) / 100m;
+            QuanLiYiFuGu.EffectPercentAtRank(fullForce.GuRank) / 100m;
 
         foreach (AbstractLiDaoXuYing phantom in selected)
         {
@@ -305,9 +303,10 @@ public static class LiDaoPhantomSystem
             );
         }
 
-        if (fullForce.GuRank >= 8)
+        float chanceGain =
+            QuanLiYiFuGu.PermanentChanceGainAtRank(fullForce.GuRank);
+        if (chanceGain > 0f)
         {
-            float chanceGain = fullForce.GuRank >= 9 ? 0.05f : 0.03f;
             foreach (AbstractLiDaoXuYing phantom in permanent)
             {
                 float capped = Math.Min(0.8f, phantom.BaseChance + chanceGain);
@@ -315,7 +314,9 @@ public static class LiDaoPhantomSystem
             }
         }
 
-        if (fullForce.GuRank >= 9)
+        int recoveryAcceleration =
+            QuanLiYiFuGu.RecoveryAccelerationAtRank(fullForce.GuRank);
+        if (recoveryAcceleration > 0)
         {
             int turn = cardPlay.Player.PlayerCombatState?.TurnNumber ?? 1;
             foreach (CardModel gu in GuCardPileSystem.RecoveryPileType
@@ -323,7 +324,11 @@ public static class LiDaoPhantomSystem
                          .Cards
                          .Where(card => card is ILiDaoBeastGuCard))
             {
-                GuCardUsageRules.AccelerateRecoveryBy(gu, 1, turn);
+                GuCardUsageRules.AccelerateRecoveryBy(
+                    gu,
+                    recoveryAcceleration,
+                    turn
+                );
             }
         }
 
@@ -494,7 +499,7 @@ public static class LiDaoPhantomSystem
 
         LocString prompt = new(
             "cards",
-            "GU_ZHEN_REN_CARD_LI_DAO_REPLACE_PHANTOM.selectionScreenPrompt"
+            "LU_GU_ZHEN_REN_CARD_LI_DAO_REPLACE_PHANTOM.selectionScreenPrompt"
         );
         CardSelectorPrefs prefs = new(prompt, 1)
         {

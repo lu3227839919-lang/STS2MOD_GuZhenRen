@@ -138,11 +138,11 @@ internal static class ShaZhaoTuiYanSystem
 
         LocString title = new(
             "cards",
-            "GU_ZHEN_REN_SHA_ZHAO_SYNTHESIS.failureTitle"
+            "LU_GU_ZHEN_REN_SHA_ZHAO_SYNTHESIS.failureTitle"
         );
         LocString body = new(
             "cards",
-            $"GU_ZHEN_REN_SHA_ZHAO_SYNTHESIS.{reason}"
+            $"LU_GU_ZHEN_REN_SHA_ZHAO_SYNTHESIS.{reason}"
         );
 
         NErrorPopup? popup = NErrorPopup.Create(
@@ -545,7 +545,7 @@ internal static class ShaZhaoTuiYanSystem
 
     private static readonly SavedAttachedState<CardModel, string>
         MaterialBoundShaZhaoState = new(
-            "gu_zhen_ren.sha_zhao.material_bound_sha_zhao",
+            "lu_gu_zhen_ren.sha_zhao.material_bound_sha_zhao",
             static () => string.Empty
         );
 

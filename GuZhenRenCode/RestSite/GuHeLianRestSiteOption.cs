@@ -32,26 +32,26 @@ public sealed class GuHeLianRestSiteOption
     : ModRestSiteOptionTemplate
 {
     internal const string OptionIdentifier =
-        "GU_ZHEN_REN_HE_LIAN";
+        "LU_GU_ZHEN_REN_HE_LIAN";
 
     private const int MinimumSelectableMaterialCount = 1;
 
     private static readonly LocString DescriptionText =
         new(
             "rest_site_ui",
-            "OPTION_GU_ZHEN_REN_HE_LIAN.description"
+            "OPTION_LU_GU_ZHEN_REN_HE_LIAN.description"
         );
 
     private static readonly LocString SelectionPrompt =
         new(
             "rest_site_ui",
-            "OPTION_GU_ZHEN_REN_HE_LIAN.selectionPrompt"
+            "OPTION_LU_GU_ZHEN_REN_HE_LIAN.selectionPrompt"
         );
 
     private static readonly LocString TargetSelectionPrompt =
         new(
             "rest_site_ui",
-            "OPTION_GU_ZHEN_REN_HE_LIAN.targetSelectionPrompt"
+            "OPTION_LU_GU_ZHEN_REN_HE_LIAN.targetSelectionPrompt"
         );
 
     private const string FallbackIconPath =

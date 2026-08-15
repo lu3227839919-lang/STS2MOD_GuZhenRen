@@ -51,13 +51,49 @@ public sealed class FeiXiongZhiLiGu :
         RefreshRankValues();
     }
 
+    internal static int ChanceAtRank(int rank) => rank switch
+    {
+        <= 1 => 18, 2 => 20, 3 => 22, 4 => 25, 5 => 28,
+        6 => 30, 7 => 33, 8 => 36, _ => 40,
+    };
+
+    internal static int DamageAtRank(int rank) => rank switch
+    {
+        <= 1 => 10, 2 => 12, 3 => 14, 4 => 16, 5 => 19,
+        6 => 24, 7 => 28, 8 => 34, _ => 40,
+    };
+
+    internal static int DivineMightAtRank(int rank) => rank switch
+    {
+        <= 5 => 0,
+        6 => 6,
+        7 => 8,
+        8 => 10,
+        _ => 12,
+    };
+
+    internal static int BlockedTargetBonusAtRank(int rank) => rank switch
+    {
+        3 => 4,
+        4 => 5,
+        5 => 6,
+        _ => 0,
+    };
+
+    internal static decimal FirstManifestMultiplierAtRank(
+        int rank,
+        bool firstThisTurn
+    ) => rank >= 9 && firstThisTurn ? 1.5m : 1m;
+
+    internal static int QuakeDamageAtRank(int rank) => rank >= 8 ? 6 : 0;
+
     private void RefreshRankValues()
     {
         DynamicVars["Chance"].BaseValue =
-            LiDaoRankTable.FeiXiongChance(GuRank);
+            ChanceAtRank(GuRank);
         DynamicVars.Damage.BaseValue =
-            LiDaoRankTable.FeiXiongDamage(GuRank);
+            DamageAtRank(GuRank);
         DynamicVars["DivineMight"].BaseValue =
-            LiDaoRankTable.FeiXiongDivineMight(GuRank);
+            DivineMightAtRank(GuRank);
     }
 }

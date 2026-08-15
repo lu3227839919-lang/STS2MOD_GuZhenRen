@@ -25,6 +25,16 @@ public abstract class AbstractLiDaoGuCard :
 
     public abstract Type CompanionCardType { get; }
 
+    /// <summary>
+    /// 普通力道蛊的通用恢复回合数。特殊卡牌可在本体中覆写。
+    /// </summary>
+    public override int RecoveryDelayTurns => GuRank switch
+    {
+        <= 5 => 2,
+        <= 8 => 3,
+        _ => 4,
+    };
+
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         base.CanonicalKeywords
             .Append(GuZhenRenKeywords.LianLi)

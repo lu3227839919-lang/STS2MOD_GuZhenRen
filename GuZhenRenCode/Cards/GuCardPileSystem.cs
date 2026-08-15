@@ -33,15 +33,15 @@ public static class GuCardPileSystem
     public const string RecoveryLocalId = "gu_discard";
 
     /// <summary>Fully-qualified RitsuLib card-pile ID for the Gu Hand.</summary>
-    public const string PileId = "GU_ZHEN_REN_CARDPILE_GU_CARDS";
+    public const string PileId = "LU_GU_ZHEN_REN_CARDPILE_GU_CARDS";
 
     /// <summary>Fully-qualified RitsuLib ID for cooled Gu waiting to enter the Gu Hand.</summary>
     public const string StoragePileId =
-        "GU_ZHEN_REN_CARDPILE_GU_STORAGE";
+        "LU_GU_ZHEN_REN_CARDPILE_GU_STORAGE";
 
     /// <summary>Fully-qualified RitsuLib ID for Gu cards that are still cooling down.</summary>
     public const string RecoveryPileId =
-        "GU_ZHEN_REN_CARDPILE_GU_DISCARD";
+        "LU_GU_ZHEN_REN_CARDPILE_GU_DISCARD";
 
     public const string DiscardPileId = RecoveryPileId;
 
@@ -52,7 +52,7 @@ public static class GuCardPileSystem
     public const string GuSealedLocalId = "gu_sealed";
 
     public const string GuSealedPileId =
-        "GU_ZHEN_REN_CARDPILE_GU_SEALED";
+        "LU_GU_ZHEN_REN_CARDPILE_GU_SEALED";
 
     private const string GuSealedPileIconPath =
         "res://GuZhenRen/materials/ShaZhaoMaterialPile.svg";

@@ -41,12 +41,37 @@ public sealed class TiaoXiYunLi : AbstractLiDaoCompanionCard
         RefreshRankValues();
     }
 
+    private static int BlockAtRank(int rank) => rank switch
+    {
+        <= 1 => 7, 2 => 8, 3 => 9, 4 => 10, 5 => 11,
+        6 => 12, 7 => 13, 8 => 14, _ => 16,
+    };
+
+    private static int PhantomBonusAtRank(int rank) => rank switch
+    {
+        <= 2 => 3,
+        <= 4 => 4,
+        <= 6 => 5,
+        <= 8 => 6,
+        _ => 7,
+    };
+
+    private static int HealAtRank(int rank, int phantomKinds) => rank switch
+    {
+        6 or 7 => phantomKinds >= 1 ? 1 : 0,
+        8 => phantomKinds >= 2 ? 2 : 0,
+        >= 9 => Math.Min(phantomKinds, 3),
+        _ => 0,
+    };
+
+    private static bool CanHealAtRank(int rank) => rank >= 6;
+
     protected override void RefreshRankValues()
     {
         DynamicVars.Block.BaseValue =
-            LiDaoCompanionRankTable.TiaoXiYunLiBlock(GuRank) + _upBlock;
+            BlockAtRank(GuRank) + _upBlock;
         DynamicVars["PhantomBonus"].BaseValue =
-            LiDaoCompanionRankTable.TiaoXiYunLiPhantomBonus(GuRank) +
+            PhantomBonusAtRank(GuRank) +
             _upPhantomBonus;
     }
 
@@ -62,7 +87,7 @@ public sealed class TiaoXiYunLi : AbstractLiDaoCompanionCard
         {
             description.Add(
                 "Heal",
-                LiDaoCompanionRankTable.TiaoXiYunLiHeal(rank, 3)
+                HealAtRank(rank, 3)
             );
         }
         if (rank >= 9)
@@ -94,9 +119,9 @@ public sealed class TiaoXiYunLi : AbstractLiDaoCompanionCard
             cardPlay
         );
 
-        if (LiDaoCompanionRankTable.TiaoXiYunLiCanHeal(rank))
+        if (CanHealAtRank(rank))
         {
-            int heal = LiDaoCompanionRankTable.TiaoXiYunLiHeal(rank, kinds);
+            int heal = HealAtRank(rank, kinds);
             if (heal > 0)
             {
                 await CreatureCmd.Heal(Owner.Creature, heal);

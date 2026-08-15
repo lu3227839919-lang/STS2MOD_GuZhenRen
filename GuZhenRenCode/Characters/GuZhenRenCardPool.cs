@@ -13,8 +13,8 @@ public sealed class GuZhenRenCardPool : TypeListCardPoolModel
     /// </summary>
     // Title 和 EnergyColorName 是池子的稳定标识，不是玩家看到的角色名。
     // 自定义角色卡、遗物、药水池保持同一个 EnergyColorName，方便实验室和文本统一读取能量图标。
-    public override string Title => "GuZhenRen";
-    public override string EnergyColorName => "GuZhenRen";
+    public override string Title => Entry.ModId;
+    public override string EnergyColorName => Entry.ModId;
 
     // 这里指定卡牌文本和大图使用的能量图标路径。
     // res://GuZhenRen/... 里的 GuZhenRen 是 PCK 资源目录，不是 C# namespace。

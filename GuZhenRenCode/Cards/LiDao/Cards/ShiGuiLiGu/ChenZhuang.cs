@@ -41,12 +41,36 @@ public sealed class ChenZhuang : AbstractLiDaoCompanionCard
         RefreshRankValues();
     }
 
+    private static int BlockAtRank(int rank) => rank switch
+    {
+        <= 1 => 8, 2 => 9, 3 => 10, 4 => 11, 5 => 12,
+        6 => 13, 7 => 14, 8 => 15, _ => 16,
+    };
+
+    private static int AttackBonusAtRank(int rank) => rank switch
+    {
+        <= 2 => 2,
+        <= 4 => 3,
+        <= 6 => 4,
+        <= 8 => 5,
+        _ => 6,
+    };
+
+    private static int NoBlockBonusAtRank(int rank) => rank switch
+    {
+        5 => 2,
+        6 => 3,
+        7 => 4,
+        8 => 5,
+        _ => 0,
+    };
+
     protected override void RefreshRankValues()
     {
         DynamicVars.Block.BaseValue =
-            LiDaoCompanionRankTable.ChenZhuangBlock(GuRank) + _upBlock;
+            BlockAtRank(GuRank) + _upBlock;
         DynamicVars["AttackBonus"].BaseValue =
-            LiDaoCompanionRankTable.ChenZhuangAttackBonus(GuRank) +
+            AttackBonusAtRank(GuRank) +
             _upAttackBonus;
     }
 
@@ -59,7 +83,7 @@ public sealed class ChenZhuang : AbstractLiDaoCompanionCard
         description.Add("NoBlockRange", rank is >= 5 and <= 8 ? 1 : 0);
         description.Add(
             "NoBlockBonus",
-            LiDaoCompanionRankTable.ChenZhuangNoBlockBonus(rank)
+            NoBlockBonusAtRank(rank)
         );
     }
 
@@ -78,8 +102,7 @@ public sealed class ChenZhuang : AbstractLiDaoCompanionCard
         {
             if (rank <= 8)
             {
-                block += LiDaoCompanionRankTable
-                    .ChenZhuangNoBlockBonus(rank);
+                block += NoBlockBonusAtRank(rank);
             }
             else
             {

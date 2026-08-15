@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 
+using GuZhenRen.Cards.HeLian;
 using GuZhenRen.Characters;
 using GuZhenRen.Multiplayer;
 using GuZhenRen.Powers.LiDao;
@@ -60,9 +61,16 @@ public abstract class AbstractLiDaoXuYing :
             )
         );
 
+    private static int CondenseChanceGainAtRank(int rank) => rank switch
+    {
+        <= 5 => 10,
+        <= 8 => 15,
+        _ => 20,
+    };
+
     internal virtual void Condense()
     {
-        float gain = LiDaoRankTable.CondenseChanceGain(GuRank) / 100f;
+        float gain = CondenseChanceGainAtRank(GuRank) / 100f;
         float capped = Math.Min(0.8f, BaseChance + gain);
         IncreaseBaseChance(capped - BaseChance);
     }
@@ -107,8 +115,8 @@ public sealed class BaiZhiXuYing : AbstractLiDaoXuYing
 
     private void RefreshRankValues()
     {
-        SetBaseChance(LiDaoRankTable.BaiZhiChance(GuRank) / 100f);
-        DynamicVars.Damage.BaseValue = LiDaoRankTable.BaiZhiDamage(GuRank);
+        SetBaseChance(BaiZhiGu.ChanceAtRank(GuRank) / 100f);
+        DynamicVars.Damage.BaseValue = BaiZhiGu.DamageAtRank(GuRank);
     }
 }
 
@@ -145,11 +153,11 @@ public sealed class FeiXiongXuYing : AbstractLiDaoXuYing
 
     private void RefreshRankValues()
     {
-        SetBaseChance(LiDaoRankTable.FeiXiongChance(GuRank) / 100f);
+        SetBaseChance(FeiXiongZhiLiGu.ChanceAtRank(GuRank) / 100f);
         DynamicVars.Damage.BaseValue =
-            LiDaoRankTable.FeiXiongDamage(GuRank);
+            FeiXiongZhiLiGu.DamageAtRank(GuRank);
         DynamicVars["DivineMight"].BaseValue =
-            LiDaoRankTable.FeiXiongDivineMight(GuRank);
+            FeiXiongZhiLiGu.DivineMightAtRank(GuRank);
     }
 }
 
@@ -186,9 +194,9 @@ public sealed class EXuYing : AbstractLiDaoXuYing
 
     private void RefreshRankValues()
     {
-        SetBaseChance(LiDaoRankTable.EChance(GuRank) / 100f);
-        DynamicVars.Damage.BaseValue = LiDaoRankTable.EDamage(GuRank);
-        DynamicVars["Hits"].BaseValue = LiDaoRankTable.EHits(GuRank);
+        SetBaseChance(ELiGu.ChanceAtRank(GuRank) / 100f);
+        DynamicVars.Damage.BaseValue = ELiGu.DamageAtRank(GuRank);
+        DynamicVars["Hits"].BaseValue = ELiGu.HitsAtRank(GuRank);
     }
 }
 
@@ -225,11 +233,11 @@ public sealed class QingNiuXuYing : AbstractLiDaoXuYing
 
     private void RefreshRankValues()
     {
-        SetBaseChance(LiDaoRankTable.QingNiuChance(GuRank) / 100f);
+        SetBaseChance(QingNiuLaoLiGu.ChanceAtRank(GuRank) / 100f);
         DynamicVars.Damage.BaseValue =
-            LiDaoRankTable.QingNiuDamage(GuRank);
+            QingNiuLaoLiGu.DamageAtRank(GuRank);
         DynamicVars.Block.BaseValue =
-            LiDaoRankTable.QingNiuBlock(GuRank);
+            QingNiuLaoLiGu.BlockAtRank(GuRank);
     }
 }
 
@@ -263,8 +271,8 @@ public sealed class ShiGuiXuYing : AbstractLiDaoXuYing
 
     private void RefreshRankValues()
     {
-        SetBaseChance(LiDaoRankTable.ShiGuiChance(GuRank) / 100f);
-        DynamicVars.Block.BaseValue = LiDaoRankTable.ShiGuiBlock(GuRank);
+        SetBaseChance(ShiGuiLiGu.ChanceAtRank(GuRank) / 100f);
+        DynamicVars.Block.BaseValue = ShiGuiLiGu.BlockAtRank(GuRank);
     }
 }
 
@@ -293,10 +301,11 @@ public sealed class BaiShouXuYing : AbstractLiDaoXuYing
         LastManifestedKinds => _lastManifestedKinds;
 
     protected override decimal IntrinsicEffectMultiplier =>
-        LiDaoRankTable.BaiShouEffectPercent(GuRank) / 100m +
-        (GuRank >= 6
-            ? Math.Min(3, CondenseCountState[this] / 2) * 0.10m
-            : 0m);
+        BaiShouLiGu.EffectPercentAtRank(GuRank) / 100m +
+        BaiShouLiGu.CondenseInternalBonusPercentAtRank(
+            GuRank,
+            CondenseCountState[this]
+        ) / 100m;
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
@@ -347,7 +356,7 @@ public sealed class BaiShouXuYing : AbstractLiDaoXuYing
         LiDaoBeastKind first = SelectKind(
             choices,
             rng,
-            GuRank >= 7 ? _lastSelected : -1
+            BaiShouLiGu.AvoidRepeatManifestAtRank(GuRank) ? _lastSelected : -1
         );
         _lastSelected = (int)first;
         List<LiDaoBeastKind> manifested = [first];
@@ -361,8 +370,9 @@ public sealed class BaiShouXuYing : AbstractLiDaoXuYing
             LiDaoPhantomSystem.OtherManifestedForCurrentAttack
         );
 
-        bool triggerSecond = GuRank >= 9 ||
-            (GuRank >= 8 && rng.NextInt(100) < 35);
+        int secondChance = BaiShouLiGu.SecondManifestChanceAtRank(GuRank);
+        bool triggerSecond = secondChance >= 100 ||
+            (secondChance > 0 && rng.NextInt(100) < secondChance);
 
         if (triggerSecond)
         {
@@ -388,22 +398,24 @@ public sealed class BaiShouXuYing : AbstractLiDaoXuYing
         base.Condense();
         CondenseCountState[this]++;
         DynamicVars["InternalBonusPercent"].BaseValue =
-            GuRank >= 6
-                ? Math.Min(3, CondenseCountState[this] / 2) * 10
-                : 0;
+            BaiShouLiGu.CondenseInternalBonusPercentAtRank(
+                GuRank,
+                CondenseCountState[this]
+            );
     }
 
     protected override void OnXuYingGuRankChanged() => RefreshRankValues();
 
     private void RefreshRankValues()
     {
-        SetBaseChance(LiDaoRankTable.BaiShouChance(GuRank) / 100f);
+        SetBaseChance(BaiShouLiGu.ChanceAtRank(GuRank) / 100f);
         DynamicVars["EffectPercent"].BaseValue =
-            LiDaoRankTable.BaiShouEffectPercent(GuRank);
+            BaiShouLiGu.EffectPercentAtRank(GuRank);
         DynamicVars["InternalBonusPercent"].BaseValue =
-            GuRank >= 6
-                ? Math.Min(3, CondenseCountState[this] / 2) * 10
-                : 0;
+            BaiShouLiGu.CondenseInternalBonusPercentAtRank(
+                GuRank,
+                CondenseCountState[this]
+            );
     }
 
     private LiDaoBeastKind[] GetComposition()
@@ -476,7 +488,7 @@ public sealed class QuanLiXuYing : AbstractLiDaoXuYing
 
     private void RefreshRankValues() =>
         DynamicVars["EffectPercent"].BaseValue =
-            LiDaoRankTable.FullForcePercent(GuRank);
+            QuanLiYiFuGu.EffectPercentAtRank(GuRank);
 }
 
 internal static class LiDaoBeastEffectExecutor
@@ -563,14 +575,14 @@ internal static class LiDaoBeastEffectExecutor
             return;
         }
 
-        int damage = LiDaoRankTable.BaiZhiDamage(rank);
-        if (firstEver && rank is >= 3 and <= 5)
+        int damage = BaiZhiGu.DamageAtRank(rank);
+        if (firstEver)
         {
-            damage += rank == 5 ? 3 : 2;
+            damage += BaiZhiGu.FirstManifestBonusAtRank(rank);
         }
-        if (target.Block <= 0 && rank >= 7)
+        if (target.Block <= 0)
         {
-            damage += rank switch { 7 => 3, 8 => 4, _ => 5 };
+            damage += BaiZhiGu.NoBlockBonusAtRank(rank);
         }
 
         await Attack(source, context, target, source.ScaleEffect(damage));
@@ -589,18 +601,22 @@ internal static class LiDaoBeastEffectExecutor
             return;
         }
 
-        decimal rankNineMultiplier = rank >= 9 && firstThisTurn ? 1.5m : 1m;
-        int total = LiDaoRankTable.FeiXiongDamage(rank);
-        if (target.Block > 0 && rank is >= 3 and <= 5)
+        decimal rankMultiplier =
+            FeiXiongZhiLiGu.FirstManifestMultiplierAtRank(
+                rank,
+                firstThisTurn
+            );
+        int total = FeiXiongZhiLiGu.DamageAtRank(rank);
+        if (target.Block > 0)
         {
-            total += rank switch { 3 => 4, 4 => 5, _ => 6 };
+            total += FeiXiongZhiLiGu.BlockedTargetBonusAtRank(rank);
         }
 
-        int divine = LiDaoRankTable.FeiXiongDivineMight(rank);
+        int divine = FeiXiongZhiLiGu.DivineMightAtRank(rank);
         int normalDamage = source.ScaleEffect(
-            Math.Max(0, total - divine) * rankNineMultiplier
+            Math.Max(0, total - divine) * rankMultiplier
         );
-        int divineDamage = source.ScaleEffect(divine * rankNineMultiplier);
+        int divineDamage = source.ScaleEffect(divine * rankMultiplier);
 
         if (normalDamage > 0)
         {
@@ -619,9 +635,10 @@ internal static class LiDaoBeastEffectExecutor
             );
         }
 
-        if (rank >= 8 && source.CombatState != null)
+        int quakeBase = FeiXiongZhiLiGu.QuakeDamageAtRank(rank);
+        if (quakeBase > 0 && source.CombatState != null)
         {
-            int quake = source.ScaleEffect(6m * rankNineMultiplier);
+            int quake = source.ScaleEffect(quakeBase * rankMultiplier);
             foreach (Creature enemy in GuZhenRenDeterminism
                          .OrderCreatures(source.CombatState.HittableEnemies)
                          .Where(enemy => enemy.IsAlive && !ReferenceEquals(enemy, target)))
@@ -647,13 +664,13 @@ internal static class LiDaoBeastEffectExecutor
     )
     {
         Creature? current = target;
-        int hits = LiDaoRankTable.EHits(rank);
+        int hits = ELiGu.HitsAtRank(rank);
 
         for (int hit = 0; hit < hits; hit++)
         {
             if (current == null || current.IsDead)
             {
-                if (rank < 7)
+                if (!ELiGu.PursuesAtRank(rank))
                 {
                     break;
                 }
@@ -664,11 +681,8 @@ internal static class LiDaoBeastEffectExecutor
                 }
             }
 
-            int damage = LiDaoRankTable.EDamage(rank);
-            if (rank == 3 && hit == 1)
-            {
-                damage += 2;
-            }
+            int damage = ELiGu.DamageAtRank(rank) +
+                ELiGu.HitBonusAtRank(rank, hit);
 
             await Attack(source, context, current, source.ScaleEffect(damage));
         }
@@ -689,18 +703,18 @@ internal static class LiDaoBeastEffectExecutor
                 source,
                 context,
                 target,
-                source.ScaleEffect(LiDaoRankTable.QingNiuDamage(rank))
+                source.ScaleEffect(QingNiuLaoLiGu.DamageAtRank(rank))
             );
         }
 
-        int block = LiDaoRankTable.QingNiuBlock(rank);
-        if (rank >= 8 && firstEver)
+        int block = QingNiuLaoLiGu.BlockAtRank(rank);
+        if (firstEver)
         {
-            block += 3;
+            block += QingNiuLaoLiGu.FirstManifestBlockBonusAtRank(rank);
         }
-        if (rank >= 9 && otherManifested)
+        if (otherManifested)
         {
-            block += 5;
+            block += QingNiuLaoLiGu.PhantomLinkBlockBonusAtRank(rank);
         }
 
         await CreatureCmd.GainBlock(
@@ -718,18 +732,21 @@ internal static class LiDaoBeastEffectExecutor
         bool firstThisTurn
     )
     {
-        int block = LiDaoRankTable.ShiGuiBlock(rank);
-        if (source.Owner.Creature.Block <= 0 && rank is >= 5 and <= 7)
+        int block = ShiGuiLiGu.BlockAtRank(rank);
+        if (source.Owner.Creature.Block <= 0)
         {
-            block += rank switch { 5 => 2, 6 => 3, _ => 4 };
+            block += ShiGuiLiGu.NoBlockBonusAtRank(rank);
         }
-        if (rank == 8 && firstThisTurn)
+        if (firstThisTurn)
         {
-            block += 5;
-        }
-        if (rank >= 9 && firstThisTurn)
-        {
-            block += (int)Math.Round(block * 0.5m, MidpointRounding.AwayFromZero);
+            block += ShiGuiLiGu.FirstManifestFlatBonusAtRank(rank);
+            block = (int)Math.Round(
+                block * ShiGuiLiGu.FirstManifestMultiplierAtRank(
+                    rank,
+                    firstThisTurn
+                ),
+                MidpointRounding.AwayFromZero
+            );
         }
 
         return CreatureCmd.GainBlock(

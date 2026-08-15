@@ -23,7 +23,6 @@ public sealed class ShiGuiLiGu :
 {
     public override int TrainingRequired => GuRank >= 6 ? 1 : 2;
     public override Type CompanionCardType => typeof(ChenZhuang);
-    public override int RecoveryDelayTurns => LiDaoRankTable.Recovery(GuRank);
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
@@ -39,11 +38,39 @@ public sealed class ShiGuiLiGu :
         RefreshRankValues();
     }
 
+    internal static int ChanceAtRank(int rank) => rank switch
+    {
+        <= 1 => 30, 2 => 32, 3 => 35, 4 => 38, 5 => 40,
+        6 => 43, 7 => 45, 8 => 48, _ => 50,
+    };
+
+    internal static int BlockAtRank(int rank) => rank switch
+    {
+        <= 1 => 4, 2 => 5, 3 => 6, 4 => 7, 5 => 9,
+        6 => 11, 7 => 13, 8 => 15, _ => 18,
+    };
+
+    internal static int NoBlockBonusAtRank(int rank) => rank switch
+    {
+        5 => 2,
+        6 => 3,
+        7 => 4,
+        _ => 0,
+    };
+
+    internal static int FirstManifestFlatBonusAtRank(int rank) =>
+        rank == 8 ? 5 : 0;
+
+    internal static decimal FirstManifestMultiplierAtRank(
+        int rank,
+        bool firstThisTurn
+    ) => rank >= 9 && firstThisTurn ? 1.5m : 1m;
+
     private void RefreshRankValues()
     {
         DynamicVars["Chance"].BaseValue =
-            LiDaoRankTable.ShiGuiChance(GuRank);
+            ChanceAtRank(GuRank);
         DynamicVars.Block.BaseValue =
-            LiDaoRankTable.ShiGuiBlock(GuRank);
+            BlockAtRank(GuRank);
     }
 }

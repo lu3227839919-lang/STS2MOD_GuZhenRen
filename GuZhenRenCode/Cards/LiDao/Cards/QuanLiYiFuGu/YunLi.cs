@@ -41,12 +41,35 @@ public sealed class YunLi : AbstractLiDaoCompanionCard
         RefreshRankValues();
     }
 
+    private static int BlockAtRank(int rank) => rank switch
+    {
+        <= 1 => 5, 2 => 6, 3 => 6, 4 => 7, 5 => 8,
+        6 => 9, 7 => 10, 8 => 11, _ => 12,
+    };
+
+    private static int VigorAtRank(int rank) => rank switch
+    {
+        <= 2 => 3,
+        <= 4 => 4,
+        <= 6 => 5,
+        <= 8 => 6,
+        _ => 7,
+    };
+
+    private static int PhantomVigorBonusAtRank(int rank, int phantomKinds) =>
+        rank switch
+        {
+            6 or 7 => phantomKinds >= 1 ? 1 : 0,
+            >= 8 => phantomKinds >= 2 ? 2 : 0,
+            _ => 0,
+        };
+
     protected override void RefreshRankValues()
     {
         DynamicVars.Block.BaseValue =
-            LiDaoCompanionRankTable.YunLiBlock(GuRank) + _upBlock;
+            BlockAtRank(GuRank) + _upBlock;
         DynamicVars[typeof(VigorPower).Name].BaseValue =
-            LiDaoCompanionRankTable.YunLiVigor(GuRank) + _upVigor;
+            VigorAtRank(GuRank) + _upVigor;
     }
 
     protected override void AddExtraArgsToDescription(
@@ -62,10 +85,7 @@ public sealed class YunLi : AbstractLiDaoCompanionCard
         description.Add("PhantomVigorTwoRange", rank >= 8 ? 1 : 0);
         description.Add(
             "PhantomVigorBonus",
-            LiDaoCompanionRankTable.YunLiPhantomVigorBonus(
-                rank,
-                PermanentPhantomKinds
-            )
+            PhantomVigorBonusAtRank(rank, PermanentPhantomKinds)
         );
     }
 
@@ -78,10 +98,7 @@ public sealed class YunLi : AbstractLiDaoCompanionCard
         decimal vigor = DynamicVars[typeof(VigorPower).Name].BaseValue;
 
         int rank = GuRank;
-        vigor += LiDaoCompanionRankTable.YunLiPhantomVigorBonus(
-            rank,
-            PermanentPhantomKinds
-        );
+        vigor += PhantomVigorBonusAtRank(rank, PermanentPhantomKinds);
 
         await CreatureCmd.GainBlock(
             Owner.Creature,

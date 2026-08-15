@@ -36,9 +36,30 @@ public sealed class ChenJianChong : AbstractLiDaoCompanionCard
         RefreshRankValues();
     }
 
+    private static int DamageAtRank(int rank) => rank switch
+    {
+        <= 1 => 7, 2 => 8, 3 => 9, 4 => 10, 5 => 11,
+        6 => 13, 7 => 14, 8 => 16, _ => 18,
+    };
+
+    private static int FirstAttackBonusAtRank(int rank) => rank switch
+    {
+        3 or 4 => 2,
+        5 or 6 => 3,
+        _ => 0,
+    };
+
+    private static int NoBlockBonusAtRank(int rank) => rank switch
+    {
+        7 => 3,
+        8 => 4,
+        >= 9 => 5,
+        _ => 0,
+    };
+
     protected override void RefreshRankValues() =>
         DynamicVars.Damage.BaseValue =
-            LiDaoCompanionRankTable.ChenJianChongDamage(GuRank) + _upDamage;
+            DamageAtRank(GuRank) + _upDamage;
 
     protected override void AddExtraArgsToDescription(
         LocString description
@@ -49,12 +70,12 @@ public sealed class ChenJianChong : AbstractLiDaoCompanionCard
         description.Add("FirstAttackRange", rank is >= 3 and <= 6 ? 1 : 0);
         description.Add(
             "FirstAttackBonus",
-            LiDaoCompanionRankTable.ChenJianChongFirstAttackBonus(rank)
+            FirstAttackBonusAtRank(rank)
         );
         description.Add("NoBlockRange", rank >= 7 ? 1 : 0);
         description.Add(
             "NoBlockBonus",
-            LiDaoCompanionRankTable.ChenJianChongNoBlockBonus(rank)
+            NoBlockBonusAtRank(rank)
         );
     }
 
@@ -70,13 +91,11 @@ public sealed class ChenJianChong : AbstractLiDaoCompanionCard
         if (!PlayedAttackEarlierThisTurn() &&
             rank is >= 3 and <= 6)
         {
-            damage += LiDaoCompanionRankTable
-                .ChenJianChongFirstAttackBonus(rank);
+            damage += FirstAttackBonusAtRank(rank);
         }
         if (target.Block <= 0 && rank >= 7)
         {
-            damage += LiDaoCompanionRankTable
-                .ChenJianChongNoBlockBonus(rank);
+            damage += NoBlockBonusAtRank(rank);
         }
 
         return DamageCmd.Attack(damage)

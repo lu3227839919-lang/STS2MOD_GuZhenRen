@@ -36,25 +36,25 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
         DaoTitleLocalizationKeys =
             new Dictionary<Dao, string>
             {
-                [Dao.GuangDao] = "GU_ZHEN_REN_DAO_GUANG_DAO.title",
-                [Dao.YanDao] = "GU_ZHEN_REN_DAO_YAN_DAO.title",
-                [Dao.LiDao] = "GU_ZHEN_REN_DAO_LI_DAO.title",
-                [Dao.JinDao] = "GU_ZHEN_REN_DAO_JIN_DAO.title",
-                [Dao.TouDao] = "GU_ZHEN_REN_DAO_TOU_DAO.title",
-                [Dao.MuDao] = "GU_ZHEN_REN_DAO_MU_DAO.title",
-                [Dao.ShiDao] = "GU_ZHEN_REN_DAO_SHI_DAO.title",
-                [Dao.ShaDao] = "GU_ZHEN_REN_DAO_SHA_DAO.title",
-                [Dao.GuDao] = "GU_ZHEN_REN_DAO_GU_DAO.title",
-                [Dao.LuDao] = "GU_ZHEN_REN_DAO_LU_DAO.title",
-                [Dao.ZhiDao] = "GU_ZHEN_REN_DAO_ZHI_DAO.title",
-                [Dao.BianHuaDao] = "GU_ZHEN_REN_DAO_BIAN_HUA_DAO.title",
-                [Dao.YinYangDao] = "GU_ZHEN_REN_DAO_YIN_YANG_DAO.title",
-                [Dao.JianDao] = "GU_ZHEN_REN_DAO_JIAN_DAO.title",
-                [Dao.XueDao] = "GU_ZHEN_REN_DAO_XUE_DAO.title",
-                [Dao.YunDao] = "GU_ZHEN_REN_DAO_YUN_DAO.title",
-                [Dao.FengDao] = "GU_ZHEN_REN_DAO_FENG_DAO.title",
-                [Dao.ZhouDao] = "GU_ZHEN_REN_DAO_ZHOU_DAO.title",
-                [Dao.TuDao] = "GU_ZHEN_REN_DAO_TU_DAO.title",
+                [Dao.GuangDao] = "LU_GU_ZHEN_REN_DAO_GUANG_DAO.title",
+                [Dao.YanDao] = "LU_GU_ZHEN_REN_DAO_YAN_DAO.title",
+                [Dao.LiDao] = "LU_GU_ZHEN_REN_DAO_LI_DAO.title",
+                [Dao.JinDao] = "LU_GU_ZHEN_REN_DAO_JIN_DAO.title",
+                [Dao.TouDao] = "LU_GU_ZHEN_REN_DAO_TOU_DAO.title",
+                [Dao.MuDao] = "LU_GU_ZHEN_REN_DAO_MU_DAO.title",
+                [Dao.ShiDao] = "LU_GU_ZHEN_REN_DAO_SHI_DAO.title",
+                [Dao.ShaDao] = "LU_GU_ZHEN_REN_DAO_SHA_DAO.title",
+                [Dao.GuDao] = "LU_GU_ZHEN_REN_DAO_GU_DAO.title",
+                [Dao.LuDao] = "LU_GU_ZHEN_REN_DAO_LU_DAO.title",
+                [Dao.ZhiDao] = "LU_GU_ZHEN_REN_DAO_ZHI_DAO.title",
+                [Dao.BianHuaDao] = "LU_GU_ZHEN_REN_DAO_BIAN_HUA_DAO.title",
+                [Dao.YinYangDao] = "LU_GU_ZHEN_REN_DAO_YIN_YANG_DAO.title",
+                [Dao.JianDao] = "LU_GU_ZHEN_REN_DAO_JIAN_DAO.title",
+                [Dao.XueDao] = "LU_GU_ZHEN_REN_DAO_XUE_DAO.title",
+                [Dao.YunDao] = "LU_GU_ZHEN_REN_DAO_YUN_DAO.title",
+                [Dao.FengDao] = "LU_GU_ZHEN_REN_DAO_FENG_DAO.title",
+                [Dao.ZhouDao] = "LU_GU_ZHEN_REN_DAO_ZHOU_DAO.title",
+                [Dao.TuDao] = "LU_GU_ZHEN_REN_DAO_TU_DAO.title",
             };
 
     public override string Title
@@ -393,7 +393,7 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
 
     private static readonly SavedAttachedState<CardModel, int>
         BaseGuRankState = new(
-            "gu_zhen_ren.normal_gu_base_rank",
+            "lu_gu_zhen_ren.normal_gu_base_rank",
             () => MinimumGuRank
         );
 
@@ -405,7 +405,7 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
     /// </summary>
     private static readonly SavedAttachedState<CardModel, int>
         GuRankState = new(
-            "gu_zhen_ren.normal_gu_rank",
+            "lu_gu_zhen_ren.normal_gu_rank",
             () => MinimumGuRank
         );
 
@@ -417,7 +417,7 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
     /// </summary>
     private static readonly SavedAttachedState<CardModel, bool>
         InitialGuRankAssignedState = new(
-            "gu_zhen_ren.normal_gu_initial_rank_assigned",
+            "lu_gu_zhen_ren.normal_gu_initial_rank_assigned",
             () => false
         );
 

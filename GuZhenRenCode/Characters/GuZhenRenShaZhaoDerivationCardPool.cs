@@ -13,9 +13,9 @@ namespace GuZhenRen.Characters;
 public sealed class GuZhenRenShaZhaoDerivationCardPool
     : TypeListCardPoolModel
 {
-    public override string Title => "GuZhenRenShaZhaoDerivation";
+    public override string Title => Entry.ModId + "ShaZhaoDerivation";
 
-    public override string EnergyColorName => "GuZhenRen";
+    public override string EnergyColorName => Entry.ModId;
 
     public override Color DeckEntryCardColor =>
         GuZhenRenCardVisualStyle.CardBackgroundColor;

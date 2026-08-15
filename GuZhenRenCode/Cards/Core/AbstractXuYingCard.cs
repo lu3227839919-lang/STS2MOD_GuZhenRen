@@ -107,7 +107,7 @@ public abstract class AbstractXuYingCard
     private static readonly SavedAttachedState<CardModel, int>
         BaseChanceState =
             new(
-                "gu_zhen_ren.card.xu_ying.base_chance_scaled",
+                "lu_gu_zhen_ren.card.xu_ying.base_chance_scaled",
                 static () => 0
             );
 
@@ -120,7 +120,7 @@ public abstract class AbstractXuYingCard
     private static readonly SavedAttachedState<CardModel, bool>
         BaseChanceStateInitialized =
             new(
-                "gu_zhen_ren.card.xu_ying.base_chance_initialized",
+                "lu_gu_zhen_ren.card.xu_ying.base_chance_initialized",
                 static () => false
             );
 
@@ -688,7 +688,7 @@ public abstract class AbstractXuYingCard
     {
         LocString notice = new(
             "cards",
-            "GU_ZHEN_REN_CARD_XU_YING_MANIFESTATION.combatMessage"
+            "LU_GU_ZHEN_REN_CARD_XU_YING_MANIFESTATION.combatMessage"
         );
         notice.Add(
             "Phantom",

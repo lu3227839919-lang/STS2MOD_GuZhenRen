@@ -33,7 +33,7 @@ namespace GuZhenRen.Patches;
 internal static class XueDaoEnchantmentSlotPatch
 {
     private const string HarmonyId = Entry.ModId + ".XueDaoEnchantmentSlot";
-    private const string ExtraTabPrefix = "GuZhenRenBloodParasiteTab";
+    private const string ExtraTabPrefix = "LuGuZhenRenBloodParasiteTab";
 
     private static readonly StringName TintHue = new("h");
     private static readonly StringName TintSaturation = new("s");

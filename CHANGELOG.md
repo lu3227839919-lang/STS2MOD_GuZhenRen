@@ -2,6 +2,16 @@
 
 本项目的全部重要变更记录。版本号遵循 [SemVer](https://semver.org/lang/zh-CN/) 风格，规则见 [VERSIONING.md](VERSIONING.md)。历史版本大多未标注发布日期。
 
+## [0.11.0] - 2026-08-15
+
+### 重构
+- 力道九转数值规则内联：删除集中查表 `LiDaoRankTable`/`LiDaoCompanionRankTable`，各卡牌、伴生牌与虚影以自带的 `XxxAtRank` 静态方法承载转数数值——数值与行为完全不变，仅调整代码结构（`LiDaoXuYingCards.cs`、`LiDaoPhantomSystem.cs`、`LiDaoPowers.cs` 同步改用内联规则）。
+- Mod 改名 `LuGuZhenRen`：mod id 由 `GuZhenRen` 改为 `LuGuZhenRen`，全部本地化键改为 `LU_` 前缀（含角色键）；`Entry.ResPath` 与资源目录 `res://GuZhenRen` 保持不变。新 id 与旧版存档/运行身份隔离，旧存档中的蛊真人角色不继承。
+
+### Refactor
+- Inlined Li Dao rank rules: removed the centralized `LiDaoRankTable`/`LiDaoCompanionRankTable` lookups; each card, companion card, and phantom now carries its own rank-based values via `XxxAtRank` static methods — numbers and behavior are unchanged.
+- Renamed the mod to `LuGuZhenRen`: mod id changed from `GuZhenRen` to `LuGuZhenRen` and all localization keys now use the `LU_` prefix (including character keys); `Entry.ResPath` and the `res://GuZhenRen` asset path are unchanged. The new id is isolated from the old mod identity — existing saves with the GuZhenRen character do not carry over.
+
 ## [0.10.3] - 2026-08-14
 
 ### 修复

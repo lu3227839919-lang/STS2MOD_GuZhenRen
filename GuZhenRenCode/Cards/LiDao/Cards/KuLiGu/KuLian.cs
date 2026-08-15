@@ -40,9 +40,22 @@ public sealed class KuLian : AbstractLiDaoCompanionCard
         RefreshRankValues();
     }
 
+    private static int BlockAtRank(int rank) => rank switch
+    {
+        <= 1 => 12, 2 => 13, 3 => 14, 4 => 15, 5 => 16,
+        6 => 18, 7 => 19, 8 => 21, _ => 23,
+    };
+
+    private static int HardshipBonusAtRank(int rank) => rank switch
+    {
+        5 or 6 or 7 => 1,
+        >= 8 => 2,
+        _ => 0,
+    };
+
     protected override void RefreshRankValues() =>
         DynamicVars.Block.BaseValue =
-            LiDaoCompanionRankTable.KuLianBlock(GuRank) + _upBlock;
+            BlockAtRank(GuRank) + _upBlock;
 
     protected override void AddExtraArgsToDescription(
         LocString description
@@ -53,7 +66,7 @@ public sealed class KuLian : AbstractLiDaoCompanionCard
         description.Add("HardshipRange", rank >= 5 ? 1 : 0);
         description.Add(
             "HardshipBonus",
-            LiDaoCompanionRankTable.KuLianHardshipBonus(rank)
+            HardshipBonusAtRank(rank)
         );
     }
 
@@ -87,7 +100,7 @@ public sealed class KuLian : AbstractLiDaoCompanionCard
             int hardship =
                 Owner.Creature.GetPower<KuLiPower>()?.Hardship ?? 0;
             block += hardship *
-                LiDaoCompanionRankTable.KuLianHardshipBonus(rank);
+                HardshipBonusAtRank(rank);
         }
 
         await CreatureCmd.GainBlock(

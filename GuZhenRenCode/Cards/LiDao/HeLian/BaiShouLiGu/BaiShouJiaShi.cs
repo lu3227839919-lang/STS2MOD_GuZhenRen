@@ -41,12 +41,40 @@ public sealed class BaiShouJiaShi : AbstractLiDaoCompanionCard
         RefreshRankValues();
     }
 
+    private static int DamageAtRank(int rank) => rank switch
+    {
+        <= 1 => 7, 2 => 8, 3 => 9, 4 => 10, 5 => 11,
+        6 => 12, 7 => 13, 8 => 15, _ => 17,
+    };
+
+    private static int BlockAtRank(int rank) => rank switch
+    {
+        <= 1 => 4, 2 => 4, 3 => 5, 4 => 5, 5 => 6,
+        6 => 7, 7 => 8, 8 => 9, _ => 11,
+    };
+
+    private static int ExtraDamageAtRank(int rank) => rank switch
+    {
+        5 or 6 => 2,
+        7 => 3,
+        8 => 4,
+        >= 9 => 5,
+        _ => 0,
+    };
+
+    private static int BlockFourAtRank(int rank) => rank switch
+    {
+        8 => 3,
+        >= 9 => 4,
+        _ => 0,
+    };
+
     protected override void RefreshRankValues()
     {
         DynamicVars.Damage.BaseValue =
-            LiDaoCompanionRankTable.BaiShouJiaShiDamage(GuRank) + _upDamage;
+            DamageAtRank(GuRank) + _upDamage;
         DynamicVars.Block.BaseValue =
-            LiDaoCompanionRankTable.BaiShouJiaShiBlock(GuRank) + _upBlock;
+            BlockAtRank(GuRank) + _upBlock;
     }
 
     protected override void AddExtraArgsToDescription(
@@ -58,12 +86,12 @@ public sealed class BaiShouJiaShi : AbstractLiDaoCompanionCard
         description.Add("ExtraDamageRange", rank >= 5 ? 1 : 0);
         description.Add(
             "ExtraDamage",
-            LiDaoCompanionRankTable.BaiShouJiaShiExtraDamage(rank)
+            ExtraDamageAtRank(rank)
         );
         description.Add("BlockFourRange", rank >= 8 ? 1 : 0);
         description.Add(
             "BlockFour",
-            LiDaoCompanionRankTable.BaiShouJiaShiBlockFour(rank)
+            BlockFourAtRank(rank)
         );
     }
 
@@ -78,8 +106,7 @@ public sealed class BaiShouJiaShi : AbstractLiDaoCompanionCard
         decimal damage = DynamicVars.Damage.BaseValue;
         if (kinds >= 3)
         {
-            damage += LiDaoCompanionRankTable
-                .BaiShouJiaShiExtraDamage(rank);
+            damage += ExtraDamageAtRank(rank);
         }
 
         await DamageCmd.Attack(damage)
@@ -93,8 +120,7 @@ public sealed class BaiShouJiaShi : AbstractLiDaoCompanionCard
             decimal block = DynamicVars.Block.BaseValue;
             if (kinds >= 4)
             {
-                block += LiDaoCompanionRankTable
-                    .BaiShouJiaShiBlockFour(rank);
+                block += BlockFourAtRank(rank);
             }
             await CreatureCmd.GainBlock(
                 Owner.Creature,

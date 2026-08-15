@@ -40,12 +40,43 @@ public sealed class FeiXiongZhuang : AbstractLiDaoCompanionCard
         RefreshRankValues();
     }
 
+    private static int DamageAtRank(int rank) => rank switch
+    {
+        <= 1 => 8, 2 => 9, 3 => 10, 4 => 11, 5 => 13,
+        6 => 14, 7 => 16, 8 => 17, _ => 19,
+    };
+
+    private static int BlockBonusAtRank(int rank) => rank switch
+    {
+        <= 2 => 3,
+        3 => 4,
+        4 => 5,
+        5 => 6,
+        _ => 0,
+    };
+
+    private static int DivineMightAtRank(int rank) => rank switch
+    {
+        6 => 6,
+        7 => 7,
+        8 => 8,
+        >= 9 => 9,
+        _ => 0,
+    };
+
+    private static int QuakeAtRank(int rank) => rank switch
+    {
+        8 => 4,
+        >= 9 => 6,
+        _ => 0,
+    };
+
     protected override void RefreshRankValues()
     {
         DynamicVars.Damage.BaseValue =
-            LiDaoCompanionRankTable.FeiXiongZhuangDamage(GuRank) + _upDamage;
+            DamageAtRank(GuRank) + _upDamage;
         DynamicVars["BlockBonus"].BaseValue =
-            LiDaoCompanionRankTable.FeiXiongZhuangBlockBonus(GuRank) +
+            BlockBonusAtRank(GuRank) +
             _upBlockBonus;
     }
 
@@ -58,17 +89,17 @@ public sealed class FeiXiongZhuang : AbstractLiDaoCompanionCard
         description.Add("BlockRange", rank <= 5 ? 1 : 0);
         description.Add(
             "BlockBonus",
-            LiDaoCompanionRankTable.FeiXiongZhuangBlockBonus(rank)
+            BlockBonusAtRank(rank)
         );
         description.Add("DivineRange", rank >= 6 ? 1 : 0);
         description.Add(
             "DivineMight",
-            LiDaoCompanionRankTable.FeiXiongZhuangDivineMight(rank)
+            DivineMightAtRank(rank)
         );
         description.Add("QuakeRange", rank >= 8 ? 1 : 0);
         description.Add(
             "Quake",
-            LiDaoCompanionRankTable.FeiXiongZhuangQuake(rank)
+            QuakeAtRank(rank)
         );
     }
 
@@ -95,8 +126,7 @@ public sealed class FeiXiongZhuang : AbstractLiDaoCompanionCard
                     .WithHitFx("vfx/vfx_heavy_blunt")
                     .Execute(choiceContext);
 
-                int divine = LiDaoCompanionRankTable
-                    .FeiXiongZhuangDivineMight(rank);
+                int divine = DivineMightAtRank(rank);
                 if (divine > 0 && target.IsAlive)
                 {
                     await CreatureCmd.Damage(
@@ -135,7 +165,7 @@ public sealed class FeiXiongZhuang : AbstractLiDaoCompanionCard
             return;
         }
 
-        int quake = LiDaoCompanionRankTable.FeiXiongZhuangQuake(rank);
+        int quake = QuakeAtRank(rank);
         foreach (Creature enemy in GuZhenRenDeterminism
                      .OrderCreatures(CombatState.HittableEnemies)
                      .Where(enemy => enemy.IsAlive &&

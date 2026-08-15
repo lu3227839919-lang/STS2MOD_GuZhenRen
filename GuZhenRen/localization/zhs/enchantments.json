@@ -1,6 +1,6 @@
 {
-  "GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.title": "血寄",
-  "GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.description": "寄生附魔。跟随宿主保存、克隆并显示；不会占用普通附魔栏位。具体种类、阶段与数值显示在宿主牌正文。",
-  "GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.title": "血寄复合附魔",
-  "GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.description": "内部载体：同时保存一项普通附魔和血寄附魔。"
+  "LU_GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.title": "血寄",
+  "LU_GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.description": "寄生附魔。跟随宿主保存、克隆并显示；不会占用普通附魔栏位。具体种类、阶段与数值显示在宿主牌正文。",
+  "LU_GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.title": "血寄复合附魔",
+  "LU_GU_ZHEN_REN_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.description": "内部载体：同时保存一项普通附魔和血寄附魔。"
 }

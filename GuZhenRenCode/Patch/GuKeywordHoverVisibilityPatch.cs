@@ -365,7 +365,7 @@ internal static class GuKeywordHoverVisibilityPatch
         if (value is string text)
         {
             return text.Contains(
-                "GU_ZHEN_REN_KEYWORD_",
+                "LU_GU_ZHEN_REN_KEYWORD_",
                 StringComparison.OrdinalIgnoreCase
             );
         }

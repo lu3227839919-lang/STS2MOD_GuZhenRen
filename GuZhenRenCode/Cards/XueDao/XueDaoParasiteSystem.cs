@@ -45,17 +45,17 @@ public static class XueDaoParasiteSystem
     // 旧版旁路存档键仅用于首次读取时迁移。新数据全部写入
     // XueDaoParasiteEnchantment 的 SavedProperty。
     private static readonly SavedAttachedState<CardModel, int> LegacyKindState =
-        new("gu_zhen_ren.xue_dao.parasite_kind", static () => 0);
+        new("lu_gu_zhen_ren.xue_dao.parasite_kind", static () => 0);
     private static readonly SavedAttachedState<CardModel, int> LegacyRankState =
-        new("gu_zhen_ren.xue_dao.parasite_rank", static () => 0);
+        new("lu_gu_zhen_ren.xue_dao.parasite_rank", static () => 0);
     private static readonly SavedAttachedState<CardModel, bool> LegacyUpgradedState =
-        new("gu_zhen_ren.xue_dao.parasite_upgraded", static () => false);
+        new("lu_gu_zhen_ren.xue_dao.parasite_upgraded", static () => false);
     private static readonly SavedAttachedState<CardModel, int> LegacyStageState =
-        new("gu_zhen_ren.xue_dao.parasite_stage", static () => 0);
+        new("lu_gu_zhen_ren.xue_dao.parasite_stage", static () => 0);
     private static readonly SavedAttachedState<CardModel, int> LegacyTriggersRemainingState =
-        new("gu_zhen_ren.xue_dao.parasite_triggers_remaining", static () => 0);
+        new("lu_gu_zhen_ren.xue_dao.parasite_triggers_remaining", static () => 0);
     private static readonly SavedAttachedState<CardModel, int> LegacyTriggersCompletedState =
-        new("gu_zhen_ren.xue_dao.parasite_triggers_completed", static () => 0);
+        new("lu_gu_zhen_ren.xue_dao.parasite_triggers_completed", static () => 0);
 
     // 0.9.3 的早期构建曾把一次出牌期间的 resolving 标记写入
     // SavedProperties。即使新实现已经改用 ConditionalWeakTable，旧存档和
@@ -63,7 +63,7 @@ public static class XueDaoParasiteSystem
     // 或退出保存时因找不到属性 net ID 而中断。此状态仅作为旧档兼容占位，
     // 实际结算仍只读取下方的运行时 ResolvingStates。
     private static readonly SavedAttachedState<CardModel, bool> LegacyResolvingState =
-        new("gu_zhen_ren.xue_dao.parasite_resolving", static () => false);
+        new("lu_gu_zhen_ren.xue_dao.parasite_resolving", static () => false);
 
     private sealed class ResolvingFlag
     {
@@ -172,31 +172,31 @@ public static class XueDaoParasiteSystem
             {
                 CardType.Attack when
                     host.TargetType == TargetType.AllEnemies =>
-                    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI_ATTACK_ALL.cardText",
+                    "LU_GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI_ATTACK_ALL.cardText",
                 CardType.Attack =>
-                    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI_ATTACK.cardText",
+                    "LU_GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI_ATTACK.cardText",
                 CardType.Skill =>
-                    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI_SKILL.cardText",
+                    "LU_GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI_SKILL.cardText",
                 _ =>
-                    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI_POWER.cardText",
+                    "LU_GU_ZHEN_REN_CARD_PARASITE_BLOOD_QI_POWER.cardText",
             },
             ParasiteKind.BloodMoon => stage switch
             {
-                <= 0 => "GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.cardText",
-                1 => "GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.cardText",
-                _ => "GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.cardText",
+                <= 0 => "LU_GU_ZHEN_REN_CARD_PARASITE_CRESCENT_MOON.cardText",
+                1 => "LU_GU_ZHEN_REN_CARD_PARASITE_WAXING_MOON.cardText",
+                _ => "LU_GU_ZHEN_REN_CARD_PARASITE_FULL_MOON.cardText",
             },
             ParasiteKind.BloodFetus => host.Type switch
             {
                 CardType.Attack when
                     host.TargetType == TargetType.AllEnemies =>
-                    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS_ATTACK_ALL.cardText",
+                    "LU_GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS_ATTACK_ALL.cardText",
                 CardType.Attack =>
-                    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS_ATTACK.cardText",
+                    "LU_GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS_ATTACK.cardText",
                 CardType.Skill =>
-                    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS_SKILL.cardText",
+                    "LU_GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS_SKILL.cardText",
                 _ =>
-                    "GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS_POWER.cardText",
+                    "LU_GU_ZHEN_REN_CARD_PARASITE_BLOOD_FETUS_POWER.cardText",
             },
             _ => null,
         };
@@ -245,11 +245,11 @@ public static class XueDaoParasiteSystem
         string entry = host.Type switch
         {
             CardType.Attack when host.TargetType == TargetType.AllEnemies =>
-                "GU_ZHEN_REN_CARD_PARASITE_HOST_ATTACK_ALL",
-            CardType.Attack => "GU_ZHEN_REN_CARD_PARASITE_HOST_ATTACK",
-            CardType.Skill => "GU_ZHEN_REN_CARD_PARASITE_HOST_SKILL",
-            CardType.Power => "GU_ZHEN_REN_CARD_PARASITE_HOST_POWER",
-            _ => "GU_ZHEN_REN_CARD_PARASITE_HOST_OTHER",
+                "LU_GU_ZHEN_REN_CARD_PARASITE_HOST_ATTACK_ALL",
+            CardType.Attack => "LU_GU_ZHEN_REN_CARD_PARASITE_HOST_ATTACK",
+            CardType.Skill => "LU_GU_ZHEN_REN_CARD_PARASITE_HOST_SKILL",
+            CardType.Power => "LU_GU_ZHEN_REN_CARD_PARASITE_HOST_POWER",
+            _ => "LU_GU_ZHEN_REN_CARD_PARASITE_HOST_OTHER",
         };
         return new LocString("cards", entry).GetFormattedText();
     }

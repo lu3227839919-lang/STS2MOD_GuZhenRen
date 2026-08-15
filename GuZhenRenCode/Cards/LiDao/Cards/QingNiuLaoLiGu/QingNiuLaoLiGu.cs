@@ -23,7 +23,6 @@ public sealed class QingNiuLaoLiGu :
 {
     public override int TrainingRequired => GuRank >= 5 ? 1 : 2;
     public override Type CompanionCardType => typeof(NiuJiaoDing);
-    public override int RecoveryDelayTurns => LiDaoRankTable.Recovery(GuRank);
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
@@ -40,13 +39,37 @@ public sealed class QingNiuLaoLiGu :
         RefreshRankValues();
     }
 
+    internal static int ChanceAtRank(int rank) => rank switch
+    {
+        <= 1 => 35, 2 => 37, 3 => 40, 4 => 42, 5 => 45,
+        6 => 48, 7 => 50, 8 => 53, _ => 55,
+    };
+
+    internal static int DamageAtRank(int rank) => rank switch
+    {
+        <= 1 => 4, 2 => 5, 3 => 6, 4 => 7, 5 => 8,
+        6 => 10, 7 => 12, 8 => 14, _ => 17,
+    };
+
+    internal static int BlockAtRank(int rank) => rank switch
+    {
+        <= 1 => 2, 2 => 2, 3 => 3, 4 => 4, 5 => 5,
+        6 => 6, 7 => 7, 8 => 9, _ => 11,
+    };
+
+    internal static int FirstManifestBlockBonusAtRank(int rank) =>
+        rank >= 8 ? 3 : 0;
+
+    internal static int PhantomLinkBlockBonusAtRank(int rank) =>
+        rank >= 9 ? 5 : 0;
+
     private void RefreshRankValues()
     {
         DynamicVars["Chance"].BaseValue =
-            LiDaoRankTable.QingNiuChance(GuRank);
+            ChanceAtRank(GuRank);
         DynamicVars.Damage.BaseValue =
-            LiDaoRankTable.QingNiuDamage(GuRank);
+            DamageAtRank(GuRank);
         DynamicVars.Block.BaseValue =
-            LiDaoRankTable.QingNiuBlock(GuRank);
+            BlockAtRank(GuRank);
     }
 }

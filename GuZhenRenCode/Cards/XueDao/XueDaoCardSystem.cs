@@ -86,7 +86,7 @@ internal static class XueDaoCardSystem
 
         LocString prompt = new(
             "cards",
-            "GU_ZHEN_REN_CARD_YI_HAI.consumeSelectionPrompt"
+            "LU_GU_ZHEN_REN_CARD_YI_HAI.consumeSelectionPrompt"
         );
         CardSelectorPrefs prefs = new(prompt, consumeCount)
         {

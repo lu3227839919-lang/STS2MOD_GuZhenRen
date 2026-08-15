@@ -266,7 +266,7 @@ internal static class DeckCardSelectionManualConfirmationPatch
             ) &&
             string.Equals(
                 prefs.Prompt.LocEntryKey,
-                "OPTION_GU_ZHEN_REN_GU_RANK_UP" +
+                "OPTION_LU_GU_ZHEN_REN_GU_RANK_UP" +
                     ".selectionPrompt",
                 StringComparison.Ordinal
             );

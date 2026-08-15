@@ -141,8 +141,10 @@ public sealed class KuLiPower :
     public int Rank => DynamicVars["Rank"].IntValue;
     public int GrindingStacks => Math.Clamp(Amount - 1, 0, 3);
 
-    public bool CanRetryAllFailed => Rank >= 6 && Hardship >= 2;
-    public bool CanCreateDoubleShadow => Rank >= 8 && Hardship >= 4;
+    public bool CanRetryAllFailed =>
+        KuLiGu.CanRetryAllFailedAtRank(Rank, Hardship);
+    public bool CanCreateDoubleShadow =>
+        KuLiGu.CanCreateDoubleShadowAtRank(Rank, Hardship);
 
     public decimal EffectMultiplier => 1m +
         GetHardshipEffectBonus() +
@@ -187,23 +189,14 @@ public sealed class KuLiPower :
             return 0f;
         }
 
-        int perHardship = Rank switch
-        {
-            1 => 2,
-            2 => 3,
-            3 => 4,
-            <= 5 => 5,
-            6 => 6,
-            7 => 7,
-            8 => 8,
-            _ => 10,
-        };
+        int perHardship = KuLiGu.ChancePerHardshipAtRank(Rank);
         return Hardship * perHardship / 100f;
     }
 
     internal bool TryClaimDesperationBurst(int turn)
     {
-        if (Rank < 9 || Hardship < 4 || _lastDesperationTurn == turn)
+        if (!KuLiGu.CanDesperationBurstAtRank(Rank, Hardship) ||
+            _lastDesperationTurn == turn)
         {
             return false;
         }
@@ -212,28 +205,8 @@ public sealed class KuLiPower :
         return true;
     }
 
-    private decimal GetHardshipEffectBonus()
-    {
-        if (Rank == 3)
-        {
-            return Hardship >= 3 ? 0.05m : 0m;
-        }
-        if (Rank == 4)
-        {
-            return Hardship >= 3 ? 0.08m : 0m;
-        }
-
-        decimal perHardship = Rank switch
-        {
-            5 => 0.03m,
-            6 => 0.04m,
-            7 => 0.05m,
-            8 => 0.06m,
-            >= 9 => 0.07m,
-            _ => 0m,
-        };
-        return Hardship * perHardship;
-    }
+    private decimal GetHardshipEffectBonus() =>
+        KuLiGu.HardshipEffectBonusAtRank(Rank, Hardship);
 }
 
 [RegisterPower]
@@ -270,19 +243,12 @@ public sealed class ZiLiGengShengPower : ModPowerTemplate
         ResetTurnStateIfNeeded();
         _manifestedMask |= 1 << (int)kind;
 
-        int immediateHeal = 0;
-        if (Rank <= 2 && !_immediateHealUsed)
-        {
-            immediateHeal = 1;
-            if (Rank >= 2)
-            {
-                immediateHeal += LiDaoPhantomSystem.GetForceBase(Owner.Player!) / 2;
-            }
-        }
-        else if (Rank >= 9 && !_immediateHealUsed)
-        {
-            immediateHeal = 2;
-        }
+        int immediateHeal = _immediateHealUsed
+            ? 0
+            : ZiLiGengShengGu.ImmediateHealAtRank(
+                Rank,
+                LiDaoPhantomSystem.GetForceBase(Owner.Player!)
+            );
 
         if (immediateHeal > 0)
         {
@@ -297,9 +263,10 @@ public sealed class ZiLiGengShengPower : ModPowerTemplate
     internal void RecordCondensation()
     {
         ResetTurnStateIfNeeded();
-        if (Rank >= 6)
+        int cap = ZiLiGengShengGu.LifeForceCapAtRank(Rank);
+        if (cap > 0)
         {
-            _lifeForce = Math.Min(2, _lifeForce + 1);
+            _lifeForce = Math.Min(cap, _lifeForce + 1);
         }
     }
 
@@ -309,33 +276,37 @@ public sealed class ZiLiGengShengPower : ModPowerTemplate
         IEnumerable<Creature> participants
     )
     {
-        if (!participants.Contains(Owner) || Rank < 3)
+        if (!participants.Contains(Owner) ||
+            !ZiLiGengShengGu.HealsAtTurnEndAtRank(Rank))
         {
             return;
         }
 
         ResetTurnStateIfNeeded();
         int forceBase = LiDaoPhantomSystem.GetForceBase(Owner.Player!);
-        int cap = LiDaoRankTable.ZiLiHealingCap(Rank) + StrongBodyStacks;
+        int cap = ZiLiGengShengGu.HealingCapAtRank(Rank) + StrongBodyStacks;
         int healing = Math.Min(forceBase, cap);
 
-        if (Rank >= 5 && forceBase >= 3)
-        {
-            healing += 2;
-        }
-        if (Rank >= 6)
-        {
-            healing += _lifeForce;
-        }
-        if (Rank >= 8 && BitOperations.PopCount((uint)_manifestedMask) >= 3)
-        {
-            int hardship = Owner.GetPower<KuLiPower>()?.Hardship ?? 0;
-            healing += hardship >= 3 ? 5 : 3;
-        }
-        if (Rank >= 9 && Owner.CurrentHp * 100 < Owner.MaxHp * 30)
+        healing += ZiLiGengShengGu.ForceBaseBonusAtRank(Rank, forceBase);
+        healing += ZiLiGengShengGu.LifeForceBonusAtRank(Rank, _lifeForce);
+
+        int manifestedKinds = BitOperations.PopCount((uint)_manifestedMask);
+        int hardship = Owner.GetPower<KuLiPower>()?.Hardship ?? 0;
+        healing += ZiLiGengShengGu.ManifestationBonusAtRank(
+            Rank,
+            manifestedKinds,
+            hardship
+        );
+
+        decimal multiplier = ZiLiGengShengGu.LowHealthMultiplierAtRank(
+            Rank,
+            Owner.CurrentHp,
+            Owner.MaxHp
+        );
+        if (multiplier != 1m)
         {
             healing = (int)Math.Round(
-                healing * 1.5m,
+                healing * multiplier,
                 MidpointRounding.AwayFromZero
             );
         }
@@ -361,9 +332,9 @@ public sealed class ZiLiGengShengPower : ModPowerTemplate
         }
 
         int overflow = Math.Max(0, requested - healed);
-        if (Rank >= 7 && overflow >= 2)
+        int block = ZiLiGengShengGu.OverflowBlockAtRank(Rank, overflow);
+        if (block > 0)
         {
-            int block = Math.Min(6, overflow / 2);
             await CreatureCmd.GainBlock(
                 Owner,
                 block,

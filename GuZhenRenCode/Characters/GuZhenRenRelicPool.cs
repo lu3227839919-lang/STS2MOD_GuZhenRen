@@ -5,7 +5,7 @@ namespace GuZhenRen.Characters;
 
 public sealed class GuZhenRenRelicPool : TypeListRelicPoolModel
 {
-    public override string EnergyColorName => "GuZhenRen";
+    public override string EnergyColorName => Entry.ModId;
     public override Color LabOutlineColor => GuZhenRenCharacter.ThemeColor;
 
     // 遗物实验室和文本也会读取池子的能量图标路径。
