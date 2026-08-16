@@ -1,8 +1,10 @@
 using GuZhenRen.Multiplayer;
+using GuZhenRen.Powers.LiDao;
 
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 
 using STS2RitsuLib.Utils;
@@ -37,6 +39,12 @@ public static class LiDaoTrainingSystem
             static () => false
         );
 
+    private static readonly SavedAttachedState<CardModel, int>
+        ExtraTrainingState = new(
+            Entry.ModId + ".li_dao.extra_training",
+            static () => 0
+        );
+
     internal static void ResetForCombat(CardModel card)
     {
         if (card is not ILiDaoTrainingGuCard)
@@ -46,6 +54,7 @@ public static class LiDaoTrainingSystem
 
         ProgressState[card] = 0;
         UnsealedState[card] = false;
+        ExtraTrainingState[card] = 0;
         GuCardUsageRules.ResetUses(card);
     }
 
@@ -74,6 +83,7 @@ public static class LiDaoTrainingSystem
     /// IsFirstInSeries，因此均不计数。
     /// </summary>
     public static async Task TrainFromCompanionAsync(
+        PlayerChoiceContext choiceContext,
         CardPlay cardPlay,
         Type guType
     )
@@ -103,6 +113,12 @@ public static class LiDaoTrainingSystem
 
         if (sealedGu is not ILiDaoTrainingGuCard trainingGu)
         {
+            await RecordExtraTrainingAsync(
+                choiceContext,
+                cardPlay,
+                companion.Owner,
+                guType
+            );
             return;
         }
 
@@ -130,6 +146,76 @@ public static class LiDaoTrainingSystem
         );
     }
 
+    private static async Task RecordExtraTrainingAsync(
+        PlayerChoiceContext choiceContext,
+        CardPlay cardPlay,
+        Player owner,
+        Type guType
+    )
+    {
+        CardModel? card = FindGuCard(owner, guType);
+        if (card is not ILiDaoExtraTrainingGuCard || !IsUnsealed(card))
+        {
+            return;
+        }
+
+        int remainder = ExtraTrainingState[card] + 1;
+        QunLiPower? power = owner.Creature.GetPower<QunLiPower>();
+        if (power == null)
+        {
+            ExtraTrainingState[card] = remainder;
+            return;
+        }
+
+        while (remainder >= 2)
+        {
+            remainder -= 2;
+            await PowerCmd.ModifyAmount(
+                choiceContext,
+                power,
+                1,
+                owner.Creature,
+                cardPlay.Card
+            );
+        }
+
+        ExtraTrainingState[card] = remainder;
+    }
+
+    internal static async Task FlushExtraTrainingAsync(
+        PlayerChoiceContext choiceContext,
+        QunLiGu source
+    )
+    {
+        CardModel? card = FindGuCard(source.Owner, typeof(QunLiGu));
+        if (card == null)
+        {
+            return;
+        }
+
+        int groups = ExtraTrainingState[card] / 2;
+        ExtraTrainingState[card] %= 2;
+        if (groups <= 0)
+        {
+            return;
+        }
+
+        QunLiPower? power = source.Owner.Creature.GetPower<QunLiPower>();
+        if (power == null)
+        {
+            ExtraTrainingState[card] += groups * 2;
+            return;
+        }
+
+        await PowerCmd.ModifyAmount(
+            choiceContext,
+            power,
+            groups,
+            source.Owner.Creature,
+            source
+        );
+    }
+
     internal static IEnumerable<string> GetSealedProgressLines(
         Player owner
     )
@@ -150,4 +236,13 @@ public static class LiDaoTrainingSystem
                     Math.Max(1, gu.TrainingRequired);
             });
     }
+
+    private static CardModel? FindGuCard(Player owner, Type guType) =>
+        GuCardPileSystem.PileType.GetPile(owner).Cards
+            .Concat(GuCardPileSystem.StoragePileType.GetPile(owner).Cards)
+            .Concat(GuCardPileSystem.RecoveryPileType.GetPile(owner).Cards)
+            .Concat(GuCardPileSystem.GuSealedPileType.GetPile(owner).Cards)
+            .Where(card => card.GetType() == guType)
+            .OrderBy(GuZhenRenDeterminism.GetCardNetworkId)
+            .FirstOrDefault();
 }

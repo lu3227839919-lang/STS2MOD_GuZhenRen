@@ -297,6 +297,8 @@ public static class LiDaoPhantomSystem
             }
 
             await RecordManifestation(
+                choiceContext,
+                cardPlay,
                 cardPlay.Player,
                 phantom,
                 manifested
@@ -373,6 +375,8 @@ public static class LiDaoPhantomSystem
             {
                 manifestedCards.Add(forced);
                 await RecordManifestation(
+                    choiceContext,
+                    cardPlay,
                     cardPlay.Player,
                     forced,
                     manifestedKinds
@@ -398,6 +402,8 @@ public static class LiDaoPhantomSystem
             manifestedCards.Add(phantom);
             naturalManifested = true;
             await RecordManifestation(
+                choiceContext,
+                cardPlay,
                 cardPlay.Player,
                 phantom,
                 manifestedKinds
@@ -425,6 +431,8 @@ public static class LiDaoPhantomSystem
                 manifestedCards.Add(retry);
                 naturalManifested = true;
                 await RecordManifestation(
+                    choiceContext,
+                    cardPlay,
                     cardPlay.Player,
                     retry,
                     manifestedKinds
@@ -456,6 +464,8 @@ public static class LiDaoPhantomSystem
                     ))
                 {
                     await RecordManifestation(
+                        choiceContext,
+                        cardPlay,
                         cardPlay.Player,
                         extra,
                         manifestedKinds
@@ -466,11 +476,19 @@ public static class LiDaoPhantomSystem
     }
 
     private static async Task RecordManifestation(
+        PlayerChoiceContext choiceContext,
+        CardPlay cardPlay,
         Player owner,
         AbstractLiDaoXuYing phantom,
         ISet<LiDaoBeastKind> manifestedKinds
     )
     {
+        await LiDaoPowerSystem.NotifyPhantomTriggered(
+            choiceContext,
+            owner.Creature,
+            phantom
+        );
+
         foreach (LiDaoBeastKind kind in phantom.LastManifestedKinds)
         {
             manifestedKinds.Add(kind);
@@ -483,6 +501,46 @@ public static class LiDaoPhantomSystem
         );
         turnState.Turn = owner.PlayerCombatState?.TurnNumber ?? 1;
         turnState.Any = true;
+
+        QunLiPower? qunLi = owner.Creature.GetPower<QunLiPower>();
+        if (phantom.IsFullForcePhantom ||
+            phantom is WoLiXuYing ||
+            qunLi == null ||
+            qunLi.Amount <= 0)
+        {
+            return;
+        }
+
+        int layers = Math.Min(64, qunLi.Amount);
+        for (int layer = 0; layer < layers; layer++)
+        {
+            if (!LiDaoPowerSystem.TryRollGroupRepeat(owner, phantom))
+            {
+                break;
+            }
+
+            OtherManifestedState.Value = true;
+            if (!await phantom.TriggerFromControllerAsync(
+                    choiceContext,
+                    cardPlay,
+                    forced: true,
+                    effectMultiplier: 1m
+                ))
+            {
+                break;
+            }
+
+            await LiDaoPowerSystem.NotifyPhantomTriggered(
+                choiceContext,
+                owner.Creature,
+                phantom
+            );
+            foreach (LiDaoBeastKind kind in phantom.LastManifestedKinds)
+            {
+                manifestedKinds.Add(kind);
+                await LiDaoPowerSystem.NotifyManifested(owner.Creature, kind);
+            }
+        }
     }
 
     private static async Task EnsureCapacityAsync(
@@ -527,7 +585,7 @@ public static class LiDaoPhantomSystem
         }
     }
 
-    private static async Task EnsureControllerAsync(
+    internal static async Task EnsureControllerAsync(
         PlayerChoiceContext choiceContext,
         CardModel source
     )

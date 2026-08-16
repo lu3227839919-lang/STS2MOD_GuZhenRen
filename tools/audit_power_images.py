@@ -17,7 +17,7 @@ ROOT = os.path.abspath(
     sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), "..")
 )
 CODE = os.path.join(ROOT, "GuZhenRenPersonalCode", "Powers")
-IMG = os.path.join(ROOT, "GuZhenRen", "images", "power")
+IMG = os.path.join(ROOT, "GuZhenRenPersonal", "images", "power")
 
 if not os.path.isdir(CODE) or not os.path.isdir(IMG):
     print(f"错误:找不到 GuZhenRenPersonalCode/Powers 或 GuZhenRenPersonal/images/power({ROOT})")

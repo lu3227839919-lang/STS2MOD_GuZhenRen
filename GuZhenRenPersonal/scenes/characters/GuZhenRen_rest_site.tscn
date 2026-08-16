@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://4bbmnth2u2of"]
 
-[ext_resource type="Texture2D" uid="uid://bdnluv5jjpdau" path="res://GuZhenRenPersonal/images/characters/FangYuan_idle.png" id="1_xg78g"]
-[ext_resource type="Texture2D" uid="uid://ts3yj66gjmjt" path="res://GuZhenRenPersonal/images/characters/GuZhenRen_shadow.png" id="2_vxihv"]
+[ext_resource type="Texture2D" uid="uid://0yflfo0r3qeg" path="res://GuZhenRenPersonal/images/characters/FangYuan_idle.png" id="1_xg78g"]
+[ext_resource type="Texture2D" uid="uid://dw0mfh06i0sv3" path="res://GuZhenRenPersonal/images/characters/GuZhenRen_shadow.png" id="2_vxihv"]
 
 [node name="GuZhenRenCharacterRestSite" type="Node2D"]
 

@@ -21,6 +21,11 @@ public interface ILiDaoTrainingGuCard : IGuWormCard
     Type CompanionCardType { get; }
 }
 
+/// <summary>练满后可把多余练力转化为群力层数的力道蛊。</summary>
+public interface ILiDaoExtraTrainingGuCard : ILiDaoTrainingGuCard
+{
+}
+
 /// <summary>催动后生成常驻兽力虚影的力道蛊。</summary>
 public interface ILiDaoBeastGuCard : ILiDaoTrainingGuCard
 {

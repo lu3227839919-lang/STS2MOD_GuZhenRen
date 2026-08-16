@@ -39,7 +39,7 @@ ROOT = os.path.abspath(
     sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), "..")
 )
 CODE = os.path.join(ROOT, "GuZhenRenPersonalCode")
-IMG = os.path.join(ROOT, "GuZhenRen", "images", "cards")
+IMG = os.path.join(ROOT, "GuZhenRenPersonal", "images", "cards")
 
 # 设计上确定的共享图片(尚未在代码中显式写 AssetProfile 时用)
 # 键 = 提供图片的卡类名;值 = 复用该图、不另配图的卡类名列表

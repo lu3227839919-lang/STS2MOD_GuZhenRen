@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://0p47iy2llo0d"]
 
-[ext_resource type="Texture2D" uid="uid://dd4xxrv6tt5cg" path="res://GuZhenRenPersonal/images/characters/FangYuan_character_select_bg.png" id="1_bg"]
+[ext_resource type="Texture2D" uid="uid://b541f0unl287v" path="res://GuZhenRenPersonal/images/characters/FangYuan_character_select_bg.png" id="1_bg"]
 
 [node name="GuZhenRenCharacterSelectBg" type="Control"]
 layout_mode = 3

@@ -74,6 +74,7 @@ public abstract class AbstractLiDaoCompanionCard :
         if (ReferenceEquals(cardPlay.Card, this))
         {
             await LiDaoTrainingSystem.TrainFromCompanionAsync(
+                choiceContext,
                 cardPlay,
                 TrainedGuType
             );
@@ -99,5 +100,4 @@ public abstract class AbstractLiDaoCompanionCard :
             ? LiDaoPhantomSystem.GetPermanentPhantomKinds(Owner)
             : 0;
 }
-
 

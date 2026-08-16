@@ -61,6 +61,10 @@ public abstract class AbstractLiDaoXuYing :
             )
         );
 
+    internal int ScaleDamage(decimal value) =>
+        ScaleEffect(value) +
+        LiDaoPowerSystem.GetPhantomStrengthBonus(Owner.Creature);
+
     private static int CondenseChanceGainAtRank(int rank) => rank switch
     {
         <= 5 => 10,
@@ -585,7 +589,7 @@ internal static class LiDaoBeastEffectExecutor
             damage += BaiZhiGu.NoBlockBonusAtRank(rank);
         }
 
-        await Attack(source, context, target, source.ScaleEffect(damage));
+        await Attack(source, context, target, source.ScaleDamage(damage));
     }
 
     private static async Task ExecuteFeiXiong(
@@ -613,10 +617,10 @@ internal static class LiDaoBeastEffectExecutor
         }
 
         int divine = FeiXiongZhiLiGu.DivineMightAtRank(rank);
-        int normalDamage = source.ScaleEffect(
+        int normalDamage = source.ScaleDamage(
             Math.Max(0, total - divine) * rankMultiplier
         );
-        int divineDamage = source.ScaleEffect(divine * rankMultiplier);
+        int divineDamage = source.ScaleDamage(divine * rankMultiplier);
 
         if (normalDamage > 0)
         {
@@ -638,7 +642,7 @@ internal static class LiDaoBeastEffectExecutor
         int quakeBase = FeiXiongZhiLiGu.QuakeDamageAtRank(rank);
         if (quakeBase > 0 && source.CombatState != null)
         {
-            int quake = source.ScaleEffect(quakeBase * rankMultiplier);
+            int quake = source.ScaleDamage(quakeBase * rankMultiplier);
             foreach (Creature enemy in GuZhenRenDeterminism
                          .OrderCreatures(source.CombatState.HittableEnemies)
                          .Where(enemy => enemy.IsAlive && !ReferenceEquals(enemy, target)))
@@ -684,7 +688,7 @@ internal static class LiDaoBeastEffectExecutor
             int damage = ELiGu.DamageAtRank(rank) +
                 ELiGu.HitBonusAtRank(rank, hit);
 
-            await Attack(source, context, current, source.ScaleEffect(damage));
+            await Attack(source, context, current, source.ScaleDamage(damage));
         }
     }
 
@@ -703,7 +707,7 @@ internal static class LiDaoBeastEffectExecutor
                 source,
                 context,
                 target,
-                source.ScaleEffect(QingNiuLaoLiGu.DamageAtRank(rank))
+                source.ScaleDamage(QingNiuLaoLiGu.DamageAtRank(rank))
             );
         }
 
