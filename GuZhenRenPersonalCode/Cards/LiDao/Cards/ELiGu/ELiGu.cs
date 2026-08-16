@@ -20,7 +20,6 @@ namespace GuZhenRen.Cards.LiDao;
 [RegisterCard(typeof(GuZhenRenGuCardPool))]
 public sealed class ELiGu : AbstractLiDaoBeastGuCard<EXuYing>
 {
-    public override int TrainingRequired => GuRank >= 6 ? 1 : 2;
     public override Type CompanionCardType => typeof(JiaoShuai);
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
@@ -40,27 +39,23 @@ public sealed class ELiGu : AbstractLiDaoBeastGuCard<EXuYing>
 
     internal static int ChanceAtRank(int rank) => rank switch
     {
-        <= 1 => 25, 2 => 27, 3 => 30, 4 => 32, 5 => 35,
-        6 => 38, 7 => 40, 8 => 43, _ => 45,
+        <= 2 => 27,
+        3 => 30,
+        4 => 32,
+        _ => 35,
     };
 
     internal static int DamageAtRank(int rank) => rank switch
     {
-        <= 1 => 3, 2 => 4, 3 => 4, 4 => 5, 5 => 5,
-        6 => 6, 7 => 7, 8 => 8, _ => 8,
+        <= 2 => 4,
+        3 or 4 => 5,
+        _ => 6,
     };
 
-    internal static int HitsAtRank(int rank) => rank switch
-    {
-        <= 4 => 2,
-        <= 7 => 3,
-        _ => 4,
-    };
+    internal static int HitsAtRank(int rank) => 2;
 
     internal static int HitBonusAtRank(int rank, int hitIndex) =>
-        rank == 3 && hitIndex == 1 ? 2 : 0;
-
-    internal static bool PursuesAtRank(int rank) => rank >= 7;
+        rank >= 4 && hitIndex == 1 ? 2 : 0;
 
     private void RefreshRankValues()
     {

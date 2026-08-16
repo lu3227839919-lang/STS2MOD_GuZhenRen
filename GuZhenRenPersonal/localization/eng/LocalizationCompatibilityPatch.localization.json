@@ -132,11 +132,7 @@
     },
     "LianLi": {
       "title": "Strength Training",
-      "description": "Strength Gu begin each combat sealed. The first resolution of their matching permanent companion adds progress; full progress unseals the Gu."
-    },
-    "NingYing": {
-      "title": "Condense Phantom",
-      "description": "Activating a beast-strength Gu whose Phantom is already present raises its base manifestation chance, up to 80%."
+      "description": "Each beast-strength Gu permanently tracks its own 0/3 progress. The first effective activation on each different turn grants +1. It can create its phantom only if training was complete when combat began; progress completed during combat takes effect next combat."
     },
     "NianHua": {
       "title": "Years",
@@ -269,6 +265,56 @@
     },
     {
       "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_KU_LI_POWER.title",
+      "text": "Bitter Strength"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_KU_LI_POWER.description",
+      "text": "After an Attack fully resolves, deal Bitter Strength damage based on your current Injury tier. Higher ranks gain Strength the first time each new tier is entered."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZI_LI_GENG_SHENG_POWER.title",
+      "text": "Self-Reliance"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZI_LI_GENG_SHENG_POWER.description",
+      "text": "Wait for the next Attack, then heal after it fully resolves based on the HP damage actually dealt to its primary target."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_WO_LI_POWER.title",
+      "text": "Self Strength"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_WO_LI_POWER.description",
+      "text": "Counts beast phantom manifestations; every 3 (2 at rank 6+) grants 1 Strength. At rank 7+, 3 different kinds actually manifested in one turn grant 1 additional Strength (once per turn)."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_QUN_LI_POWER.title",
+      "text": "Group Strength"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_QUN_LI_POWER.description",
+      "text": "After the first (first 2 at rank 7) natural beast phantom manifestation each turn, that phantom may manifest once more by chance; extra manifestations cannot trigger Group Strength again."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_WO_LI_TEMP_HP_POWER.title",
+      "text": "Wo Li Temporary HP"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_WO_LI_TEMP_HP_POWER.description",
+      "text": "Temporary HP granted by Wo Li Phantoms; every 5 points lost from this source consumes 1 Wo Li Phantom."
+    },
+    {
+      "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_GUANG_HUI_POWER.title",
       "text": "Brilliance"
     },
@@ -386,26 +432,6 @@
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_JU_GUANG_POWER.description",
       "text": "The first hit of your next Light Path Attack deals {Amount} more damage. Multi-hit attacks gain this bonus only once."
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_KU_LI_POWER.title",
-      "text": "Bitter Strength"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_KU_LI_POWER.description",
-      "text": "Gain 0–4 Hardship from missing HP, increasing permanent Phantom manifestation chance and effect. Repeated activations grant up to 3 training stacks. High ranks can retry a failed manifestation, create a double shadow, or force one in desperation."
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZI_LI_GENG_SHENG_POWER.title",
-      "text": "Self-Reliance"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZI_LI_GENG_SHENG_POWER.description",
-      "text": "Tracks different beast manifestations and Condensation this turn, building strength and healing by rank. Repeated activations grant up to 3 conditioning stacks; high ranks turn excess healing into Block."
     },
     {
       "table": "powers",

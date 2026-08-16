@@ -21,26 +21,13 @@ namespace GuZhenRen.Cards.LiDao;
 public sealed class FeiXiongZhiLiGu :
     AbstractLiDaoBeastGuCard<FeiXiongXuYing>
 {
-    public override int TrainingRequired => GuRank switch
-    {
-        <= 2 => 3,
-        <= 6 => 2,
-        _ => 1,
-    };
-
     public override Type CompanionCardType => typeof(FeiXiongZhuang);
-    public override int RecoveryDelayTurns => GuRank switch
-    {
-        <= 4 => 2,
-        <= 8 => 3,
-        _ => 4,
-    };
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DynamicVar("Chance", 18m),
-        new DamageVar(10m, ValueProp.Move),
-        new DynamicVar("DivineMight", 0m),
+        new DynamicVar("Chance", 22m),
+        new DamageVar(9m, ValueProp.Move),
+        new DynamicVar("BlockBonus", 3m),
     ];
 
     public FeiXiongZhiLiGu() : base(CardRarity.Rare) => RefreshRankValues();
@@ -53,39 +40,27 @@ public sealed class FeiXiongZhiLiGu :
 
     internal static int ChanceAtRank(int rank) => rank switch
     {
-        <= 1 => 18, 2 => 20, 3 => 22, 4 => 25, 5 => 28,
-        6 => 30, 7 => 33, 8 => 36, _ => 40,
+        <= 2 => 22,
+        3 => 24,
+        4 => 26,
+        _ => 28,
     };
 
     internal static int DamageAtRank(int rank) => rank switch
     {
-        <= 1 => 10, 2 => 12, 3 => 14, 4 => 16, 5 => 19,
-        6 => 24, 7 => 28, 8 => 34, _ => 40,
-    };
-
-    internal static int DivineMightAtRank(int rank) => rank switch
-    {
-        <= 5 => 0,
-        6 => 6,
-        7 => 8,
-        8 => 10,
-        _ => 12,
+        <= 2 => 9,
+        3 => 11,
+        4 => 13,
+        _ => 15,
     };
 
     internal static int BlockedTargetBonusAtRank(int rank) => rank switch
     {
+        <= 2 => 3,
         3 => 4,
         4 => 5,
-        5 => 6,
-        _ => 0,
+        _ => 6,
     };
-
-    internal static decimal FirstManifestMultiplierAtRank(
-        int rank,
-        bool firstThisTurn
-    ) => rank >= 9 && firstThisTurn ? 1.5m : 1m;
-
-    internal static int QuakeDamageAtRank(int rank) => rank >= 8 ? 6 : 0;
 
     private void RefreshRankValues()
     {
@@ -93,7 +68,7 @@ public sealed class FeiXiongZhiLiGu :
             ChanceAtRank(GuRank);
         DynamicVars.Damage.BaseValue =
             DamageAtRank(GuRank);
-        DynamicVars["DivineMight"].BaseValue =
-            DivineMightAtRank(GuRank);
+        DynamicVars["BlockBonus"].BaseValue =
+            BlockedTargetBonusAtRank(GuRank);
     }
 }

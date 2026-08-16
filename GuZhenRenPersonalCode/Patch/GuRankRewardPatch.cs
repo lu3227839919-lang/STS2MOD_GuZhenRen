@@ -88,8 +88,8 @@ internal static class GuRankRewardPatch
 
     /// <summary>
     /// 战斗内随机给予蛊虫时复用与卡牌奖励完全相同的随机流、楼层
-    /// 分布和仙蛊上限。forceAssignment 用于百兽力蛊等构造时已写入
-    /// 默认转数、但本次仍必须重新按奖励规则随机赋阶的卡牌。
+    /// 分布和仙蛊上限。forceAssignment 用于构造时已写入默认转数、
+    /// 但本次仍必须重新按奖励规则随机赋阶的卡牌。
     /// </summary>
     internal static void AssignRandomRanksLikeReward(
         IEnumerable<CardModel> cards,
@@ -150,11 +150,6 @@ internal static class GuRankRewardPatch
                     minRank: guCard.MinimumAvailableGuRank,
                     maxRank: maximumRewardRank
                 );
-            }
-
-            if (card is BaiShouLiGu baiShouLiGu)
-            {
-                baiShouLiGu.AssignRandomComposition(cardRng);
             }
 
             if (assigned)

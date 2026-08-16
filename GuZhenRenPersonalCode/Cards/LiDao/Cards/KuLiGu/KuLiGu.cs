@@ -1,32 +1,47 @@
-using GuZhenRen.Cards.HeLian;
 using GuZhenRen.Characters;
 using GuZhenRen.Combat;
 using GuZhenRen.Powers.LiDao;
 
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Localization;
-using MegaCrit.Sts2.Core.Localization.DynamicVars;
-using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Random;
-using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib.Combat.SecondaryResources;
 using STS2RitsuLib.Interop.AutoRegistration;
-using STS2RitsuLib.Utils;
 
 namespace GuZhenRen.Cards.LiDao;
 
+/// <summary>
+/// 苦力蛊：伤势越重，攻击牌结算后追加的苦力伤害越高。
+/// 本蛊不属于兽力虚影蛊，不参与炼力、虚影容量或衍生牌系统。
+/// </summary>
 [RegisterCard(typeof(GuZhenRenGuCardPool))]
-public sealed class KuLiGu : AbstractLiDaoGuCard
+public sealed class KuLiGu : AbstractGuWormCard
 {
-    public override int TrainingRequired => GuRank >= 5 ? 1 : 2;
-    public override Type CompanionCardType => typeof(KuLian);
+    public override int YuanQiCost => 2;
 
-    protected override IEnumerable<DynamicVar> CanonicalVars =>
-    [new DynamicVar("ChancePerHardship", 2m)];
+    public override int MinimumAvailableGuRank => 3;
 
-    public KuLiGu() : base(CardRarity.Rare) => RefreshRankValues();
+    public override int MaxGuRank => 7;
+
+    public override int RecoveryDelayTurns => GuRank switch
+    {
+        <= 4 => 1,
+        5 => 2,
+        6 => 3,
+        _ => 4,
+    };
+
+    public KuLiGu()
+        : base(
+            1,
+            CardType.Power,
+            CardRarity.Uncommon,
+            TargetType.Self
+        )
+    {
+        SetDao(Dao.LiDao);
+        this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 2);
+    }
 
     protected override Task OnPlay(
         PlayerChoiceContext choiceContext,
@@ -36,60 +51,31 @@ public sealed class KuLiGu : AbstractLiDaoGuCard
         this
     );
 
-    protected override void OnGuRankChanged()
-    {
-        base.OnGuRankChanged();
-        RefreshRankValues();
-    }
-
-    internal static int ChancePerHardshipAtRank(int rank) => rank switch
-    {
-        <= 1 => 2,
-        2 => 3,
-        3 => 4,
-        <= 5 => 5,
-        6 => 6,
-        7 => 7,
-        8 => 8,
-        _ => 10,
-    };
-
-    internal static bool CanRetryAllFailedAtRank(int rank, int hardship) =>
-        rank >= 6 && hardship >= 2;
-
-    internal static bool CanCreateDoubleShadowAtRank(int rank, int hardship) =>
-        rank >= 8 && hardship >= 4;
-
-    internal static bool CanDesperationBurstAtRank(int rank, int hardship) =>
-        rank >= 9 && hardship >= 4;
-
-    internal static decimal HardshipEffectBonusAtRank(
-        int rank,
-        int hardship
-    )
-    {
-        if (rank == 3)
+    internal static int ExtraDamageAtRank(int rank, int injuryTier) =>
+        rank switch
         {
-            return hardship >= 3 ? 0.05m : 0m;
-        }
-        if (rank == 4)
-        {
-            return hardship >= 3 ? 0.08m : 0m;
-        }
-
-        decimal perHardship = rank switch
-        {
-            5 => 0.03m,
-            6 => 0.04m,
-            7 => 0.05m,
-            8 => 0.06m,
-            >= 9 => 0.07m,
-            _ => 0m,
+            <= 4 => injuryTier * 2,
+            <= 6 => injuryTier switch
+            {
+                1 => 2,
+                2 => 5,
+                3 => 9,
+                _ => 0,
+            },
+            _ => injuryTier switch
+            {
+                1 => 3,
+                2 => 6,
+                3 => 10,
+                _ => 0,
+            },
         };
-        return hardship * perHardship;
-    }
 
-    private void RefreshRankValues() =>
-        DynamicVars["ChancePerHardship"].BaseValue =
-            ChancePerHardshipAtRank(GuRank);
+    internal static int StrengthAtThreshold(int rank, int injuryTier) =>
+        rank switch
+        {
+            >= 7 when injuryTier == 3 => 2,
+            >= 6 => 1,
+            _ => 0,
+        };
 }

@@ -1,5 +1,6 @@
 using GuZhenRen.Aperture;
 using GuZhenRen.Cards.Interfaces;
+using GuZhenRen.Cards.LiDao;
 using GuZhenRen.Combat;
 
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -46,7 +47,10 @@ public abstract class AbstractGuWormCard
         // 恢复是蛊虫共有机制：卡面统一显示“恢复”标签，悬浮提示
         // 专门说明催动耗尽后进入恢复、期间无法使用、回合数结束后
         // 回到蛊牌堆。
-        yield return GuZhenRenKeywords.HuiFu;
+        if (guWorm is not ILiDaoBeastGuCard)
+        {
+            yield return GuZhenRenKeywords.HuiFu;
+        }
 
         foreach (CardKeyword keyword in GetMechanicKeywords(guWorm))
         {

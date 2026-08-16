@@ -21,7 +21,6 @@ namespace GuZhenRen.Cards.LiDao;
 public sealed class QingNiuLaoLiGu :
     AbstractLiDaoBeastGuCard<QingNiuXuYing>
 {
-    public override int TrainingRequired => GuRank >= 5 ? 1 : 2;
     public override Type CompanionCardType => typeof(NiuJiaoDing);
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
@@ -41,27 +40,34 @@ public sealed class QingNiuLaoLiGu :
 
     internal static int ChanceAtRank(int rank) => rank switch
     {
-        <= 1 => 35, 2 => 37, 3 => 40, 4 => 42, 5 => 45,
-        6 => 48, 7 => 50, 8 => 53, _ => 55,
+        <= 2 => 30,
+        3 => 33,
+        4 => 36,
+        _ => 40,
     };
 
     internal static int DamageAtRank(int rank) => rank switch
     {
-        <= 1 => 4, 2 => 5, 3 => 6, 4 => 7, 5 => 8,
-        6 => 10, 7 => 12, 8 => 14, _ => 17,
+        <= 2 => 4,
+        3 => 5,
+        4 => 6,
+        _ => 7,
     };
 
     internal static int BlockAtRank(int rank) => rank switch
     {
-        <= 1 => 2, 2 => 2, 3 => 3, 4 => 4, 5 => 5,
-        6 => 6, 7 => 7, 8 => 9, _ => 11,
+        <= 2 => 2,
+        3 => 3,
+        4 => 4,
+        _ => 5,
     };
 
-    internal static int FirstManifestBlockBonusAtRank(int rank) =>
-        rank >= 8 ? 3 : 0;
-
-    internal static int PhantomLinkBlockBonusAtRank(int rank) =>
-        rank >= 9 ? 5 : 0;
+    internal static int HitBlockBonusAtRank(int rank) => rank switch
+    {
+        4 => 1,
+        >= 5 => 2,
+        _ => 0,
+    };
 
     private void RefreshRankValues()
     {

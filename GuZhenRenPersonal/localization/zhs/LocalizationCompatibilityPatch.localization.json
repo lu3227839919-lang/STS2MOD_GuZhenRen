@@ -131,12 +131,8 @@
       "description": "留在手牌且不能手动打出。打出非虚影攻击牌后，由力道结算器按稳定顺序判定显化。"
     },
     "LianLi": {
-      "title": "练力",
-      "description": "力道蛊每场战斗开始时封存；对应永久伴生牌首次结算时增加进度，满进度后解封。"
-    },
-    "NingYing": {
-      "title": "凝影",
-      "description": "再次催动已有对应虚影的兽力蛊时，提高其基础显化率，最高80%。"
+      "title": "炼力",
+      "description": "每张兽力蛊独立永久记录0/3进度。每个不同回合首次有效催动时+1；本场开始时已完成才可生成对应虚影，本战刚完成则从下一场起生效。"
     },
     "NianHua": {
       "title": "年华",
@@ -269,6 +265,56 @@
     },
     {
       "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_KU_LI_POWER.title",
+      "text": "苦力"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_KU_LI_POWER.description",
+      "text": "根据当前伤势档位，在攻击牌完整结算后追加一次苦力伤害；高转首次进入新伤势档位时获得力量。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZI_LI_GENG_SHENG_POWER.title",
+      "text": "自力更生"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZI_LI_GENG_SHENG_POWER.description",
+      "text": "等待下一张攻击牌，并在其完整结算后按对主目标造成的实际生命伤害回复生命。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_WO_LI_POWER.title",
+      "text": "我力"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_WO_LI_POWER.description",
+      "text": "累计兽力虚影显化次数，每累计3次（6转起2次）获得1点力量；7转起同回合3种不同兽力实际显化时额外获得1点力量，每回合一次。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_QUN_LI_POWER.title",
+      "text": "群力"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_QUN_LI_POWER.description",
+      "text": "每回合前1次（7转起2次）兽力虚影自然显化后，按概率使其额外显化一次；额外显化不会再次触发群力。"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_WO_LI_TEMP_HP_POWER.title",
+      "text": "我力临时生命"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_WO_LI_TEMP_HP_POWER.description",
+      "text": "我力虚影提供的独立临时生命；每累计损失5点该来源临时生命，消耗1个我力虚影。"
+    },
+    {
+      "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_GUANG_HUI_POWER.title",
       "text": "光辉"
     },
@@ -386,26 +432,6 @@
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_JU_GUANG_POWER.description",
       "text": "下一张光道攻击的第一段伤害提高{Amount}点。多段攻击只获得一次加成。"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_KU_LI_POWER.title",
-      "text": "苦力"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_KU_LI_POWER.description",
-      "text": "依据已损失生命比例获得0至4层苦境，提高常驻虚影的显化率与效果。重复催动苦力蛊可获得至多3层苦练，并进一步强化虚影效果；高转可重判失败显化、产生双影或在绝境中强制显化。"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZI_LI_GENG_SHENG_POWER.title",
-      "text": "自力更生"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZI_LI_GENG_SHENG_POWER.description",
-      "text": "记录本回合显化的不同兽力与凝影，积蓄力气并按转数回复生命。重复催动自力更生蛊可获得至多3层强身；高转可将超额回复转化为格挡。"
     },
     {
       "table": "powers",

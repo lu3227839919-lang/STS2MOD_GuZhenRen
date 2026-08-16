@@ -11,13 +11,18 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
 
-using STS2RitsuLib;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Utils;
 
 namespace GuZhenRen.Cards.LiDao;
 
-/// <summary>万我生成的我力虚影与独立临时生命池。</summary>
+/// <summary>
+/// 万我生成的“我力虚影”与独立临时生命池。
+///
+/// 我力虚影：每个提供 5 点独立来源临时生命；第一次显化必定成功，
+/// 之后按万我转数决定显化率（6/7/8/9转 = 25/30/35/40%）。
+/// 显化成功时复制本次触发动作 50% 的可复制效果（伤害按段、格挡）。
+/// </summary>
 public static class WoLiPhantomSystem
 {
     internal static async Task AddShadowsAsync(
@@ -39,7 +44,10 @@ public static class WoLiPhantomSystem
                 rank,
                 upgraded: false
             );
-            await GuGeneratedCardFactory.AddToHandOrDiscard(phantom, owner);
+            await GuGeneratedCardFactory.AddToHandOrDiscard(
+                phantom,
+                owner
+            );
         }
 
         WoLiTempHpPower? existing =
@@ -105,13 +113,17 @@ public static class WoLiPhantomSystem
     )
     {
         CardModel source = triggeringPlay.Card;
-        decimal copyRatio = 0.5m;
+        const decimal copyRatio = 0.5m;
 
-        if (source.Type == CardType.Attack && target != null &&
+        if (source.Type == CardType.Attack &&
+            target != null &&
             TryGetDynamicValue(source, "Damage", out decimal damage))
         {
             int hits = TryGetDynamicInt(source, "Hits", 1);
-            int perHit = Math.Max(0, (int)Math.Floor(damage * copyRatio));
+            int perHit = Math.Max(
+                0,
+                (int)Math.Floor(damage * copyRatio)
+            );
             for (int index = 0; index < hits; index++)
             {
                 if (perHit <= 0 || !target.IsAlive)
@@ -201,6 +213,17 @@ public sealed class WoLiXuYing : AbstractLiDaoXuYing
         RefreshRankValues();
     }
 
+    protected override void AddExtraArgsToDescription(
+        MegaCrit.Sts2.Core.Localization.LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add(
+            "RepeatChance",
+            WanWo.RepeatManifestChanceAtRank(GuRank)
+        );
+    }
+
     protected override Task TriggerPhantomEffect(
         PlayerChoiceContext choiceContext,
         CardPlay triggeringPlay,
@@ -208,7 +231,9 @@ public sealed class WoLiXuYing : AbstractLiDaoXuYing
     )
     {
         HasManifestedState[this] = true;
-        SetBaseChance(WanWo.RepeatManifestChanceAtRank(GuRank) / 100f);
+        SetBaseChance(
+            WanWo.RepeatManifestChanceAtRank(GuRank) / 100f
+        );
         return WoLiPhantomSystem.ExecuteCopyAsync(
             this,
             choiceContext,

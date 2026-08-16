@@ -35,9 +35,9 @@ public static class LiDaoCompanionSystem
 
         var sourceGroups = combatCards
             .OfType<AbstractGuZhenRenCard>()
-            .Where(static card => card is ILiDaoTrainingGuCard)
+            .Where(static card => card is ILiDaoBeastGuCard)
             .GroupBy(card =>
-                ((ILiDaoTrainingGuCard)card).CompanionCardType)
+                ((ILiDaoBeastGuCard)card).CompanionCardType)
             .OrderBy(
                 static group => group.Key.FullName,
                 StringComparer.Ordinal
@@ -77,7 +77,6 @@ public static class LiDaoCompanionSystem
             for (int index = 0; index < pairedCount; index++)
             {
                 SetCompanionRank(companions[index], sourceCards[index].GuRank);
-                LiDaoTrainingSystem.MarkCompanionCanTrain(companions[index]);
             }
 
             for (int index = companions.Length;
@@ -102,7 +101,6 @@ public static class LiDaoCompanionSystem
                         rankedCompanion,
                         sourceCards[index].GuRank
                     );
-                    LiDaoTrainingSystem.MarkCompanionCanTrain(companion);
                     drawPile.AddInternal(companion, silent: true);
                     generatedCount++;
                 }

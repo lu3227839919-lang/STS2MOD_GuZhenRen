@@ -1,20 +1,11 @@
-using System.Runtime.CompilerServices;
-
-using GuZhenRen.Cards.HeLian;
 using GuZhenRen.Characters;
-using GuZhenRen.Multiplayer;
-using GuZhenRen.Powers.LiDao;
 
-using MegaCrit.Sts2.Core.Combat;
-using MegaCrit.Sts2.Core.Combat.History.Entries;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
-using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib.Interop.AutoRegistration;
@@ -24,7 +15,7 @@ namespace GuZhenRen.Cards.LiDao;
 [RegisterCard(typeof(GuZhenRenCardPool))]
 public sealed class JiaoShuai : AbstractLiDaoCompanionCard
 {
-    public override Type TrainedGuType => typeof(ELiGu);
+    public override Type SourceGuType => typeof(ELiGu);
 
     private decimal _upDamage;
 
@@ -32,51 +23,38 @@ public sealed class JiaoShuai : AbstractLiDaoCompanionCard
     [
         new DamageVar(4m, ValueProp.Move),
         new DynamicVar("Hits", 2m),
+        new DynamicVar("SecondHitBonus", 0m),
     ];
 
-    public JiaoShuai() : base(CardType.Attack, TargetType.AnyEnemy)
-    {
+    public JiaoShuai() : base(CardType.Attack, TargetType.AnyEnemy) =>
         RefreshRankValues();
-    }
 
     private static int DamageAtRank(int rank) => rank switch
     {
-        <= 1 => 4, 2 => 5, 3 => 4, 4 => 5, 5 => 5,
-        6 => 6, 7 => 6, 8 => 7, _ => 8,
+        <= 2 => 4,
+        3 or 4 => 5,
+        _ => 6,
     };
 
-    private static int HitsAtRank(int rank) => rank switch
-    {
-        <= 4 => 2,
-        <= 7 => 3,
-        _ => 4,
-    };
-
-    private static int LastHitBonusAtRank(int rank) =>
-        rank is 3 or 4 ? 2 : 0;
-
-    private static bool PursuesAtRank(int rank) => rank >= 7;
+    private static int SecondHitBonusAtRank(int rank) =>
+        rank >= 4 ? 2 : 0;
 
     protected override void RefreshRankValues()
     {
-        DynamicVars.Damage.BaseValue =
-            DamageAtRank(GuRank) + _upDamage;
-        DynamicVars["Hits"].BaseValue =
-            HitsAtRank(GuRank);
+        DynamicVars.Damage.BaseValue = DamageAtRank(GuRank) + _upDamage;
+        DynamicVars["Hits"].BaseValue = 2m;
+        DynamicVars["SecondHitBonus"].BaseValue =
+            SecondHitBonusAtRank(GuRank);
     }
 
-    protected override void AddExtraArgsToDescription(
-        LocString description
-    )
+    protected override void AddExtraArgsToDescription(LocString description)
     {
         base.AddExtraArgsToDescription(description);
-        int rank = GuRank;
-        description.Add("LastHitRange", rank is >= 3 and <= 4 ? 1 : 0);
+        description.Add("SecondHitRange", GuRank >= 4 ? 1 : 0);
         description.Add(
-            "LastHitBonus",
-            LastHitBonusAtRank(rank)
+            "SecondHitBonus",
+            SecondHitBonusAtRank(GuRank)
         );
-        description.Add("PursuitRange", rank >= 7 ? 1 : 0);
     }
 
     protected override async Task OnPlay(
@@ -84,37 +62,18 @@ public sealed class JiaoShuai : AbstractLiDaoCompanionCard
         CardPlay cardPlay
     )
     {
-        int rank = GuRank;
-        int hits = DynamicVars["Hits"].IntValue;
-        decimal baseDamage = DynamicVars.Damage.BaseValue;
-        int lastHitBonus = LastHitBonusAtRank(rank);
-        bool pursues = PursuesAtRank(rank);
-
-        Creature? current = cardPlay.Target;
-        for (int hit = 0; hit < hits; hit++)
+        Creature target = cardPlay.Target!;
+        for (int hit = 0; hit < 2 && target.IsAlive; hit++)
         {
-            if (current == null || current.IsDead)
+            decimal damage = DynamicVars.Damage.BaseValue;
+            if (hit == 1)
             {
-                if (!pursues)
-                {
-                    break;
-                }
-                current = LiDaoPhantomSystem.FindPursuitTarget(this);
-                if (current == null)
-                {
-                    break;
-                }
-            }
-
-            decimal damage = baseDamage;
-            if (lastHitBonus > 0 && hit == hits - 1)
-            {
-                damage += lastHitBonus;
+                damage += SecondHitBonusAtRank(GuRank);
             }
 
             await DamageCmd.Attack(damage)
                 .FromCard(this, cardPlay)
-                .Targeting(current)
+                .Targeting(target)
                 .WithHitFx("vfx/vfx_attack_blunt")
                 .Execute(choiceContext);
         }

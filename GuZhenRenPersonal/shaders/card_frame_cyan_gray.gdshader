@@ -7,9 +7,9 @@ shader_type canvas_item;
  * 这里保留原卡框的透明度和明暗结构，只把颜色映射为青灰色阶。
  */
 
-uniform vec4 shadow_color : source_color = vec4(0.10, 0.17, 0.19, 1.0);
-uniform vec4 middle_color : source_color = vec4(0.31, 0.43, 0.45, 1.0);
-uniform vec4 highlight_color : source_color = vec4(0.62, 0.70, 0.70, 1.0);
+uniform vec4 shadow_color : source_color = vec4(0.72, 0.73, 0.74, 1.0);
+uniform vec4 middle_color : source_color = vec4(0.84, 0.85, 0.86, 1.0);
+uniform vec4 highlight_color : source_color = vec4(0.95, 0.95, 0.96, 1.0);
 
 uniform float contrast : hint_range(0.50, 1.80, 0.01) = 1.08;
 uniform float detail_strength : hint_range(0.00, 0.40, 0.01) = 0.12;

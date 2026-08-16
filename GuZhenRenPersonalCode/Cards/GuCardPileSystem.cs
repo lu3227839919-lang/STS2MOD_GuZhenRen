@@ -46,8 +46,8 @@ public static class GuCardPileSystem
     public const string DiscardPileId = RecoveryPileId;
 
     /// <summary>
-    /// 蛊封存堆：力道蛊与杀招封装材料共用的战斗内封存牌堆。
-    /// 封存的蛊既不占用蛊手牌/存放牌堆，也不占用蛊冷却堆。
+    /// 蛊封存堆：仅供杀招封装材料使用的战斗内封存牌堆。
+    /// 封存的材料不占用蛊手牌/存放牌堆，也不占用蛊冷却堆。
     /// </summary>
     public const string GuSealedLocalId = "gu_sealed";
 
@@ -82,9 +82,8 @@ public static class GuCardPileSystem
     public static PileType DiscardPileType => RecoveryPileType;
 
     /// <summary>
-    /// 蛊封存堆：力道蛊与杀招封装材料共用（可见 UI，位于原版消耗
-    /// 牌堆上方）。力道蛊战斗开始时封存于此，练力解封后进入蛊牌堆；
-    /// 杀招封存材料移入此处，解体或杀招消耗后移回恢复堆。
+    /// 蛊封存堆：杀招封装材料专用（可见 UI，位于原版消耗牌堆上方）。
+    /// 材料在解体或杀招消耗后移回恢复堆。
     /// </summary>
     public static PileType GuSealedPileType { get; private set; }
 
@@ -188,8 +187,8 @@ public static class GuCardPileSystem
             StoragePileType = storageDefinition.PileType;
             RecoveryPileType = recoveryDefinition.PileType;
 
-            // 蛊封存堆：力道蛊与杀招封装材料共用一个牌堆，使用
-            // RitsuLib 的右下自动槽位，紧邻原版消耗牌堆。不要再叠加
+            // 蛊封存堆：仅供杀招封装材料使用，采用 RitsuLib 的右下
+            // 自动槽位，紧邻原版消耗牌堆。不要再叠加
             // 向上的固定偏移，否则不同分辨率下会漂入敌人区域。独立
             // SVG 图标随模组 PCK 打包，避免引用不存在的原版资源后
             // 只剩数量文本。
@@ -243,17 +242,13 @@ public static class GuCardPileSystem
         ArgumentNullException.ThrowIfNull(owner);
 
         EnsureInitialized();
-        PileType targetPile;
-        if (card is ILiDaoTrainingGuCard)
+        GuCardUsageRules.ResetUses(card);
+        if (card is ILiDaoBeastGuCard)
         {
-            LiDaoTrainingSystem.ResetForCombat(card);
-            targetPile = GuSealedPileType;
+            LiDaoBeastTrainingSystem.InitializeGeneratedForCurrentCombat(card);
         }
-        else
-        {
-            GuCardUsageRules.ResetUses(card);
-            targetPile = StoragePileType;
-        }
+
+        PileType targetPile = StoragePileType;
 
         CardPileAddResult result =
             await CardPileCmd.AddGeneratedCardToCombat(
@@ -266,9 +261,8 @@ public static class GuCardPileSystem
     }
 
     /// <summary>
-    /// 把药水生成的临时蛊登记为战斗生成牌。需要炼力的力道蛊进入
-    /// 蛊封存堆；其他蛊统一遵守五张蛊手牌上限，满位时先进入蛊
-    /// 存放牌堆，待出现空位后按现有补牌流程进入蛊手牌。
+    /// 把药水生成的临时蛊登记为战斗生成牌。所有蛊统一遵守五张蛊手牌
+    /// 上限，满位时先进入蛊存放牌堆，待出现空位后按现有补牌流程进入。
     /// </summary>
     internal static async Task<bool> AddTemporaryGuToCombat(
         CardModel card,
@@ -290,23 +284,19 @@ public static class GuCardPileSystem
         }
 
         EnsureInitialized();
-        PileType targetPile;
-        if (card is ILiDaoTrainingGuCard)
+        GuCardUsageRules.ResetUses(card);
+        if (card is ILiDaoBeastGuCard)
         {
-            LiDaoTrainingSystem.ResetForCombat(card);
-            targetPile = GuSealedPileType;
-        }
-        else
-        {
-            GuCardUsageRules.ResetUses(card);
-            bool entersActivePile =
-                bypassCapacity || HasAvailableActiveSlot(owner);
-            targetPile = entersActivePile
-                ? PileType
-                : StoragePileType;
+            LiDaoBeastTrainingSystem.InitializeGeneratedForCurrentCombat(card);
         }
 
-        if (bypassCapacity && card is not ILiDaoTrainingGuCard)
+        bool entersActivePile =
+            bypassCapacity || HasAvailableActiveSlot(owner);
+        PileType targetPile = entersActivePile
+            ? PileType
+            : StoragePileType;
+
+        if (bypassCapacity)
         {
             TemporaryCapacityBypassState[card] = true;
         }
@@ -360,17 +350,13 @@ public static class GuCardPileSystem
         HashSet<CardPile> changedPiles = [];
         foreach (CardModel card in guCards)
         {
-            CardPile targetPile;
-            if (card is ILiDaoTrainingGuCard)
+            GuCardUsageRules.ResetUses(card);
+            if (card is ILiDaoBeastGuCard)
             {
-                LiDaoTrainingSystem.ResetForCombat(card);
-                targetPile = guSealedPile;
+                LiDaoBeastTrainingSystem.CaptureCombatStart(card);
             }
-            else
-            {
-                GuCardUsageRules.ResetUses(card);
-                targetPile = storagePile;
-            }
+
+            CardPile targetPile = storagePile;
 
             CardPile? sourcePile = card.Pile;
             if (sourcePile != null &&
@@ -388,9 +374,7 @@ public static class GuCardPileSystem
             changedPile.InvokeContentsChanged();
         }
 
-        CardModel[] openingCandidates = guCards
-            .Where(static card => card is not ILiDaoTrainingGuCard)
-            .ToArray();
+        CardModel[] openingCandidates = guCards;
         CardModel[] openingCards = DrawRandomGuCards(
             owner,
             openingCandidates,
@@ -420,8 +404,7 @@ public static class GuCardPileSystem
             Entry.Logger.Info(
                 $"[蛊牌入场] 共 {guCards.Length} 张蛊牌；随机选取 " +
                 $"{openingCards.Length} 张进入蛊手牌，" +
-                $"{openingCandidates.Length - openingCards.Length} 张留在蛊存放牌堆待命，" +
-                $"{guCards.Length - openingCandidates.Length} 张力道蛊进入蛊封存堆；" +
+                $"{openingCandidates.Length - openingCards.Length} 张留在蛊存放牌堆待命；" +
                 $"确定性选择=[{selectedCards}]。"
             );
         }
@@ -596,7 +579,6 @@ public static class GuCardPileSystem
 
         CardPile storagePile = StoragePileType.GetPile(owner);
         CardPile recoveryPile = RecoveryPileType.GetPile(owner);
-        CardPile guSealedPile = GuSealedPileType.GetPile(owner);
         MoveActiveOverflowToStorageOrRecovery(owner);
         HashSet<CardPile> changedPiles = [];
 
@@ -621,14 +603,6 @@ public static class GuCardPileSystem
                 sourcePile.RemoveInternal(card, silent: true);
                 changedPiles.Add(sourcePile);
 
-                if (card is ILiDaoTrainingGuCard &&
-                    !LiDaoTrainingSystem.IsUnsealed(card))
-                {
-                    guSealedPile.AddInternal(card, silent: true);
-                    changedPiles.Add(guSealedPile);
-                    continue;
-                }
-
                 if (GuCardUsageRules.CanUse(card) &&
                     !GuCardUsageRules.HasRecoverySchedule(card))
                 {
@@ -639,7 +613,8 @@ public static class GuCardPileSystem
                 }
                 else
                 {
-                    if (!GuCardUsageRules.HasRecoverySchedule(card))
+                    if (card is not ILiDaoBeastGuCard &&
+                        !GuCardUsageRules.HasRecoverySchedule(card))
                     {
                         int currentTurn =
                             owner.PlayerCombatState?.TurnNumber ?? 1;
@@ -685,7 +660,10 @@ public static class GuCardPileSystem
         {
             int currentTurn =
                 card.Owner.PlayerCombatState?.TurnNumber ?? 1;
-            GuCardUsageRules.ScheduleRecovery(card, currentTurn);
+            if (card is not ILiDaoBeastGuCard)
+            {
+                GuCardUsageRules.ScheduleRecovery(card, currentTurn);
+            }
             return RecoveryPileType;
         }
 
@@ -722,7 +700,8 @@ public static class GuCardPileSystem
         int currentTurn = owner.PlayerCombatState?.TurnNumber ?? 1;
         foreach (CardModel card in depletedCards)
         {
-            if (!GuCardUsageRules.HasRecoverySchedule(card))
+            if (card is not ILiDaoBeastGuCard &&
+                !GuCardUsageRules.HasRecoverySchedule(card))
             {
                 GuCardUsageRules.ScheduleRecovery(card, currentTurn);
             }
@@ -761,6 +740,7 @@ public static class GuCardPileSystem
         CardPile storagePile = StoragePileType.GetPile(owner);
         CardModel[] coolingCards = recoveryPile.Cards
             .Where(static card => card is IGuWormCard)
+            .Where(static card => card is not ILiDaoBeastGuCard)
             // 被杀招封装的材料不进入恢复循环。
             .Where(card =>
                 !ShaZhaoTuiYanSystem.IsMaterialSealed(card)
@@ -789,6 +769,7 @@ public static class GuCardPileSystem
 
         CardModel[] activelyCoolingCards = recoveryPile.Cards
             .Where(static card => card is IGuWormCard)
+            .Where(static card => card is not ILiDaoBeastGuCard)
             .Where(card =>
                 !ShaZhaoTuiYanSystem.IsMaterialSealed(card)
             )
@@ -988,32 +969,29 @@ public static class GuCardPileSystem
             return PileType.Deck;
         }
 
-        if (card is ILiDaoTrainingGuCard)
-        {
-            EnsureInitialized();
-            LiDaoTrainingSystem.ResetForCombat(card);
-            MoveCardWithoutAnimation(
-                card,
-                GuSealedPileType.GetPile(owner)
-            );
-            return GuSealedPileType;
-        }
-
         if (card is IGuWormCard)
         {
             EnsureInitialized();
 
             GuCardUsageRules.ResetUses(card);
-            GuCardUsageRules.ScheduleRecovery(
-                card,
-                Math.Max(1, owner.PlayerCombatState.TurnNumber)
-            );
+            if (card is ILiDaoBeastGuCard)
+            {
+                LiDaoBeastTrainingSystem
+                    .InitializeGeneratedForCurrentCombat(card);
+            }
+            else
+            {
+                GuCardUsageRules.ScheduleRecovery(
+                    card,
+                    Math.Max(1, owner.PlayerCombatState.TurnNumber)
+                );
+            }
 
-            MoveCardWithoutAnimation(
-                card,
-                RecoveryPileType.GetPile(owner)
-            );
-            return RecoveryPileType;
+            PileType targetPile = card is ILiDaoBeastGuCard
+                ? StoragePileType
+                : RecoveryPileType;
+            MoveCardWithoutAnimation(card, targetPile.GetPile(owner));
+            return targetPile;
         }
 
         CardPile hand = PileType.Hand.GetPile(owner);
@@ -1036,7 +1014,8 @@ public static class GuCardPileSystem
         targetPile.AddInternal(card, silent: true);
 
         sourcePile?.InvokeContentsChanged();
-        targetPile.InvokeContentsChanged();    }
+        targetPile.InvokeContentsChanged();
+    }
 
     /// <summary>
     /// 在蛊牌堆之间移动卡牌（供杀招材料封装/返还等内部流程使用）。
@@ -1172,7 +1151,8 @@ public static class GuCardPileSystem
                 continue;
             }
 
-            if (!GuCardUsageRules.HasRecoverySchedule(card))
+            if (card is not ILiDaoBeastGuCard &&
+                !GuCardUsageRules.HasRecoverySchedule(card))
             {
                 GuCardUsageRules.ScheduleRecovery(card, currentTurn);
             }

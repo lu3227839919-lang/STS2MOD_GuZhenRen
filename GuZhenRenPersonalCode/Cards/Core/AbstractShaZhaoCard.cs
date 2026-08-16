@@ -425,6 +425,16 @@ public abstract class AbstractShaZhaoCard
         ShaZhaoLifecycle.Instant;
 
     /// <summary>
+    /// 推演时是否把配方材料永久封存进蛊封存堆（不参与后续返还）。
+    ///
+    /// 默认 false：材料按生命周期在杀招消耗/解体/战斗结束时归还。
+    /// 重写为 true 的杀招（如万我）在推演完成时立即解除材料绑定，
+    /// 材料保持封存状态，战斗结束兜底也不会归还。
+    /// </summary>
+    public virtual bool MaterialsSealedPermanently =>
+        false;
+
+    /// <summary>
     /// 次数型杀招的总使用次数。
     /// </summary>
     public virtual int ShaZhaoMaxUses => 1;

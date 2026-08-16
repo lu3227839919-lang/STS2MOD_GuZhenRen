@@ -18,22 +18,13 @@ using STS2RitsuLib.Utils;
 namespace GuZhenRen.Cards.LiDao;
 
 public abstract class AbstractLiDaoGuCard :
-    AbstractGuWormCard,
-    ILiDaoTrainingGuCard
+    AbstractGuWormCard
 {
-    public abstract int TrainingRequired { get; }
-
     public abstract Type CompanionCardType { get; }
 
-    /// <summary>
-    /// 普通力道蛊的通用恢复回合数。特殊卡牌可在本体中覆写。
-    /// </summary>
-    public override int RecoveryDelayTurns => GuRank switch
-    {
-        <= 5 => 2,
-        <= 8 => 3,
-        _ => 4,
-    };
+    public override int MinimumAvailableGuRank => 2;
+
+    public override int MaxGuRank => 5;
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         base.CanonicalKeywords
@@ -42,7 +33,7 @@ public abstract class AbstractLiDaoGuCard :
 
     protected AbstractLiDaoGuCard(
         CardRarity rarity
-    ) : base(0, CardType.Skill, rarity, TargetType.Self)
+    ) : base(0, CardType.Power, rarity, TargetType.Self)
     {
         SetDao(Dao.LiDao);
         this.SecondaryCosts().Set(YuanQiSystem.ResourceId, YuanQiCost);
@@ -53,38 +44,72 @@ public abstract class AbstractLiDaoGuCard :
     )
     {
         base.AddExtraArgsToDescription(description);
-        description.Add("Training", TrainingRequired);
+        description.Add(
+            "Training",
+            LiDaoBeastTrainingSystem.TrainingRequired
+        );
         description.Add(
             "TrainingProgress",
-            LiDaoTrainingSystem.GetProgress(this)
+            LiDaoBeastTrainingSystem.GetProgress(this)
+        );
+        description.Add(
+            "TrainingComplete",
+            LiDaoBeastTrainingSystem.IsTrainingComplete(this) ? 1 : 0
+        );
+        description.Add(
+            "CanManifestThisCombat",
+            LiDaoBeastTrainingSystem.WasCompleteAtCombatStart(this) ? 1 : 0
         );
     }
 
 }
 
-public abstract class AbstractLiDaoBeastGuCard<TPhantom> :
+public abstract class AbstractLiDaoBeastGuCard :
     AbstractLiDaoGuCard,
     ILiDaoBeastGuCard
-    where TPhantom : AbstractLiDaoXuYing
-{
-    public Type PhantomCardType => typeof(TPhantom);
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        base.CanonicalKeywords
-            .Append(GuZhenRenKeywords.NingYing)
-            .Distinct();
+{
+    /// <summary>
+    /// SavedAttachedState 不随 MutableClone 自动复制；普通字段负责把每张
+    /// 永久蛊各自的炼力进度桥接到对应战斗实例。
+    /// </summary>
+    internal int BeastTrainingProgressBridge { get; set; }
 
     protected AbstractLiDaoBeastGuCard(CardRarity rarity) : base(rarity)
     {
     }
 
-    protected override Task OnPlay(
+    public abstract Type PhantomCardType { get; }
+}
+
+public abstract class AbstractLiDaoBeastGuCard<TPhantom> :
+    AbstractLiDaoBeastGuCard
+    where TPhantom : AbstractLiDaoXuYing
+{
+    public override Type PhantomCardType => typeof(TPhantom);
+
+    protected AbstractLiDaoBeastGuCard(CardRarity rarity) : base(rarity)
+    {
+    }
+
+    protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay
-    ) => LiDaoPhantomSystem.ActivateBeastGuAsync<TPhantom>(
-        choiceContext,
-        this
-    );
+    )
+    {
+        if (!LiDaoBeastTrainingSystem.RecordEffectiveActivation(
+                this,
+                cardPlay
+            ))
+        {
+            return;
+        }
+
+        await LiDaoPhantomSystem.ActivateBeastGuAsync<TPhantom>(
+            choiceContext,
+            this
+        );
+    }
 
     public override IReadOnlyList<CardModel> GetCarouselCards() =>
         [GuCardReferenceFactory.Create<TPhantom>(this)];

@@ -788,6 +788,13 @@ internal static class ShaZhaoTuiYanSystem
         // 材料封装：材料移入隐藏材料区并绑定到杀招。
         await shaZhao.BindMaterialsAsync(selectedCards);
 
+        // 材料永久封存型杀招（如万我）：推演完成时立即解除材料绑定，
+        // 材料保持封存、不参与杀招消耗/解体/战斗结束兜底的返还。
+        if (shaZhao.MaterialsSealedPermanently)
+        {
+            shaZhao.ClearBoundMaterials();
+        }
+
         // 登记每场推演次数；八至九转补发第二张推演牌。
         await ApertureSystem.RegisterShaZhaoDerivationAsync(player);
 

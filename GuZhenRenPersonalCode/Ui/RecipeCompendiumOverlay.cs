@@ -755,10 +755,10 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
         List<(string Kind, CardModel Card)> related = [];
         HashSet<Type> includedTypes = [];
 
-        if (source is ILiDaoTrainingGuCard trainingGu)
+        if (source is ILiDaoBeastGuCard beastGu)
         {
             CardModel companion = ModelDb.GetById<CardModel>(
-                ModelDb.GetId(trainingGu.CompanionCardType)
+                ModelDb.GetId(beastGu.CompanionCardType)
             ).ToMutable();
             if (companion is AbstractGuZhenRenCard rankedCompanion)
             {
@@ -1111,16 +1111,12 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
             ));
         }
 
-        bool addedGenericBeastRecipe = false;
         foreach ((
                      Type resultType,
                      IReadOnlyList<Type> materials,
                      int minimumRank
                  ) in HeLianRecipeRegistry.GetRecipeDetails())
         {
-            bool isGenericBeastRecipe = resultType == typeof(BaiShouLiGu);
-            if (isGenericBeastRecipe && addedGenericBeastRecipe) continue;
-            addedGenericBeastRecipe |= isGenericBeastRecipe;
             string resultName = NameOf(resultType);
             string materialText = FormatMaterials(materials, NameOf);
             recipes.Add(new RecipeViewModel(
@@ -1129,10 +1125,8 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
                 resultType,
                 materials,
                 minimumRank,
-                isGenericBeastRecipe
-                    ? $"{resultName} 任意三种不同兽力蛊 {minimumRank}"
-                    : $"{resultName} {materialText} {minimumRank}",
-                isGenericBeastRecipe
+                $"{resultName} {materialText} {minimumRank}",
+                false
             ));
         }
 

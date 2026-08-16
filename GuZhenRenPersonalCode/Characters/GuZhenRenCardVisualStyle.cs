@@ -12,7 +12,7 @@ namespace GuZhenRen.Characters;
 internal static class GuZhenRenCardVisualStyle
 {
     public static readonly Color CardBackgroundColor =
-        new(0.42f, 0.42f, 0.42f, 1f);
+        new(0.88f, 0.88f, 0.88f, 1f);
 
     private static ShaderMaterial? _frameMaterial;
 
@@ -33,8 +33,8 @@ internal static class GuZhenRenCardVisualStyle
                 uniform float s = 0.0;
                 uniform float v = 1.0;
 
-                uniform vec4 frame_color : source_color = vec4(0.01, 0.01, 0.01, 1.0);
-                uniform vec4 background_color : source_color = vec4(0.42, 0.42, 0.42, 1.0);
+                uniform vec4 frame_color : source_color = vec4(0.85, 0.85, 0.85, 1.0);
+                uniform vec4 background_color : source_color = vec4(0.88, 0.88, 0.88, 1.0);
 
                 void fragment()
                 {
@@ -81,6 +81,9 @@ internal static class GuZhenRenCardVisualStyle
                 """,
         };
 
+        Entry.Logger.Info(
+            $"[卡框] CreateFrameMaterial 创建卡框材质：frame=0.85 background=0.88。"
+        );
         return new ShaderMaterial
         {
             Shader = shader,

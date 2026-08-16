@@ -7,6 +7,7 @@ using GuZhenRen.Powers.GuangDao;
 using GuZhenRen.RestSite;
 
 using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Models;
@@ -215,6 +216,19 @@ public sealed class KongQiaoRelic
         if (cardPlay.Card is IGuWormCard &&
             cardPlay.IsFirstInSeries)
         {
+            // Power 类型蛊（能力蛊：苦力蛊/自力更生蛊/我力蛊/群力蛊）：
+            // 使用原版能力牌逻辑，打出后从本场战斗移除（离场），
+            // 不进入蛊冷却/恢复循环，本场战斗不再返回蛊手牌；
+            // 蛊牌属于永久牌组，下场战斗重新入场后仍可再次打出。
+            if (cardPlay.Card.Type == CardType.Power)
+            {
+                await CardPileCmd.RemoveFromCombat(
+                    cardPlay.Card,
+                    skipVisuals: false
+                );
+                return;
+            }
+
             // CardModel.OnPlayWrapper 在 AfterCardPlayed 之后才会把
             // Play 堆中的卡牌送入结果堆。蛊牌的结果堆是 RitsuLib 自定义
             // 牌堆；多人动作在客户端执行时，原版的最后一步迁移可能

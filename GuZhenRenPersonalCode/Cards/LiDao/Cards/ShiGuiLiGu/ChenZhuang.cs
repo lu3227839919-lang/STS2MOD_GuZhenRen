@@ -1,20 +1,10 @@
-using System.Runtime.CompilerServices;
-
-using GuZhenRen.Cards.HeLian;
 using GuZhenRen.Characters;
-using GuZhenRen.Multiplayer;
-using GuZhenRen.Powers.LiDao;
 
-using MegaCrit.Sts2.Core.Combat;
-using MegaCrit.Sts2.Core.Combat.History.Entries;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
-using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib.Interop.AutoRegistration;
@@ -24,7 +14,7 @@ namespace GuZhenRen.Cards.LiDao;
 [RegisterCard(typeof(GuZhenRenCardPool))]
 public sealed class ChenZhuang : AbstractLiDaoCompanionCard
 {
-    public override Type TrainedGuType => typeof(ShiGuiLiGu);
+    public override Type SourceGuType => typeof(ShiGuiLiGu);
     public override bool GainsBlock => true;
 
     private decimal _upBlock;
@@ -33,58 +23,44 @@ public sealed class ChenZhuang : AbstractLiDaoCompanionCard
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new BlockVar(8m, ValueProp.Move),
-        new DynamicVar("AttackBonus", 2m),
+        new DynamicVar("AttackBonus", 0m),
+        new DynamicVar("NoBlockBonus", 0m),
     ];
 
-    public ChenZhuang() : base(CardType.Skill, TargetType.Self)
-    {
+    public ChenZhuang() : base(CardType.Skill, TargetType.Self) =>
         RefreshRankValues();
-    }
 
     private static int BlockAtRank(int rank) => rank switch
     {
-        <= 1 => 8, 2 => 9, 3 => 10, 4 => 11, 5 => 12,
-        6 => 13, 7 => 14, 8 => 15, _ => 16,
+        <= 2 => 8,
+        3 => 10,
+        4 => 11,
+        _ => 12,
     };
 
     private static int AttackBonusAtRank(int rank) => rank switch
     {
-        <= 2 => 2,
-        <= 4 => 3,
-        <= 6 => 4,
-        <= 8 => 5,
-        _ => 6,
-    };
-
-    private static int NoBlockBonusAtRank(int rank) => rank switch
-    {
-        5 => 2,
-        6 => 3,
-        7 => 4,
-        8 => 5,
+        4 => 3,
+        >= 5 => 4,
         _ => 0,
     };
 
+    private static int NoBlockBonusAtRank(int rank) => rank >= 5 ? 2 : 0;
+
     protected override void RefreshRankValues()
     {
-        DynamicVars.Block.BaseValue =
-            BlockAtRank(GuRank) + _upBlock;
+        DynamicVars.Block.BaseValue = BlockAtRank(GuRank) + _upBlock;
         DynamicVars["AttackBonus"].BaseValue =
-            AttackBonusAtRank(GuRank) +
-            _upAttackBonus;
+            AttackBonusAtRank(GuRank) + _upAttackBonus;
+        DynamicVars["NoBlockBonus"].BaseValue =
+            NoBlockBonusAtRank(GuRank);
     }
 
-    protected override void AddExtraArgsToDescription(
-        LocString description
-    )
+    protected override void AddExtraArgsToDescription(LocString description)
     {
         base.AddExtraArgsToDescription(description);
-        int rank = GuRank;
-        description.Add("NoBlockRange", rank is >= 5 and <= 8 ? 1 : 0);
-        description.Add(
-            "NoBlockBonus",
-            NoBlockBonusAtRank(rank)
-        );
+        description.Add("AttackBonusRange", GuRank >= 4 ? 1 : 0);
+        description.Add("NoBlockRange", GuRank >= 5 ? 1 : 0);
     }
 
     protected override Task OnPlay(
@@ -92,28 +68,15 @@ public sealed class ChenZhuang : AbstractLiDaoCompanionCard
         CardPlay cardPlay
     )
     {
-        int rank = GuRank;
         decimal block = DynamicVars.Block.BaseValue;
-        decimal attackBonus = PlayedAttackEarlierThisTurn()
-            ? DynamicVars["AttackBonus"].BaseValue
-            : 0m;
-
-        if (Owner.Creature.Block <= 0)
+        if (GuRank >= 4 && PlayedAttackEarlierThisTurn())
         {
-            if (rank <= 8)
-            {
-                block += NoBlockBonusAtRank(rank);
-            }
-            else
-            {
-                block = Math.Round(
-                    block * 1.5m,
-                    MidpointRounding.AwayFromZero
-                );
-            }
+            block += DynamicVars["AttackBonus"].BaseValue;
         }
-
-        block += attackBonus;
+        if (GuRank >= 5 && Owner.Creature.Block <= 0)
+        {
+            block += DynamicVars["NoBlockBonus"].BaseValue;
+        }
 
         return CreatureCmd.GainBlock(
             Owner.Creature,

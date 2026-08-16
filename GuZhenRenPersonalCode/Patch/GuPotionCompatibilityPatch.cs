@@ -202,11 +202,10 @@ internal static class GuPotionCompatibilityPatch
                 card is IGuWormCard &&
                 (!requiredType.HasValue ||
                     card.Type == requiredType.Value) &&
-                (GuZhenRenCardRules.CanAppearInCardReward(
-                        player,
-                        card
-                    ) ||
-                    card is BaiShouLiGu)
+                GuZhenRenCardRules.CanAppearInCardReward(
+                    player,
+                    card
+                )
             )
             .GroupBy(card => card.Id)
             .Select(group => group.First())
@@ -305,7 +304,7 @@ internal static class GuPotionCompatibilityPatch
     {
         Type? companionType = guCard switch
         {
-            ILiDaoTrainingGuCard liDao => liDao.CompanionCardType,
+            ILiDaoBeastGuCard liDao => liDao.CompanionCardType,
             IZhouDaoCompanionGuCard zhouDao => zhouDao.CompanionCardType,
             _ => null,
         };
@@ -339,13 +338,6 @@ internal static class GuPotionCompatibilityPatch
         {
             rankedCompanion.InitializeGuRankFromSource(
                 sourceGu.GuRank
-            );
-        }
-
-        if (guCard is ILiDaoTrainingGuCard)
-        {
-            LiDaoTrainingSystem.MarkCompanionCanTrain(
-                companion
             );
         }
 

@@ -1,11 +1,8 @@
-using System.Reflection;
-
 using GuZhenRen.Cards.LiDao;
 
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
-using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
@@ -13,13 +10,16 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
 
-using STS2RitsuLib;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
-using STS2RitsuLib.Utils;
 
 namespace GuZhenRen.Powers.LiDao;
 
+/// <summary>
+/// 万我生成的独立临时生命来源。
+/// 每个我力虚影提供 5 点临时生命；每累计损失 5 点该来源临时生命，
+/// 消耗 1 个我力虚影。临时生命优先于真实生命吸收伤害。
+/// </summary>
 [RegisterPower]
 public sealed class WoLiTempHpPower : ModPowerTemplate
 {
@@ -44,8 +44,8 @@ public sealed class WoLiTempHpPower : ModPowerTemplate
     ];
 
     public override PowerAssetProfile AssetProfile => new(
-        IconPath: "res://GuZhenRenPersonal/images/power/WoLiTempHpPower-64x64.png",
-        BigIconPath: "res://GuZhenRenPersonal/images/power/WoLiTempHpPower-256x256.png"
+        IconPath: "res://GuZhenRenPersonal/images/power/LiDaoBattlePower-64x64.png",
+        BigIconPath: "res://GuZhenRenPersonal/images/power/LiDaoBattlePower-256x256.png"
     );
 
     internal void AddShadows(int count)
@@ -68,7 +68,9 @@ public sealed class WoLiTempHpPower : ModPowerTemplate
         CardPlay? cardPlay
     )
     {
-        if (!ReferenceEquals(target, Owner) || TempHp <= 0 || amount <= 0)
+        if (!ReferenceEquals(target, Owner) ||
+            TempHp <= 0 ||
+            amount <= 0)
         {
             _pendingAbsorption = 0;
             return 0m;
@@ -96,15 +98,15 @@ public sealed class WoLiTempHpPower : ModPowerTemplate
             return;
         }
 
-        int actual = ExtractDamage(result, _pendingAbsorption);
+        int absorbed = _pendingAbsorption;
         _pendingAbsorption = 0;
-        if (actual <= 0)
+        if (absorbed <= 0)
         {
             return;
         }
 
-        int hp = Math.Max(0, TempHp - actual);
-        int remainder = LossRemainder + actual;
+        int hp = Math.Max(0, TempHp - absorbed);
+        int remainder = LossRemainder + absorbed;
         int consumed = 0;
         while (remainder >= 5 && Amount - consumed > 0)
         {
@@ -131,28 +133,5 @@ public sealed class WoLiTempHpPower : ModPowerTemplate
         }
 
         InvokeDisplayAmountChanged();
-    }
-
-    private static int ExtractDamage(
-        DamageResult result,
-        int fallback
-    )
-    {
-        object boxed = result;
-        Type type = boxed.GetType();
-        foreach (string name in new[] { "Damage", "DamageDealt", "UnblockedDamage" })
-        {
-            object? value = type.GetProperty(name)?.GetValue(boxed);
-            if (value is int integer)
-            {
-                return Math.Clamp(integer, 0, fallback);
-            }
-            if (value is decimal decimalValue)
-            {
-                return Math.Clamp((int)Math.Round(decimalValue), 0, fallback);
-            }
-        }
-
-        return fallback;
     }
 }

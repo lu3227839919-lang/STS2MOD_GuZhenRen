@@ -6,7 +6,7 @@
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_DISCARD.description": "Stores only Gu that are still cooling down. After a Gu spends all available activations it enters this pile; when cooldown completes it returns to the Gu Storage Pile, then enters the Gu Hand in order. Left-click to inspect.",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_DISCARD.empty": "The Gu Cooldown Pile is empty.",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_SEALED.title": "Sealed Gu Pile",
-  "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_SEALED.description": "Holds Strength Gu that have not finished training this combat, plus Gu Worms sealed into Killer Moves. Play their permanent companion cards to train them; at full progress they unseal into the Gu Hand. Materials return to the Gu Cooldown Pile when the Killer Move is consumed or dismantled.",
+  "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_SEALED.description": "Holds Gu Worms sealed into Killer Moves. Materials return to the Gu Cooldown Pile when the Killer Move is consumed or dismantled.",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_SEALED.empty": "No sealed Gu.",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_CARDS.selectionPrompt": "Select Gu Worm materials matching the selected Killer Move, then confirm.",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_CARDS.targetSelectionPrompt": "First select the Killer Move to deduce. Only matching materials will be shown next.",

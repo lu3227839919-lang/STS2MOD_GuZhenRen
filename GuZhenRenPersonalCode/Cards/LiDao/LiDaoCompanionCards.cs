@@ -25,7 +25,7 @@ public abstract class AbstractLiDaoCompanionCard :
     AbstractGuZhenRenGeneratedCard,
     ILiDaoCompanionCard
 {
-    public abstract Type TrainedGuType { get; }
+    public abstract Type SourceGuType { get; }
 
     protected AbstractLiDaoCompanionCard(
         CardType type,
@@ -66,21 +66,6 @@ public abstract class AbstractLiDaoCompanionCard :
     {
     }
 
-    public override async Task AfterCardPlayed(
-        PlayerChoiceContext choiceContext,
-        CardPlay cardPlay
-    )
-    {
-        if (ReferenceEquals(cardPlay.Card, this))
-        {
-            await LiDaoTrainingSystem.TrainFromCompanionAsync(
-                choiceContext,
-                cardPlay,
-                TrainedGuType
-            );
-        }
-    }
-
     /// <summary>本回合是否已打出过攻击牌（不含当前正在结算的这张）。</summary>
     protected bool PlayedAttackEarlierThisTurn()
     {
@@ -94,10 +79,4 @@ public abstract class AbstractLiDaoCompanionCard :
             );
     }
 
-    /// <summary>当前常驻虚影包含的兽力种类数（基础虚影计 1 种，百兽按组成计）。</summary>
-    protected int PermanentPhantomKinds =>
-        Owner != null
-            ? LiDaoPhantomSystem.GetPermanentPhantomKinds(Owner)
-            : 0;
 }
-

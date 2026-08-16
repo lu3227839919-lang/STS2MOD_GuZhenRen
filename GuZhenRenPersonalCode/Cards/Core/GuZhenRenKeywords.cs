@@ -48,7 +48,6 @@ namespace GuZhenRen.Cards;
 [RegisterOwnedCardKeyword(nameof(ZhuiJi), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(XuYing), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(LianLi), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
-[RegisterOwnedCardKeyword(nameof(NingYing), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(NianHua), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(SuiMan), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(HuanBu), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
@@ -98,7 +97,6 @@ public sealed class GuZhenRenKeywords
     public static readonly CardKeyword ZhuiJi = Create(nameof(ZhuiJi));
     public static readonly CardKeyword XuYing = Create(nameof(XuYing));
     public static readonly CardKeyword LianLi = Create(nameof(LianLi));
-    public static readonly CardKeyword NingYing = Create(nameof(NingYing));
     public static readonly CardKeyword NianHua = Create(nameof(NianHua));
     public static readonly CardKeyword SuiMan = Create(nameof(SuiMan));
     public static readonly CardKeyword HuanBu = Create(nameof(HuanBu));
@@ -164,7 +162,7 @@ public sealed class GuZhenRenKeywords
             YueXiang, CanYue,
             YingYue, ManYue, XueTai, TaiDong, PoTai, FuHua,
             TunJi, ZongEDu, YiChu, ZhuiJi,
-            XuYing, LianLi, NingYing,
+            XuYing, LianLi,
             NianHua, SuiMan, HuanBu, XiYing,
         };
 

@@ -1,22 +1,9 @@
-using System.Numerics;
-
-using GuZhenRen.Cards;
 using GuZhenRen.Cards.LiDao;
 
-using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
-using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Entities.Creatures;
-using MegaCrit.Sts2.Core.Entities.Players;
-using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
-using MegaCrit.Sts2.Core.ValueProps;
-
-using STS2RitsuLib.Interop.AutoRegistration;
-using STS2RitsuLib.Scaffolding.Content;
 
 namespace GuZhenRen.Powers.LiDao;
 
@@ -41,23 +28,10 @@ public static class LiDaoPowerSystem
                 source.Owner.Creature,
                 source
             );
-        }
-        else
-        {
-            existing.ConfigureRank(Math.Max(existing.Rank, source.GuRank));
-            await PowerCmd.ModifyAmount(
-                choiceContext,
-                existing,
-                1,
-                source.Owner.Creature,
-                source
-            );
+            return;
         }
 
-        await LiDaoTrainingSystem.FlushExtraTrainingAsync(
-            choiceContext,
-            source
-        );
+        existing.ConfigureRank(Math.Max(existing.Rank, source.GuRank));
     }
 
     public static async Task ActivateWoLiAsync(
@@ -102,20 +76,22 @@ public static class LiDaoPowerSystem
                 source.Owner.Creature,
                 source
             );
+            Entry.Logger.Info(
+                $"[苦力] ActivateKuLiAsync 已施加 KuLiPower，rank={source.GuRank}，" +
+                $"card={source.Id}。"
+            );
+            power.RecordActivation();
+            await power.SyncInjuryThresholdsAsync(choiceContext);
             return;
         }
 
         existing.ConfigureRank(Math.Max(existing.Rank, source.GuRank));
-        if (existing.GrindingStacks < 3)
-        {
-            await PowerCmd.ModifyAmount(
-                choiceContext,
-                existing,
-                1,
-                source.Owner.Creature,
-                source
-            );
-        }
+        existing.RecordActivation();
+        await existing.SyncInjuryThresholdsAsync(choiceContext);
+        Entry.Logger.Info(
+            $"[苦力] ActivateKuLiAsync 已更新 KuLiPower，rank={existing.Rank}，" +
+            $"card={source.Id}。"
+        );
     }
 
     public static async Task ActivateZiLiAsync(
@@ -131,6 +107,7 @@ public static class LiDaoPowerSystem
                 (ZiLiGengShengPower)
                     ModelDb.Power<ZiLiGengShengPower>().ToMutable();
             power.ConfigureRank(source.GuRank);
+            power.Arm();
             await PowerCmd.Apply(
                 choiceContext,
                 power,
@@ -143,56 +120,6 @@ public static class LiDaoPowerSystem
         }
 
         existing.ConfigureRank(Math.Max(existing.Rank, source.GuRank));
-        if (existing.StrongBodyStacks < 3)
-        {
-            await PowerCmd.ModifyAmount(
-                choiceContext,
-                existing,
-                1,
-                source.Owner.Creature,
-                source
-            );
-        }
+        existing.Arm();
     }
-
-    public static decimal GetBeastEffectMultiplier(Creature owner) =>
-        owner.GetPower<KuLiPower>()?.EffectMultiplier ?? 1m;
-
-    public static Task NotifyManifested(
-        Creature owner,
-        LiDaoBeastKind kind
-    ) => owner.GetPower<ZiLiGengShengPower>() is { } power
-        ? power.RecordManifestationAsync(kind)
-        : Task.CompletedTask;
-
-    public static Task NotifyPhantomTriggered(
-        PlayerChoiceContext choiceContext,
-        Creature owner,
-        AbstractLiDaoXuYing phantom
-    ) => owner.GetPower<WoLiPower>() is { } power
-        ? power.RecordPhantomTriggerAsync(choiceContext, phantom)
-        : Task.CompletedTask;
-
-    public static int GetPhantomStrengthBonus(Creature owner) =>
-        owner.GetPower<WoLiPower>() is { StrengthApplies: true } &&
-        owner.GetPower<StrengthPower>() is { } strength
-            ? Math.Max(0, strength.Amount)
-            : 0;
-
-    public static bool TryRollGroupRepeat(
-        Player owner,
-        AbstractLiDaoXuYing phantom
-    )
-    {
-        if (phantom.IsFullForcePhantom || phantom is WoLiXuYing)
-        {
-            return false;
-        }
-
-        return owner.Creature.GetPower<QunLiPower>() is { } power &&
-            power.TryRollRepeat(owner);
-    }
-
-    public static void NotifyCondensed(Creature owner) =>
-        owner.GetPower<ZiLiGengShengPower>()?.RecordCondensation();
 }

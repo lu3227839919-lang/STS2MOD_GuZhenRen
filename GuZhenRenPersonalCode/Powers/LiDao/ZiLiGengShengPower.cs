@@ -1,18 +1,12 @@
-using System.Numerics;
-
-using GuZhenRen.Cards;
 using GuZhenRen.Cards.LiDao;
 
-using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
-using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib.Interop.AutoRegistration;
@@ -20,23 +14,31 @@ using STS2RitsuLib.Scaffolding.Content;
 
 namespace GuZhenRen.Powers.LiDao;
 
+/// <summary>
+/// 自力更生蛊的待触发状态。只统计标记攻击对主目标造成的实际
+/// 生命伤害；格挡与过量伤害不会进入回复基数。
+/// </summary>
 [RegisterPower]
 public sealed class ZiLiGengShengPower : ModPowerTemplate
 {
-    private int _trackedTurn;
-    private int _manifestedMask;
-    private int _lifeForce;
-    private bool _immediateHealUsed;
+    private bool _armed;
+    private bool _trackingAttack;
+    private CardModel? _trackedCard;
+    private Creature? _primaryTarget;
+    private int _actualDamage;
+    private bool _killedPrimaryTarget;
+    private int _attachedLiDaoDamageDepth;
 
     public override PowerType Type => PowerType.Buff;
-    public override PowerStackType StackType => PowerStackType.Counter;
-    public override int DisplayAmount => StrongBodyStacks;
+
+    public override PowerStackType StackType => PowerStackType.Single;
+
+    public override int DisplayAmount => _armed ? 1 : 0;
 
     public int Rank => DynamicVars["Rank"].IntValue;
-    public int StrongBodyStacks => Math.Clamp(Amount - 1, 0, 3);
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
-        [new DynamicVar("Rank", 1m)];
+        [new DynamicVar("Rank", 3m)];
 
     public override PowerAssetProfile AssetProfile => new(
         IconPath: "res://GuZhenRenPersonal/images/power/ZiLiGengShengPower-64x64.png",
@@ -45,134 +47,128 @@ public sealed class ZiLiGengShengPower : ModPowerTemplate
 
     internal void ConfigureRank(int rank)
     {
-        DynamicVars["Rank"].BaseValue = Math.Clamp(rank, 1, 9);
+        DynamicVars["Rank"].BaseValue = Math.Clamp(rank, 3, 7);
         InvokeDisplayAmountChanged();
     }
 
-    internal async Task RecordManifestationAsync(LiDaoBeastKind kind)
+    internal void Arm()
     {
-        ResetTurnStateIfNeeded();
-        _manifestedMask |= 1 << (int)kind;
+        _armed = true;
+        ClearTrackedAttack();
+        InvokeDisplayAmountChanged();
+    }
 
-        int immediateHeal = _immediateHealUsed
-            ? 0
-            : ZiLiGengShengGu.ImmediateHealAtRank(
-                Rank,
-                LiDaoPhantomSystem.GetForceBase(Owner.Player!)
-            );
-
-        if (immediateHeal > 0)
+    internal void BeginAttachedLiDaoDamage(CardModel sourceCard)
+    {
+        if (_trackingAttack && sourceCard == _trackedCard)
         {
-            _immediateHealUsed = true;
-            await HealWithOverflow(
-                new ThrowingPlayerChoiceContext(),
-                immediateHeal
-            );
+            _attachedLiDaoDamageDepth++;
         }
     }
 
-    internal void RecordCondensation()
+    internal void EndAttachedLiDaoDamage(CardModel sourceCard)
     {
-        ResetTurnStateIfNeeded();
-        int cap = ZiLiGengShengGu.LifeForceCapAtRank(Rank);
-        if (cap > 0)
+        if (sourceCard == _trackedCard && _attachedLiDaoDamageDepth > 0)
         {
-            _lifeForce = Math.Min(cap, _lifeForce + 1);
+            _attachedLiDaoDamageDepth--;
         }
     }
 
-    public override async Task BeforeSideTurnEnd(
+    public override Task BeforeCardPlayed(CardPlay cardPlay)
+    {
+        if (!_armed ||
+            _trackingAttack ||
+            cardPlay.Player.Creature != Owner ||
+            cardPlay.Card.Type != CardType.Attack ||
+            !cardPlay.IsFirstInSeries)
+        {
+            return Task.CompletedTask;
+        }
+
+        _armed = false;
+        _trackingAttack = true;
+        _trackedCard = cardPlay.Card;
+        _primaryTarget = GetPrimaryTarget(cardPlay);
+        _actualDamage = 0;
+        _killedPrimaryTarget = false;
+        _attachedLiDaoDamageDepth = 0;
+        InvokeDisplayAmountChanged();
+        return Task.CompletedTask;
+    }
+
+    public override Task AfterDamageGiven(
         PlayerChoiceContext choiceContext,
-        CombatSide side,
-        IEnumerable<Creature> participants
+        Creature? dealer,
+        DamageResult result,
+        ValueProp props,
+        Creature target,
+        CardModel? cardSource
     )
     {
-        if (!participants.Contains(Owner) ||
-            !ZiLiGengShengGu.HealsAtTurnEndAtRank(Rank))
+        if (!_trackingAttack ||
+            dealer != Owner ||
+            target != _primaryTarget ||
+            cardSource != _trackedCard)
+        {
+            return Task.CompletedTask;
+        }
+
+        if (_attachedLiDaoDamageDepth > 0 &&
+            !ZiLiGengShengGu.CountsAttachedLiDaoDamageAtRank(Rank))
+        {
+            return Task.CompletedTask;
+        }
+
+        _actualDamage += result.UnblockedDamage;
+        _killedPrimaryTarget |= result.WasTargetKilled;
+        return Task.CompletedTask;
+    }
+
+    public override async Task AfterCardPlayedLate(
+        PlayerChoiceContext choiceContext,
+        CardPlay cardPlay
+    )
+    {
+        if (!_trackingAttack ||
+            !cardPlay.IsLastInSeries ||
+            cardPlay.Card != _trackedCard)
         {
             return;
         }
 
-        ResetTurnStateIfNeeded();
-        int forceBase = LiDaoPhantomSystem.GetForceBase(Owner.Player!);
-        int cap = ZiLiGengShengGu.HealingCapAtRank(Rank) + StrongBodyStacks;
-        int healing = Math.Min(forceBase, cap);
+        int actualDamage = _actualDamage;
+        bool killedTarget = _killedPrimaryTarget;
+        ClearTrackedAttack();
 
-        healing += ZiLiGengShengGu.ForceBaseBonusAtRank(Rank, forceBase);
-        healing += ZiLiGengShengGu.LifeForceBonusAtRank(Rank, _lifeForce);
-
-        int manifestedKinds = BitOperations.PopCount((uint)_manifestedMask);
-        int hardship = Owner.GetPower<KuLiPower>()?.Hardship ?? 0;
-        healing += ZiLiGengShengGu.ManifestationBonusAtRank(
-            Rank,
-            manifestedKinds,
-            hardship
-        );
-
-        decimal multiplier = ZiLiGengShengGu.LowHealthMultiplierAtRank(
-            Rank,
-            Owner.CurrentHp,
-            Owner.MaxHp
-        );
-        if (multiplier != 1m)
-        {
-            healing = (int)Math.Round(
-                healing * multiplier,
+        int healing = Math.Min(
+            ZiLiGengShengGu.HealingCapAtRank(Rank, killedTarget),
+            (int)Math.Round(
+                actualDamage *
+                    ZiLiGengShengGu.HealingRatioAtRank(Rank),
                 MidpointRounding.AwayFromZero
-            );
-        }
-
+            )
+        );
         if (healing > 0)
         {
-            await HealWithOverflow(choiceContext, healing);
+            await CreatureCmd.Heal(Owner, healing);
         }
 
-        ResetTurnState(force: true);
+        await PowerCmd.Remove(this);
     }
 
-    private async Task HealWithOverflow(
-        PlayerChoiceContext choiceContext,
-        int requested
-    )
-    {
-        int missing = Math.Max(0, Owner.MaxHp - Owner.CurrentHp);
-        int healed = Math.Min(missing, requested);
-        if (healed > 0)
-        {
-            await CreatureCmd.Heal(Owner, healed);
-        }
+    private Creature? GetPrimaryTarget(CardPlay cardPlay) =>
+        cardPlay.Target ??
+        cardPlay.Card.CombatState?
+            .GetOpponentsOf(Owner)
+            .FirstOrDefault(creature => creature.IsHittable);
 
-        int overflow = Math.Max(0, requested - healed);
-        int block = ZiLiGengShengGu.OverflowBlockAtRank(Rank, overflow);
-        if (block > 0)
-        {
-            await CreatureCmd.GainBlock(
-                Owner,
-                block,
-                ValueProp.Unpowered,
-                cardPlay: null
-            );
-        }
-    }
-
-    private void ResetTurnStateIfNeeded()
+    private void ClearTrackedAttack()
     {
-        int turn = Owner.Player?.PlayerCombatState?.TurnNumber ?? 1;
-        if (_trackedTurn != turn)
-        {
-            ResetTurnState(force: true);
-            _trackedTurn = turn;
-        }
-    }
-
-    private void ResetTurnState(bool force)
-    {
-        if (!force)
-        {
-            return;
-        }
-        _manifestedMask = 0;
-        _lifeForce = 0;
-        _immediateHealUsed = false;
+        _trackingAttack = false;
+        _trackedCard = null;
+        _primaryTarget = null;
+        _actualDamage = 0;
+        _killedPrimaryTarget = false;
+        _attachedLiDaoDamageDepth = 0;
     }
 }

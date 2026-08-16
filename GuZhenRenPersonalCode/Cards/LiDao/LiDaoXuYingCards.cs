@@ -1,9 +1,6 @@
 using System.Runtime.CompilerServices;
 
-using GuZhenRen.Cards.HeLian;
 using GuZhenRen.Characters;
-using GuZhenRen.Multiplayer;
-using GuZhenRen.Powers.LiDao;
 
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -12,13 +9,9 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Random;
 using MegaCrit.Sts2.Core.ValueProps;
 
-using STS2RitsuLib;
 using STS2RitsuLib.Interop.AutoRegistration;
-using STS2RitsuLib.Scaffolding.Content;
-using STS2RitsuLib.Utils;
 
 namespace GuZhenRen.Cards.LiDao;
 
@@ -29,16 +22,9 @@ public abstract class AbstractLiDaoXuYing :
 {
     public abstract LiDaoBeastKind? BeastKind { get; }
 
-    public virtual bool IsFullForcePhantom => false;
-
-    public virtual int PhantomSlotCost => IsFullForcePhantom ? 0 : 1;
-
-    public virtual IReadOnlyCollection<LiDaoBeastKind>
-        LastManifestedKinds => BeastKind is { } kind ? [kind] : [];
+    public virtual int PhantomSlotCost => 1;
 
     protected sealed override bool UsesCentralResolution => true;
-
-    protected virtual decimal IntrinsicEffectMultiplier => 1m;
 
     protected AbstractLiDaoXuYing(
         CardType type,
@@ -47,45 +33,21 @@ public abstract class AbstractLiDaoXuYing :
     {
     }
 
-    internal decimal GetCombinedEffectMultiplier() =>
-        ResolutionMultiplier *
-        IntrinsicEffectMultiplier *
-        LiDaoPowerSystem.GetBeastEffectMultiplier(Owner.Creature);
-
     internal int ScaleEffect(decimal value) =>
         Math.Max(
             0,
             (int)Math.Round(
-                value * GetCombinedEffectMultiplier(),
+                value * ResolutionMultiplier,
                 MidpointRounding.AwayFromZero
             )
         );
 
-    internal int ScaleDamage(decimal value) =>
-        ScaleEffect(value) +
-        LiDaoPowerSystem.GetPhantomStrengthBonus(Owner.Creature);
-
-    private static int CondenseChanceGainAtRank(int rank) => rank switch
-    {
-        <= 5 => 10,
-        <= 8 => 15,
-        _ => 20,
-    };
-
-    internal virtual void Condense()
-    {
-        float gain = CondenseChanceGainAtRank(GuRank) / 100f;
-        float capped = Math.Min(0.8f, BaseChance + gain);
-        IncreaseBaseChance(capped - BaseChance);
-    }
+    internal int ScaleDamage(decimal value) => ScaleEffect(value);
 
     protected override void AddExtraArgsToDescription(LocString description)
     {
         base.AddExtraArgsToDescription(description);
-        description.Add(
-            "Chance",
-            (int)MathF.Round(BaseChance * 100f)
-        );
+        description.Add("Chance", (int)MathF.Round(BaseChance * 100f));
     }
 }
 
@@ -95,12 +57,13 @@ public sealed class BaiZhiXuYing : AbstractLiDaoXuYing
     public override LiDaoBeastKind? BeastKind => LiDaoBeastKind.BaiZhi;
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
-        [new DamageVar(5m, ValueProp.Move)];
+    [
+        new DamageVar(6m, ValueProp.Move),
+        new DynamicVar("FirstBonus", 0m),
+    ];
 
-    public BaiZhiXuYing() : base(CardType.Attack, TargetType.AnyEnemy)
-    {
+    public BaiZhiXuYing() : base(CardType.Attack, TargetType.AnyEnemy) =>
         RefreshRankValues();
-    }
 
     protected override Task TriggerPhantomEffect(
         PlayerChoiceContext choiceContext,
@@ -111,8 +74,7 @@ public sealed class BaiZhiXuYing : AbstractLiDaoXuYing
         LiDaoBeastKind.BaiZhi,
         GuRank,
         choiceContext,
-        target,
-        LiDaoPhantomSystem.OtherManifestedForCurrentAttack
+        target
     );
 
     protected override void OnXuYingGuRankChanged() => RefreshRankValues();
@@ -121,47 +83,8 @@ public sealed class BaiZhiXuYing : AbstractLiDaoXuYing
     {
         SetBaseChance(BaiZhiGu.ChanceAtRank(GuRank) / 100f);
         DynamicVars.Damage.BaseValue = BaiZhiGu.DamageAtRank(GuRank);
-    }
-}
-
-[RegisterCard(typeof(GuZhenRenXuYingCardPool))]
-public sealed class FeiXiongXuYing : AbstractLiDaoXuYing
-{
-    public override LiDaoBeastKind? BeastKind => LiDaoBeastKind.FeiXiong;
-
-    protected override IEnumerable<DynamicVar> CanonicalVars =>
-    [
-        new DamageVar(10m, ValueProp.Move),
-        new DynamicVar("DivineMight", 0m),
-    ];
-
-    public FeiXiongXuYing() : base(CardType.Attack, TargetType.AnyEnemy)
-    {
-        RefreshRankValues();
-    }
-
-    protected override Task TriggerPhantomEffect(
-        PlayerChoiceContext choiceContext,
-        CardPlay triggeringPlay,
-        Creature? target
-    ) => LiDaoBeastEffectExecutor.ExecuteAsync(
-        this,
-        LiDaoBeastKind.FeiXiong,
-        GuRank,
-        choiceContext,
-        target,
-        LiDaoPhantomSystem.OtherManifestedForCurrentAttack
-    );
-
-    protected override void OnXuYingGuRankChanged() => RefreshRankValues();
-
-    private void RefreshRankValues()
-    {
-        SetBaseChance(FeiXiongZhiLiGu.ChanceAtRank(GuRank) / 100f);
-        DynamicVars.Damage.BaseValue =
-            FeiXiongZhiLiGu.DamageAtRank(GuRank);
-        DynamicVars["DivineMight"].BaseValue =
-            FeiXiongZhiLiGu.DivineMightAtRank(GuRank);
+        DynamicVars["FirstBonus"].BaseValue =
+            BaiZhiGu.FirstManifestBonusAtRank(GuRank);
     }
 }
 
@@ -172,14 +95,13 @@ public sealed class EXuYing : AbstractLiDaoXuYing
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(3m, ValueProp.Move),
+        new DamageVar(4m, ValueProp.Move),
         new DynamicVar("Hits", 2m),
+        new DynamicVar("SecondHitBonus", 0m),
     ];
 
-    public EXuYing() : base(CardType.Attack, TargetType.AnyEnemy)
-    {
+    public EXuYing() : base(CardType.Attack, TargetType.AnyEnemy) =>
         RefreshRankValues();
-    }
 
     protected override Task TriggerPhantomEffect(
         PlayerChoiceContext choiceContext,
@@ -190,8 +112,7 @@ public sealed class EXuYing : AbstractLiDaoXuYing
         LiDaoBeastKind.E,
         GuRank,
         choiceContext,
-        target,
-        LiDaoPhantomSystem.OtherManifestedForCurrentAttack
+        target
     );
 
     protected override void OnXuYingGuRankChanged() => RefreshRankValues();
@@ -200,7 +121,9 @@ public sealed class EXuYing : AbstractLiDaoXuYing
     {
         SetBaseChance(ELiGu.ChanceAtRank(GuRank) / 100f);
         DynamicVars.Damage.BaseValue = ELiGu.DamageAtRank(GuRank);
-        DynamicVars["Hits"].BaseValue = ELiGu.HitsAtRank(GuRank);
+        DynamicVars["Hits"].BaseValue = 2m;
+        DynamicVars["SecondHitBonus"].BaseValue =
+            ELiGu.HitBonusAtRank(GuRank, 1);
     }
 }
 
@@ -213,12 +136,11 @@ public sealed class QingNiuXuYing : AbstractLiDaoXuYing
     [
         new DamageVar(4m, ValueProp.Move),
         new BlockVar(2m, ValueProp.Move),
+        new DynamicVar("HitBlockBonus", 0m),
     ];
 
-    public QingNiuXuYing() : base(CardType.Attack, TargetType.AnyEnemy)
-    {
+    public QingNiuXuYing() : base(CardType.Attack, TargetType.AnyEnemy) =>
         RefreshRankValues();
-    }
 
     protected override Task TriggerPhantomEffect(
         PlayerChoiceContext choiceContext,
@@ -229,8 +151,7 @@ public sealed class QingNiuXuYing : AbstractLiDaoXuYing
         LiDaoBeastKind.QingNiu,
         GuRank,
         choiceContext,
-        target,
-        LiDaoPhantomSystem.OtherManifestedForCurrentAttack
+        target
     );
 
     protected override void OnXuYingGuRankChanged() => RefreshRankValues();
@@ -240,8 +161,9 @@ public sealed class QingNiuXuYing : AbstractLiDaoXuYing
         SetBaseChance(QingNiuLaoLiGu.ChanceAtRank(GuRank) / 100f);
         DynamicVars.Damage.BaseValue =
             QingNiuLaoLiGu.DamageAtRank(GuRank);
-        DynamicVars.Block.BaseValue =
-            QingNiuLaoLiGu.BlockAtRank(GuRank);
+        DynamicVars.Block.BaseValue = QingNiuLaoLiGu.BlockAtRank(GuRank);
+        DynamicVars["HitBlockBonus"].BaseValue =
+            QingNiuLaoLiGu.HitBlockBonusAtRank(GuRank);
     }
 }
 
@@ -251,12 +173,13 @@ public sealed class ShiGuiXuYing : AbstractLiDaoXuYing
     public override LiDaoBeastKind? BeastKind => LiDaoBeastKind.ShiGui;
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
-        [new BlockVar(4m, ValueProp.Move)];
+    [
+        new BlockVar(6m, ValueProp.Move),
+        new DynamicVar("NoBlockBonus", 0m),
+    ];
 
-    public ShiGuiXuYing() : base(CardType.Skill, TargetType.Self)
-    {
+    public ShiGuiXuYing() : base(CardType.Skill, TargetType.Self) =>
         RefreshRankValues();
-    }
 
     protected override Task TriggerPhantomEffect(
         PlayerChoiceContext choiceContext,
@@ -267,8 +190,7 @@ public sealed class ShiGuiXuYing : AbstractLiDaoXuYing
         LiDaoBeastKind.ShiGui,
         GuRank,
         choiceContext,
-        target,
-        LiDaoPhantomSystem.OtherManifestedForCurrentAttack
+        target
     );
 
     protected override void OnXuYingGuRankChanged() => RefreshRankValues();
@@ -277,231 +199,54 @@ public sealed class ShiGuiXuYing : AbstractLiDaoXuYing
     {
         SetBaseChance(ShiGuiLiGu.ChanceAtRank(GuRank) / 100f);
         DynamicVars.Block.BaseValue = ShiGuiLiGu.BlockAtRank(GuRank);
+        DynamicVars["NoBlockBonus"].BaseValue =
+            ShiGuiLiGu.NoBlockBonusAtRank(GuRank);
     }
 }
 
 [RegisterCard(typeof(GuZhenRenXuYingCardPool))]
-public sealed class BaiShouXuYing : AbstractLiDaoXuYing
+public sealed class FeiXiongXuYing : AbstractLiDaoXuYing
 {
-    private static readonly SavedAttachedState<CardModel, string>
-        CompositionState = new(
-            Entry.ModId + ".li_dao.bai_shou_phantom_composition",
-            static () => string.Empty
-        );
-
-    private static readonly SavedAttachedState<CardModel, int>
-        CondenseCountState = new(
-            Entry.ModId + ".li_dao.bai_shou_condense_count",
-            static () => 0
-        );
-
-    private string _composition = string.Empty;
-    private int _lastSelected = -1;
-    private LiDaoBeastKind[] _lastManifestedKinds = [];
-
-    public override LiDaoBeastKind? BeastKind => null;
-
-    public override IReadOnlyCollection<LiDaoBeastKind>
-        LastManifestedKinds => _lastManifestedKinds;
-
-    protected override decimal IntrinsicEffectMultiplier =>
-        BaiShouLiGu.EffectPercentAtRank(GuRank) / 100m +
-        BaiShouLiGu.CondenseInternalBonusPercentAtRank(
-            GuRank,
-            CondenseCountState[this]
-        ) / 100m;
+    public override LiDaoBeastKind? BeastKind => LiDaoBeastKind.FeiXiong;
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DynamicVar("EffectPercent", 60m),
-        new DynamicVar("InternalBonusPercent", 0m),
+        new DamageVar(9m, ValueProp.Move),
+        new DynamicVar("BlockBonus", 3m),
     ];
 
-    public BaiShouXuYing() : base(CardType.Attack, TargetType.AnyEnemy)
-    {
+    public FeiXiongXuYing() : base(CardType.Attack, TargetType.AnyEnemy) =>
         RefreshRankValues();
-    }
-
-    internal void ConfigureComposition(
-        IReadOnlyList<LiDaoBeastKind> kinds
-    )
-    {
-        LiDaoBeastKind[] normalized = kinds
-            .Distinct()
-            .OrderBy(kind => kind)
-            .Take(3)
-            .ToArray();
-
-        if (normalized.Length != 3)
-        {
-            throw new ArgumentException(
-                "百兽虚影需要三种不同兽力。",
-                nameof(kinds)
-            );
-        }
-
-        _composition = string.Join(',', normalized.Select(kind => (int)kind));
-        CompositionState[this] = _composition;
-    }
-
-    protected override async Task TriggerPhantomEffect(
-        PlayerChoiceContext choiceContext,
-        CardPlay triggeringPlay,
-        Creature? target
-    )
-    {
-        LiDaoBeastKind[] choices = GetComposition();
-        Rng rng = RitsuLibFramework.GetModPlayerRng(
-            Owner,
-            Entry.ModId,
-            "li_dao/bai_shou"
-        );
-
-        LiDaoBeastKind first = SelectKind(
-            choices,
-            rng,
-            BaiShouLiGu.AvoidRepeatManifestAtRank(GuRank) ? _lastSelected : -1
-        );
-        _lastSelected = (int)first;
-        List<LiDaoBeastKind> manifested = [first];
-
-        await LiDaoBeastEffectExecutor.ExecuteAsync(
-            this,
-            first,
-            GuRank,
-            choiceContext,
-            target,
-            LiDaoPhantomSystem.OtherManifestedForCurrentAttack
-        );
-
-        int secondChance = BaiShouLiGu.SecondManifestChanceAtRank(GuRank);
-        bool triggerSecond = secondChance >= 100 ||
-            (secondChance > 0 && rng.NextInt(100) < secondChance);
-
-        if (triggerSecond)
-        {
-            LiDaoBeastKind second = SelectKind(choices, rng, (int)first);
-            manifested.Add(second);
-            _lastSelected = (int)second;
-
-            await LiDaoBeastEffectExecutor.ExecuteAsync(
-                this,
-                second,
-                GuRank,
-                choiceContext,
-                target,
-                otherManifested: true
-            );
-        }
-
-        _lastManifestedKinds = manifested.Distinct().ToArray();
-    }
-
-    internal override void Condense()
-    {
-        base.Condense();
-        CondenseCountState[this]++;
-        DynamicVars["InternalBonusPercent"].BaseValue =
-            BaiShouLiGu.CondenseInternalBonusPercentAtRank(
-                GuRank,
-                CondenseCountState[this]
-            );
-    }
-
-    protected override void OnXuYingGuRankChanged() => RefreshRankValues();
-
-    private void RefreshRankValues()
-    {
-        SetBaseChance(BaiShouLiGu.ChanceAtRank(GuRank) / 100f);
-        DynamicVars["EffectPercent"].BaseValue =
-            BaiShouLiGu.EffectPercentAtRank(GuRank);
-        DynamicVars["InternalBonusPercent"].BaseValue =
-            BaiShouLiGu.CondenseInternalBonusPercentAtRank(
-                GuRank,
-                CondenseCountState[this]
-            );
-    }
-
-    private LiDaoBeastKind[] GetComposition()
-    {
-        string serialized = CompositionState[this];
-        if (string.IsNullOrWhiteSpace(serialized))
-        {
-            serialized = _composition;
-        }
-
-        LiDaoBeastKind[] parsed = serialized
-            .Split(',', StringSplitOptions.RemoveEmptyEntries)
-            .Select(value => int.TryParse(value, out int kind) ? kind : -1)
-            .Where(kind => Enum.IsDefined(typeof(LiDaoBeastKind), kind))
-            .Select(kind => (LiDaoBeastKind)kind)
-            .Distinct()
-            .Take(3)
-            .ToArray();
-
-        return parsed.Length == 3
-            ? parsed
-            :
-            [
-                LiDaoBeastKind.BaiZhi,
-                LiDaoBeastKind.E,
-                LiDaoBeastKind.QingNiu,
-            ];
-    }
-
-    private static LiDaoBeastKind SelectKind(
-        IReadOnlyList<LiDaoBeastKind> choices,
-        Rng rng,
-        int excluded
-    )
-    {
-        LiDaoBeastKind[] eligible = choices
-            .Where(kind => (int)kind != excluded)
-            .ToArray();
-        return rng.NextItem(eligible.Length > 0 ? eligible : choices.ToArray());
-    }
-}
-
-[RegisterCard(typeof(GuZhenRenXuYingCardPool))]
-public sealed class QuanLiXuYing : AbstractLiDaoXuYing
-{
-    public override LiDaoBeastKind? BeastKind => null;
-
-    public override bool IsFullForcePhantom => true;
-
-    // 与全力以赴蛊共用同一张卡图。
-    public override CardAssetProfile AssetProfile =>
-        CardImageCatalog.Create(typeof(QuanLiYiFuGu));
-
-    protected override IEnumerable<DynamicVar> CanonicalVars =>
-        [new DynamicVar("EffectPercent", 100m)];
-
-    public QuanLiXuYing() : base(CardType.Skill, TargetType.Self)
-    {
-        SetBaseChance(1f);
-        RefreshRankValues();
-    }
 
     protected override Task TriggerPhantomEffect(
         PlayerChoiceContext choiceContext,
         CardPlay triggeringPlay,
         Creature? target
-    ) => Task.CompletedTask;
+    ) => LiDaoBeastEffectExecutor.ExecuteAsync(
+        this,
+        LiDaoBeastKind.FeiXiong,
+        GuRank,
+        choiceContext,
+        target
+    );
 
     protected override void OnXuYingGuRankChanged() => RefreshRankValues();
 
-    private void RefreshRankValues() =>
-        DynamicVars["EffectPercent"].BaseValue =
-            QuanLiYiFuGu.EffectPercentAtRank(GuRank);
+    private void RefreshRankValues()
+    {
+        SetBaseChance(FeiXiongZhiLiGu.ChanceAtRank(GuRank) / 100f);
+        DynamicVars.Damage.BaseValue =
+            FeiXiongZhiLiGu.DamageAtRank(GuRank);
+        DynamicVars["BlockBonus"].BaseValue =
+            FeiXiongZhiLiGu.BlockedTargetBonusAtRank(GuRank);
+    }
 }
 
 internal static class LiDaoBeastEffectExecutor
 {
     private sealed class RuntimeState
     {
-        internal int ManifestedMask;
-        internal int FeiXiongTurn;
-        internal int ShiGuiTurn;
+        internal int BaiZhiTurn;
     }
 
     private static readonly ConditionalWeakTable<CardModel, RuntimeState>
@@ -512,56 +257,25 @@ internal static class LiDaoBeastEffectExecutor
         LiDaoBeastKind kind,
         int rank,
         PlayerChoiceContext choiceContext,
-        Creature? target,
-        bool otherManifested
+        Creature? target
     )
     {
-        RuntimeState state = States.GetValue(
-            source,
-            static _ => new RuntimeState()
-        );
-        int turn = source.Owner.PlayerCombatState?.TurnNumber ?? 1;
-        bool firstEver = (state.ManifestedMask & (1 << (int)kind)) == 0;
-        state.ManifestedMask |= 1 << (int)kind;
-
         switch (kind)
         {
             case LiDaoBeastKind.BaiZhi:
-                await ExecuteBaiZhi(source, rank, choiceContext, target, firstEver);
-                break;
-            case LiDaoBeastKind.FeiXiong:
-                bool firstThisTurn = state.FeiXiongTurn != turn;
-                state.FeiXiongTurn = turn;
-                await ExecuteFeiXiong(
-                    source,
-                    rank,
-                    choiceContext,
-                    target,
-                    firstThisTurn
-                );
+                await ExecuteBaiZhi(source, rank, choiceContext, target);
                 break;
             case LiDaoBeastKind.E:
                 await ExecuteE(source, rank, choiceContext, target);
                 break;
             case LiDaoBeastKind.QingNiu:
-                await ExecuteQingNiu(
-                    source,
-                    rank,
-                    choiceContext,
-                    target,
-                    otherManifested,
-                    firstEver
-                );
+                await ExecuteQingNiu(source, rank, choiceContext, target);
                 break;
             case LiDaoBeastKind.ShiGui:
-                bool firstTurtleThisTurn = state.ShiGuiTurn != turn;
-                state.ShiGuiTurn = turn;
-                await ExecuteShiGui(
-                    source,
-                    rank,
-                    choiceContext,
-                    firstTurtleThisTurn
-                );
+                await ExecuteShiGui(source, rank);
+                break;
+            case LiDaoBeastKind.FeiXiong:
+                await ExecuteFeiXiong(source, rank, choiceContext, target);
                 break;
         }
     }
@@ -570,8 +284,7 @@ internal static class LiDaoBeastEffectExecutor
         AbstractLiDaoXuYing source,
         int rank,
         PlayerChoiceContext context,
-        Creature? target,
-        bool firstEver
+        Creature? target
     )
     {
         if (target == null)
@@ -579,85 +292,16 @@ internal static class LiDaoBeastEffectExecutor
             return;
         }
 
+        RuntimeState state = States.GetValue(source, static _ => new());
+        int turn = source.Owner.PlayerCombatState?.TurnNumber ?? 1;
         int damage = BaiZhiGu.DamageAtRank(rank);
-        if (firstEver)
+        if (state.BaiZhiTurn != turn)
         {
+            state.BaiZhiTurn = turn;
             damage += BaiZhiGu.FirstManifestBonusAtRank(rank);
-        }
-        if (target.Block <= 0)
-        {
-            damage += BaiZhiGu.NoBlockBonusAtRank(rank);
         }
 
         await Attack(source, context, target, source.ScaleDamage(damage));
-    }
-
-    private static async Task ExecuteFeiXiong(
-        AbstractLiDaoXuYing source,
-        int rank,
-        PlayerChoiceContext context,
-        Creature? target,
-        bool firstThisTurn
-    )
-    {
-        if (target == null)
-        {
-            return;
-        }
-
-        decimal rankMultiplier =
-            FeiXiongZhiLiGu.FirstManifestMultiplierAtRank(
-                rank,
-                firstThisTurn
-            );
-        int total = FeiXiongZhiLiGu.DamageAtRank(rank);
-        if (target.Block > 0)
-        {
-            total += FeiXiongZhiLiGu.BlockedTargetBonusAtRank(rank);
-        }
-
-        int divine = FeiXiongZhiLiGu.DivineMightAtRank(rank);
-        int normalDamage = source.ScaleDamage(
-            Math.Max(0, total - divine) * rankMultiplier
-        );
-        int divineDamage = source.ScaleDamage(divine * rankMultiplier);
-
-        if (normalDamage > 0)
-        {
-            await Attack(source, context, target, normalDamage);
-        }
-        if (divineDamage > 0 && target.IsAlive)
-        {
-            await CreatureCmd.Damage(
-                context,
-                target,
-                divineDamage,
-                ValueProp.Unblockable | ValueProp.Unpowered,
-                source.Owner.Creature,
-                source,
-                cardPlay: null
-            );
-        }
-
-        int quakeBase = FeiXiongZhiLiGu.QuakeDamageAtRank(rank);
-        if (quakeBase > 0 && source.CombatState != null)
-        {
-            int quake = source.ScaleDamage(quakeBase * rankMultiplier);
-            foreach (Creature enemy in GuZhenRenDeterminism
-                         .OrderCreatures(source.CombatState.HittableEnemies)
-                         .Where(enemy => enemy.IsAlive && !ReferenceEquals(enemy, target)))
-            {
-                await CreatureCmd.Damage(
-                    context,
-                    enemy,
-                    quake,
-                    ValueProp.Unpowered,
-                    source.Owner.Creature,
-                    source,
-                    cardPlay: null
-                );
-            }
-        }
     }
 
     private static async Task ExecuteE(
@@ -667,28 +311,16 @@ internal static class LiDaoBeastEffectExecutor
         Creature? target
     )
     {
-        Creature? current = target;
-        int hits = ELiGu.HitsAtRank(rank);
-
-        for (int hit = 0; hit < hits; hit++)
+        if (target == null)
         {
-            if (current == null || current.IsDead)
-            {
-                if (!ELiGu.PursuesAtRank(rank))
-                {
-                    break;
-                }
-                current = SelectPursuitTarget(source);
-                if (current == null)
-                {
-                    break;
-                }
-            }
+            return;
+        }
 
+        for (int hit = 0; hit < 2 && target.IsAlive; hit++)
+        {
             int damage = ELiGu.DamageAtRank(rank) +
                 ELiGu.HitBonusAtRank(rank, hit);
-
-            await Attack(source, context, current, source.ScaleDamage(damage));
+            await Attack(source, context, target, source.ScaleDamage(damage));
         }
     }
 
@@ -696,34 +328,28 @@ internal static class LiDaoBeastEffectExecutor
         AbstractLiDaoXuYing source,
         int rank,
         PlayerChoiceContext context,
-        Creature? target,
-        bool otherManifested,
-        bool firstEver
+        Creature? target
     )
     {
+        int bonusBlock = 0;
         if (target != null)
         {
-            await Attack(
-                source,
-                context,
-                target,
-                source.ScaleDamage(QingNiuLaoLiGu.DamageAtRank(rank))
+            int damage = source.ScaleDamage(
+                QingNiuLaoLiGu.DamageAtRank(rank)
             );
-        }
-
-        int block = QingNiuLaoLiGu.BlockAtRank(rank);
-        if (firstEver)
-        {
-            block += QingNiuLaoLiGu.FirstManifestBlockBonusAtRank(rank);
-        }
-        if (otherManifested)
-        {
-            block += QingNiuLaoLiGu.PhantomLinkBlockBonusAtRank(rank);
+            int hpBefore = target.CurrentHp;
+            await Attack(source, context, target, damage);
+            if (target.CurrentHp < hpBefore)
+            {
+                bonusBlock = QingNiuLaoLiGu.HitBlockBonusAtRank(rank);
+            }
         }
 
         await CreatureCmd.GainBlock(
             source.Owner.Creature,
-            source.ScaleEffect(block),
+            source.ScaleEffect(
+                QingNiuLaoLiGu.BlockAtRank(rank) + bonusBlock
+            ),
             ValueProp.Move,
             cardPlay: null
         );
@@ -731,26 +357,13 @@ internal static class LiDaoBeastEffectExecutor
 
     private static Task ExecuteShiGui(
         AbstractLiDaoXuYing source,
-        int rank,
-        PlayerChoiceContext context,
-        bool firstThisTurn
+        int rank
     )
     {
         int block = ShiGuiLiGu.BlockAtRank(rank);
         if (source.Owner.Creature.Block <= 0)
         {
             block += ShiGuiLiGu.NoBlockBonusAtRank(rank);
-        }
-        if (firstThisTurn)
-        {
-            block += ShiGuiLiGu.FirstManifestFlatBonusAtRank(rank);
-            block = (int)Math.Round(
-                block * ShiGuiLiGu.FirstManifestMultiplierAtRank(
-                    rank,
-                    firstThisTurn
-                ),
-                MidpointRounding.AwayFromZero
-            );
         }
 
         return CreatureCmd.GainBlock(
@@ -759,6 +372,27 @@ internal static class LiDaoBeastEffectExecutor
             ValueProp.Move,
             cardPlay: null
         );
+    }
+
+    private static async Task ExecuteFeiXiong(
+        AbstractLiDaoXuYing source,
+        int rank,
+        PlayerChoiceContext context,
+        Creature? target
+    )
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        int damage = FeiXiongZhiLiGu.DamageAtRank(rank);
+        if (target.Block > 0)
+        {
+            damage += FeiXiongZhiLiGu.BlockedTargetBonusAtRank(rank);
+        }
+
+        await Attack(source, context, target, source.ScaleDamage(damage));
     }
 
     private static Task Attack(
@@ -771,14 +405,4 @@ internal static class LiDaoBeastEffectExecutor
         .Targeting(target)
         .WithHitFx("vfx/vfx_attack_blunt")
         .Execute(context);
-
-    private static Creature? SelectPursuitTarget(AbstractLiDaoXuYing source) =>
-        source.CombatState == null
-            ? null
-            : GuZhenRenDeterminism
-                .OrderCreatures(source.CombatState.HittableEnemies)
-                .Where(enemy => enemy.IsAlive)
-                .OrderBy(enemy => enemy.CurrentHp)
-                .ThenBy(enemy => enemy.CombatId)
-                .FirstOrDefault();
 }
