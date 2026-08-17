@@ -158,7 +158,6 @@
     "GU_ZHEN_REN_PERSONAL_CARD_HONG_ZAO_XIAN_YUAN.description": "Retain as immortal essence. Equals two Green Grape essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
     "GU_ZHEN_REN_PERSONAL_CARD_BAI_LI_XIAN_YUAN.description": "Retain as immortal essence. Equals two Red Date essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
     "GU_ZHEN_REN_PERSONAL_CARD_HUANG_XING_XIAN_YUAN.description": "Retain as immortal essence. Equals two White Litchi essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
-    "GU_ZHEN_REN_PERSONAL_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "Your {Capacity}-card Gu capacity is full. Choose an existing Gu Worm to replace to obtain [gold]{NewCard}[/gold].",
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_QI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] {BloodCost}, [gold]Self-Devour[/gold]. Choose 1 normal card in your hand and implant [gold]Blood Qi[/gold].",
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_YUE_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Fusion[/gold]; [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] 2: implant [gold]Moon Phase[/gold]. Three-stage [gold]Shared Pools[/gold]—Bleed {CrescentBleed}/{WaxingBleed}/{FullBleed}; Marks {CrescentMarks}/{WaxingMarks}/{FullMarks}.",
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_CHI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. Gain {XueYuanPower:diff()} [gold]Blood Essence[/gold]; convert each [gold]Overflow[/gold] into {OverflowBlock} Block.",
@@ -168,11 +167,7 @@
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_TAI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Fusion[/gold]; [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] 2, [gold]Self-Devour[/gold]: implant [gold]Blood Fetus[/gold], which can [gold]Devour Parasite[/gold] and [gold]Hatches[/gold] after 3 [gold]Fetal Movement[/gold].",
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_FU_WANG_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Devour Remains 2[/gold]: add a same-rank [gold]Blood Bat King[/gold]; each adds 2 hits, and 2 grants [gold]Pursuit[/gold]. Resolve [gold]Blood Skull[/gold].",
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_HE_JIA_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Blood River[/gold]: below 4 Essence, gain {LowBloodGain} Essence and {LowBlock} Block; otherwise [gold]Bloodthirst[/gold] 2 for {HighBlock} Block, then half next turn. Each [gold]Blood Skull[/gold] adds 2 Block.",
-    "GU_ZHEN_REN_PERSONAL_CARD_WAN_HAI_GUI_CHAO.description": "[gold]Devour Remains 3[/gold]. Split a {Damage:diff()} + {DamagePerRemains} per Remains damage pool among all enemies. Gain {Block:diff()} + {BlockPerRemains} Block per Remains.",
-    "GU_ZHEN_REN_PERSONAL_CARD_PARASITE_CRESCENT_MOON.extraCardText": "Enchantment · Moon Phase (Rank {Rank} · Crescent): {TriggersRemaining} trigger(s) remain; advances after the host is played.",
-    "GU_ZHEN_REN_PERSONAL_CARD_PARASITE_WAXING_MOON.extraCardText": "Enchantment · Moon Phase (Rank {Rank} · Waxing): {TriggersRemaining} trigger(s) remain; advances after the host is played.",
-    "GU_ZHEN_REN_PERSONAL_CARD_PARASITE_FULL_MOON.extraCardText": "Enchantment · Moon Phase (Rank {Rank} · Full): {TriggersRemaining} trigger(s) remain; hatches after the host is played.",
-    "GU_ZHEN_REN_PERSONAL_CARD_PARASITE_BLOOD_FETUS.extraCardText": "Enchantment · Blood Fetus (Rank {Rank}): {Stage}/3 Fetal Movement, {TriggersRemaining} trigger(s) remain; hatches at 3."
+    "GU_ZHEN_REN_PERSONAL_CARD_WAN_HAI_GUI_CHAO.description": "[gold]Devour Remains 3[/gold]. Split a {Damage:diff()} + {DamagePerRemains} per Remains damage pool among all enemies. Gain {Block:diff()} + {BlockPerRemains} Block per Remains."
   },
   "characterNameOverrides": {
     "title": "Gu Yue Fang Yuan",

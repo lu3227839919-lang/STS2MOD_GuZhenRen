@@ -158,7 +158,6 @@
     "GU_ZHEN_REN_PERSONAL_CARD_HONG_ZAO_XIAN_YUAN.description": "作为仙元保留在手中。等于两张青提仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
     "GU_ZHEN_REN_PERSONAL_CARD_BAI_LI_XIAN_YUAN.description": "作为仙元保留在手中。等于两张红枣仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
     "GU_ZHEN_REN_PERSONAL_CARD_HUANG_XING_XIAN_YUAN.description": "作为仙元保留在手中。等于两张白荔仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
-    "GU_ZHEN_REN_PERSONAL_CARD_REPLACE_GU_WORM.selectionScreenPrompt": "蛊虫容量已达{Capacity}张。选择一张现有蛊虫替换，以获得[gold]{NewCard}[/gold]。",
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_QI_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n[gold]渴血[/gold]{BloodCost}、[gold]自噬[/gold]。选择1张普通手牌植入[gold]血气[/gold]。",
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_YUE_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]合练[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n[gold]渴血[/gold]2：植入[gold]月相[/gold]。三阶段[gold]总额度[/gold]——流血{CrescentBleed}/{WaxingBleed}/{FullBleed}；血印{CrescentMarks}/{WaxingMarks}/{FullMarks}。",
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_CHI_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n获得{XueYuanPower:diff()}点[gold]血元[/gold]；每点[gold]溢出[/gold]转化为{OverflowBlock}点格挡。",
@@ -168,11 +167,7 @@
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_TAI_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]合练[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n[gold]渴血[/gold]2、[gold]自噬[/gold]：植入[gold]血胎[/gold]，可[gold]吞寄[/gold]；3点[gold]胎动[/gold]后[gold]孵化[/gold]。",
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_FU_WANG_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n[gold]嗜骸 2[/gold]：获得同转[gold]血蝠王[/gold]；每张+2次攻击，2张时获得[gold]追击[/gold]。结算[gold]血颅[/gold]。",
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_HE_JIA_GU.description": "{Rank:cond:>=6?仙蛊，|}[gold]{RankCN}转[/gold]，[gold]冷却[/gold]{RecoveryTurnsCN}；\n[gold]血河[/gold]：血元低于4时获得{LowBloodGain}点血元与{LowBlock}点格挡；否则[gold]渴血[/gold]2，获得{HighBlock}点格挡，下回合再获得一半。每层[gold]血颅[/gold]使格挡+2。",
-    "GU_ZHEN_REN_PERSONAL_CARD_WAN_HAI_GUI_CHAO.description": "[gold]嗜骸 3[/gold]。形成{Damage:diff()}＋每张{DamagePerRemains}点的总伤害池并分配给所有敌人；获得{Block:diff()}＋每张{BlockPerRemains}点格挡。",
-    "GU_ZHEN_REN_PERSONAL_CARD_PARASITE_CRESCENT_MOON.extraCardText": "附魔·月相（{Rank}转·残月）：剩余{TriggersRemaining}次触发；打出宿主后推进。",
-    "GU_ZHEN_REN_PERSONAL_CARD_PARASITE_WAXING_MOON.extraCardText": "附魔·月相（{Rank}转·盈月）：剩余{TriggersRemaining}次触发；打出宿主后推进。",
-    "GU_ZHEN_REN_PERSONAL_CARD_PARASITE_FULL_MOON.extraCardText": "附魔·月相（{Rank}转·满月）：剩余{TriggersRemaining}次触发；打出宿主后孵化。",
-    "GU_ZHEN_REN_PERSONAL_CARD_PARASITE_BLOOD_FETUS.extraCardText": "附魔·血胎（{Rank}转）：{Stage}/3点胎动，剩余{TriggersRemaining}次触发；3点时孵化。"
+    "GU_ZHEN_REN_PERSONAL_CARD_WAN_HAI_GUI_CHAO.description": "[gold]嗜骸 3[/gold]。形成{Damage:diff()}＋每张{DamagePerRemains}点的总伤害池并分配给所有敌人；获得{Block:diff()}＋每张{BlockPerRemains}点格挡。"
   },
   "characterNameOverrides": {
     "title": "古月方源",
