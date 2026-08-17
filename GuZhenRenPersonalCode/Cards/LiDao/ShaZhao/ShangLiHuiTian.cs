@@ -12,7 +12,6 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib.Interop.AutoRegistration;
-using STS2RitsuLib.Scaffolding.Content;
 
 namespace GuZhenRen.Cards.ShaZhao;
 
@@ -35,6 +34,7 @@ public sealed class ShangLiHuiTian : AbstractShaZhaoCard
     private const string LightBonusVar = "LightBonus";
     private const string HeavyBonusVar = "HeavyBonus";
     private const string CriticalBonusVar = "CriticalBonus";
+    private const string RecoveryPercentVar = "RecoveryPercent";
 
     public override int MinimumAvailableGuRank => 3;
     public override int MaxGuRank => 7;
@@ -45,6 +45,7 @@ public sealed class ShangLiHuiTian : AbstractShaZhaoCard
         new DynamicVar(LightBonusVar, 8m),
         new DynamicVar(HeavyBonusVar, 16m),
         new DynamicVar(CriticalBonusVar, 28m),
+        new DynamicVar(RecoveryPercentVar, 60m),
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
@@ -75,6 +76,7 @@ public sealed class ShangLiHuiTian : AbstractShaZhaoCard
         description.Add("LightBonus", LightBonusAtRank(GuRank));
         description.Add("HeavyBonus", HeavyBonusAtRank(GuRank));
         description.Add("CriticalBonus", CriticalBonusAtRank(GuRank));
+        description.Add("RecoveryPercent", RecoveryPercentAtRank(GuRank));
     }
 
     protected override async Task OnPlay(
@@ -168,6 +170,8 @@ public sealed class ShangLiHuiTian : AbstractShaZhaoCard
             HeavyBonusAtRank(GuRank);
         DynamicVars[CriticalBonusVar].BaseValue =
             CriticalBonusAtRank(GuRank);
+        DynamicVars[RecoveryPercentVar].BaseValue =
+            RecoveryPercentAtRank(GuRank);
     }
 
     private static int BaseDamageAtRank(int rank) => rank switch
@@ -204,6 +208,16 @@ public sealed class ShangLiHuiTian : AbstractShaZhaoCard
         5 => 28,
         6 => 32,
         _ => 36,
+    };
+
+
+    private static int RecoveryPercentAtRank(int rank) => rank switch
+    {
+        <= 3 => 40,
+        4 => 50,
+        5 => 60,
+        6 => 75,
+        _ => 90,
     };
 
     private static int GetInjuryTier(Creature creature)

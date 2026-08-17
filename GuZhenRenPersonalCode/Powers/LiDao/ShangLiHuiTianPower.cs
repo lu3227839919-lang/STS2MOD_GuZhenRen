@@ -49,6 +49,15 @@ public sealed class ShangLiHuiTianPower : ModPowerTemplate
     public int MaxRecordedDamage =>
         Math.Max(0, DynamicVars[MaxDamageVar].IntValue);
 
+    public int RecoveryPercent => Rank switch
+    {
+        <= 3 => 40,
+        4 => 50,
+        5 => 60,
+        6 => 75,
+        _ => 90,
+    };
+
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new DynamicVar(RankVar, 3m),
@@ -178,9 +187,11 @@ public sealed class ShangLiHuiTianPower : ModPowerTemplate
         _deathPreventionClaimed = true;
         _activePlays.Clear();
 
-        int healing = MaxRecordedDamage;
+        int recordedDamage = MaxRecordedDamage;
+        int healing = recordedDamage * RecoveryPercent / 100;
         Entry.Logger.Info(
-            $"[伤力回天] 触发回复 reason={reason} healing={healing} " +
+            $"[伤力回天] 触发回复 reason={reason} recorded={recordedDamage} " +
+                $"percent={RecoveryPercent}% healing={healing} " +
             $"hp={Owner.CurrentHp}/{Owner.MaxHp}。"
         );
 
