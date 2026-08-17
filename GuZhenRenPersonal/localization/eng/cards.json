@@ -1,4 +1,6 @@
 {
+    "GU_ZHEN_REN_PERSONAL_CARD_HEI_TIAN_DA_SHOU_YIN.title":  "Black Heaven Great Hand Seal",
+    "GU_ZHEN_REN_PERSONAL_CARD_HEI_TIAN_DA_SHOU_YIN.description":  "[gold]Rank {Rank}[/gold]. Count all current Phantom cards. Mountain-Shaking: all enemies lose {BlockBreak} Block, then take {BaseDamage} + Phantom count × {PhantomDamage} damage; living enemies gain {BaseVulnerable} Vulnerable. Block Break applies {PoShiVulnerable} additional Vulnerable. {Rank7Exact:cond:\u003e0?Restore 1 Energy per broken enemy, up to {PoShiEnergyCap}.|}{Rank8Exact:cond:\u003e0?Restore 1 Energy per broken enemy, up to {PoShiEnergyCap}; breaking at least {HuiLanThreshold} enemies deals {HuiLanDamage} rebound damage to all enemies.|}{Rank9Exact:cond:\u003e0?Restore 1 Energy per broken enemy, up to {PoShiEnergyCap}; breaking at least {HuiLanThreshold} enemies deals {HuiLanDamage} rebound damage to all enemies; if every enemy alive at the start is broken, rebound again.|}",
     "GU_ZHEN_REN_PERSONAL_DAO_GUANG_DAO.title":  "Light Path",
     "GU_ZHEN_REN_PERSONAL_DAO_YAN_DAO.title":  "Fire Path",
     "GU_ZHEN_REN_PERSONAL_DAO_LI_DAO.title":  "Strength Path",

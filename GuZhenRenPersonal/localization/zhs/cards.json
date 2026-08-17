@@ -1,4 +1,6 @@
 {
+    "GU_ZHEN_REN_PERSONAL_CARD_HEI_TIAN_DA_SHOU_YIN.title":  "黑天大手印",
+    "GU_ZHEN_REN_PERSONAL_CARD_HEI_TIAN_DA_SHOU_YIN.description":  "[gold]{Rank}转[/gold]。计算当前全部虚影牌数量。撼山：使所有敌人失去{BlockBreak}点格挡；随后对所有敌人造成{BaseDamage}＋虚影数量×{PhantomDamage}点伤害，并对存活敌人施加{BaseVulnerable}层易伤。破势时再施加{PoShiVulnerable}层易伤。{Rank7Exact:cond:\u003e0?每成功破势1名敌人回复1点能量，最多{PoShiEnergyCap}点。|}{Rank8Exact:cond:\u003e0?每成功破势1名敌人回复1点能量，最多{PoShiEnergyCap}点；破势至少{HuiLanThreshold}名敌人时，回澜造成{HuiLanDamage}点群体伤害。|}{Rank9Exact:cond:\u003e0?每成功破势1名敌人回复1点能量，最多{PoShiEnergyCap}点；破势至少{HuiLanThreshold}名敌人时，回澜造成{HuiLanDamage}点群体伤害；若开始时的全部存活敌人均成功破势，再回澜一次。|}",
     "GU_ZHEN_REN_PERSONAL_DAO_GUANG_DAO.title":  "光道",
     "GU_ZHEN_REN_PERSONAL_DAO_YAN_DAO.title":  "炎道",
     "GU_ZHEN_REN_PERSONAL_DAO_LI_DAO.title":  "力道",
