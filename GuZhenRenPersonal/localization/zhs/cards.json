@@ -275,5 +275,7 @@
     "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU.title":  "年流",
     "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU.description":  "获得2点[gold]年华[/gold]。[gold]消耗[/gold]。",
     "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU_PLUS.title":  "年流+",
-    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU_PLUS.description":  "获得3点[gold]年华[/gold]。抽1张牌。[gold]消耗[/gold]。"
+    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU_PLUS.description":  "获得3点[gold]年华[/gold]。抽1张牌。[gold]消耗[/gold]。",
+    "GU_ZHEN_REN_PERSONAL_CARD_SHANG_LI_HUI_TIAN.title":  "伤力回天",
+    "GU_ZHEN_REN_PERSONAL_CARD_SHANG_LI_HUI_TIAN.description":  "[gold]{Rank}转[/gold]。造成{Damage}点伤害；按当前伤势，轻伤/重伤/极重伤额外造成{LightBonus}/{HeavyBonus}/{CriticalBonus}点伤害。随后进入回天状态：记录之后每张牌完整结算时对敌人造成的实际生命伤害总和，只保留其中最高值；同一张牌附带的苦力等后续伤害也计入。首次濒死时，以该最高值回复生命并阻止此次死亡；若本场未触发，则战斗结束时以该最高值回复生命。回复只触发一次。"
 }

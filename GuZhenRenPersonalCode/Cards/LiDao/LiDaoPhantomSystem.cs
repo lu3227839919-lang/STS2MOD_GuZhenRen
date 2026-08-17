@@ -12,7 +12,7 @@ using MegaCrit.Sts2.Core.Models;
 namespace GuZhenRen.Cards.LiDao;
 
 /// <summary>
-/// 新版兽力虚影的生成、容量与集中显化结算。
+/// 新版力道虚影的生成、容量与集中显化结算。
 /// 同种虚影可以存在多个；每张虚影独立占用容量并独立判定显化。
 /// </summary>
 public static class LiDaoPhantomSystem

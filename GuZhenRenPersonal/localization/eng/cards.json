@@ -275,5 +275,7 @@
     "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU.title":  "Year Flow",
     "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU.description":  "Gain 2 [gold]Years[/gold]. [gold]Exhaust[/gold].",
     "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU_PLUS.title":  "Year Flow+",
-    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU_PLUS.description":  "Gain 3 [gold]Years[/gold]. Draw 1. [gold]Exhaust[/gold]."
+    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU_PLUS.description":  "Gain 3 [gold]Years[/gold]. Draw 1. [gold]Exhaust[/gold].",
+    "GU_ZHEN_REN_PERSONAL_CARD_SHANG_LI_HUI_TIAN.title":  "Injury Force Reversal",
+    "GU_ZHEN_REN_PERSONAL_CARD_SHANG_LI_HUI_TIAN.description":  "[gold]Rank {Rank}[/gold]. Deal {Damage} damage; while Lightly/Heavily/Critically Injured, deal {LightBonus}/{HeavyBonus}/{CriticalBonus} additional damage. Then enter Reversal: for each later card, record the total actual HP damage it deals when fully resolved, keeping only the highest value; follow-up damage from the same card, including Ku Li damage, is included. The first time you would die, heal that amount and prevent that death. If it never triggers, heal that amount when combat ends. This healing triggers only once."
 }
