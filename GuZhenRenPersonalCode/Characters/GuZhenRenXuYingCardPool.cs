@@ -44,7 +44,7 @@ public sealed class GuZhenRenXuYingCardPool
     /// 虚影卡框与普通卡统一使用同一 HSV 卡框材质（h=0.603, s=0.19, v=1.2）。
     /// </summary>
     private static readonly Material? _poolFrameMaterial =
-        MaterialUtils.CreateHsvShaderMaterial(0.603f, 0.19f, 1.2f);
+        MaterialUtils.CreateHsvShaderMaterial(0.56f, 0.19f, 1.2f);
     public override Material? PoolFrameMaterial => _poolFrameMaterial;
 
     public override bool IsColorless =>

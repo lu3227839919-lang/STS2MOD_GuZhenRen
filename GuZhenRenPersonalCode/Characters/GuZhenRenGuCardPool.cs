@@ -28,7 +28,7 @@ public sealed class GuZhenRenGuCardPool : TypeListCardPoolModel
 
     // 卡框颜色由 HSV 材质控制（h=0.603, s=0.19, v=1.2）。
     private static readonly Material? _poolFrameMaterial =
-        MaterialUtils.CreateHsvShaderMaterial(0.603f, 0.19f, 1.2f);
+        MaterialUtils.CreateHsvShaderMaterial(0.56f, 0.19f, 1.2f);
     public override Material? PoolFrameMaterial => _poolFrameMaterial;
 
     public override bool IsColorless => false;
