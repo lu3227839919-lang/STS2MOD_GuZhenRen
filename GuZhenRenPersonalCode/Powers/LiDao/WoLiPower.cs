@@ -1,5 +1,3 @@
-using System.Numerics;
-
 using GuZhenRen.Cards.LiDao;
 
 using MegaCrit.Sts2.Core.Commands;
@@ -17,8 +15,9 @@ namespace GuZhenRen.Powers.LiDao;
 /// 我力蛊的持续战斗状态。
 /// 5转只统计自然显化，每 3 次获得 1 点力量；
 /// 6转起统计全部实际显化（含群力额外显化），每 2 次获得 1 点力量；
-/// 7转起同回合 3 种不同兽力实际显化后额外获得 1 点力量（每回合一次）。
-/// 力量可正常作用于具有伤害的兽力虚影。
+/// 7转起同回合 3 种不同力道虚影实际显化后额外获得 1 点力量（每回合一次）。
+/// “不同种类”按具体虚影类型统计，因此我力虚影也可作为其中一种。
+/// 力量可正常作用于具有伤害的力道虚影。
 /// </summary>
 [RegisterPower]
 public sealed class WoLiPower : ModPowerTemplate
@@ -26,7 +25,7 @@ public sealed class WoLiPower : ModPowerTemplate
     private const string ManifestCountVar = "ManifestCount";
 
     private int _lastDistinctTurn;
-    private int _distinctMask;
+    private readonly HashSet<Type> _distinctPhantomTypes = [];
     private bool _distinctBonusUsed;
 
     public override PowerType Type => PowerType.Buff;
@@ -70,20 +69,22 @@ public sealed class WoLiPower : ModPowerTemplate
         DynamicVars[ManifestCountVar].BaseValue = count;
         InvokeDisplayAmountChanged();
 
-        if (rank >= 7 && phantom.BeastKind is { } kind)
+        if (rank >= 7)
         {
             int turn = CurrentTurn;
             if (turn != _lastDistinctTurn)
             {
                 _lastDistinctTurn = turn;
-                _distinctMask = 0;
+                _distinctPhantomTypes.Clear();
                 _distinctBonusUsed = false;
             }
 
-            _distinctMask |= 1 << (int)kind;
+            // 按具体虚影类型统计“不同种类”，而不是只看 BeastKind。
+            // 这样我力虚影以及未来新增的非兽力力道虚影，也能触发
+            // 原本由不同兽力虚影驱动的联动效果。
+            _distinctPhantomTypes.Add(phantom.GetType());
             if (!_distinctBonusUsed &&
-                BitOperations.PopCount((uint)_distinctMask) >=
-                    WoLiGu.DistinctPhantomThreshold)
+                _distinctPhantomTypes.Count >= WoLiGu.DistinctPhantomThreshold)
             {
                 _distinctBonusUsed = true;
                 await GrantStrengthAsync(choiceContext, 1);

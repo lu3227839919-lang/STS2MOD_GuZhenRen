@@ -8,7 +8,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 namespace GuZhenRen.Powers.LiDao;
 
 /// <summary>
-/// 兽力虚影显化事件分发中枢。
+/// 力道虚影显化事件分发中枢（包含兽力虚影与我力虚影）。
 ///
 /// - 自然显化（攻击触发成功后）：先交群力判定（可能产生额外显化），
 ///   再交我力按显化类型计数。

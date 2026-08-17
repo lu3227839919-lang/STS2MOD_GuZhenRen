@@ -11,7 +11,7 @@ using STS2RitsuLib.Interop.AutoRegistration;
 namespace GuZhenRen.Cards.LiDao;
 
 /// <summary>
-/// 群力蛊：兽力虚影自然显化后的虚影发动机。
+/// 群力蛊：力道虚影自然显化后的虚影发动机（兽力与我力均可触发）。
 /// 每次自然显化都开启一条独立连锁，按概率使同一虚影连续额外显化；
 /// 单次连锁最多额外显化 1/2/3 次，且不会递归开启新连锁，
 /// 6转起每次额外显化均计入实际显化。

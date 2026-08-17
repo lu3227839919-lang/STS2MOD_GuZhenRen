@@ -23,8 +23,8 @@ namespace GuZhenRen.Cards.ShaZhao;
 /// （不返还、不进入消耗堆）；手牌中生成 1 张万我。
 ///
 /// 打出万我时：
-/// 1. 快照 Nv（当前兽力虚影数量）与 Ng（不同兽力蛊种类数）。
-/// 2. 消耗所有兽力虚影，将所有兽力蛊移入蛊封存堆。
+/// 1. 快照 Nv（当前兽力虚影数量，不包含我力虚影）与 Ng（不同兽力蛊种类数）。
+/// 2. 仅消耗所有兽力虚影；已有我力虚影保留。将所有兽力蛊移入蛊封存堆。
 /// 3. 我力虚影数量 = 1 + Nv + ⌊max(0, Ng − Nv) ÷ 2⌋。
 /// 4. 每个我力虚影提供 5 点临时生命，首次显化必定成功，
 ///    之后按转数 25/30/35/40% 显化，显化时复制动作 50% 效果。
@@ -97,7 +97,9 @@ public sealed class WanWo : AbstractShaZhaoCard
             .Where(card => card is ILiDaoBeastGuCard)
             .ToArray();
         AbstractLiDaoXuYing[] beastPhantoms =
-            LiDaoPhantomSystem.GetPermanentPhantoms(owner).ToArray();
+            LiDaoPhantomSystem.GetPermanentPhantoms(owner)
+                .Where(phantom => phantom.BeastKind is not null)
+                .ToArray();
 
         int nv = beastPhantoms.Length;
         int ng = beastGu
@@ -114,7 +116,7 @@ public sealed class WanWo : AbstractShaZhaoCard
 
         try
         {
-            // 消耗所有兽力虚影。
+            // 仅消耗兽力虚影；我力虚影 BeastKind == null，因此保留。
             foreach (AbstractLiDaoXuYing phantom in beastPhantoms)
             {
                 await CardPileCmd.RemoveFromCombat(
