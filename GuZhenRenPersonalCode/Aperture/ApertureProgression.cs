@@ -60,15 +60,19 @@ public static class ApertureProgression
 
     /// <summary>
     /// 每回合元气回复（首回合固定发放满额，与转数无关）。
-    /// 曲线 2、2、3、3、3、4、4、4、4：
-    /// 一至二转 2、三至五转 3、六至九转 4。
+    /// 回复量根据当前空窍元气上限决定：
+    /// 上限 3 回复 1、上限 4~5 回复 2、上限 6~7 回复 3、
+    /// 上限 8~9 回复 4。
+    /// 对应一至九转曲线为 1、2、2、2、2、3、3、4、4。
     /// </summary>
     public static int GetYuanQiRecovery(int rank)
     {
-        return Math.Max(MinimumRank, rank) switch
+        int capacity = GetYuanQiCapacity(rank);
+        return capacity switch
         {
-            <= 2 => 2,
-            <= 5 => 3,
+            <= 3 => 1,
+            <= 5 => 2,
+            <= 7 => 3,
             _ => 4,
         };
     }

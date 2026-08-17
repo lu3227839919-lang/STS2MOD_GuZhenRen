@@ -413,8 +413,9 @@ public sealed class KongQiaoRelic
 
     /// <summary>
     /// 原生能量重置完成后，第一回合把元气补满至当前空窍转数的
-    /// 上限（一转 3 ~ 九转 9）；从第二回合起按转数自动回复
-    /// （一至二转 2、三至五转 3、六至九转 4），且不超过转数上限。
+    /// 上限（一转 3 ~ 九转 9）；从第二回合起根据当前元气上限回复：
+    /// 上限 3 回复 1、4~5 回复 2、6~7 回复 3、8~9 回复 4，
+    /// 且不超过当前元气上限。
     /// </summary>
     public override async Task AfterEnergyReset(Player player)
     {
