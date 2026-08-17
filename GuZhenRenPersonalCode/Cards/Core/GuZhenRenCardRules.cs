@@ -27,9 +27,6 @@ public static class GuZhenRenCardRules
 {
     public const int XianGuRank = 6;
 
-    // 蛊虫不进入普通抽牌循环，因此以永久牌组容量承担构筑代价。
-    public const int GuWormDeckCapacity = 12;
-
     private static readonly object XianGuMutationSync = new();
 
     // 0 表示旧存档或尚未登记；其他值保存“首次成为仙蛊的楼层 + 1”。
@@ -107,98 +104,7 @@ public static class GuZhenRenCardRules
             receivingPlayer,
             candidate,
             ignoredExistingCards: null,
-            plannedAdditions: null,
-            allowSingleGuReplacementAtCapacity: false
-        );
-    }
-
-    /// <summary>
-    /// 奖励和商店在恰好达到蛊虫容量时仍可展示新蛊虫。
-    /// 真正获得时必须先选择一张现有蛊虫作为替换对象。
-    /// 唯一性与仙蛊冲突规则仍然照常检查。
-    /// </summary>
-    public static bool CanOfferWithGuReplacement(
-        IRunState runState,
-        Player receivingPlayer,
-        CardModel candidate
-    )
-    {
-        if (candidate is AbstractGuZhenRenCard rankedGu &&
-            candidate is IGuWormCard &&
-            ApertureSystem.GetState(receivingPlayer).Rank <
-                rankedGu.MinimumAvailableGuRank)
-        {
-            return false;
-        }
-
-        if (!CanEnterPermanentDeck(
-                runState,
-                receivingPlayer,
-                candidate,
-                ignoredExistingCards: null,
-                plannedAdditions: null,
-                allowSingleGuReplacementAtCapacity: true
-            ))
-        {
-            return false;
-        }
-
-        if (candidate is not IGuWormCard)
-        {
-            return true;
-        }
-
-        int guCount = receivingPlayer.Deck.Cards.Count(card =>
-            card is IGuWormCard
-        );
-
-        if (guCount < GuWormDeckCapacity)
-        {
-            return true;
-        }
-
-        // 容量已满时至少要存在一张合法替换对象，避免奖励或商店
-        // 展示一张最终无法获得的蛊虫。
-        return receivingPlayer.Deck.Cards.Any(existing =>
-            CanReplaceGuWorm(
-                receivingPlayer,
-                existing,
-                candidate
-            )
-        );
-    }
-
-    internal static bool CanReplaceGuWorm(
-        Player receivingPlayer,
-        CardModel existing,
-        CardModel candidate
-    )
-    {
-        ArgumentNullException.ThrowIfNull(receivingPlayer);
-        ArgumentNullException.ThrowIfNull(existing);
-        ArgumentNullException.ThrowIfNull(candidate);
-
-        /*
-         * 奖励候选通常是 ModelDb 的 canonical model，读取 candidate.Owner
-         * 会触发 AssertMutable。接收玩家已经由调用上下文明确提供，唯一性
-         * 与容量检查都应使用 receivingPlayer，而不是候选牌的 Owner。
-         */
-        if (existing is not IGuWormCard ||
-            candidate is not IGuWormCard ||
-            existing.Pile?.Type != PileType.Deck ||
-            !ReferenceEquals(existing.Owner, receivingPlayer))
-        {
-            return false;
-        }
-
-        return CanEnterPermanentDeck(
-            receivingPlayer.RunState,
-            receivingPlayer,
-            candidate,
-            ignoredExistingCards:
-                new HashSet<CardModel> { existing },
-            plannedAdditions: null,
-            allowSingleGuReplacementAtCapacity: false
+            plannedAdditions: null
         );
     }
 
@@ -402,8 +308,7 @@ public static class GuZhenRenCardRules
                         {
                             ignoredExistingCard,
                         },
-                plannedAdditions: null,
-                allowSingleGuReplacementAtCapacity: false
+                plannedAdditions: null
             );
         }
 
@@ -635,39 +540,12 @@ public static class GuZhenRenCardRules
         Player receivingPlayer,
         CardModel candidate,
         IReadOnlySet<CardModel>? ignoredExistingCards,
-        IReadOnlyList<PlannedCardAddition>? plannedAdditions,
-        bool allowSingleGuReplacementAtCapacity = false
+        IReadOnlyList<PlannedCardAddition>? plannedAdditions
     )
     {
         ArgumentNullException.ThrowIfNull(runState);
         ArgumentNullException.ThrowIfNull(receivingPlayer);
         ArgumentNullException.ThrowIfNull(candidate);
-
-        if (receivingPlayer.Character is GuZhenRenCharacter &&
-            candidate is IGuWormCard)
-        {
-            int existingGuCount = receivingPlayer.Deck.Cards.Count(card =>
-                card is IGuWormCard &&
-                ignoredExistingCards?.Contains(card) != true
-            );
-            int plannedGuCount = plannedAdditions?.Count(item =>
-                ReferenceEquals(item.Player, receivingPlayer) &&
-                item.Card is IGuWormCard
-            ) ?? 0;
-
-            int guCountBeforeCandidate =
-                existingGuCount + plannedGuCount;
-
-            if (guCountBeforeCandidate + 1 >
-                GuWormDeckCapacity &&
-                !(
-                    allowSingleGuReplacementAtCapacity &&
-                    guCountBeforeCandidate == GuWormDeckCapacity
-                ))
-            {
-                return false;
-            }
-        }
 
         CardUniqueScope scope = GetUniqueScope(candidate);
 

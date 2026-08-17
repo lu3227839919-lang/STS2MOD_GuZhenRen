@@ -318,8 +318,7 @@ internal static class CardUniquenessPatch
         if (GuZhenRenCardRules
             .TryAuthorizePermanentDeckEntry(
                 runState,
-                card,
-                GuDeckCapacityReplacementPatch.CardBeingReplaced
+                card
             ))
         {
             return;
@@ -374,7 +373,7 @@ internal static class CardUniquenessPatch
                 )
             )
             .Where(card =>
-                GuZhenRenCardRules.CanOfferWithGuReplacement(
+                GuZhenRenCardRules.CanOfferToPlayer(
                     runState,
                     player,
                     card
@@ -426,7 +425,7 @@ internal static class CardUniquenessPatch
                     player,
                     card
                 ) &&
-                GuZhenRenCardRules.CanOfferWithGuReplacement(
+                GuZhenRenCardRules.CanOfferToPlayer(
                     player.RunState,
                     player,
                     card
@@ -459,7 +458,7 @@ internal static class CardUniquenessPatch
                 player,
                 result.Card
             ) ||
-            !GuZhenRenCardRules.CanOfferWithGuReplacement(
+            !GuZhenRenCardRules.CanOfferToPlayer(
                 runState,
                 player,
                 result.Card

@@ -1,0 +1,481 @@
+--- a/GuZhenRenPersonalCode/Cards/Core/GuZhenRenCardRules.cs
++++ b/GuZhenRenPersonalCode/Cards/Core/GuZhenRenCardRules.cs
+@@ -27,9 +27,6 @@
+ {
+     public const int XianGuRank = 6;
+ 
+-    // 蛊虫不进入普通抽牌循环，因此以永久牌组容量承担构筑代价。
+-    public const int GuWormDeckCapacity = 12;
+-
+     private static readonly object XianGuMutationSync = new();
+ 
+     // 0 表示旧存档或尚未登记；其他值保存“首次成为仙蛊的楼层 + 1”。
+@@ -107,98 +104,7 @@
+             receivingPlayer,
+             candidate,
+             ignoredExistingCards: null,
+-            plannedAdditions: null,
+-            allowSingleGuReplacementAtCapacity: false
+-        );
+-    }
+-
+-    /// <summary>
+-    /// 奖励和商店在恰好达到蛊虫容量时仍可展示新蛊虫。
+-    /// 真正获得时必须先选择一张现有蛊虫作为替换对象。
+-    /// 唯一性与仙蛊冲突规则仍然照常检查。
+-    /// </summary>
+-    public static bool CanOfferWithGuReplacement(
+-        IRunState runState,
+-        Player receivingPlayer,
+-        CardModel candidate
+-    )
+-    {
+-        if (candidate is AbstractGuZhenRenCard rankedGu &&
+-            candidate is IGuWormCard &&
+-            ApertureSystem.GetState(receivingPlayer).Rank <
+-                rankedGu.MinimumAvailableGuRank)
+-        {
+-            return false;
+-        }
+-
+-        if (!CanEnterPermanentDeck(
+-                runState,
+-                receivingPlayer,
+-                candidate,
+-                ignoredExistingCards: null,
+-                plannedAdditions: null,
+-                allowSingleGuReplacementAtCapacity: true
+-            ))
+-        {
+-            return false;
+-        }
+-
+-        if (candidate is not IGuWormCard)
+-        {
+-            return true;
+-        }
+-
+-        int guCount = receivingPlayer.Deck.Cards.Count(card =>
+-            card is IGuWormCard
+-        );
+-
+-        if (guCount < GuWormDeckCapacity)
+-        {
+-            return true;
+-        }
+-
+-        // 容量已满时至少要存在一张合法替换对象，避免奖励或商店
+-        // 展示一张最终无法获得的蛊虫。
+-        return receivingPlayer.Deck.Cards.Any(existing =>
+-            CanReplaceGuWorm(
+-                receivingPlayer,
+-                existing,
+-                candidate
+-            )
+-        );
+-    }
+-
+-    internal static bool CanReplaceGuWorm(
+-        Player receivingPlayer,
+-        CardModel existing,
+-        CardModel candidate
+-    )
+-    {
+-        ArgumentNullException.ThrowIfNull(receivingPlayer);
+-        ArgumentNullException.ThrowIfNull(existing);
+-        ArgumentNullException.ThrowIfNull(candidate);
+-
+-        /*
+-         * 奖励候选通常是 ModelDb 的 canonical model，读取 candidate.Owner
+-         * 会触发 AssertMutable。接收玩家已经由调用上下文明确提供，唯一性
+-         * 与容量检查都应使用 receivingPlayer，而不是候选牌的 Owner。
+-         */
+-        if (existing is not IGuWormCard ||
+-            candidate is not IGuWormCard ||
+-            existing.Pile?.Type != PileType.Deck ||
+-            !ReferenceEquals(existing.Owner, receivingPlayer))
+-        {
+-            return false;
+-        }
+-
+-        return CanEnterPermanentDeck(
+-            receivingPlayer.RunState,
+-            receivingPlayer,
+-            candidate,
+-            ignoredExistingCards:
+-                new HashSet<CardModel> { existing },
+-            plannedAdditions: null,
+-            allowSingleGuReplacementAtCapacity: false
++            plannedAdditions: null
+         );
+     }
+ 
+@@ -402,8 +308,7 @@
+                         {
+                             ignoredExistingCard,
+                         },
+-                plannedAdditions: null,
+-                allowSingleGuReplacementAtCapacity: false
++                plannedAdditions: null
+             );
+         }
+ 
+@@ -635,40 +540,13 @@
+         Player receivingPlayer,
+         CardModel candidate,
+         IReadOnlySet<CardModel>? ignoredExistingCards,
+-        IReadOnlyList<PlannedCardAddition>? plannedAdditions,
+-        bool allowSingleGuReplacementAtCapacity = false
++        IReadOnlyList<PlannedCardAddition>? plannedAdditions
+     )
+     {
+         ArgumentNullException.ThrowIfNull(runState);
+         ArgumentNullException.ThrowIfNull(receivingPlayer);
+         ArgumentNullException.ThrowIfNull(candidate);
+ 
+-        if (receivingPlayer.Character is GuZhenRenCharacter &&
+-            candidate is IGuWormCard)
+-        {
+-            int existingGuCount = receivingPlayer.Deck.Cards.Count(card =>
+-                card is IGuWormCard &&
+-                ignoredExistingCards?.Contains(card) != true
+-            );
+-            int plannedGuCount = plannedAdditions?.Count(item =>
+-                ReferenceEquals(item.Player, receivingPlayer) &&
+-                item.Card is IGuWormCard
+-            ) ?? 0;
+-
+-            int guCountBeforeCandidate =
+-                existingGuCount + plannedGuCount;
+-
+-            if (guCountBeforeCandidate + 1 >
+-                GuWormDeckCapacity &&
+-                !(
+-                    allowSingleGuReplacementAtCapacity &&
+-                    guCountBeforeCandidate == GuWormDeckCapacity
+-                ))
+-            {
+-                return false;
+-            }
+-        }
+-
+         CardUniqueScope scope = GetUniqueScope(candidate);
+ 
+         if (scope == CardUniqueScope.None)
+--- a/GuZhenRenPersonalCode/Entry.cs
++++ b/GuZhenRenPersonalCode/Entry.cs
+@@ -61,7 +61,6 @@
+         new(nameof(XueDaoParasiteExhaustPatch), XueDaoParasiteExhaustPatch.Initialize, XueDaoParasiteExhaustPatch.Uninitialize),
+         new(nameof(YiHaiCombatVictoryPatch), YiHaiCombatVictoryPatch.Initialize, YiHaiCombatVictoryPatch.Uninitialize),
+         new(nameof(XueDaoRemainsKillPatch), XueDaoRemainsKillPatch.Initialize, XueDaoRemainsKillPatch.Uninitialize),
+-        new(nameof(GuDeckCapacityReplacementPatch), GuDeckCapacityReplacementPatch.Initialize, GuDeckCapacityReplacementPatch.Uninitialize),
+         new(nameof(MerchantInventoryCompatibilityPatch), MerchantInventoryCompatibilityPatch.Initialize, MerchantInventoryCompatibilityPatch.Uninitialize),
+         new(nameof(AncientCompatibilityPatch), AncientCompatibilityPatch.Initialize, AncientCompatibilityPatch.Uninitialize),
+         new(nameof(ShaZhaoTuiYanSystem), ShaZhaoTuiYanSystem.Initialize, ShaZhaoTuiYanSystem.Uninitialize),
+--- a/GuZhenRenPersonalCode/Patch/CardUniquenessPatch.cs
++++ b/GuZhenRenPersonalCode/Patch/CardUniquenessPatch.cs
+@@ -318,8 +318,7 @@
+         if (GuZhenRenCardRules
+             .TryAuthorizePermanentDeckEntry(
+                 runState,
+-                card,
+-                GuDeckCapacityReplacementPatch.CardBeingReplaced
++                card
+             ))
+         {
+             return;
+@@ -374,7 +373,7 @@
+                 )
+             )
+             .Where(card =>
+-                GuZhenRenCardRules.CanOfferWithGuReplacement(
++                GuZhenRenCardRules.CanOfferToPlayer(
+                     runState,
+                     player,
+                     card
+@@ -426,7 +425,7 @@
+                     player,
+                     card
+                 ) &&
+-                GuZhenRenCardRules.CanOfferWithGuReplacement(
++                GuZhenRenCardRules.CanOfferToPlayer(
+                     player.RunState,
+                     player,
+                     card
+@@ -459,7 +458,7 @@
+                 player,
+                 result.Card
+             ) ||
+-            !GuZhenRenCardRules.CanOfferWithGuReplacement(
++            !GuZhenRenCardRules.CanOfferToPlayer(
+                 runState,
+                 player,
+                 result.Card
+--- a/GuZhenRenPersonalCode/Patch/GuDeckCapacityReplacementPatch.cs
++++ /dev/null
+@@ -1,261 +0,0 @@
+-using System.Reflection;
+-using System.Threading;
+-
+-using HarmonyLib;
+-
+-using GuZhenRen.Characters;
+-
+-using MegaCrit.Sts2.Core.CardSelection;
+-using MegaCrit.Sts2.Core.Commands;
+-using MegaCrit.Sts2.Core.Entities.Cards;
+-using MegaCrit.Sts2.Core.Entities.Players;
+-using MegaCrit.Sts2.Core.Localization;
+-using MegaCrit.Sts2.Core.Models;
+-
+-namespace GuZhenRen.Cards;
+-
+-/// <summary>
+-/// 蛊虫牌组达到容量上限后，获得新蛊虫不再直接失败或隐藏奖励。
+-/// 玩家选中新蛊虫后，必须从现有牌组中选择一张可合法替换的蛊虫。
+-/// 新牌先在“忽略待替换牌”的规则上下文中加入，成功后再移除旧牌，
+-/// 因此加入失败时不会提前损失原牌。
+-/// </summary>
+-internal static class GuDeckCapacityReplacementPatch
+-{
+-    private const string HarmonyId =
+-        Entry.ModId + ".GuDeckCapacityReplacement";
+-
+-    private static readonly AsyncLocal<int> BypassDepth = new();
+-
+-    private static readonly AsyncLocal<CardModel?>
+-        ActiveReplacementCard = new();
+-
+-    private static bool _initialized;
+-
+-    internal static CardModel? CardBeingReplaced =>
+-        ActiveReplacementCard.Value;
+-
+-    internal static void Initialize()
+-    {
+-        if (_initialized)
+-        {
+-            return;
+-        }
+-
+-        MethodInfo? addCard = AccessTools.Method(
+-            typeof(CardPileCmd),
+-            nameof(CardPileCmd.Add),
+-            [
+-                typeof(CardModel),
+-                typeof(PileType),
+-                typeof(CardPilePosition),
+-                typeof(AbstractModel),
+-                typeof(bool),
+-            ]
+-        );
+-
+-        if (addCard == null)
+-        {
+-            throw new MissingMethodException(
+-                "蛊虫容量替换所需的 CardPileCmd.Add 重载不存在。"
+-            );
+-        }
+-
+-        new Harmony(HarmonyId).Patch(
+-            addCard,
+-            prefix: new HarmonyMethod(
+-                typeof(GuDeckCapacityReplacementPatch),
+-                nameof(AddCardPrefix)
+-            )
+-        );
+-
+-        _initialized = true;
+-    }
+-
+-    internal static void Uninitialize()
+-    {
+-        try
+-        {
+-            new Harmony(HarmonyId).UnpatchAll(HarmonyId);
+-        }
+-        finally
+-        {
+-            BypassDepth.Value = 0;
+-            ActiveReplacementCard.Value = null;
+-            _initialized = false;
+-        }
+-    }
+-
+-    private static bool AddCardPrefix(
+-        CardModel card,
+-        PileType newPileType,
+-        CardPilePosition position,
+-        AbstractModel? clonedBy,
+-        bool skipVisuals,
+-        ref Task<CardPileAddResult> __result
+-    )
+-    {
+-        if (BypassDepth.Value > 0 ||
+-            newPileType != PileType.Deck ||
+-            card is not IGuWormCard ||
+-            card.Pile != null ||
+-            card.Owner.Character is not GuZhenRenCharacter)
+-        {
+-            return true;
+-        }
+-
+-        int existingGuCount =
+-            card.Owner.Deck.Cards.Count(existing =>
+-                existing is IGuWormCard
+-            );
+-
+-        if (existingGuCount <
+-            GuZhenRenCardRules.GuWormDeckCapacity)
+-        {
+-            return true;
+-        }
+-
+-        __result = ReplaceThenAdd(
+-            card,
+-            newPileType,
+-            position,
+-            clonedBy,
+-            skipVisuals
+-        );
+-        return false;
+-    }
+-
+-    private static async Task<CardPileAddResult> ReplaceThenAdd(
+-        CardModel card,
+-        PileType newPileType,
+-        CardPilePosition position,
+-        AbstractModel? clonedBy,
+-        bool skipVisuals
+-    )
+-    {
+-        Player player = card.Owner;
+-        CardModel[] replaceableCards =
+-            player.Deck.Cards
+-                .Where(existing =>
+-                    GuZhenRenCardRules.CanReplaceGuWorm(
+-                        player,
+-                        existing,
+-                        card
+-                    )
+-                )
+-                .ToArray();
+-
+-        if (replaceableCards.Length == 0)
+-        {
+-            Entry.Logger.Info(
+-                $"无法获得 {card.Id}：蛊虫容量已满，且没有可合法替换的蛊虫。"
+-            );
+-            return FailedResult(card, newPileType);
+-        }
+-
+-        LocString prompt = new(
+-            "cards",
+-            "GU_ZHEN_REN_PERSONAL_CARD_REPLACE_GU_WORM.selectionScreenPrompt"
+-        );
+-        prompt.Add(
+-            "Capacity",
+-            GuZhenRenCardRules.GuWormDeckCapacity
+-        );
+-        prompt.Add("NewCard", card.Title);
+-
+-        CardSelectorPrefs prefs = new(prompt, 1, 1)
+-        {
+-            Cancelable = false,
+-            RequireManualConfirmation = true,
+-        };
+-
+-        CardModel? replacement =
+-            (
+-                await CardSelectCmd.FromDeckGeneric(
+-                    player,
+-                    prefs,
+-                    filter: existing =>
+-                        replaceableCards.Contains(existing),
+-                    sortingOrder: existing =>
+-                        existing is IGuRankProvider gu
+-                            ? gu.GuRank
+-                            : int.MaxValue
+-                )
+-            )
+-            .FirstOrDefault();
+-
+-        if (replacement == null ||
+-            replacement.Pile?.Type != PileType.Deck)
+-        {
+-            return FailedResult(card, newPileType);
+-        }
+-
+-        CardPileAddResult addResult;
+-
+-        ActiveReplacementCard.Value = replacement;
+-        BypassDepth.Value++;
+-
+-        try
+-        {
+-            addResult = await CardPileCmd.Add(
+-                card,
+-                newPileType,
+-                position,
+-                clonedBy,
+-                skipVisuals
+-            );
+-        }
+-        finally
+-        {
+-            BypassDepth.Value--;
+-            ActiveReplacementCard.Value = null;
+-        }
+-
+-        if (!addResult.success)
+-        {
+-            return addResult;
+-        }
+-
+-        try
+-        {
+-            await CardPileCmd.RemoveFromDeck(
+-                replacement,
+-                showPreview: false
+-            );
+-        }
+-        catch
+-        {
+-            // 极端情况下移除旧牌失败，撤销刚加入的新牌，避免容量永久超限。
+-            if (addResult.cardAdded.Pile?.Type == PileType.Deck)
+-            {
+-                await CardPileCmd.RemoveFromDeck(
+-                    addResult.cardAdded,
+-                    showPreview: false
+-                );
+-            }
+-
+-            throw;
+-        }
+-
+-        Entry.Logger.Info(
+-            $"蛊虫容量替换：移除 {replacement.Id}，获得 {addResult.cardAdded.Id}。"
+-        );
+-
+-        return addResult;
+-    }
+-
+-    private static CardPileAddResult FailedResult(
+-        CardModel card,
+-        PileType targetPile
+-    )
+-    {
+-        return new CardPileAddResult
+-        {
+-            cardAdded = card,
+-            success = false,
+-            oldPile = card.Pile,
+-            targetPile = targetPile,
+-            modifyingModels = null,
+-        };
+-    }
+-}
+--- a/GuZhenRenPersonalCode/Patch/GuDeckCapacityReplacementPatch.cs.uid
++++ /dev/null
+@@ -1 +0,0 @@
+-uid://ccleu0do4claq

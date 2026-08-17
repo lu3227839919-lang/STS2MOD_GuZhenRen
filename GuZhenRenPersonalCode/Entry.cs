@@ -61,7 +61,6 @@ public partial class Entry
         new(nameof(XueDaoParasiteExhaustPatch), XueDaoParasiteExhaustPatch.Initialize, XueDaoParasiteExhaustPatch.Uninitialize),
         new(nameof(YiHaiCombatVictoryPatch), YiHaiCombatVictoryPatch.Initialize, YiHaiCombatVictoryPatch.Uninitialize),
         new(nameof(XueDaoRemainsKillPatch), XueDaoRemainsKillPatch.Initialize, XueDaoRemainsKillPatch.Uninitialize),
-        new(nameof(GuDeckCapacityReplacementPatch), GuDeckCapacityReplacementPatch.Initialize, GuDeckCapacityReplacementPatch.Uninitialize),
         new(nameof(MerchantInventoryCompatibilityPatch), MerchantInventoryCompatibilityPatch.Initialize, MerchantInventoryCompatibilityPatch.Uninitialize),
         new(nameof(AncientCompatibilityPatch), AncientCompatibilityPatch.Initialize, AncientCompatibilityPatch.Uninitialize),
         new(nameof(ShaZhaoTuiYanSystem), ShaZhaoTuiYanSystem.Initialize, ShaZhaoTuiYanSystem.Uninitialize),
