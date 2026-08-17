@@ -12,14 +12,15 @@ namespace GuZhenRen.Cards.LiDao;
 
 /// <summary>
 /// 群力蛊：兽力虚影自然显化后的虚影发动机。
-/// 每回合前 N 次自然显化按概率使该虚影额外显化一次；
-/// 额外显化不会再次触发群力（递归阻断），6转起计入实际显化。
+/// 每次自然显化都开启一条独立连锁，按概率使同一虚影连续额外显化；
+/// 单次连锁最多额外显化 1/2/3 次，且不会递归开启新连锁，
+/// 6转起每次额外显化均计入实际显化。
 /// 本蛊不属于兽力虚影蛊，不参与炼力、虚影容量或衍生牌系统。
 /// </summary>
 [RegisterCard(typeof(GuZhenRenGuCardPool))]
 public sealed class QunLiGu : AbstractGuWormCard
 {
-    public override int YuanQiCost => 2;
+    public override int YuanQiCost => 1;
 
     public override int MinimumAvailableGuRank => 5;
 
@@ -42,7 +43,7 @@ public sealed class QunLiGu : AbstractGuWormCard
         )
     {
         SetDao(Dao.LiDao);
-        this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 2);
+        this.SecondaryCosts().Set(YuanQiSystem.ResourceId, YuanQiCost);
     }
 
     protected override Task OnPlay(
@@ -55,11 +56,18 @@ public sealed class QunLiGu : AbstractGuWormCard
 
     internal static int GroupChanceAtRank(int rank) => rank switch
     {
-        >= 7 => 45,
-        6 => 35,
-        _ => 25,
+        >= 7 => 40,
+        6 => 30,
+        _ => 20,
     };
 
-    internal static int GroupTriggerLimitAtRank(int rank) =>
-        rank >= 7 ? 2 : 1;
+    internal static int GroupRepeatLimitAtRank(int rank) => rank switch
+    {
+        >= 7 => 3,
+        6 => 2,
+        _ => 1,
+    };
+
+    internal static bool ExtraManifestCountsAsActualAtRank(int rank) =>
+        rank >= 6;
 }

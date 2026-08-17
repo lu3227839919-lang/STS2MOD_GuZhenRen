@@ -14,15 +14,13 @@ namespace GuZhenRen.Powers.LiDao;
 
 /// <summary>
 /// 群力蛊的持续战斗状态。
-/// 每回合前 N 次（5/6转 1 次，7转 2 次）兽力虚影自然显化后，
-/// 按概率使该虚影额外显化一次；额外显化不会再次触发群力（递归阻断）。
+/// 每次兽力虚影自然显化后都开启一条独立连锁：每次判定成功便使
+/// 同一虚影额外显化，并继续判定，直至失败或达到 1/2/3 次上限。
+/// 连锁在本 Power 内循环执行，不会递归开启新的群力连锁。
 /// </summary>
 [RegisterPower]
 public sealed class QunLiPower : ModPowerTemplate
 {
-    private int _lastTurn;
-    private int _usedThisTurn;
-
     public override PowerType Type => PowerType.Buff;
     public override PowerStackType StackType => PowerStackType.Single;
     public override int DisplayAmount => GroupChancePercent;
@@ -51,47 +49,45 @@ public sealed class QunLiPower : ModPowerTemplate
         CardPlay cardPlay
     )
     {
-        int turn = CurrentTurn;
-        if (turn != _lastTurn)
-        {
-            _lastTurn = turn;
-            _usedThisTurn = 0;
-        }
-
-        if (_usedThisTurn >= QunLiGu.GroupTriggerLimitAtRank(Rank))
-        {
-            return;
-        }
-        _usedThisTurn++;
-        InvokeDisplayAmountChanged();
-
         int chance = GroupChancePercent;
-        if (chance <= 0 ||
-            RitsuLibFramework.GetModPlayerRng(
-                Owner.Player!,
-                Entry.ModId,
-                "li_dao/qun_li_repeat"
-            ).NextInt(100) >= chance)
+        if (chance <= 0)
         {
             return;
         }
 
-        bool executed = await phantom.TriggerFromControllerAsync(
-            choiceContext,
-            cardPlay,
-            forced: true,
-            effectMultiplier: 1m
+        var rng = RitsuLibFramework.GetModPlayerRng(
+            Owner.Player!,
+            Entry.ModId,
+            "li_dao/qun_li_repeat"
         );
-        if (executed)
+
+        int repeatLimit = QunLiGu.GroupRepeatLimitAtRank(Rank);
+        for (int repeat = 0; repeat < repeatLimit; repeat++)
         {
-            await LiDaoManifestHub.NotifyGroupExtraManifestAsync(
+            if (rng.NextInt(100) >= chance)
+            {
+                break;
+            }
+
+            bool executed = await phantom.TriggerFromControllerAsync(
                 choiceContext,
-                Owner.Player!,
-                phantom
+                cardPlay,
+                forced: true,
+                effectMultiplier: 1m
             );
+            if (!executed)
+            {
+                break;
+            }
+
+            if (QunLiGu.ExtraManifestCountsAsActualAtRank(Rank))
+            {
+                await LiDaoManifestHub.NotifyGroupExtraManifestAsync(
+                    choiceContext,
+                    Owner.Player!,
+                    phantom
+                );
+            }
         }
     }
-
-    private int CurrentTurn =>
-        Owner.Player?.PlayerCombatState?.TurnNumber ?? 0;
 }

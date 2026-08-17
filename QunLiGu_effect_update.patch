@@ -1,0 +1,223 @@
+diff --git a/GuZhenRenPersonal/localization/eng/LocalizationCompatibilityPatch.localization.json b/GuZhenRenPersonal/localization/eng/LocalizationCompatibilityPatch.localization.json
+index 05cab51..825dc9f 100644
+--- a/GuZhenRenPersonal/localization/eng/LocalizationCompatibilityPatch.localization.json
++++ b/GuZhenRenPersonal/localization/eng/LocalizationCompatibilityPatch.localization.json
+@@ -301,7 +301,7 @@
+     {
+       "table": "powers",
+       "key": "GU_ZHEN_REN_PERSONAL_POWER_QUN_LI_POWER.description",
+-      "text": "After the first (first 2 at rank 7) natural beast phantom manifestation each turn, that phantom may manifest once more by chance; extra manifestations cannot trigger Group Strength again."
++      "text": "After any natural beast phantom manifestation, that phantom may repeatedly manifest again until a roll fails or the chain limit is reached. Extra manifestations cannot trigger Group Strength; at rank 6+ they count as actual manifestations."
+     },
+     {
+       "table": "powers",
+diff --git a/GuZhenRenPersonal/localization/eng/cards.json b/GuZhenRenPersonal/localization/eng/cards.json
+index 2c58501..9229a82 100644
+--- a/GuZhenRenPersonal/localization/eng/cards.json
++++ b/GuZhenRenPersonal/localization/eng/cards.json
+@@ -37,7 +37,7 @@
+     "GU_ZHEN_REN_PERSONAL_CARD_WO_LI_GU.title":  "Self Strength Gu",
+     "GU_ZHEN_REN_PERSONAL_CARD_WO_LI_GU.description":  "[gold]Rank {Rank}[/gold]. [gold]Power[/gold]. Activate to gain Self Strength. {Rank5Exact:cond:\u003e0?Every 3 natural beast phantom manifestations grant 1 Strength.|}{Rank6Exact:cond:\u003e0?Every 2 actual beast phantom manifestations grant 1 Strength; extra manifestations from Group Strength and similar effects also count.|}{Rank7Exact:cond:\u003e0?Every 2 actual beast phantom manifestations grant 1 Strength; if 3 different kinds of beast phantoms have actually manifested this turn, gain 1 additional Strength (once per turn).|}While Self Strength is active, your Strength also applies to beast phantoms that deal damage.",
+     "GU_ZHEN_REN_PERSONAL_CARD_QUN_LI_GU.title":  "Group Strength Gu",
+-    "GU_ZHEN_REN_PERSONAL_CARD_QUN_LI_GU.description":  "[gold]Rank {Rank}[/gold]. [gold]Power[/gold]. Activate to gain Group Strength. {Rank5Exact:cond:\u003e0?After the first natural beast phantom manifestation each turn, it may manifest once more at 25% chance. Extra manifestations from Group Strength cannot trigger Group Strength again.|}{Rank6Exact:cond:\u003e0?After the first natural beast phantom manifestation each turn, it may manifest once more at 35% chance; that extra manifestation counts as an actual manifestation for effects like Self Strength Gu, but cannot trigger Group Strength again.|}{Rank7Exact:cond:\u003e0?After each of the first 2 natural beast phantom manifestations each turn, that phantom may manifest once more at 45% chance; extra manifestations count as actual manifestations, but cannot trigger Group Strength again.|}",
++    "GU_ZHEN_REN_PERSONAL_CARD_QUN_LI_GU.description":  "[gold]Rank {Rank}[/gold]. [gold]Power[/gold]. Activate to gain Group Strength. {Rank5Exact:cond:\u003e0?After any beast phantom manifests naturally, it has a 20% chance to manifest again. Each Group Strength chain can add up to 1 manifestation.|}{Rank6Exact:cond:\u003e0?After any beast phantom manifests naturally, it has a 30% chance to manifest again; after each success, roll again. Each chain can add up to 2 manifestations, each counting as an actual manifestation.|}{Rank7Exact:cond:\u003e0?After any beast phantom manifests naturally, it has a 40% chance to manifest again; after each success, roll again. Each chain can add up to 3 manifestations, each counting as an actual manifestation.|}",
+     "GU_ZHEN_REN_PERSONAL_CARD_BA_SHAN.title":  "Mountain Toppler",
+     "GU_ZHEN_REN_PERSONAL_CARD_BA_SHAN.description":  "[gold]Rank {Rank}[/gold]. Activate: all enemies lose {BlockBreak} Block, then take {Damage} damage and 1 Vulnerable. If this activation breaks an enemy\u0027s Block, apply {BreakVulnerableBonus} additional Vulnerable.",
+     "GU_ZHEN_REN_PERSONAL_CARD_WAN_LAN.title":  "Turn the Tide",
+diff --git a/GuZhenRenPersonal/localization/zhs/LocalizationCompatibilityPatch.localization.json b/GuZhenRenPersonal/localization/zhs/LocalizationCompatibilityPatch.localization.json
+index 4c6b0a3..9412060 100644
+--- a/GuZhenRenPersonal/localization/zhs/LocalizationCompatibilityPatch.localization.json
++++ b/GuZhenRenPersonal/localization/zhs/LocalizationCompatibilityPatch.localization.json
+@@ -301,7 +301,7 @@
+     {
+       "table": "powers",
+       "key": "GU_ZHEN_REN_PERSONAL_POWER_QUN_LI_POWER.description",
+-      "text": "每回合前1次（7转起2次）兽力虚影自然显化后，按概率使其额外显化一次；额外显化不会再次触发群力。"
++      "text": "每次兽力虚影自然显化后，按概率使同一虚影连续额外显化，直至判定失败或达到上限；额外显化不会再次触发群力，6转起计为实际显化。"
+     },
+     {
+       "table": "powers",
+diff --git a/GuZhenRenPersonal/localization/zhs/cards.json b/GuZhenRenPersonal/localization/zhs/cards.json
+index 57f084f..37d7133 100644
+--- a/GuZhenRenPersonal/localization/zhs/cards.json
++++ b/GuZhenRenPersonal/localization/zhs/cards.json
+@@ -37,7 +37,7 @@
+     "GU_ZHEN_REN_PERSONAL_CARD_WO_LI_GU.title":  "我力蛊",
+     "GU_ZHEN_REN_PERSONAL_CARD_WO_LI_GU.description":  "[gold]{RankCN}转[/gold]，[gold]能力[/gold]。催动：获得「我力」。{Rank5Exact:cond:\u003e0?每累计3次兽力虚影自然显化，获得1点力量。|}{Rank6Exact:cond:\u003e0?每累计2次实际兽力虚影显化，获得1点力量；群力等效果产生的额外实际显化也计入。|}{Rank7Exact:cond:\u003e0?每累计2次实际兽力虚影显化，获得1点力量；若本回合已有3种不同兽力虚影实际显化过，额外获得1点力量，每回合最多触发一次。|}我力生效期间，你的力量同时作用于具有伤害的兽力虚影。",
+     "GU_ZHEN_REN_PERSONAL_CARD_QUN_LI_GU.title":  "群力蛊",
+-    "GU_ZHEN_REN_PERSONAL_CARD_QUN_LI_GU.description":  "[gold]{RankCN}转[/gold]，[gold]能力[/gold]。催动：获得「群力」。{Rank5Exact:cond:\u003e0?每回合第一次有兽力虚影自然显化后，以25%概率使该虚影额外显化一次。由群力产生的额外显化不能再次触发群力。|}{Rank6Exact:cond:\u003e0?每回合第一次有兽力虚影自然显化后，以35%概率使该虚影额外显化一次；此次额外显化视为一次实际兽力虚影显化，可被我力蛊等效果统计，但不能再次触发群力。|}{Rank7Exact:cond:\u003e0?每回合前2次兽力虚影自然显化后，各以45%概率使对应虚影额外显化一次；额外显化视为实际兽力虚影显化，但不能再次触发群力。|}",
++    "GU_ZHEN_REN_PERSONAL_CARD_QUN_LI_GU.description":  "[gold]{RankCN}转[/gold]，[gold]能力[/gold]。催动：获得「群力」。{Rank5Exact:cond:\u003e0?每当有兽力虚影自然显化后，以20%概率使该虚影再次显化，本次群力连锁最多额外显化1次。|}{Rank6Exact:cond:\u003e0?每当有兽力虚影自然显化后，以30%概率使该虚影再次显化；每次成功后继续判定，本次群力连锁最多额外显化2次。每次额外显化均视为实际显化。|}{Rank7Exact:cond:\u003e0?每当有兽力虚影自然显化后，以40%概率使该虚影再次显化；每次成功后继续判定，本次群力连锁最多额外显化3次。每次额外显化均视为实际显化。|}",
+     "GU_ZHEN_REN_PERSONAL_CARD_BA_SHAN.title":  "拔山",
+     "GU_ZHEN_REN_PERSONAL_CARD_BA_SHAN.description":  "[gold]{RankCN}转[/gold]。催动：使所有敌人失去{BlockBreak}点格挡，然后对其造成{Damage}点伤害并施加1层易伤。若此次催动使其格挡归零，额外施加{BreakVulnerableBonus}层易伤。",
+     "GU_ZHEN_REN_PERSONAL_CARD_WAN_LAN.title":  "挽澜",
+diff --git a/GuZhenRenPersonalCode/Cards/LiDao/Cards/QunLiGu/QunLiGu.cs b/GuZhenRenPersonalCode/Cards/LiDao/Cards/QunLiGu/QunLiGu.cs
+index 24b89cc..eb1c33e 100644
+--- a/GuZhenRenPersonalCode/Cards/LiDao/Cards/QunLiGu/QunLiGu.cs
++++ b/GuZhenRenPersonalCode/Cards/LiDao/Cards/QunLiGu/QunLiGu.cs
+@@ -12,14 +12,15 @@ namespace GuZhenRen.Cards.LiDao;
+ 
+ /// <summary>
+ /// 群力蛊：兽力虚影自然显化后的虚影发动机。
+-/// 每回合前 N 次自然显化按概率使该虚影额外显化一次；
+-/// 额外显化不会再次触发群力（递归阻断），6转起计入实际显化。
++/// 每次自然显化都开启一条独立连锁，按概率使同一虚影连续额外显化；
++/// 单次连锁最多额外显化 1/2/3 次，且不会递归开启新连锁，
++/// 6转起每次额外显化均计入实际显化。
+ /// 本蛊不属于兽力虚影蛊，不参与炼力、虚影容量或衍生牌系统。
+ /// </summary>
+ [RegisterCard(typeof(GuZhenRenGuCardPool))]
+ public sealed class QunLiGu : AbstractGuWormCard
+ {
+-    public override int YuanQiCost => 2;
++    public override int YuanQiCost => 1;
+ 
+     public override int MinimumAvailableGuRank => 5;
+ 
+@@ -42,7 +43,7 @@ public sealed class QunLiGu : AbstractGuWormCard
+         )
+     {
+         SetDao(Dao.LiDao);
+-        this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 2);
++        this.SecondaryCosts().Set(YuanQiSystem.ResourceId, YuanQiCost);
+     }
+ 
+     protected override Task OnPlay(
+@@ -55,11 +56,18 @@ public sealed class QunLiGu : AbstractGuWormCard
+ 
+     internal static int GroupChanceAtRank(int rank) => rank switch
+     {
+-        >= 7 => 45,
+-        6 => 35,
+-        _ => 25,
++        >= 7 => 40,
++        6 => 30,
++        _ => 20,
+     };
+ 
+-    internal static int GroupTriggerLimitAtRank(int rank) =>
+-        rank >= 7 ? 2 : 1;
++    internal static int GroupRepeatLimitAtRank(int rank) => rank switch
++    {
++        >= 7 => 3,
++        6 => 2,
++        _ => 1,
++    };
++
++    internal static bool ExtraManifestCountsAsActualAtRank(int rank) =>
++        rank >= 6;
+ }
+diff --git a/GuZhenRenPersonalCode/Powers/LiDao/LiDaoManifestHub.cs b/GuZhenRenPersonalCode/Powers/LiDao/LiDaoManifestHub.cs
+index ada07cf..6d51a99 100644
+--- a/GuZhenRenPersonalCode/Powers/LiDao/LiDaoManifestHub.cs
++++ b/GuZhenRenPersonalCode/Powers/LiDao/LiDaoManifestHub.cs
+@@ -12,7 +12,8 @@ namespace GuZhenRen.Powers.LiDao;
+ ///
+ /// - 自然显化（攻击触发成功后）：先交群力判定（可能产生额外显化），
+ ///   再交我力按显化类型计数。
+-/// - 群力额外显化：只交我力按“实际显化”计数，绝不回调群力，避免递归。
++/// - 6转起的群力额外显化：只交我力按“实际显化”计数，绝不回调群力，
++///   避免递归；5转的群力额外显化不进入该事件。
+ /// </summary>
+ public static class LiDaoManifestHub
+ {
+diff --git a/GuZhenRenPersonalCode/Powers/LiDao/QunLiPower.cs b/GuZhenRenPersonalCode/Powers/LiDao/QunLiPower.cs
+index 9fb83a6..3014238 100644
+--- a/GuZhenRenPersonalCode/Powers/LiDao/QunLiPower.cs
++++ b/GuZhenRenPersonalCode/Powers/LiDao/QunLiPower.cs
+@@ -14,15 +14,13 @@ namespace GuZhenRen.Powers.LiDao;
+ 
+ /// <summary>
+ /// 群力蛊的持续战斗状态。
+-/// 每回合前 N 次（5/6转 1 次，7转 2 次）兽力虚影自然显化后，
+-/// 按概率使该虚影额外显化一次；额外显化不会再次触发群力（递归阻断）。
++/// 每次兽力虚影自然显化后都开启一条独立连锁：每次判定成功便使
++/// 同一虚影额外显化，并继续判定，直至失败或达到 1/2/3 次上限。
++/// 连锁在本 Power 内循环执行，不会递归开启新的群力连锁。
+ /// </summary>
+ [RegisterPower]
+ public sealed class QunLiPower : ModPowerTemplate
+ {
+-    private int _lastTurn;
+-    private int _usedThisTurn;
+-
+     public override PowerType Type => PowerType.Buff;
+     public override PowerStackType StackType => PowerStackType.Single;
+     public override int DisplayAmount => GroupChancePercent;
+@@ -51,47 +49,45 @@ public sealed class QunLiPower : ModPowerTemplate
+         CardPlay cardPlay
+     )
+     {
+-        int turn = CurrentTurn;
+-        if (turn != _lastTurn)
+-        {
+-            _lastTurn = turn;
+-            _usedThisTurn = 0;
+-        }
+-
+-        if (_usedThisTurn >= QunLiGu.GroupTriggerLimitAtRank(Rank))
+-        {
+-            return;
+-        }
+-        _usedThisTurn++;
+-        InvokeDisplayAmountChanged();
+-
+         int chance = GroupChancePercent;
+-        if (chance <= 0 ||
+-            RitsuLibFramework.GetModPlayerRng(
+-                Owner.Player!,
+-                Entry.ModId,
+-                "li_dao/qun_li_repeat"
+-            ).NextInt(100) >= chance)
++        if (chance <= 0)
+         {
+             return;
+         }
+ 
+-        bool executed = await phantom.TriggerFromControllerAsync(
+-            choiceContext,
+-            cardPlay,
+-            forced: true,
+-            effectMultiplier: 1m
++        var rng = RitsuLibFramework.GetModPlayerRng(
++            Owner.Player!,
++            Entry.ModId,
++            "li_dao/qun_li_repeat"
+         );
+-        if (executed)
++
++        int repeatLimit = QunLiGu.GroupRepeatLimitAtRank(Rank);
++        for (int repeat = 0; repeat < repeatLimit; repeat++)
+         {
+-            await LiDaoManifestHub.NotifyGroupExtraManifestAsync(
++            if (rng.NextInt(100) >= chance)
++            {
++                break;
++            }
++
++            bool executed = await phantom.TriggerFromControllerAsync(
+                 choiceContext,
+-                Owner.Player!,
+-                phantom
++                cardPlay,
++                forced: true,
++                effectMultiplier: 1m
+             );
++            if (!executed)
++            {
++                break;
++            }
++
++            if (QunLiGu.ExtraManifestCountsAsActualAtRank(Rank))
++            {
++                await LiDaoManifestHub.NotifyGroupExtraManifestAsync(
++                    choiceContext,
++                    Owner.Player!,
++                    phantom
++                );
++            }
+         }
+     }
+-
+-    private int CurrentTurn =>
+-        Owner.Player?.PlayerCombatState?.TurnNumber ?? 0;
+ }

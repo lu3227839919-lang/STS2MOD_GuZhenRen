@@ -37,7 +37,7 @@
     "GU_ZHEN_REN_PERSONAL_CARD_WO_LI_GU.title":  "我力蛊",
     "GU_ZHEN_REN_PERSONAL_CARD_WO_LI_GU.description":  "[gold]{RankCN}转[/gold]，[gold]能力[/gold]。催动：获得「我力」。{Rank5Exact:cond:\u003e0?每累计3次兽力虚影自然显化，获得1点力量。|}{Rank6Exact:cond:\u003e0?每累计2次实际兽力虚影显化，获得1点力量；群力等效果产生的额外实际显化也计入。|}{Rank7Exact:cond:\u003e0?每累计2次实际兽力虚影显化，获得1点力量；若本回合已有3种不同兽力虚影实际显化过，额外获得1点力量，每回合最多触发一次。|}我力生效期间，你的力量同时作用于具有伤害的兽力虚影。",
     "GU_ZHEN_REN_PERSONAL_CARD_QUN_LI_GU.title":  "群力蛊",
-    "GU_ZHEN_REN_PERSONAL_CARD_QUN_LI_GU.description":  "[gold]{RankCN}转[/gold]，[gold]能力[/gold]。催动：获得「群力」。{Rank5Exact:cond:\u003e0?每回合第一次有兽力虚影自然显化后，以25%概率使该虚影额外显化一次。由群力产生的额外显化不能再次触发群力。|}{Rank6Exact:cond:\u003e0?每回合第一次有兽力虚影自然显化后，以35%概率使该虚影额外显化一次；此次额外显化视为一次实际兽力虚影显化，可被我力蛊等效果统计，但不能再次触发群力。|}{Rank7Exact:cond:\u003e0?每回合前2次兽力虚影自然显化后，各以45%概率使对应虚影额外显化一次；额外显化视为实际兽力虚影显化，但不能再次触发群力。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_QUN_LI_GU.description":  "[gold]{RankCN}转[/gold]，[gold]能力[/gold]。催动：获得「群力」。{Rank5Exact:cond:\u003e0?每当有兽力虚影自然显化后，以20%概率使该虚影再次显化，本次群力连锁最多额外显化1次。|}{Rank6Exact:cond:\u003e0?每当有兽力虚影自然显化后，以30%概率使该虚影再次显化；每次成功后继续判定，本次群力连锁最多额外显化2次。每次额外显化均视为实际显化。|}{Rank7Exact:cond:\u003e0?每当有兽力虚影自然显化后，以40%概率使该虚影再次显化；每次成功后继续判定，本次群力连锁最多额外显化3次。每次额外显化均视为实际显化。|}",
     "GU_ZHEN_REN_PERSONAL_CARD_BA_SHAN.title":  "拔山",
     "GU_ZHEN_REN_PERSONAL_CARD_BA_SHAN.description":  "[gold]{RankCN}转[/gold]。催动：使所有敌人失去{BlockBreak}点格挡，然后对其造成{Damage}点伤害并施加1层易伤。若此次催动使其格挡归零，额外施加{BreakVulnerableBonus}层易伤。",
     "GU_ZHEN_REN_PERSONAL_CARD_WAN_LAN.title":  "挽澜",

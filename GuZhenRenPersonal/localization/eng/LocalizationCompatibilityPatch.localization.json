@@ -301,7 +301,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_QUN_LI_POWER.description",
-      "text": "After the first (first 2 at rank 7) natural beast phantom manifestation each turn, that phantom may manifest once more by chance; extra manifestations cannot trigger Group Strength again."
+      "text": "After any natural beast phantom manifestation, that phantom may repeatedly manifest again until a roll fails or the chain limit is reached. Extra manifestations cannot trigger Group Strength; at rank 6+ they count as actual manifestations."
     },
     {
       "table": "powers",

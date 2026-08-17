@@ -301,7 +301,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_QUN_LI_POWER.description",
-      "text": "每回合前1次（7转起2次）兽力虚影自然显化后，按概率使其额外显化一次；额外显化不会再次触发群力。"
+      "text": "每次兽力虚影自然显化后，按概率使同一虚影连续额外显化，直至判定失败或达到上限；额外显化不会再次触发群力，6转起计为实际显化。"
     },
     {
       "table": "powers",
