@@ -37,6 +37,8 @@ public static class WoLiPhantomSystem
             return;
         }
 
+        WoLiXuYing? controllerSource = null;
+
         for (int index = 0; index < count; index++)
         {
             WoLiXuYing phantom = GuGeneratedCardFactory.Create<WoLiXuYing>(
@@ -44,9 +46,26 @@ public static class WoLiPhantomSystem
                 rank,
                 upgraded: false
             );
+            controllerSource ??= phantom;
+
             await GuGeneratedCardFactory.AddToHandOrDiscard(
                 phantom,
                 owner
+            );
+        }
+
+        // 我力虚影由《万我》直接生成，并不会经过普通兽力蛊的
+        // ActivateBeastGuAsync 流程。若此前没有兽力虚影，战斗中可能
+        // 尚不存在 LiDaoBattlePower，导致后续攻击完全不会进入集中
+        // 显化判定——即使我力虚影的首次显化概率已经是 100%。
+        //
+        // 因此，只要成功生成了我力虚影，就在这里确保集中显化控制器
+        // 已注册。这样下一次符合条件的攻击即可正常触发首次必定显化。
+        if (controllerSource != null)
+        {
+            await LiDaoPhantomSystem.EnsureControllerAsync(
+                choiceContext,
+                controllerSource
             );
         }
 

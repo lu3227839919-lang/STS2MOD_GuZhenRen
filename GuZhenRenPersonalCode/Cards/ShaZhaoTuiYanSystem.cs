@@ -244,9 +244,10 @@ internal static class ShaZhaoTuiYanSystem
             CardPile guPile
     )
     {
-        // 材料可从蛊手牌与蛊恢复牌堆（冷却中）选择。
+        // 杀招推演材料可从蛊手牌与蛊存放牌堆选择。
+        // 蛊恢复/冷却牌堆与蛊封存堆不参与推演候选。
         CardModel[] availableMaterials = guPile.Cards
-            .Concat(GuCardPileSystem.RecoveryPileType.GetPile(player).Cards)
+            .Concat(GuCardPileSystem.StoragePileType.GetPile(player).Cards)
             .Distinct()
             .Where(IsEligibleMaterial)
             .ToArray();
@@ -292,6 +293,9 @@ internal static class ShaZhaoTuiYanSystem
                     new CardSelectorPrefs(targetPrompt, 1)
                     {
                         Cancelable = true,
+                        // 即使当前只能推演出一张杀招，也必须进入选择界面，
+                        // 由玩家明确点击选择，而不是被选卡命令自动确认。
+                        RequireManualConfirmation = true,
                         PretendCardsCanBePlayed = true,
                     }
                 )
@@ -313,11 +317,8 @@ internal static class ShaZhaoTuiYanSystem
             out int maximumMaterialCount
         );
 
-        CardModel[] choices = guPile.Cards
-            .Concat(GuCardPileSystem.RecoveryPileType.GetPile(player).Cards)
-            .Distinct()
+        CardModel[] choices = availableMaterials
             .Where(card =>
-                IsEligibleMaterial(card) &&
                 materialTypes.Contains(card.GetType())
             )
             .Select((card, index) => (card, index))
@@ -342,6 +343,21 @@ internal static class ShaZhaoTuiYanSystem
         if (choices.Length < minimumMaterialCount)
         {
             return (targetCardType, []);
+        }
+
+        // 目标杀招确定后，如果蛊手牌与蛊存放牌堆中只存在唯一一组
+        // 合法材料实例，则直接使用，不再打开材料选择界面。
+        // 若同名蛊有多个实例，或存在多条当前都可完成的替代配方，
+        // 则仍进入材料选择界面，让玩家决定具体使用哪一组材料。
+        if (TryGetUniqueMaterialSelection(
+                choices,
+                targetCardType,
+                minimumMaterialCount,
+                maximumMaterialCount,
+                out List<CardModel> uniqueMaterials
+            ))
+        {
+            return (targetCardType, uniqueMaterials);
         }
 
         LocString materialPrompt = new(
@@ -380,6 +396,94 @@ internal static class ShaZhaoTuiYanSystem
         return (targetCardType, selected);
     }
 
+    /// <summary>
+    /// 判断指定杀招是否只有唯一一组合法材料实例。
+    /// 候选范围已经限定为蛊手牌与蛊存放牌堆。
+    /// 直接枚举组合可以正确处理同类型蛊的多个不同实例、
+    /// 替代配方以及需要重复材料类型的配方。
+    /// </summary>
+    private static bool TryGetUniqueMaterialSelection(
+        IReadOnlyList<CardModel> choices,
+        Type targetCardType,
+        int minimumMaterialCount,
+        int maximumMaterialCount,
+        out List<CardModel> selected
+    )
+    {
+        selected = [];
+
+        List<CardModel>? uniqueSelection = null;
+        bool foundMultiple = false;
+        List<CardModel> current = [];
+
+        void Search(int startIndex, int remaining)
+        {
+            if (foundMultiple)
+            {
+                return;
+            }
+
+            if (remaining == 0)
+            {
+                if (!ShaZhaoRecipeRegistry.HasMatchingRecipe(
+                        current,
+                        targetCardType
+                    ))
+                {
+                    return;
+                }
+
+                if (uniqueSelection != null)
+                {
+                    foundMultiple = true;
+                    return;
+                }
+
+                uniqueSelection = [.. current];
+                return;
+            }
+
+            for (
+                int index = startIndex;
+                index <= choices.Count - remaining;
+                index++
+            )
+            {
+                current.Add(choices[index]);
+                Search(index + 1, remaining - 1);
+                current.RemoveAt(current.Count - 1);
+
+                if (foundMultiple)
+                {
+                    return;
+                }
+            }
+        }
+
+        int minimum = Math.Max(0, minimumMaterialCount);
+        int maximum = Math.Min(
+            choices.Count,
+            Math.Max(minimum, maximumMaterialCount)
+        );
+
+        for (
+            int materialCount = minimum;
+            materialCount <= maximum && !foundMultiple;
+            materialCount++
+        )
+        {
+            Search(0, materialCount);
+        }
+
+        if (foundMultiple || uniqueSelection == null)
+        {
+            return false;
+        }
+
+        selected = uniqueSelection;
+        return true;
+    }
+
     private static bool IsEligibleMaterial(CardModel card)
     {
         if (card is not IGuWormCard ||
@@ -389,20 +493,19 @@ internal static class ShaZhaoTuiYanSystem
             return false;
         }
 
-        // 蛊手牌的材料须可催动（未耗尽次数、未被封存）；
-        // 蛊恢复牌堆（冷却中）的蛊虫次数已耗尽，只需未被封存即可作材料。
-        return card.Pile?.Type == GuCardPileSystem.PileType
-            ? GuCardUsageRules.CanUse(card)
-            : !ShaZhaoTuiYanSystem.IsMaterialSealed(card);
+        // 蛊手牌与蛊存放牌堆中的材料都必须仍可催动
+        // （未耗尽次数、未被封存）。
+        return GuCardUsageRules.CanUse(card);
     }
 
     /// <summary>
-    /// 材料可来自蛊手牌或蛊恢复牌堆（未封存的蛊虫）。
+    /// 杀招推演材料可来自蛊手牌或蛊存放牌堆。
+    /// 蛊恢复/冷却牌堆与蛊封存堆不适用。
     /// </summary>
     private static bool IsInEligibleMaterialPile(CardModel card)
     {
         return card.Pile?.Type == GuCardPileSystem.PileType ||
-            card.Pile?.Type == GuCardPileSystem.RecoveryPileType;
+            card.Pile?.Type == GuCardPileSystem.StoragePileType;
     }
 
     /// <summary>
