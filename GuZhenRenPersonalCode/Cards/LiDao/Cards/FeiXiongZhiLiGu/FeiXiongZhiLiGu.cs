@@ -28,6 +28,7 @@ public sealed class FeiXiongZhiLiGu :
         new DynamicVar("Chance", 22m),
         new DamageVar(9m, ValueProp.Move),
         new DynamicVar("BlockBonus", 3m),
+        new DynamicVar(LiDaoBeastTrainingSystem.ProgressVarName, 0m),
     ];
 
     public FeiXiongZhiLiGu() : base(CardRarity.Rare) => RefreshRankValues();

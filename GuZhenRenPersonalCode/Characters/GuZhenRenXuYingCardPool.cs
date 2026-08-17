@@ -1,6 +1,7 @@
 using Godot;
 
 using STS2RitsuLib.Scaffolding.Content;
+using STS2RitsuLib.Utils;
 
 namespace GuZhenRen.Characters;
 
@@ -34,18 +35,17 @@ public sealed class GuZhenRenXuYingCardPool
     public override string? TextEnergyIconPath =>
         $"{Entry.ResPath}/images/characters/energy_text.png";
 
-    public override Color DeckEntryCardColor =>
-        GuZhenRenCardVisualStyle.CardBackgroundColor;
+    public override Color DeckEntryCardColor => new(0.88f, 0.88f, 0.88f);
 
     public override Color EnergyOutlineColor =>
         new(0.08f, 0.18f, 0.24f);
 
     /// <summary>
-    /// 虚影卡框与普通卡统一使用白灰代码材质
-    /// （GuZhenRenCardVisualStyle.FrameMaterial：白灰纸底 + 白灰框架）。
+    /// 虚影卡框与普通卡统一使用同一 HSV 卡框材质（h=0.603, s=0.19, v=1.2）。
     /// </summary>
-    public override Material? PoolFrameMaterial =>
-        GuZhenRenCardVisualStyle.FrameMaterial;
+    private static readonly Material? _poolFrameMaterial =
+        MaterialUtils.CreateHsvShaderMaterial(0.603f, 0.19f, 1.2f);
+    public override Material? PoolFrameMaterial => _poolFrameMaterial;
 
     public override bool IsColorless =>
         false;

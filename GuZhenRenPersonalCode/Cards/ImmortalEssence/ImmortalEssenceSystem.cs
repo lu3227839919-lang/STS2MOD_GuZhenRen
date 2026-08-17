@@ -109,8 +109,28 @@ public static class ImmortalEssenceSystem
             return true;
         }
 
-        Player player = cardPlay.Player;
-        int remainingCost = GetActivationCost(guCard.GuRank);
+        return await SpendUnits(
+            cardPlay.Player,
+            GetActivationCost(guCard.GuRank)
+        );
+    }
+
+    /// <summary>
+    /// 从手牌仙元中扣除指定单位（杀招推演等非催动场景）。
+    /// 与催动扣费共用同一结算：归零的仙元牌先登记为待消耗，
+    /// 等当前出牌系列结束后统一进入消耗牌堆。
+    /// </summary>
+    public static async Task<bool> SpendUnits(
+        Player player,
+        int units
+    )
+    {
+        ArgumentNullException.ThrowIfNull(player);
+
+        if (units <= 0)
+        {
+            return true;
+        }
 
         AbstractXianYuanCard[] availableCards =
             player.PlayerCombatState?.Hand.Cards
@@ -120,11 +140,12 @@ public static class ImmortalEssenceSystem
                 .ThenBy(GuZhenRenDeterminism.GetCardNetworkId)
                 .ToArray() ?? [];
 
-        if (availableCards.Sum(GetRemainingUnits) < remainingCost)
+        if (availableCards.Sum(GetRemainingUnits) < units)
         {
             return false;
         }
 
+        int remainingCost = units;
         List<AbstractXianYuanCard> depletedCards = [];
 
         foreach (AbstractXianYuanCard essence in availableCards)

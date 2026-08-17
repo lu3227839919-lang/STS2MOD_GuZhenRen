@@ -1,5 +1,6 @@
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 
 using STS2RitsuLib.Utils;
@@ -9,25 +10,18 @@ namespace GuZhenRen.Cards.LiDao;
 /// <summary>
 /// 新版兽力蛊的实例级永久炼力状态。
 ///
-/// 永久进度同时写入 SavedAttachedState 与普通实例字段：前者负责存档和
-/// 多人快照，后者负责永久牌组到战斗牌的 MutableClone。战斗牌增加进度
-/// 时会同步写回自己的 DeckVersion，因此同名多张蛊各自独立保存。
+/// 永久进度主存于卡牌 DynamicVars（随卡牌克隆与存档持久化，跨战斗、
+/// 跨幕继承）；普通实例字段仅作兼容桥接。战斗牌增加进度时会同步写回
+/// 自己的 DeckVersion，因此同名多张蛊各自独立保存。
 /// </summary>
 public static class LiDaoBeastTrainingSystem
 {
     public const int TrainingRequired = 3;
 
-    private static readonly SavedAttachedState<CardModel, int>
-        ProgressState = new(
-            Entry.ModId + ".li_dao.beast_training.progress",
-            static () => 0
-        );
-
-    private static readonly SavedAttachedState<CardModel, bool>
-        ProgressInitializedState = new(
-            Entry.ModId + ".li_dao.beast_training.progress_initialized",
-            static () => false
-        );
+    /// <summary>
+    /// 炼力进度的隐藏 DynamicVar 名（不出现在卡面）。
+    /// </summary>
+    public const string ProgressVarName = "GuLiTraining";
 
     /// <summary>
     /// 仅属于当前战斗实例的开战快照。达到 3/3 的同一场战斗中仍保持
@@ -62,10 +56,7 @@ public static class LiDaoBeastTrainingSystem
             return 0;
         }
 
-        int progress = ProgressInitializedState[card]
-            ? ProgressState[card]
-            : beastGu.BeastTrainingProgressBridge;
-        progress = Math.Clamp(progress, 0, TrainingRequired);
+        int progress = ReadProgress(card);
         beastGu.BeastTrainingProgressBridge = progress;
         return progress;
     }
@@ -166,13 +157,31 @@ public static class LiDaoBeastTrainingSystem
         }
     }
 
+    private static int ReadProgress(CardModel card)
+    {
+        if (card.DynamicVars.TryGetValue(
+                ProgressVarName,
+                out DynamicVar? progressVar) &&
+            progressVar is not null)
+        {
+            return Math.Clamp(progressVar.IntValue, 0, TrainingRequired);
+        }
+
+        return 0;
+    }
+
     private static void WriteProgress(
         AbstractLiDaoBeastGuCard card,
         int progress
     )
     {
         card.BeastTrainingProgressBridge = progress;
-        ProgressState[card] = progress;
-        ProgressInitializedState[card] = true;
+        if (card.DynamicVars.TryGetValue(
+                ProgressVarName,
+                out DynamicVar? progressVar) &&
+            progressVar is not null)
+        {
+            progressVar.BaseValue = progress;
+        }
     }
 }

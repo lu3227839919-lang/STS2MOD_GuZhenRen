@@ -14,17 +14,14 @@ public enum LiDaoBeastKind
 }
 
 /// <summary>拥有永久 0/3 炼力进度，炼成后催动可生成虚影的兽力蛊。</summary>
-public interface ILiDaoBeastGuCard : IGuWormCard
+public interface ILiDaoBeastGuCard : ICompanionSourceGuCard
 {
-    Type CompanionCardType { get; }
-
     Type PhantomCardType { get; }
 }
 
-/// <summary>所有力道伴生普通牌的公共契约。</summary>
-public interface ILiDaoCompanionCard
+/// <summary>所有力道伴生普通牌的公共契约（转数跟随对应蛊）。</summary>
+public interface ILiDaoCompanionCard : ICompanionCard
 {
-    Type SourceGuType { get; }
 }
 
 /// <summary>力道集中结算器读取虚影类型、排序与容量信息的契约。</summary>

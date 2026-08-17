@@ -243,10 +243,26 @@ internal static class GuCardPileCombatPatch
     {
         foreach (Player player in players)
         {
-            int liDaoCount =
-                LiDaoCompanionSystem.GenerateForCombat(player);
-            int zhouDaoCount =
-                ZhouDaoCompanionSystem.GenerateForCombat(player);
+            int liDaoCount = CompanionCardSystem.GenerateForCombat(
+                player,
+                CompanionCardSystem.CompanionPairingMode.OnePerSourceCard,
+                static card =>
+                    card is ILiDaoBeastGuCard beastGu
+                        ? beastGu.CompanionCardType
+                        : null,
+                static card => card is ILiDaoCompanionCard,
+                "力道"
+            );
+            int zhouDaoCount = CompanionCardSystem.GenerateForCombat(
+                player,
+                CompanionCardSystem.CompanionPairingMode.OnePerSourceType,
+                static card =>
+                    card is IZhouDaoCompanionGuCard zhouDao
+                        ? zhouDao.CompanionCardType
+                        : null,
+                static card => card is IZhouDaoCompanionCard,
+                "宙道"
+            );
             int generatedCount = liDaoCount + zhouDaoCount;
 
             if (player.PlayerCombatState is { }

@@ -28,6 +28,7 @@ public sealed class QingNiuLaoLiGu :
         new DynamicVar("Chance", 35m),
         new DamageVar(4m, ValueProp.Move),
         new BlockVar(2m, ValueProp.Move),
+        new DynamicVar(LiDaoBeastTrainingSystem.ProgressVarName, 0m),
     ];
 
     public QingNiuLaoLiGu() : base(CardRarity.Common) => RefreshRankValues();

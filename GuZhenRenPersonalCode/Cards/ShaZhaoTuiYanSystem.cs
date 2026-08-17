@@ -3,6 +3,7 @@ using System.Reflection;
 using Godot;
 
 using GuZhenRen.Aperture;
+using GuZhenRen.Cards.ImmortalEssence;
 using GuZhenRen.Cards.ShaZhao;
 using GuZhenRen.Characters;
 using GuZhenRen.Combat;
@@ -243,7 +244,10 @@ internal static class ShaZhaoTuiYanSystem
             CardPile guPile
     )
     {
+        // 材料可从蛊手牌与蛊恢复牌堆（冷却中）选择。
         CardModel[] availableMaterials = guPile.Cards
+            .Concat(GuCardPileSystem.RecoveryPileType.GetPile(player).Cards)
+            .Distinct()
             .Where(IsEligibleMaterial)
             .ToArray();
 
@@ -310,6 +314,8 @@ internal static class ShaZhaoTuiYanSystem
         );
 
         CardModel[] choices = guPile.Cards
+            .Concat(GuCardPileSystem.RecoveryPileType.GetPile(player).Cards)
+            .Distinct()
             .Where(card =>
                 IsEligibleMaterial(card) &&
                 materialTypes.Contains(card.GetType())
@@ -376,10 +382,27 @@ internal static class ShaZhaoTuiYanSystem
 
     private static bool IsEligibleMaterial(CardModel card)
     {
-        return card is IGuWormCard &&
-            card.Pile?.Type == GuCardPileSystem.PileType &&
-            GuCardUsageRules.CanUse(card) &&
-            !card.Keywords.Contains(CardKeyword.Unplayable);
+        if (card is not IGuWormCard ||
+            !IsInEligibleMaterialPile(card) ||
+            card.Keywords.Contains(CardKeyword.Unplayable))
+        {
+            return false;
+        }
+
+        // 蛊手牌的材料须可催动（未耗尽次数、未被封存）；
+        // 蛊恢复牌堆（冷却中）的蛊虫次数已耗尽，只需未被封存即可作材料。
+        return card.Pile?.Type == GuCardPileSystem.PileType
+            ? GuCardUsageRules.CanUse(card)
+            : !ShaZhaoTuiYanSystem.IsMaterialSealed(card);
+    }
+
+    /// <summary>
+    /// 材料可来自蛊手牌或蛊恢复牌堆（未封存的蛊虫）。
+    /// </summary>
+    private static bool IsInEligibleMaterialPile(CardModel card)
+    {
+        return card.Pile?.Type == GuCardPileSystem.PileType ||
+            card.Pile?.Type == GuCardPileSystem.RecoveryPileType;
     }
 
     /// <summary>
@@ -718,10 +741,9 @@ internal static class ShaZhaoTuiYanSystem
             return false;
         }
 
-        if (playerCombatState.Energy < ActivationEnergyCost ||
-            !selectedCards.All(card =>
+        if (!selectedCards.All(card =>
                 ReferenceEquals(card.Owner, player) &&
-                card.Pile?.Type == GuCardPileSystem.PileType &&
+                IsInEligibleMaterialPile(card) &&
                 IsEligibleMaterial(card)
             ))
         {
@@ -738,18 +760,54 @@ internal static class ShaZhaoTuiYanSystem
             return false;
         }
 
-        int yuanQiCost = CalculateShaZhaoYuanQiCost(
-            player,
-            selectedCards
-        );
+        // 杀招转数 = 材料最高转数；六转及以上为仙道杀招。
+        // 仙道杀招推演改为按转数消耗仙元单位（6转1、7转2、8转4、9转8），
+        // 不再消耗元气与推演能量；凡道杀招保持原费用（元气 + 1 能量）。
+        // 无论凡道仙道，推演出的杀招首次打出均免费。
+        int materialMaxRank = selectedCards.Count == 0
+            ? 0
+            : selectedCards.Max(
+                static card =>
+                    AbstractShaZhaoCard.GetMaterialRank(card)
+            );
+        bool isImmortalShaZhao =
+            materialMaxRank >= ApertureProgression.ImmortalRank;
 
-        if (SecondaryResourceCmd.Get(
-                player,
-                YuanQiSystem.ResourceId
-            ) < yuanQiCost)
+        int xianYuanCost =
+            ImmortalEssenceSystem.GetActivationCost(materialMaxRank);
+        int yuanQiCost = 0;
+
+        if (isImmortalShaZhao)
         {
-            ShowSynthesisFailure(player, "insufficientResources");
-            return false;
+            // 仙道杀招：推演不扣能量，仅需手牌仙元足够。
+            if (ImmortalEssenceSystem.GetAvailableUnits(player) <
+                xianYuanCost)
+            {
+                ShowSynthesisFailure(player, "insufficientXianYuan");
+                return false;
+            }
+        }
+        else
+        {
+            if (playerCombatState.Energy < ActivationEnergyCost)
+            {
+                ShowSynthesisFailure(player, "stateChanged");
+                return false;
+            }
+
+            yuanQiCost = CalculateShaZhaoYuanQiCost(
+                player,
+                selectedCards
+            );
+
+            if (SecondaryResourceCmd.Get(
+                    player,
+                    YuanQiSystem.ResourceId
+                ) < yuanQiCost)
+            {
+                ShowSynthesisFailure(player, "insufficientResources");
+                return false;
+            }
         }
 
         if (!ShaZhaoRecipeRegistry.TryCreateResultForTarget(
@@ -763,27 +821,49 @@ internal static class ShaZhaoTuiYanSystem
             return false;
         }
 
-        bool spentYuanQi =
-            await SecondaryResourceCmd.Spend(
-                player,
-                YuanQiSystem.ResourceId,
-                yuanQiCost,
-                card: shaZhao,
-                source: shaZhao
-            );
-
-        if (!spentYuanQi)
+        if (isImmortalShaZhao)
         {
-            RemoveUncommittedResult(shaZhao);
-            ShowSynthesisFailure(player, "insufficientResources");
-            return false;
+            // 仙道杀招：按转数扣仙元。
+            bool spentXianYuan =
+                await ImmortalEssenceSystem.SpendUnits(
+                    player,
+                    xianYuanCost
+                );
+
+            if (!spentXianYuan)
+            {
+                RemoveUncommittedResult(shaZhao);
+                ShowSynthesisFailure(player, "insufficientXianYuan");
+                return false;
+            }
+        }
+        else
+        {
+            bool spentYuanQi =
+                await SecondaryResourceCmd.Spend(
+                    player,
+                    YuanQiSystem.ResourceId,
+                    yuanQiCost,
+                    card: shaZhao,
+                    source: shaZhao
+                );
+
+            if (!spentYuanQi)
+            {
+                RemoveUncommittedResult(shaZhao);
+                ShowSynthesisFailure(player, "insufficientResources");
+                return false;
+            }
+
+            // 支付推演牌自身 1 点能量。
+            await PlayerCmd.LoseEnergy(
+                ActivationEnergyCost,
+                player
+            );
         }
 
-        // 支付推演牌自身 1 点能量。
-        await PlayerCmd.LoseEnergy(
-            ActivationEnergyCost,
-            player
-        );
+        // 所有杀招首次打出免费（打出后恢复原费；次数型杀招视为第一次打出）。
+        shaZhao.EnergyCost.SetUntilPlayed(0);
 
         // 材料封装：材料移入隐藏材料区并绑定到杀招。
         await shaZhao.BindMaterialsAsync(selectedCards);

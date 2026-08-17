@@ -17,8 +17,7 @@ public sealed class GuZhenRenShaZhaoDerivationCardPool
 
     public override string EnergyColorName => Entry.ModId;
 
-    public override Color DeckEntryCardColor =>
-        GuZhenRenCardVisualStyle.CardBackgroundColor;
+    public override Color DeckEntryCardColor => new(0.88f, 0.88f, 0.88f);
 
     public override bool IsColorless => false;
 }

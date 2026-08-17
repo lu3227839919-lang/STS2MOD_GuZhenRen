@@ -42,25 +42,24 @@ public static class ApertureProgression
 
     /// <summary>
     /// 空窍转数对应的元气容量上限。
-    /// 曲线 5、5、6、6、7、7、8、8、9；
-    /// 每两转提升 1 点。
+    /// 曲线 3、4、4、5、5、7、7、8、9。
     /// </summary>
     private static readonly IReadOnlyDictionary<int, int>
         YuanQiCapacityByRank = new Dictionary<int, int>
         {
-            [1] = 5,
-            [2] = 5,
-            [3] = 6,
-            [4] = 6,
-            [5] = 7,
+            [1] = 3,
+            [2] = 4,
+            [3] = 4,
+            [4] = 5,
+            [5] = 5,
             [6] = 7,
-            [7] = 8,
+            [7] = 7,
             [8] = 8,
             [9] = 9,
         };
 
     /// <summary>
-    /// 每回合元气回复（首回合固定发放 5 点，与转数无关）。
+    /// 每回合元气回复（首回合固定发放满额，与转数无关）。
     /// 曲线 2、2、3、3、3、4、4、4、4：
     /// 一至二转 2、三至五转 3、六至九转 4。
     /// </summary>
@@ -75,33 +74,10 @@ public static class ApertureProgression
     }
 
     /// <summary>
-    /// 每场战斗开始时的空窍元气量（下限）。
-    /// 曲线 4、4、5、5、6、6、7、7、8；
-    /// 每两转提升 1 点。
+    /// 每场战斗开始时的空窍元气量：默认补满至当前转数上限。
     /// </summary>
-    private static readonly IReadOnlyDictionary<int, int>
-        YuanQiStartAmountByRank = new Dictionary<int, int>
-        {
-            [1] = 4,
-            [2] = 4,
-            [3] = 5,
-            [4] = 5,
-            [5] = 6,
-            [6] = 6,
-            [7] = 7,
-            [8] = 7,
-            [9] = 8,
-        };
-
-    public static int GetYuanQiStartAmount(int rank)
-    {
-        int normalizedRank = Math.Clamp(
-            rank,
-            MinimumRank,
-            MaximumImplementedRank
-        );
-        return YuanQiStartAmountByRank[normalizedRank];
-    }
+    public static int GetYuanQiStartAmount(int rank) =>
+        GetYuanQiCapacity(rank);
 
     public static int GetRequiredXp(int rank)
     {

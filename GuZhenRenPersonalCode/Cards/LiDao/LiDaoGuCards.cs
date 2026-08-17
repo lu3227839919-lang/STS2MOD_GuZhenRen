@@ -3,11 +3,14 @@ using GuZhenRen.Characters;
 using GuZhenRen.Combat;
 using GuZhenRen.Powers.LiDao;
 
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.Random;
 using MegaCrit.Sts2.Core.ValueProps;
 
@@ -70,8 +73,9 @@ public abstract class AbstractLiDaoBeastGuCard :
 
 {
     /// <summary>
-    /// SavedAttachedState 不随 MutableClone 自动复制；普通字段负责把每张
-    /// 永久蛊各自的炼力进度桥接到对应战斗实例。
+    /// 炼力进度主存于卡牌 DynamicVars（随卡牌克隆与存档持久化，
+    /// 跨战斗、跨幕继承）；普通实例字段仅作兼容桥接。
+    /// GuLiTraining 变量由各具体兽力蛊在 CanonicalVars 中声明。
     /// </summary>
     internal int BeastTrainingProgressBridge { get; set; }
 
@@ -97,18 +101,30 @@ public abstract class AbstractLiDaoBeastGuCard<TPhantom> :
         CardPlay cardPlay
     )
     {
-        if (!LiDaoBeastTrainingSystem.RecordEffectiveActivation(
-                this,
-                cardPlay
-            ))
+        bool canManifest = LiDaoBeastTrainingSystem.RecordEffectiveActivation(
+            this,
+            cardPlay
+        );
+        if (canManifest)
         {
+            await LiDaoPhantomSystem.ActivateBeastGuAsync<TPhantom>(
+                choiceContext,
+                this
+            );
             return;
         }
 
-        await LiDaoPhantomSystem.ActivateBeastGuAsync<TPhantom>(
-            choiceContext,
-            this
-        );
+        // 未炼力成功：催动提供 1 点力量。
+        if (!LiDaoBeastTrainingSystem.IsTrainingComplete(this))
+        {
+            await PowerCmd.Apply<StrengthPower>(
+                choiceContext,
+                Owner.Creature,
+                1,
+                Owner.Creature,
+                this
+            );
+        }
     }
 
     public override IReadOnlyList<CardModel> GetCarouselCards() =>

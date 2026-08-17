@@ -302,12 +302,10 @@ internal static class GuPotionCompatibilityPatch
         Player owner
     )
     {
-        Type? companionType = guCard switch
-        {
-            ILiDaoBeastGuCard liDao => liDao.CompanionCardType,
-            IZhouDaoCompanionGuCard zhouDao => zhouDao.CompanionCardType,
-            _ => null,
-        };
+        Type? companionType =
+            guCard is ICompanionSourceGuCard companionSource
+                ? companionSource.CompanionCardType
+                : null;
         if (companionType == null ||
             owner.Creature.CombatState is not { } combatState)
         {
