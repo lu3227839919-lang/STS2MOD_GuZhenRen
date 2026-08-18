@@ -46,6 +46,13 @@ public static class GuCardUsageRules
             () => 0
         );
 
+    // 0 表示当前不在蛊存放队列；正数是在本场战斗内单调递增的入队序号。
+    private static readonly SavedAttachedState<CardModel, int>
+        StorageQueueOrderState = new(
+            "lu_gu_zhen_ren.gu_storage_queue_order",
+            () => 0
+        );
+
     // 元气可能在 AutoPlay 创建 CardPlay 之前预付。该状态只在当前进程
     // 的一次出牌链中使用，不写入存档；真正的资源数量仍由游戏同步。
     private static readonly ConditionalWeakTable<
@@ -87,6 +94,7 @@ public static class GuCardUsageRules
             // 新战斗/新一次冷却周期不继承上一次的“完成顺序”。
             // 真正冷却完成时会由 MarkRecoveryCompleted 写入本轮次。
             RecoveryCompletedTurnState[card] = 0;
+            StorageQueueOrderState[card] = 0;
             PreparedPayments.Remove(card);
 
             if (card is IGuRecoveryEffectSource recoverySource)
@@ -118,7 +126,9 @@ public static class GuCardUsageRules
         int extraTurns
     )
     {
-        if (extraTurns <= 0 || card is not IGuWormCard)
+        if (extraTurns <= 0 ||
+            card is not IGuWormCard ||
+            ShaZhaoTuiYanSystem.IsMaterialSealed(card))
         {
             return;
         }
@@ -137,7 +147,9 @@ public static class GuCardUsageRules
         int currentTurn
     )
     {
-        if (turns <= 0 || card is not IGuWormCard)
+        if (turns <= 0 ||
+            card is not IGuWormCard ||
+            ShaZhaoTuiYanSystem.IsMaterialSealed(card))
         {
             return;
         }
@@ -287,7 +299,8 @@ public static class GuCardUsageRules
     )
     {
         ArgumentNullException.ThrowIfNull(card);
-        if (card is not IGuWormCard)
+        if (card is not IGuWormCard ||
+            ShaZhaoTuiYanSystem.IsMaterialSealed(card))
         {
             return;
         }
@@ -318,7 +331,8 @@ public static class GuCardUsageRules
     )
     {
         ArgumentNullException.ThrowIfNull(card);
-        if (card is not IGuWormCard guCard)
+        if (card is not IGuWormCard guCard ||
+            ShaZhaoTuiYanSystem.IsMaterialSealed(card))
         {
             return;
         }
@@ -330,13 +344,18 @@ public static class GuCardUsageRules
     }
 
     public static bool HasRecoverySchedule(CardModel card) =>
-        card is IGuWormCard && RecoveryReadyTurnState[card] > 0;
+        card is IGuWormCard &&
+        !ShaZhaoTuiYanSystem.IsMaterialSealed(card) &&
+        RecoveryReadyTurnState[card] > 0;
 
     /// <summary>取得当前计划恢复回合；未安排恢复时返回0。</summary>
     public static int GetRecoveryReadyTurn(CardModel card)
     {
         ArgumentNullException.ThrowIfNull(card);
-        return card is IGuWormCard ? RecoveryReadyTurnState[card] : 0;
+        return card is IGuWormCard &&
+            !ShaZhaoTuiYanSystem.IsMaterialSealed(card)
+                ? RecoveryReadyTurnState[card]
+                : 0;
     }
 
     /// <summary>
@@ -350,7 +369,9 @@ public static class GuCardUsageRules
     )
     {
         ArgumentNullException.ThrowIfNull(card);
-        if (turns <= 0 || card is not IGuWormCard)
+        if (turns <= 0 ||
+            card is not IGuWormCard ||
+            ShaZhaoTuiYanSystem.IsMaterialSealed(card))
         {
             return GetRecoveryReadyTurn(card);
         }
@@ -372,7 +393,8 @@ public static class GuCardUsageRules
         int currentTurn
     )
     {
-        if (card is not IGuWormCard)
+        if (card is not IGuWormCard ||
+            ShaZhaoTuiYanSystem.IsMaterialSealed(card))
         {
             return false;
         }
@@ -409,6 +431,26 @@ public static class GuCardUsageRules
             ? RecoveryCompletedTurnState[card]
             : 0;
     }
+
+    public static int GetStorageQueueOrder(CardModel card)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        return card is IGuWormCard
+            ? Math.Max(0, StorageQueueOrderState[card])
+            : 0;
+    }
+
+    internal static void SetStorageQueueOrder(CardModel card, int order)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        if (card is IGuWormCard)
+        {
+            StorageQueueOrderState[card] = Math.Max(0, order);
+        }
+    }
+
+    internal static void ClearStorageQueueOrder(CardModel card) =>
+        SetStorageQueueOrder(card, 0);
 
     private static async Task<bool> CommitActivationPaymentCore(
         CardModel card

@@ -20,9 +20,12 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Hooks;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes.CommonUi;
+using MegaCrit.Sts2.Core.Rooms;
+using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib;
@@ -87,6 +90,46 @@ internal static class ShaZhaoTuiYanSystem
                     : Task.CompletedTask,
             priority: 100
         );
+
+        Harmony harmony = new(HarmonyId);
+        MethodInfo? removeFromCombat = AccessTools.Method(
+            typeof(CardPileCmd),
+            nameof(CardPileCmd.RemoveFromCombat),
+            [typeof(CardModel), typeof(bool)]
+        );
+        if (removeFromCombat != null &&
+            removeFromCombat.ReturnType == typeof(Task))
+        {
+            harmony.Patch(
+                removeFromCombat,
+                postfix: new HarmonyMethod(
+                    typeof(ShaZhaoTuiYanSystem),
+                    nameof(RemoveFromCombatPostfix)
+                )
+            );
+        }
+        else
+        {
+            Entry.Logger.Warn(
+                "[杀招绑定] 未找到兼容的 CardPileCmd.RemoveFromCombat，" +
+                "异常移出兜底未挂载。"
+            );
+        }
+
+        MethodInfo? afterCombatEnd = AccessTools.Method(
+            typeof(Hook),
+            nameof(Hook.AfterCombatEnd)
+        );
+        if (afterCombatEnd != null)
+        {
+            harmony.Patch(
+                afterCombatEnd,
+                prefix: new HarmonyMethod(
+                    typeof(ShaZhaoTuiYanSystem),
+                    nameof(AfterCombatEndPrefix)
+                )
+            );
+        }
         _initialized = true;
     }
 
@@ -160,7 +203,7 @@ internal static class ShaZhaoTuiYanSystem
     }
 
     /// <summary>
-    /// 成功推演费用 = 所有材料有效元气消耗的平均值 × 2。
+    /// 成功推演费用 = 所有材料有效元气消耗的算术平均值。
     /// 元气是整数资源，因此非整数结果统一向上取整。
     /// 优先读取 RitsuLib 已解析的元气支付计划；没有声明次级费用的旧蛊牌
     /// 则使用当前原生能量消耗兼容计算。
@@ -175,16 +218,14 @@ internal static class ShaZhaoTuiYanSystem
             return 0;
         }
 
-        // 0.8.0 新公式：max(2, Σ材料元气 − 材料数量 + 1)
-        // 单材料不再被重复计费；多材料获得少量组合折扣。
-        int totalMaterialCost = materials.Sum(card =>
-            Math.Max(0, GetMaterialYuanQiCost(player, card))
+        long totalMaterialCost = materials.Sum(card =>
+            (long)Math.Max(0, GetMaterialYuanQiCost(player, card))
         );
 
-        return Math.Max(
-            2,
-            totalMaterialCost - materials.Count + 1
-        );
+        long roundedUpAverage =
+            (totalMaterialCost + materials.Count - 1) /
+            materials.Count;
+        return (int)Math.Min(int.MaxValue, roundedUpAverage);
     }
 
     private static int GetMaterialYuanQiCost(
@@ -675,6 +716,14 @@ internal static class ShaZhaoTuiYanSystem
             static () => string.Empty
         );
 
+    internal enum ShaZhaoBindingFinalizeReason
+    {
+        Completed,
+        Dismantled,
+        AbnormalRemoval,
+        CombatEnd,
+    }
+
     /// <summary>
     /// 材料蛊是否已被某张杀招封装。
     /// 封装期间不能催动、不能恢复、不能参与其他杀招。
@@ -683,6 +732,26 @@ internal static class ShaZhaoTuiYanSystem
     {
         return card is IGuWormCard &&
             MaterialBoundShaZhaoState[card].Length > 0;
+    }
+
+    internal static string GetMaterialBindingTitle(CardModel material)
+    {
+        string boundId = MaterialBoundShaZhaoState[material];
+        if (boundId.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        AbstractShaZhaoCard? shaZhao = material.Owner?
+            .PlayerCombatState?
+            .AllCards
+            .OfType<AbstractShaZhaoCard>()
+            .FirstOrDefault(card => string.Equals(
+                card.Id.ToString(),
+                boundId,
+                StringComparison.Ordinal
+            ));
+        return shaZhao?.Title ?? boundId;
     }
 
     internal static async Task MarkMaterialSealedAsync(
@@ -711,74 +780,72 @@ internal static class ShaZhaoTuiYanSystem
     }
 
     /// <summary>
-    /// 解除封装并送还恢复：杀招正常消耗、主动解体时调用。
-    /// 材料从蛊封存堆飞入蛊恢复堆，并从零强制恢复；
-    /// 消耗牌杀招（Exhaust）使用后额外 +1 回合恢复。
+    /// 杀招绑定的唯一收口。正常用完、主动解体或异常移出战斗都会
+    /// 让材料重新开始完整冷却并统一额外 +1；战斗结束只清理战斗状态。
     /// </summary>
-    public static async Task ReleaseMaterialsAsync(
-        PlayerChoiceContext choiceContext,
+    public static async Task FinalizeShaZhaoBindingAsync(
         AbstractShaZhaoCard shaZhao,
         Player player,
-        bool extraRecoveryTurn
+        ShaZhaoBindingFinalizeReason reason
     )
     {
+        if (!shaZhao.HasBoundMaterials ||
+            shaZhao.MaterialsSealedPermanently)
+        {
+            return;
+        }
+
         IReadOnlyList<CardModel> materials =
             shaZhao.BoundMaterials;
+
+        if (reason == ShaZhaoBindingFinalizeReason.CombatEnd)
+        {
+            foreach (CardModel material in materials)
+            {
+                MaterialBoundShaZhaoState[material] = string.Empty;
+            }
+            shaZhao.ClearBoundMaterials();
+            return;
+        }
 
         foreach (CardModel material in materials)
         {
             await UnsealMaterialAsync(
                 material,
-                shaZhao,
-                player,
-                extraRecoveryTurn
+                player
             );
         }
 
         shaZhao.ClearBoundMaterials();
-        await Task.CompletedTask;
     }
 
     /// <summary>
-    /// 战斗结束兜底：无条件解除全部杀招绑定并返还材料。
+    /// 战斗结束兜底：在原版清空战斗牌之前解除所有普通杀招绑定。
     /// </summary>
-    public static void ReleaseMaterialsForCombatEnd(
-        AbstractShaZhaoCard shaZhao,
-        Player player
-    )
+    private static void FinalizeAllBindingsForCombatEnd(Player player)
     {
-        foreach (CardModel material in shaZhao.BoundMaterials)
+        AbstractShaZhaoCard[] shaZhaoCards = player.PlayerCombatState?
+            .AllCards
+            .OfType<AbstractShaZhaoCard>()
+            .Where(static card =>
+                card.HasBoundMaterials &&
+                !card.MaterialsSealedPermanently
+            )
+            .ToArray() ?? [];
+
+        foreach (AbstractShaZhaoCard shaZhao in shaZhaoCards)
         {
-            MaterialBoundShaZhaoState[material] =
-                string.Empty;
-
-            CardPile recoveryPile =
-                GuCardPileSystem.RecoveryPileType
-                    .GetPile(player);
-            if (!ReferenceEquals(material.Pile, recoveryPile))
+            foreach (CardModel material in shaZhao.BoundMaterials)
             {
-                GuCardPileSystem.MoveCardToPile(
-                    material,
-                    recoveryPile
-                );
+                MaterialBoundShaZhaoState[material] = string.Empty;
             }
-
-            int currentTurn =
-                player.PlayerCombatState?.TurnNumber ?? 0;
-            GuCardUsageRules.ScheduleRecovery(
-                material,
-                currentTurn
-            );
+            shaZhao.ClearBoundMaterials();
         }
-
-        shaZhao.ClearBoundMaterials();
     }
 
     private static async Task UnsealMaterialAsync(
         CardModel material,
-        AbstractShaZhaoCard shaZhao,
-        Player player,
-        bool extraRecoveryTurn
+        Player player
     )
     {
         MaterialBoundShaZhaoState[material] =
@@ -786,7 +853,7 @@ internal static class ShaZhaoTuiYanSystem
 
         // 送回蛊恢复堆（飞行动画），并从当前回合开始从零强制恢复：
         // 无视封存前已有的恢复进度，完整恢复周期重新计算；
-        // extraRecoveryTurn（主动解体 / 消耗牌杀招）再额外延后 1 回合。
+        // 所有正常完成/解体/异常移出统一额外延后 1 回合。
         CardPile recoveryPile =
             GuCardPileSystem.RecoveryPileType
                 .GetPile(player);
@@ -804,8 +871,57 @@ internal static class ShaZhaoTuiYanSystem
         GuCardUsageRules.ResetRecovery(
             material,
             currentTurn,
-            extraRecoveryTurn ? 1 : 0
+            extraTurns: 1
         );
+    }
+
+    private static void RemoveFromCombatPostfix(
+        object[] __args,
+        ref Task __result
+    )
+    {
+        AbstractShaZhaoCard? shaZhao = __args
+            .OfType<AbstractShaZhaoCard>()
+            .FirstOrDefault();
+        if (shaZhao == null || !shaZhao.HasBoundMaterials)
+        {
+            return;
+        }
+
+        Player player = shaZhao.Owner;
+        __result = AwaitRemovalAndFinalizeAsync(
+            __result,
+            shaZhao,
+            player
+        );
+    }
+
+    private static async Task AwaitRemovalAndFinalizeAsync(
+        Task removalTask,
+        AbstractShaZhaoCard shaZhao,
+        Player player
+    )
+    {
+        await removalTask;
+        if (shaZhao.HasBoundMaterials)
+        {
+            await FinalizeShaZhaoBindingAsync(
+                shaZhao,
+                player,
+                ShaZhaoBindingFinalizeReason.AbnormalRemoval
+            );
+        }
+    }
+
+    private static void AfterCombatEndPrefix(
+        IRunState runState,
+        CombatRoom room
+    )
+    {
+        foreach (Player player in runState.Players)
+        {
+            FinalizeAllBindingsForCombatEnd(player);
+        }
     }
 
     /// <summary>
@@ -864,8 +980,8 @@ internal static class ShaZhaoTuiYanSystem
         }
 
         // 杀招转数 = 材料最高转数；六转及以上为仙道杀招。
-        // 仙道杀招推演改为按转数消耗仙元单位（6转1、7转2、8转4、9转8），
-        // 不再消耗元气与推演能量；凡道杀招保持原费用（元气 + 1 能量）。
+        // 推演牌成功时一律支付 1 点普通能量；凡道杀招额外支付材料
+        // 元气费用的向上取整平均值，仙道杀招额外支付最高转对应仙元。
         // 无论凡道仙道，推演出的杀招首次打出均免费。
         int materialMaxRank = selectedCards.Count == 0
             ? 0
@@ -877,12 +993,19 @@ internal static class ShaZhaoTuiYanSystem
             materialMaxRank >= ApertureProgression.ImmortalRank;
 
         int xianYuanCost =
-            ImmortalEssenceSystem.GetActivationCost(materialMaxRank);
+            isImmortalShaZhao
+                ? ImmortalEssenceSystem.GetActivationCost(materialMaxRank)
+                : 0;
         int yuanQiCost = 0;
+
+        if (playerCombatState.Energy < ActivationEnergyCost)
+        {
+            ShowSynthesisFailure(player, "stateChanged");
+            return false;
+        }
 
         if (isImmortalShaZhao)
         {
-            // 仙道杀招：推演不扣能量，仅需手牌仙元足够。
             if (ImmortalEssenceSystem.GetAvailableUnits(player) <
                 xianYuanCost)
             {
@@ -892,12 +1015,6 @@ internal static class ShaZhaoTuiYanSystem
         }
         else
         {
-            if (playerCombatState.Energy < ActivationEnergyCost)
-            {
-                ShowSynthesisFailure(player, "stateChanged");
-                return false;
-            }
-
             yuanQiCost = CalculateShaZhaoYuanQiCost(
                 player,
                 selectedCards
@@ -958,18 +1075,22 @@ internal static class ShaZhaoTuiYanSystem
                 return false;
             }
 
-            // 支付推演牌自身 1 点能量。
-            await PlayerCmd.LoseEnergy(
-                ActivationEnergyCost,
-                player
-            );
         }
+
+        // “杀招推演”本身始终是一张 1 费普通牌。仅成功推演后扣除，
+        // 取消、失败与资源不足均不收费。
+        await PlayerCmd.LoseEnergy(
+            ActivationEnergyCost,
+            player
+        );
 
         // 所有杀招首次打出免费（打出后恢复原费；次数型杀招视为第一次打出）。
         shaZhao.EnergyCost.SetUntilPlayed(0);
 
         // 材料封装：材料移入隐藏材料区并绑定到杀招。
         await shaZhao.BindMaterialsAsync(selectedCards);
+        // 先封存完全部材料，再统一补一次蛊手牌，避免多次动画与同步交错。
+        await GuCardPileSystem.RefillGuHandAsync(player);
 
         // 材料永久封存型杀招（如万我）：推演完成时立即解除材料绑定，
         // 材料保持封存、不参与杀招消耗/解体/战斗结束兜底的返还。
@@ -983,21 +1104,25 @@ internal static class ShaZhaoTuiYanSystem
 
         // 杀招加入普通手牌；杀招本体仍占容量，只有“杀招推演”系统牌容量豁免。
         bool addedToHand =
-            await GuCardPileSystem.AddGeneratedCardToHand(
-                shaZhao,
-                player
-            );
+            await HandCapacityExemptionPatch
+                .AddGeneratedShaZhaoToHandAsync(shaZhao, player);
         if (!addedToHand)
         {
-            await CardPileCmd.AddGeneratedCardToCombat(
+            await FinalizeShaZhaoBindingAsync(
                 shaZhao,
-                PileType.Discard,
-                player
+                player,
+                ShaZhaoBindingFinalizeReason.AbnormalRemoval
+            );
+            RemoveUncommittedResult(shaZhao);
+            throw new InvalidOperationException(
+                $"推演杀招 {shaZhao.Id} 无法进入普通手牌。"
             );
         }
 
         Entry.Logger.Info(
-            $"[杀招推演] 成功推演 {shaZhao.GetType().Name}，消耗元气 {yuanQiCost}，材料 {selectedCards.Count} 张。"
+            $"[杀招推演] 成功推演 {shaZhao.GetType().Name}，" +
+            $"消耗能量 {ActivationEnergyCost}、元气 {yuanQiCost}、" +
+            $"仙元 {xianYuanCost}，材料 {selectedCards.Count} 张。"
         );
 
         return true;

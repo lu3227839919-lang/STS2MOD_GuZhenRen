@@ -115,6 +115,9 @@ public static class GuCardPileSystem
         OpeningEntryState
     > OpeningEntryStates = new();
 
+    private static readonly ConditionalWeakTable<Player, SemaphoreSlim>
+        RefillGates = new();
+
     private static bool _initialized;
 
     public static void Initialize()
@@ -257,6 +260,12 @@ public static class GuCardPileSystem
                 owner
             );
 
+        if (result.success)
+        {
+            EnqueueStorageCardAtTail(card, owner);
+            await RefillGuHandAsync(owner);
+        }
+
         return result.success;
     }
 
@@ -311,6 +320,11 @@ public static class GuCardPileSystem
         if (!result.success)
         {
             TemporaryCapacityBypassState.Remove(card);
+        }
+        else if (targetPile == StoragePileType)
+        {
+            EnqueueStorageCardAtTail(card, owner);
+            await RefillGuHandAsync(owner);
         }
 
         return result.success;
@@ -375,12 +389,25 @@ public static class GuCardPileSystem
         }
 
         CardModel[] openingCandidates = guCards;
-        CardModel[] openingCards = DrawRandomGuCards(
+        CardModel[] openingOrder = DrawRandomGuCards(
             owner,
             openingCandidates,
-            ActivePileCapacity,
+            openingCandidates.Length,
             OpeningDrawSelectionDomain
         );
+        CardModel[] openingCards = openingOrder
+            .Take(ActivePileCapacity)
+            .ToArray();
+        foreach (CardModel card in openingCards)
+        {
+            GuCardUsageRules.ClearStorageQueueOrder(card);
+        }
+        int openingQueueOrder = 1;
+        foreach (CardModel card in openingOrder.Skip(openingCards.Length))
+        {
+            GuCardUsageRules.SetStorageQueueOrder(card, openingQueueOrder++);
+        }
+        ReorderStoragePileForOpening(storagePile, openingOrder);
 
         OpeningEntryStates.Remove(owner);
         OpeningEntryState state = OpeningEntryStates.GetValue(
@@ -515,6 +542,8 @@ public static class GuCardPileSystem
                 state.AnimationTask = null;
             }
         }
+
+        await RefillGuHandAsync(owner);
     }
 
     /// <summary>
@@ -534,6 +563,11 @@ public static class GuCardPileSystem
             clonedBy: null,
             skipVisuals: false
         );
+
+        if (result.success)
+        {
+            GuCardUsageRules.ClearStorageQueueOrder(card);
+        }
 
         // 原版不会为其他玩家的手牌动画阻塞当前客户端。
         if (result.success && LocalContext.IsMine(card))
@@ -609,6 +643,7 @@ public static class GuCardPileSystem
                     // 已可用的蛊统一进入蛊存放牌堆，由回合开始的补牌流程
                     // 按冷却完成顺序送入蛊手牌。
                     storagePile.AddInternal(card, silent: true);
+                    EnqueueStorageCardAtTail(card, owner);
                     changedPiles.Add(storagePile);
                 }
                 else
@@ -714,6 +749,8 @@ public static class GuCardPileSystem
             clonedBy: null,
             skipVisuals: false
         );
+
+        await RefillGuHandAsync(owner);
     }
 
     /// <summary>
@@ -818,23 +855,7 @@ public static class GuCardPileSystem
             );
         }
 
-        CardModel[] readyCards = storagePile.Cards
-            .Where(card =>
-                card is IGuWormCard &&
-                GuCardUsageRules.CanUse(card) &&
-                !GuCardUsageRules.HasRecoverySchedule(card) &&
-                !ShaZhaoTuiYanSystem.IsMaterialSealed(card)
-            )
-            // 先冷却完成的先进入蛊手牌；同回合完成时用网络 ID 稳定定序。
-            .OrderBy(GuCardUsageRules.GetRecoveryCompletedTurn)
-            .ThenBy(GuZhenRenDeterminism.GetCardNetworkId)
-            .Take(GetAvailableActiveSlots(owner))
-            .ToArray();
-
-        foreach (CardModel card in readyCards)
-        {
-            await AddGuCardToActivePileSequentiallyAsync(card);
-        }
+        await RefillGuHandAsync(owner);
     }
 
 
@@ -885,11 +906,7 @@ public static class GuCardPileSystem
             acceleratedBySuiMan: true
         );
 
-        if (GetAvailableActiveSlots(owner) > 0 &&
-            ReferenceEquals(card.Pile, StoragePileType.GetPile(owner)))
-        {
-            await AddGuCardToActivePileSequentiallyAsync(card);
-        }
+        await RefillGuHandAsync(owner);
 
         return true;
     }
@@ -988,9 +1005,15 @@ public static class GuCardPileSystem
             }
 
             PileType targetPile = card is ILiDaoBeastGuCard
-                ? StoragePileType
+                ? HasAvailableActiveSlot(owner)
+                    ? PileType
+                    : StoragePileType
                 : RecoveryPileType;
             MoveCardWithoutAnimation(card, targetPile.GetPile(owner));
+            if (targetPile == StoragePileType)
+            {
+                EnqueueStorageCardAtTail(card, owner);
+            }
             return targetPile;
         }
 
@@ -1043,8 +1066,10 @@ public static class GuCardPileSystem
 
         EnsureInitialized();
 
-        CardPile destination = targetPile.GetPile(card.Owner);
-        if (ReferenceEquals(card.Pile, destination))
+        Player owner = card.Owner;
+        CardPile destination = targetPile.GetPile(owner);
+        CardPile? source = card.Pile;
+        if (ReferenceEquals(source, destination))
         {
             return;
         }
@@ -1087,6 +1112,173 @@ public static class GuCardPileSystem
         {
             MoveCardWithoutAnimation(card, destination);
         }
+
+        if (ReferenceEquals(card.Pile, destination))
+        {
+            if (targetPile == StoragePileType)
+            {
+                EnqueueStorageCardAtTail(card, owner);
+            }
+            else if (targetPile == PileType)
+            {
+                GuCardUsageRules.ClearStorageQueueOrder(card);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 统一蛊手牌补位入口。任何系统造成常规蛊手牌空位后都调用这里；
+    /// 不设置每回合次数上限，按蛊存放队列顺序一直补到五张或队列为空。
+    /// </summary>
+    public static async Task RefillGuHandAsync(Player owner)
+    {
+        ArgumentNullException.ThrowIfNull(owner);
+        EnsureInitialized();
+
+        if (owner.PlayerCombatState == null ||
+            IsOpeningEntryPending(owner))
+        {
+            return;
+        }
+
+        SemaphoreSlim gate = RefillGates.GetValue(
+            owner,
+            static _ => new SemaphoreSlim(1, 1)
+        );
+        await gate.WaitAsync();
+        try
+        {
+            if (owner.PlayerCombatState == null ||
+                IsOpeningEntryPending(owner))
+            {
+                return;
+            }
+
+            MoveActiveOverflowToStorageOrRecovery(owner);
+            NormalizeStorageQueue(owner);
+
+            CardPile storagePile = StoragePileType.GetPile(owner);
+            while (GetAvailableActiveSlots(owner) > 0)
+            {
+                CardModel? next = storagePile.Cards
+                    .Where(IsReadyStorageCard)
+                    .OrderBy(GuCardUsageRules.GetStorageQueueOrder)
+                    .ThenBy(GuZhenRenDeterminism.GetCardNetworkId)
+                    .FirstOrDefault();
+                if (next == null)
+                {
+                    break;
+                }
+
+                CardPileAddResult result =
+                    await AddGuCardToActivePileSequentiallyAsync(next);
+                if (!result.success)
+                {
+                    Entry.Logger.Warn(
+                        $"[蛊牌补位] {next.Id} 无法从存放队列进入蛊手牌。"
+                    );
+                    break;
+                }
+            }
+        }
+        finally
+        {
+            gate.Release();
+        }
+    }
+
+    /// <summary>按真实 FIFO 顺序预览存放队列。</summary>
+    internal static IReadOnlyList<CardModel> GetStorageQueuePreview(
+        Player owner,
+        int maximumCount = 3
+    )
+    {
+        ArgumentNullException.ThrowIfNull(owner);
+        EnsureInitialized();
+        NormalizeStorageQueue(owner);
+
+        return StoragePileType.GetPile(owner).Cards
+            .Where(IsReadyStorageCard)
+            .OrderBy(GuCardUsageRules.GetStorageQueueOrder)
+            .ThenBy(GuZhenRenDeterminism.GetCardNetworkId)
+            .Take(Math.Max(0, maximumCount))
+            .ToArray();
+    }
+
+    private static bool IsReadyStorageCard(CardModel card) =>
+        card is IGuWormCard &&
+        GuCardUsageRules.CanUse(card) &&
+        !GuCardUsageRules.HasRecoverySchedule(card) &&
+        !ShaZhaoTuiYanSystem.IsMaterialSealed(card);
+
+    private static void EnqueueStorageCardAtTail(
+        CardModel card,
+        Player owner
+    )
+    {
+        if (card is not IGuWormCard ||
+            !ReferenceEquals(card.Pile, StoragePileType.GetPile(owner)) ||
+            GuCardUsageRules.GetStorageQueueOrder(card) > 0)
+        {
+            return;
+        }
+
+        int nextOrder = StoragePileType.GetPile(owner).Cards
+            .Where(static candidate => candidate is IGuWormCard)
+            .Select(GuCardUsageRules.GetStorageQueueOrder)
+            .DefaultIfEmpty(0)
+            .Max() + 1;
+        GuCardUsageRules.SetStorageQueueOrder(card, nextOrder);
+    }
+
+    private static void NormalizeStorageQueue(Player owner)
+    {
+        CardPile storagePile = StoragePileType.GetPile(owner);
+        int nextOrder = storagePile.Cards
+            .Where(static card => card is IGuWormCard)
+            .Select(GuCardUsageRules.GetStorageQueueOrder)
+            .DefaultIfEmpty(0)
+            .Max() + 1;
+
+        foreach (CardModel card in storagePile.Cards
+                     .Where(IsReadyStorageCard)
+                     .Where(card =>
+                         GuCardUsageRules.GetStorageQueueOrder(card) <= 0
+                     )
+                     .OrderBy(GuCardUsageRules.GetRecoveryCompletedTurn)
+                     .ThenBy(GuZhenRenDeterminism.GetCardNetworkId))
+        {
+            GuCardUsageRules.SetStorageQueueOrder(card, nextOrder++);
+        }
+    }
+
+    private static void ReorderStoragePileForOpening(
+        CardPile storagePile,
+        IReadOnlyList<CardModel> openingOrder
+    )
+    {
+        HashSet<CardModel> orderedCards = openingOrder.ToHashSet();
+        CardModel[] reordered = openingOrder
+            .Where(card => ReferenceEquals(card.Pile, storagePile))
+            .Concat(storagePile.Cards.Where(card =>
+                !orderedCards.Contains(card)
+            ))
+            .ToArray();
+
+        if (storagePile.Cards.SequenceEqual(reordered))
+        {
+            return;
+        }
+
+        foreach (CardModel card in reordered)
+        {
+            storagePile.RemoveInternal(card, silent: true);
+        }
+        foreach (CardModel card in reordered)
+        {
+            storagePile.AddInternal(card, silent: true);
+        }
+        storagePile.InvokeContentsChanged();
     }
 
     internal static bool HasAvailableActiveSlot(Player owner)
@@ -1094,6 +1286,15 @@ public static class GuCardPileSystem
         ArgumentNullException.ThrowIfNull(owner);
         EnsureInitialized();
         return GetAvailableActiveSlots(owner) > 0;
+    }
+
+    /// <summary>
+    /// 药水临时蛊不占常规五格，不能通过调蛊制造额外常规补位。
+    /// </summary>
+    internal static bool IsTemporaryCapacityBypass(CardModel card)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        return BypassesActivePileCapacity(card);
     }
 
     private static bool BypassesActivePileCapacity(CardModel card) =>
@@ -1115,7 +1316,7 @@ public static class GuCardPileSystem
         Math.Max(0, ActivePileCapacity - GetActiveGuCount(owner));
 
     /// <summary>
-    /// 兼容旧存档或其他模组直接移动蛊牌的情况，保证存放堆绝不超过
+    /// 兼容旧存档或其他模组直接移动蛊牌的情况，保证蛊手牌绝不超过
     /// 五张。可用的溢出蛊回到蛊存放牌堆；耗尽牌继续进入蛊冷却堆。
     /// </summary>
     private static void MoveActiveOverflowToStorageOrRecovery(Player owner)
@@ -1147,6 +1348,7 @@ public static class GuCardPileSystem
                 !GuCardUsageRules.HasRecoverySchedule(card))
             {
                 storagePile.AddInternal(card, silent: true);
+                EnqueueStorageCardAtTail(card, owner);
                 storageChanged = true;
                 continue;
             }

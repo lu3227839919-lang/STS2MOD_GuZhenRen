@@ -62,18 +62,55 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
         get
         {
             string cardTitle = base.Title;
-            if (CurrentDao is not { } dao ||
-                !DaoTitleLocalizationKeys.TryGetValue(
+            string displayTitle = cardTitle;
+            if (CurrentDao is { } dao &&
+                DaoTitleLocalizationKeys.TryGetValue(
                     dao,
                     out string? key
                 ))
             {
-                return cardTitle;
+                string daoTitle = new LocString("cards", key)
+                    .GetFormattedText();
+                displayTitle = $"{daoTitle}-{cardTitle}";
             }
 
-            string daoTitle = new LocString("cards", key)
-                .GetFormattedText();
-            return $"{daoTitle}-{cardTitle}";
+            if (this is not IGuWormCard)
+            {
+                return displayTitle;
+            }
+
+            if (ShaZhaoTuiYanSystem.IsMaterialSealed(this))
+            {
+                LocString suffix = new(
+                    "cards",
+                    "GU_ZHEN_REN_PERSONAL_CARD_STATUS.sealedTitleSuffix"
+                );
+                suffix.Add(
+                    "ShaZhao",
+                    ShaZhaoTuiYanSystem.GetMaterialBindingTitle(this)
+                );
+                return displayTitle + suffix.GetFormattedText();
+            }
+
+            if (Pile?.Type == GuCardPileSystem.RecoveryPileType &&
+                GuCardUsageRules.HasRecoverySchedule(this))
+            {
+                int currentTurn =
+                    Owner?.PlayerCombatState?.TurnNumber ?? 0;
+                int remainingTurns = Math.Max(
+                    0,
+                    GuCardUsageRules.GetRecoveryReadyTurn(this) -
+                    currentTurn
+                );
+                LocString suffix = new(
+                    "cards",
+                    "GU_ZHEN_REN_PERSONAL_CARD_STATUS.recoveryTitleSuffix"
+                );
+                suffix.Add("Turns", remainingTurns);
+                return displayTitle + suffix.GetFormattedText();
+            }
+
+            return displayTitle;
         }
     }
 

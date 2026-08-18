@@ -87,7 +87,7 @@ internal static class XueDaoParasiteExhaustPatch
                 out CardModel? card
             ) ||
             card == null ||
-            !XueDaoParasiteSystem.HasParasite(card))
+            !RequiresPostExhaustHandling(card))
         {
             return;
         }
@@ -136,7 +136,7 @@ internal static class XueDaoParasiteExhaustPatch
                 out CardModel? card
             ) ||
             card == null ||
-            !XueDaoParasiteSystem.HasParasite(card))
+            !RequiresPostExhaustHandling(card))
         {
             return;
         }
@@ -156,10 +156,7 @@ internal static class XueDaoParasiteExhaustPatch
     {
         await exhaustTask;
 
-        await XueDaoParasiteSystem.BreakIfExhaustedAsync(
-            choiceContext,
-            card
-        );
+        await HandlePostExhaustAsync(choiceContext, card);
     }
 
     private static async Task<TResult> AwaitExhaustAndBreakAsync<TResult>(
@@ -170,11 +167,39 @@ internal static class XueDaoParasiteExhaustPatch
     {
         TResult result = await exhaustTask;
 
-        await XueDaoParasiteSystem.BreakIfExhaustedAsync(
-            choiceContext,
-            card
-        );
+        await HandlePostExhaustAsync(choiceContext, card);
 
         return result;
+    }
+
+    private static bool RequiresPostExhaustHandling(CardModel card) =>
+        XueDaoParasiteSystem.HasParasite(card) ||
+        card is AbstractShaZhaoCard { HasBoundMaterials: true };
+
+    private static async Task HandlePostExhaustAsync(
+        PlayerChoiceContext choiceContext,
+        CardModel card
+    )
+    {
+        if (XueDaoParasiteSystem.HasParasite(card))
+        {
+            await XueDaoParasiteSystem.BreakIfExhaustedAsync(
+                choiceContext,
+                card
+            );
+        }
+
+        if (card is AbstractShaZhaoCard
+            {
+                HasBoundMaterials: true
+            } shaZhao)
+        {
+            await ShaZhaoTuiYanSystem.FinalizeShaZhaoBindingAsync(
+                shaZhao,
+                shaZhao.Owner,
+                ShaZhaoTuiYanSystem
+                    .ShaZhaoBindingFinalizeReason.AbnormalRemoval
+            );
+        }
     }
 }

@@ -193,6 +193,41 @@ internal static class HandCapacityExemptionPatch
     }
 
     /// <summary>
+    /// 推演成功生成的杀招允许在生成瞬间临时突破普通手牌容量。
+    /// 杀招本身并非容量豁免牌，之后仍会正常计入手牌上限。
+    /// </summary>
+    internal static async Task<bool> AddGeneratedShaZhaoToHandAsync(
+        AbstractShaZhaoCard card,
+        Player owner
+    )
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        ArgumentNullException.ThrowIfNull(owner);
+
+        CardPile hand = PileType.Hand.GetPile(owner);
+        if (ReferenceEquals(card.Pile, hand))
+        {
+            return true;
+        }
+
+        CardPileAddResult result =
+            await CardPileCmd.AddGeneratedCardToCombat(
+                card,
+                CountTowardHandLimit(hand.Cards) < CardPile.MaxCardsInHand
+                    ? PileType.Hand
+                    : PileType.Discard,
+                owner
+            );
+
+        if (result.success && !ReferenceEquals(card.Pile, hand))
+        {
+            await ForceMoveToHandAsync(card, hand);
+        }
+
+        return result.success && ReferenceEquals(card.Pile, hand);
+    }
+
+    /// <summary>
     /// 已在战斗中的容量豁免牌返回普通手牌时使用。
     /// 主要覆盖虚影显化后的回手与推演取消/失败后的回手。
     /// </summary>

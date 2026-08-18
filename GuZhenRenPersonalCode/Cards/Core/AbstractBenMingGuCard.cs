@@ -13,6 +13,7 @@ using STS2RitsuLib.Scaffolding.Content;
 
 // RitsuLib 可保存附加状态。
 using STS2RitsuLib.Utils;
+using STS2RitsuLib.Interactions.RightClick;
 
 // 游戏命令，例如 CreatureCmd。
 using MegaCrit.Sts2.Core.Commands;
@@ -47,6 +48,14 @@ namespace GuZhenRen.Cards;
 )]
 public abstract class AbstractBenMingGuCard : ModCardTemplate, IGuWormCard
 {
+    public bool CanHandleRightClickLocal(
+        ModRightClickContext context
+    ) => TiaoGuSystem.CanTuneGu(this, context.Player);
+
+    public Task OnRightClick(
+        ModRightClickExecutionContext context
+    ) => TiaoGuSystem.TuneGuAsync(this, context.Player);
+
     /// <summary>
     /// 默认使用与具体运行时卡牌类型同名的 PNG。
     /// </summary>

@@ -226,6 +226,7 @@ public sealed class KongQiaoRelic
                     cardPlay.Card,
                     skipVisuals: false
                 );
+                await GuCardPileSystem.RefillGuHandAsync(Owner);
                 return;
             }
 
@@ -256,6 +257,7 @@ public sealed class KongQiaoRelic
                 .MoveDepletedGuCardsToRecoveryAsync(Owner);
             await GuRecoveryEffectSystem
                 .HandleEnteredRecoveryAsync(cardPlay.Card);
+            await GuCardPileSystem.RefillGuHandAsync(Owner);
         }
 
         if (cardPlay.IsLastInSeries)

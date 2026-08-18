@@ -1,3 +1,5 @@
+using STS2RitsuLib.Interactions.RightClick;
+
 namespace GuZhenRen.Cards;
 
 /// <summary>
@@ -23,7 +25,9 @@ public interface IGuRankProvider
 /// 只有实现本接口的卡牌才允许作为合练材料。
 /// 仙元、杀招推演等即使具有其他系统数值，也不应实现此接口。
 /// </summary>
-public interface IGuWormCard : IGuRankProvider
+public interface IGuWormCard
+    : IGuRankProvider,
+      IModRightClickableCard
 {
     /// <summary>
     /// 催动该蛊虫需要支付的元气。普通蛊默认 1，合练蛊通常为 2。

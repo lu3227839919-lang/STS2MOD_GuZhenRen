@@ -26,6 +26,38 @@ namespace GuZhenRen.Cards;
 public abstract class AbstractShaZhaoCard
     : AbstractGuZhenRenCard
 {
+    public override string Title
+    {
+        get
+        {
+            string title = base.Title;
+            Type[] materialTypes = OrderedMaterialTypes.ToArray();
+            if (materialTypes.Length == 0)
+            {
+                return title;
+            }
+
+            CardModel[] guTemplates =
+                ModelDb.CardPool<GuZhenRenGuCardPool>()
+                    .AllCards
+                    .ToArray();
+            string materials = string.Join(
+                " / ",
+                materialTypes.Select(type =>
+                    guTemplates.FirstOrDefault(card =>
+                        card.GetType() == type
+                    )?.Title ?? type.Name
+                )
+            );
+            LocString suffix = new(
+                "cards",
+                "GU_ZHEN_REN_PERSONAL_CARD_STATUS.shaZhaoMaterialsSuffix"
+            );
+            suffix.Add("Materials", materials);
+            return title + suffix.GetFormattedText();
+        }
+    }
+
     /// <summary>
     /// 杀招牌固定属于杀招隐藏卡池。
     /// </summary>
@@ -396,7 +428,7 @@ public abstract class AbstractShaZhaoCard
         /// <summary>阶段型：按阶段推进形态，最终阶段后消耗并返还材料。</summary>
         Staged,
 
-        /// <summary>封印型：本场战斗不返还材料，战斗结束后归还。</summary>
+        /// <summary>封印型：效果真正完成后消耗，并按统一规则返还材料。</summary>
         Sealed,
     }
 
@@ -639,15 +671,10 @@ public abstract class AbstractShaZhaoCard
     )
     {
         Player player = Owner;
-        await ShaZhaoTuiYanSystem.ReleaseMaterialsAsync(
-            choiceContext,
+        await ShaZhaoTuiYanSystem.FinalizeShaZhaoBindingAsync(
             this,
             player,
-            // 消耗牌杀招使用后：材料同样返还——从蛊封存堆飞入恢复堆，
-            // 从零恢复并额外 +1 回合恢复；非消耗杀招按常规返还。
-            extraRecoveryTurn: CanonicalKeywords.Contains(
-                CardKeyword.Exhaust
-            )
+            ShaZhaoTuiYanSystem.ShaZhaoBindingFinalizeReason.Completed
         );
         await CardExhaustCompat.ExhaustAsync(
             choiceContext,
@@ -671,11 +698,10 @@ public abstract class AbstractShaZhaoCard
         }
 
         await PlayerCmd.LoseEnergy(1, player);
-        await ShaZhaoTuiYanSystem.ReleaseMaterialsAsync(
-            choiceContext,
+        await ShaZhaoTuiYanSystem.FinalizeShaZhaoBindingAsync(
             this,
             player,
-            extraRecoveryTurn: true
+            ShaZhaoTuiYanSystem.ShaZhaoBindingFinalizeReason.Dismantled
         );
         await CardExhaustCompat.ExhaustAsync(
             choiceContext,
@@ -684,14 +710,4 @@ public abstract class AbstractShaZhaoCard
         return true;
     }
 
-    /// <summary>
-    /// 战斗结束兜底：无条件返还全部绑定材料。
-    /// </summary>
-    internal void ReleaseMaterialsForCombatEnd(Player player)
-    {
-        ShaZhaoTuiYanSystem.ReleaseMaterialsForCombatEnd(
-            this,
-            player
-        );
-    }
 }

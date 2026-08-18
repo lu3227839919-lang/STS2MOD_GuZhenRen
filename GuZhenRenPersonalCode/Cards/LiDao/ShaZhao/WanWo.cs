@@ -134,6 +134,7 @@ public sealed class WanWo : AbstractShaZhaoCard
                     skipVisuals: false
                 );
             }
+            await GuCardPileSystem.RefillGuHandAsync(owner);
 
             // 按新公式生成我力虚影，并叠加独立临时生命来源。
             await WoLiPhantomSystem.AddShadowsAsync(
