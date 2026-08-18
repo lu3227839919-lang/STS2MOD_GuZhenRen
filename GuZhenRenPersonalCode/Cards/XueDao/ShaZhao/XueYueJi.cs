@@ -22,7 +22,6 @@ public sealed class XueYueJi : AbstractShaZhaoCard
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         [
             CardKeyword.Retain,
-            GuZhenRenKeywords.FuHua,
         ];
 
     protected override bool IsPlayable =>

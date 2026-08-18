@@ -35,8 +35,6 @@ public sealed class XueQiGu : AbstractGuWormCard
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         base.CanonicalKeywords.Concat(
         [
-            GuZhenRenKeywords.XueQi,
-            GuZhenRenKeywords.FuHua,
         ]).Distinct();
 
     protected override bool IsPlayable =>

@@ -17,7 +17,6 @@ namespace GuZhenRen.Powers.LiDao;
 /// 6转起统计全部实际显化（含群力额外显化），每 2 次获得 1 点力量；
 /// 7转起同回合 3 种不同力道虚影实际显化后额外获得 1 点力量（每回合一次）。
 /// “不同种类”按具体虚影类型统计，因此我力虚影也可作为其中一种。
-/// 力量可正常作用于具有伤害的力道虚影。
 /// </summary>
 [RegisterPower]
 public sealed class WoLiPower : ModPowerTemplate

@@ -53,6 +53,7 @@ public sealed class BaShan : AbstractGuWormCard
         base.AddExtraArgsToDescription(description);
         description.Add("BlockBreak", BlockBreakAtRank(GuRank));
         description.Add("Damage", DamageAtRank(GuRank));
+        description.Add("BaseVulnerable", 1);
         description.Add("BreakVulnerableBonus", BreakVulnerableBonusAtRank(GuRank));
     }
 

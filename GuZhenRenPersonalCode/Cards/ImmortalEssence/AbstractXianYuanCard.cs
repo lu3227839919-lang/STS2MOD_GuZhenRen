@@ -51,7 +51,7 @@ public abstract class AbstractXianYuanCard
             type: CardType.Skill,
             rarity: CardRarity.Rare,
             target: TargetType.Self,
-            showInCardLibrary: false
+            showInCardLibrary: true
         )
     {
     }

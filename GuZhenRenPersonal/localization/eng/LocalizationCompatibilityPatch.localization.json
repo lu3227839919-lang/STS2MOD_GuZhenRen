@@ -4,7 +4,7 @@
   "keywords": {
     "XianGu": {
       "title": "Immortal Gu",
-      "description": "A rank 6 or higher Gu. Across the run, all players may permanently own only one Immortal Gu with the same card identity. This rule is independent of [gold]Unique[/gold]."
+      "description": "A Rank 6 or higher Gu. During this run, only one copy of the same Immortal Gu may exist across all players' permanent decks."
     },
     "CuiDong": {
       "title": "Activation",
@@ -12,7 +12,7 @@
     },
     "HuiFu": {
       "title": "Cooldown",
-      "description": "After all activations are spent, the Gu enters the Gu Cooldown Pile and cannot be used. When cooldown finishes, it returns to the Gu Storage Pile and then enters the Gu Hand in cooldown-completion order."
+      "description": "After a Gu is activated, it enters the Gu Storage Pile after the listed number of turns."
     },
     "HeLian": {
       "title": "Fusion",
@@ -26,49 +26,9 @@
       "title": "Self-Devour",
       "description": "When paying Bloodthirst, lose 2 HP for each missing Blood Essence instead; this cannot reduce HP below 1."
     },
-    "XueQi": {
-      "title": "Blood Qi",
-      "description": "Adapts to the host: damage and Bleed, Block and Blood Essence, or direct Blood Essence. Higher ranks trigger multiple times."
-    },
-    "YueXiang": {
-      "title": "Moon Phase",
-      "description": "Blood Moon advances Crescent → Waxing → Full. Each complete host resolution advances one phase."
-    },
-    "XueTai": {
-      "title": "Blood Fetus",
-      "description": "A compound parasite. Each trigger adapts to the host and gains Fetal Movement; it hatches at 3."
-    },
-    "TaiDong": {
-      "title": "Fetal Movement",
-      "description": "Blood Fetus maturity. It hatches at 3; devouring another parasite can inherit 1–2 progress."
-    },
-    "PoTai": {
-      "title": "Rupture",
-      "description": "If an immature parasitized host enters Exhaust, remove the parasite and gain 1 Blood Essence without resolving remaining effects."
-    },
-    "FuHua": {
-      "title": "Hatch",
-      "description": "The final resolution after a parasite completes its last trigger, after which it is removed."
-    },
-    "TunJi": {
-      "title": "Devour Parasite",
-      "description": "Blood Fetus replaces Blood Qi or a non-Full Moon parasite and inherits 1–2 Fetal Movement."
-    },
     "ZongEDu": {
       "title": "Shared Pool",
       "description": "AoE damage, Bleed, or Blood Marks are shared totals divided among living enemies, not copied per enemy."
-    },
-    "CanYue": {
-      "title": "Crescent",
-      "description": "Moon Phase stage 1. Resolve the lower shared damage and Bleed pool, then advance to Waxing."
-    },
-    "YingYue": {
-      "title": "Waxing",
-      "description": "Moon Phase stage 2. Resolve the middle shared pool and possible Blood Marks, then advance to Full."
-    },
-    "ManYue": {
-      "title": "Full Moon",
-      "description": "Final Moon Phase. Resolve the largest shared pool and hatch; rank 6+ refunds Blood Essence and rank 9 also draws."
     },
     "YiChu": {
       "title": "Overflow",
@@ -128,7 +88,7 @@
     },
     "XuYing": {
       "title": "Phantom",
-      "description": "Remains in hand and cannot be played manually. After a non-Phantom Attack, the Strength controller checks manifestations in stable order."
+      "description": "Remains in hand and cannot be played manually. After a non-Phantom Attack, the Strength controller checks manifestations in stable order. Phantom Attack damage is affected by Strength."
     },
     "LianLi": {
       "title": "Strength Training",
@@ -136,11 +96,11 @@
     },
     "NianHua": {
       "title": "Years",
-      "description": "Time Path resource, max 6. Reaching 6 immediately triggers Year Complete, then resets to 0; overflow continues afterward."
+      "description": "A Time Path resource. At 6, trigger Year Complete, reset to 0, and continue resolving overflow."
     },
     "SuiMan": {
       "title": "Year Complete",
-      "description": "At 6 Years, choose a recovering Gu to reduce its remaining recovery by 1 turn, and extend all duration-based enemy debuffs by 1 turn."
+      "description": "Choose a cooling-down Gu to reduce its cooldown by 1 turn; extend all duration-based enemy debuffs by 1 turn."
     },
     "HuanBu": {
       "title": "Slow Steps",
@@ -149,6 +109,10 @@
     "XiYing": {
       "title": "Past Echo",
       "description": "A temporary copy created by Backtrack Gu. It Exhausts, cannot be Backtracked again, and grants Years when played."
+    },
+    "PoShi": {
+      "title": "Break Stance",
+      "description": "When an effect reduces an enemy that originally had Block to 0 Block, it is considered a Break Stance."
     }
   },
   "cardDescriptionOverrides": {

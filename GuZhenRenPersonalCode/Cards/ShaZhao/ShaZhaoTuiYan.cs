@@ -26,7 +26,7 @@ public sealed class ShaZhaoTuiYan : AbstractGuZhenRenGeneratedCard
             CardType.Skill,
             CardRarity.Rare,
             TargetType.None,
-            showInCardLibrary: false
+            showInCardLibrary: true
         )
     {
     }

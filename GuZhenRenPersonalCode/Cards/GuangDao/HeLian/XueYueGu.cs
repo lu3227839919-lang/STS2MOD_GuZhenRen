@@ -32,7 +32,6 @@ public sealed class XueYueGu : AbstractHeLianGuCard
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         base.CanonicalKeywords.Concat(
         [
-            GuZhenRenKeywords.YueXiang,
             GuZhenRenKeywords.ZongEDu,
         ]).Distinct();
 
