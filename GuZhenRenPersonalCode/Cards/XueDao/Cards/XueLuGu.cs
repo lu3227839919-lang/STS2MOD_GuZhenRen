@@ -26,15 +26,6 @@ public sealed class XueLuGu : AbstractGuWormCard
 
     public override bool GainsBlock => true;
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        base.CanonicalKeywords
-            .Append(
-                GuZhenRenKeywords.GetShiHaiKeyword(
-                    GetMaximumAbsorb()
-                )
-            )
-            .Distinct();
-
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new BlockVar(6m, ValueProp.Move),

@@ -997,26 +997,15 @@ internal static class CardUniquenessPatch
         keywords.ExceptWith(
             GuZhenRenKeywords.RemovedDisplayKeywords
         );
-        keywords.Remove(
-            GuZhenRenKeywords.XianGu
-        );
-
-
         bool isXianGu =
             GuZhenRenCardRules.IsXianGu(__instance);
 
         if (isXianGu)
         {
-            /*
-             * 兼容旧版本已经把“唯一”复制进实例本地关键词的存档。
-             * 仙蛊改为显示独立的“仙蛊”关键词；跨玩家整局唯一性
-             * 仍由 GuZhenRenCardRules.IsXianGu 独立执行。
-             */
+            // 仙蛊属于品阶/系统标签，不再绑定关键词；旧档若残留
+            // “唯一”展示词也一并清理。唯一性规则本身保持不变。
             keywords.Remove(
                 GuZhenRenKeywords.Unique
-            );
-            keywords.Add(
-                GuZhenRenKeywords.XianGu
             );
         }
 

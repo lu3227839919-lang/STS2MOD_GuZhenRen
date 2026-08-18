@@ -55,6 +55,10 @@ public sealed class JiaoShuai : AbstractLiDaoCompanionCard
             "SecondHitBonus",
             SecondHitBonusAtRank(GuRank)
         );
+        description.Add(
+            "SecondHitDamage",
+            DynamicVars.Damage.IntValue + SecondHitBonusAtRank(GuRank)
+        );
     }
 
     protected override async Task OnPlay(

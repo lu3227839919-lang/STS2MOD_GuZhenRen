@@ -59,9 +59,22 @@ public abstract class AbstractLiDaoGuCard :
             "TrainingComplete",
             LiDaoBeastTrainingSystem.IsTrainingComplete(this) ? 1 : 0
         );
+        bool trainingComplete =
+            LiDaoBeastTrainingSystem.IsTrainingComplete(this);
+        bool canManifest =
+            LiDaoBeastTrainingSystem.WasCompleteAtCombatStart(this);
+
         description.Add(
             "CanManifestThisCombat",
-            LiDaoBeastTrainingSystem.WasCompleteAtCombatStart(this) ? 1 : 0
+            canManifest ? 1 : 0
+        );
+        description.Add(
+            "TrainingPending",
+            trainingComplete && !canManifest ? 1 : 0
+        );
+        description.Add(
+            "TrainingInProgress",
+            trainingComplete ? 0 : 1
         );
     }
 

@@ -65,6 +65,15 @@ public sealed class BaiZhiXuYing : AbstractLiDaoXuYing
     public BaiZhiXuYing() : base(CardType.Attack, TargetType.AnyEnemy) =>
         RefreshRankValues();
 
+    protected override void AddExtraArgsToDescription(LocString description)
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add(
+            "FirstManifestDamage",
+            DynamicVars.Damage.IntValue + DynamicVars["FirstBonus"].IntValue
+        );
+    }
+
     protected override Task TriggerPhantomEffect(
         PlayerChoiceContext choiceContext,
         CardPlay triggeringPlay,
@@ -102,6 +111,15 @@ public sealed class EXuYing : AbstractLiDaoXuYing
 
     public EXuYing() : base(CardType.Attack, TargetType.AnyEnemy) =>
         RefreshRankValues();
+
+    protected override void AddExtraArgsToDescription(LocString description)
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add(
+            "SecondHitDamage",
+            DynamicVars.Damage.IntValue + DynamicVars["SecondHitBonus"].IntValue
+        );
+    }
 
     protected override Task TriggerPhantomEffect(
         PlayerChoiceContext choiceContext,
@@ -142,6 +160,15 @@ public sealed class QingNiuXuYing : AbstractLiDaoXuYing
     public QingNiuXuYing() : base(CardType.Attack, TargetType.AnyEnemy) =>
         RefreshRankValues();
 
+    protected override void AddExtraArgsToDescription(LocString description)
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add(
+            "HitBlockTotal",
+            DynamicVars.Block.IntValue + DynamicVars["HitBlockBonus"].IntValue
+        );
+    }
+
     protected override Task TriggerPhantomEffect(
         PlayerChoiceContext choiceContext,
         CardPlay triggeringPlay,
@@ -181,6 +208,15 @@ public sealed class ShiGuiXuYing : AbstractLiDaoXuYing
     public ShiGuiXuYing() : base(CardType.Skill, TargetType.Self) =>
         RefreshRankValues();
 
+    protected override void AddExtraArgsToDescription(LocString description)
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add(
+            "NoBlockTotal",
+            DynamicVars.Block.IntValue + DynamicVars["NoBlockBonus"].IntValue
+        );
+    }
+
     protected override Task TriggerPhantomEffect(
         PlayerChoiceContext choiceContext,
         CardPlay triggeringPlay,
@@ -217,6 +253,15 @@ public sealed class FeiXiongXuYing : AbstractLiDaoXuYing
 
     public FeiXiongXuYing() : base(CardType.Attack, TargetType.AnyEnemy) =>
         RefreshRankValues();
+
+    protected override void AddExtraArgsToDescription(LocString description)
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add(
+            "BlockedDamage",
+            DynamicVars.Damage.IntValue + DynamicVars["BlockBonus"].IntValue
+        );
+    }
 
     protected override Task TriggerPhantomEffect(
         PlayerChoiceContext choiceContext,

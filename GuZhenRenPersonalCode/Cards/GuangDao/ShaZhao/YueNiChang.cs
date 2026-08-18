@@ -60,6 +60,23 @@ public sealed class YueNiChang
 
     public override int ShaZhaoMaxUses => 2;
 
+    protected override void AddExtraArgsToDescription(
+        MegaCrit.Sts2.Core.Localization.LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add("NoMoonBlade", GuRank < 3 ? 1 : 0);
+        description.Add(
+            "NormalMoonBlade",
+            GuRank is >= 3 and <= 5 ? 1 : 0
+        );
+        description.Add(
+            "UpgradedMoonBlade",
+            GuRank is >= 6 and <= 8 ? 1 : 0
+        );
+        description.Add("FullMoonBlade", GuRank >= 9 ? 1 : 0);
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay

@@ -4,6 +4,7 @@ using GuZhenRen.Powers.LiDao;
 
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Localization;
 
 using STS2RitsuLib.Combat.SecondaryResources;
 using STS2RitsuLib.Interop.AutoRegistration;
@@ -41,6 +42,19 @@ public sealed class WoLiGu : AbstractGuWormCard
     {
         SetDao(Dao.LiDao);
         this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 1);
+    }
+
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add(
+            "ManifestsPerStrength",
+            ManifestsPerStrengthAtRank(GuRank)
+        );
+        description.Add("DistinctThreshold", DistinctPhantomThreshold);
+        description.Add("HasDistinctBonus", GuRank >= 7 ? 1 : 0);
     }
 
     protected override Task OnPlay(

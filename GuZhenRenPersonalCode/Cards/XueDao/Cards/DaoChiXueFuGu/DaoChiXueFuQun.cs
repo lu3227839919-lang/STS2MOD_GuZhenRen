@@ -22,6 +22,11 @@ public sealed class DaoChiXueFuQun : AbstractBloodBatToken
 
     protected override bool TransfersOnKill => true;
 
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        base.CanonicalKeywords
+            .Append(GuZhenRenKeywords.ZhuiJi)
+            .Distinct();
+
     public DaoChiXueFuQun() : base(2)
     {
     }

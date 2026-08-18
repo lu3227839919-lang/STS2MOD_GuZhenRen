@@ -52,6 +52,17 @@ public sealed class FeiXiongZhuang : AbstractLiDaoCompanionCard
             BlockBonusAtRank(GuRank) + _upBlockBonus;
     }
 
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add(
+            "BlockedDamage",
+            DynamicVars.Damage.IntValue + DynamicVars["BlockBonus"].IntValue
+        );
+    }
+
     protected override Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay

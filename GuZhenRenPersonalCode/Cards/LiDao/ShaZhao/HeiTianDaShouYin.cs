@@ -56,7 +56,11 @@ public sealed class HeiTianDaShouYin : AbstractShaZhaoCard
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        [CardKeyword.Retain, CardKeyword.Exhaust];
+        [
+            CardKeyword.Retain,
+            CardKeyword.Exhaust,
+            GuZhenRenKeywords.PoShi,
+        ];
 
     public override ShaZhaoLifecycle Lifecycle =>
         ShaZhaoLifecycle.Instant;
@@ -77,8 +81,22 @@ public sealed class HeiTianDaShouYin : AbstractShaZhaoCard
     )
     {
         base.AddExtraArgsToDescription(description);
+        int phantomCount = 0;
+        if (CombatState != null)
+        {
+            phantomCount = PileType.Hand.GetPile(Owner).Cards.Count(card =>
+                card.Keywords.Contains(GuZhenRenKeywords.XuYing)
+            );
+        }
+
         description.Add("BaseDamage", BaseDamageAtRank(GuRank));
         description.Add("PhantomDamage", PhantomDamageAtRank(GuRank));
+        description.Add(
+            "CurrentDamage",
+            BaseDamageAtRank(GuRank) +
+                phantomCount * PhantomDamageAtRank(GuRank)
+        );
+        description.Add("PhantomCount", phantomCount);
         description.Add("BlockBreak", BlockBreakAtRank(GuRank));
         description.Add("BaseVulnerable", 1);
         description.Add("PoShiVulnerable", PoShiVulnerableAtRank(GuRank));

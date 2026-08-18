@@ -2,17 +2,9 @@
   "schemaVersion": 1,
   "language": "eng",
   "keywords": {
-    "XianGu": {
-      "title": "Immortal Gu",
-      "description": "A Rank 6 or higher Gu. During this run, only one copy of the same Immortal Gu may exist across all players' permanent decks."
-    },
     "CuiDong": {
       "title": "Activation",
       "description": "Gu cards can be played directly from the Gu Hand. After all available activations are spent, they enter the Gu Cooldown Pile."
-    },
-    "HuiFu": {
-      "title": "Cooldown",
-      "description": "After a Gu is activated, it enters the Gu Storage Pile after the listed number of turns."
     },
     "HeLian": {
       "title": "Fusion",
@@ -20,23 +12,19 @@
     },
     "KeXue": {
       "title": "Bloodthirst",
-      "description": "Spend the listed amount of Blood Essence to use or empower the corresponding effect."
-    },
-    "ZiShi": {
-      "title": "Self-Devour",
-      "description": "When paying Bloodthirst, lose 2 HP for each missing Blood Essence instead; this cannot reduce HP below 1."
+      "description": "Spend the listed Blood Essence to trigger the stated effect."
     },
     "ZongEDu": {
-      "title": "Shared Pool",
-      "description": "AoE damage, Bleed, or Blood Marks are shared totals divided among living enemies, not copied per enemy."
+      "title": "Shared Total",
+      "description": "The listed amount is shared among all living enemies."
     },
     "YiChu": {
       "title": "Overflow",
-      "description": "When a resource gain exceeds its cap, the amount that could not be gained is converted into another benefit as stated by the card."
+      "description": "Amount above the resource cap converts as stated on the card."
     },
     "ZhuiJi": {
       "title": "Pursuit",
-      "description": "If the target dies, unresolved remaining hits move to another living enemy."
+      "description": "If the target dies, remaining hits move to another enemy."
     },
     "YaoHua1": {
       "title": "Illumination 1",
@@ -74,25 +62,13 @@
       "title": "Illumination 9",
       "description": "When you have at least 9 Radiance, automatically spend 9 Radiance and trigger this card’s Illumination effect."
     },
-    "ShiHai1": {
-      "title": "Devour Remains 1",
-      "description": "Choose up to 1 Remains in your hand to consume or absorb; see this card's description for the effect. Remains are gained when a Blood Path Gu card kills an enemy, or when Bleed kills it; unused Remains are kept in your permanent deck after combat."
-    },
-    "ShiHai2": {
-      "title": "Devour Remains 2",
-      "description": "Choose up to 2 Remains in your hand to consume or absorb; see this card's description for the effect. Remains are gained when a Blood Path Gu card kills an enemy, or when Bleed kills it; unused Remains are kept in your permanent deck after combat."
-    },
-    "ShiHai3": {
-      "title": "Devour Remains 3",
-      "description": "Choose up to 3 Remains in your hand to consume or absorb; see this card's description for the effect. Remains are gained when a Blood Path Gu card kills an enemy, or when Bleed kills it; unused Remains are kept in your permanent deck after combat."
-    },
     "XuYing": {
       "title": "Phantom",
-      "description": "Remains in hand and cannot be played manually. After a non-Phantom Attack, the Strength controller checks manifestations in stable order. Phantom Attack damage is affected by Strength."
+      "description": "Automatically Retained and cannot be played manually. After a non-Phantom Attack resolves, manifests at the listed chance. Phantoms do not trigger other Phantoms."
     },
     "LianLi": {
-      "title": "Strength Training",
-      "description": "Each beast-strength Gu permanently tracks its own 0/3 progress. The first effective activation on each different turn grants +1. It can create its phantom only if training was complete when combat began; progress completed during combat takes effect next combat."
+      "title": "Strength Refinement",
+      "description": "The first effective activation each turn advances permanent progress by 1. At progress 3, starting next combat, activation grants the matching Phantom."
     },
     "NianHua": {
       "title": "Years",
@@ -112,26 +88,94 @@
     },
     "PoShi": {
       "title": "Break Stance",
-      "description": "When an effect reduces an enemy that originally had Block to 0 Block, it is considered a Break Stance."
+      "description": "Triggers when this effect reduces an enemy's existing Block to 0."
+    },
+    "XueJiCost": {
+      "title": "Blood Rite",
+      "description": "Spend the listed Blood Essence first; each missing point costs 2 HP instead, leaving at least 1 HP."
+    },
+    "LianHai1": {
+      "title": "Refine Remains 1",
+      "description": "Consume up to 1 Remains; see the card for the payoff."
+    },
+    "LianHai2": {
+      "title": "Refine Remains 2",
+      "description": "Consume up to 2 Remains; see the card for the payoff."
+    },
+    "LianHai3": {
+      "title": "Refine Remains 3",
+      "description": "Consume up to 3 Remains; see the card for the payoff."
+    },
+    "XueQiCore": {
+      "title": "Blood Qi",
+      "description": "Triggers an effect based on the host type and may trigger multiple times."
+    },
+    "XueYueCore": {
+      "title": "Blood Moon",
+      "description": "Progresses through Crescent, Waxing, and Full Moon, advancing one stage each trigger."
+    },
+    "XueTaiCore": {
+      "title": "Blood Fetus",
+      "description": "Triggers by host type, may devour another parasite to inherit progress, and triggers its final effect at progress 3."
+    },
+    "ShangShi": {
+      "title": "Injury",
+      "description": "Based on current HP: 75% or less is Light Injury, 50% or less Heavy Injury, and 25% or less Critical Injury."
     }
   },
   "cardDescriptionOverrides": {
-    "GU_ZHEN_REN_PERSONAL_CARD_SHA_ZHAO_TUI_YAN.description": "Retain. First choose a craftable Killer Move, then choose matching Gu Worm materials. If successful, pay the derivation essence to gain the Killer Move; otherwise the card returns to your hand.",
+    "GU_ZHEN_REN_PERSONAL_CARD_SHA_ZHAO_TUI_YAN.description": "Pay 1 Energy to choose a Killer Move and its materials. Canceling or failing costs nothing. The deduced move's first play costs no Energy; when it is exhausted, its materials enter full cooldown with 1 extra turn.",
     "GU_ZHEN_REN_PERSONAL_CARD_BAI_SHI_GU.description": "Gain {Dexterity:diff()} temporary [gold]Dexterity[/gold]. {BlockRetentionTurns:cond:>0?For the next {BlockRetentionTurns} turn(s), your Block is not removed at the start of your turn.|}",
     "GU_ZHEN_REN_PERSONAL_CARD_QING_TI_XIAN_YUAN.description": "Retain as immortal essence. Provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
     "GU_ZHEN_REN_PERSONAL_CARD_HONG_ZAO_XIAN_YUAN.description": "Retain as immortal essence. Equals two Green Grape essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
     "GU_ZHEN_REN_PERSONAL_CARD_BAI_LI_XIAN_YUAN.description": "Retain as immortal essence. Equals two Red Date essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
     "GU_ZHEN_REN_PERSONAL_CARD_HUANG_XING_XIAN_YUAN.description": "Retain as immortal essence. Equals two White Litchi essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_QI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] {BloodCost}, [gold]Self-Devour[/gold]. Choose 1 normal card in your hand and implant [gold]Blood Qi[/gold].",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_YUE_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Fusion[/gold]; [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] 2: implant [gold]Moon Phase[/gold]. Three-stage [gold]Shared Pools[/gold]—Bleed {CrescentBleed}/{WaxingBleed}/{FullBleed}; Marks {CrescentMarks}/{WaxingMarks}/{FullMarks}.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_CHI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. Gain {XueYuanPower:diff()} [gold]Blood Essence[/gold]; convert each [gold]Overflow[/gold] into {OverflowBlock} Block.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_PI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. Gain {Block:diff()} Block; [gold]Bloodthirst[/gold] 1: gain {EmpoweredBlock} more. Each [gold]Blood Skull[/gold] adds 2 Block.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_LU_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. Gain {Block:diff()} Block; [gold]Devour Remains {MaxAbsorb}[/gold]: each grants 1 [gold]Blood Skull[/gold], or heals {Heal:diff()} HP at the cap.",
-    "GU_ZHEN_REN_PERSONAL_CARD_DAO_CHI_XUE_FU_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. Add a same-rank [gold]Blade-Wing Blood Bat[/gold]; [gold]Devour Remains 2[/gold]: add a [gold]Blade-Wing Blood Bat Swarm[/gold] instead.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_TAI_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Fusion[/gold]; [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Bloodthirst[/gold] 2, [gold]Self-Devour[/gold]: implant [gold]Blood Fetus[/gold], which can [gold]Devour Parasite[/gold] and [gold]Hatches[/gold] after 3 [gold]Fetal Movement[/gold].",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_FU_WANG_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Devour Remains 2[/gold]: add a same-rank [gold]Blood Bat King[/gold]; each adds 2 hits, and 2 grants [gold]Pursuit[/gold]. Resolve [gold]Blood Skull[/gold].",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_HE_JIA_GU.description": "[gold]Rank {Rank}[/gold]. [gold]Cooldown[/gold] {RecoveryTurns}. [gold]Blood River[/gold]: below 4 Essence, gain {LowBloodGain} Essence and {LowBlock} Block; otherwise [gold]Bloodthirst[/gold] 2 for {HighBlock} Block, then half next turn. Each [gold]Blood Skull[/gold] adds 2 Block.",
-    "GU_ZHEN_REN_PERSONAL_CARD_WAN_HAI_GUI_CHAO.description": "[gold]Devour Remains 3[/gold]. Split a {Damage:diff()} + {DamagePerRemains} per Remains damage pool among all enemies. Gain {Block:diff()} + {BlockPerRemains} Block per Remains."
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_QI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\n[gold]Blood Rite[/gold] {BloodCost}: implant [gold]Blood Qi[/gold] into 1 normal card in hand; it may trigger {TriggerCount} times.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_YUE_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\n[gold]Bloodthirst[/gold] 2: implant [gold]Blood Moon[/gold] into 1 normal card in hand. Later stages are stronger.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_CHI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {XueYuanPower:diff()} Blood Essence; each [gold]Overflow[/gold] converts into {OverflowBlock} Block.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_PI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {Block:diff()} Block; [gold]Bloodthirst[/gold] 1: gain {EmpoweredBlock} more. Each Blood Skull grants 2 more Block.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_LU_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {Block:diff()} Block; [gold]Refine Remains {MaxAbsorb}[/gold]: each grants 1 Blood Skull; at the cap, heal {Heal:diff()} HP instead.",
+    "GU_ZHEN_REN_PERSONAL_CARD_DAO_CHI_XUE_FU_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain 1 same-rank Blade-Wing Blood Bat; [gold]Refine Remains 2[/gold]: gain Blood Bat Swarm instead.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_TAI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\n[gold]Blood Rite[/gold] 2: implant [gold]Blood Fetus[/gold] into 1 normal card in hand; it may devour another parasite.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_FU_WANG_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\n[gold]Refine Remains 2[/gold]: gain 1 same-rank Blood Bat King. Each Remains adds 2 attacks and 1 Blood Skull; using 2 grants Pursuit. At the Blood Skull cap, each excess Remains heals 3 HP.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_HE_JIA_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nWith fewer than 4 Blood Essence, gain {LowBloodGain} Blood Essence and {LowBlock} Block; otherwise [gold]Bloodthirst[/gold] 2: gain {HighBlock} Block, then gain half that amount next turn. Each Blood Skull grants 2 more Block.",
+    "GU_ZHEN_REN_PERSONAL_CARD_WAN_HAI_GUI_CHAO.description": "[gold]Refine Remains 3[/gold]: deal {Damage:diff()} [gold]Shared Total[/gold] damage and gain {Block:diff()} Block; each Remains increases damage by {DamagePerRemains} and Block by {BlockPerRemains}. Rank 6+: consuming 3 grants half this Block next turn. Materials do not return this combat.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_DI_ZI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nDeal {Damage:diff()} damage to ALL enemies and apply {XueYinPower:diff()} Blood Mark to each; if only 1 enemy remains, apply 1 more. Gain 1 same-rank Blood Cloud Devour.",
+    "GU_ZHEN_REN_PERSONAL_CARD_DAO_CHI_XUE_FU.description": "Deal {Damage:diff()} damage {TotalHits} times; if the initial target has Bleed, attack once more. Then apply {LiuXuePower:diff()} Bleed. Each Blood Skull increases each hit by 1 damage.",
+    "GU_ZHEN_REN_PERSONAL_CARD_DAO_CHI_XUE_FU_QUN.description": "Deal {Damage:diff()} damage {TotalHits} times with Pursuit; if the initial target has Bleed, attack once more. Then apply {LiuXuePower:diff()} Bleed to each surviving enemy hit. Each Blood Skull increases each hit by 1 damage.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_FU_WANG.description": "Deal {Damage:diff()} damage {TotalHits} times. If the initial target has Bleed, attack once more. Each Blood Skull increases each hit by 1 damage.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_YUN_SHI_SHEN.description": "Deal {Damage:diff()} damage to ALL enemies; enemies that had Blood Mark before this play take {ExtraHits} extra hit(s) and gain {LiuXuePower:diff()} Bleed. Each triggered Mark shortens the source Blood Drop Gu cooldown by 1 turn, up to {BreedCap} turns this play.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_PIAO_LIU.description": "Usable twice. Choose a destination; the tide passes through all enemies, dealing {Damage:diff()} damage at each stop and consuming up to {MaxBleedConsumed} Bleed to empower it. Each Bleed consumed increases that damage by {DamagePerBleed}. Remaining Bleed moves onward and ends at the destination. Rank 6+: add Bleed there equal to the number of enemies passed.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_YUE_JI.description": "Uses increase with rank, up to 3. Choose a Blood Parasite host and resolve its parasite once without playing the host. Rank 9: if this completes the parasite, gain 2 Blood Essence.",
+    "GU_ZHEN_REN_PERSONAL_CARD_BAI_ZHI_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Power[/gold]\n{CanManifestThisCombat:cond:>0?Activate: gain 1 White Boar Phantom.|}{TrainingPending:cond:>0?[gold]Strength Refinement[/gold] complete: starting next combat, activation gains 1 White Boar Phantom.|}{TrainingInProgress:cond:>0?[gold]Strength Refinement[/gold] · Progress {TrainingProgress}: activate to gain 1 Strength.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_FEI_XIONG_ZHI_LI_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Power[/gold]\n{CanManifestThisCombat:cond:>0?Activate: gain 1 Flying Bear Phantom.|}{TrainingPending:cond:>0?[gold]Strength Refinement[/gold] complete: starting next combat, activation gains 1 Flying Bear Phantom.|}{TrainingInProgress:cond:>0?[gold]Strength Refinement[/gold] · Progress {TrainingProgress}: activate to gain 1 Strength.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_E_LI_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Power[/gold]\n{CanManifestThisCombat:cond:>0?Activate: gain 1 Crocodile Phantom.|}{TrainingPending:cond:>0?[gold]Strength Refinement[/gold] complete: starting next combat, activation gains 1 Crocodile Phantom.|}{TrainingInProgress:cond:>0?[gold]Strength Refinement[/gold] · Progress {TrainingProgress}: activate to gain 1 Strength.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_QING_NIU_LAO_LI_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Power[/gold]\n{CanManifestThisCombat:cond:>0?Activate: gain 1 Green Ox Phantom.|}{TrainingPending:cond:>0?[gold]Strength Refinement[/gold] complete: starting next combat, activation gains 1 Green Ox Phantom.|}{TrainingInProgress:cond:>0?[gold]Strength Refinement[/gold] · Progress {TrainingProgress}: activate to gain 1 Strength.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_SHI_GUI_LI_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Power[/gold]\n{CanManifestThisCombat:cond:>0?Activate: gain 1 Stone Turtle Phantom.|}{TrainingPending:cond:>0?[gold]Strength Refinement[/gold] complete: starting next combat, activation gains 1 Stone Turtle Phantom.|}{TrainingInProgress:cond:>0?[gold]Strength Refinement[/gold] · Progress {TrainingProgress}: activate to gain 1 Strength.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_KU_LI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Power[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\n{Rank3Exact:cond:>0?After the first Attack each turn|After each Attack}, add Labor damage by [gold]Injury[/gold]: {LightDamage} Light, {HeavyDamage} Heavy, {CriticalDamage} Critical.{Rank6Exact:cond:>0?Gain 1 Strength the first time you enter each worse Injury tier.|}{Rank7Exact:cond:>0?First entering Light or Heavy grants 1 Strength; Critical grants 2.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_ZI_LI_GENG_SHENG_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Power[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain Self-Reliance: after your next Attack fully resolves, heal {HealingPercent}% of actual HP damage to its main target, up to {HealingCap}.{HasKillBonus:cond:>0?If it kills the target, the cap is {KillHealingCap}.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_QUN_LI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Power[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nActivate: gain Group Strength. After a Beast Phantom naturally manifests, it has a {GroupChance}% chance to continue, up to {RepeatLimit} extra time(s).",
+    "GU_ZHEN_REN_PERSONAL_CARD_WO_LI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Power[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nActivate: gain My Strength. Every {ManifestsPerStrength} Beast Phantom manifestations grant 1 Strength.{HasDistinctBonus:cond:>0?Manifesting {DistinctThreshold} different Beast Phantoms this turn grants 1 more Strength.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_CHEN_JIAN_CHONG.description": "[gold]Rank {Rank}[/gold]\nDeal {Damage:diff()} damage.{FirstAttackRange:cond:>0?If this is your first Attack this turn, deal {FirstAttackDamage} instead.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_FEI_XIONG_ZHUANG.description": "[gold]Rank {Rank}[/gold]\nDeal {Damage:diff()} damage; if the target has Block, deal {BlockedDamage} instead.",
+    "GU_ZHEN_REN_PERSONAL_CARD_JIAO_SHUAI.description": "[gold]Rank {Rank}[/gold]\nDeal {Damage:diff()} damage, then deal {SecondHitRange:cond:>0?{SecondHitDamage}|{Damage:diff()}} damage.",
+    "GU_ZHEN_REN_PERSONAL_CARD_NIU_JIAO_DING.description": "[gold]Rank {Rank}[/gold]\nDeal {Damage:diff()} damage and gain {Block:diff()} Block.",
+    "GU_ZHEN_REN_PERSONAL_CARD_CHEN_ZHUANG.description": "[gold]Rank {Rank}[/gold]\nGain {Block:diff()} Block.{AttackBonusRange:cond:>0?If you played an Attack this turn, gain {AttackBonus:diff()} more.|}{NoBlockRange:cond:>0?If you had no Block before playing this, gain {NoBlockBonus} more.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_BAI_ZHI_XU_YING.description": "{Chance}% manifest: deal {Damage:diff()} damage.{FirstBonus:cond:>0?The first manifestation each turn deals {FirstManifestDamage} instead.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_FEI_XIONG_XU_YING.description": "{Chance}% manifest: deal {Damage:diff()} damage; if the target has Block, deal {BlockedDamage} instead.",
+    "GU_ZHEN_REN_PERSONAL_CARD_E_XU_YING.description": "{Chance}% manifest: deal {Damage:diff()} damage, then {SecondHitDamage} damage.",
+    "GU_ZHEN_REN_PERSONAL_CARD_QING_NIU_XU_YING.description": "{Chance}% manifest: deal {Damage:diff()} damage and gain {Block:diff()} Block.{HitBlockBonus:cond:>0?If the hit reaches HP, gain {HitBlockTotal} Block instead.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_SHI_GUI_XU_YING.description": "{Chance}% manifest: gain {Block:diff()} Block.{NoBlockBonus:cond:>0?If you have no Block, gain {NoBlockTotal} instead.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_BA_SHAN.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nAll enemies lose {BlockBreak} Block, then take {Damage} damage and gain {BaseVulnerable} Vulnerable; [gold]Broken Stance[/gold] targets gain {BreakVulnerableBonus} more.",
+    "GU_ZHEN_REN_PERSONAL_CARD_WAN_LAN.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nDeal {Damage} damage {Hits} times. For every 2 hits that reach HP, gain 1 Energy.{Rank7Exact:cond:>0?If every hit reaches HP, gain 1 more Energy.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_DAO_HAI_BA_SHAN.description": "Immortal Gu · [gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nAll enemies lose {BlockBreak} Block, then take {Damage} damage 3 times; [gold]Broken Stance[/gold] targets gain {BreakVulnerable} Vulnerable. Gain 1 Energy per broken enemy, up to {EnergyCap}.{Rank8Exact:cond:>0?If at least 2 enemies break, deal {ReboundDamage} damage to all enemies.|}{Rank9Exact:cond:>0?If at least 2 enemies break, deal {ReboundDamage} damage to all; if all break, deal it once more.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_SHANG_LI_HUI_TIAN.description": "[gold]Rank {Rank}[/gold]\nDeal {CurrentDamage} damage based on [gold]Injury[/gold]. Gain Return to Heaven: record the highest actual HP damage dealt by a later single card; the first time you would die, heal {RecoveryPercent}% of it and survive, otherwise heal after combat. Triggers once.",
+    "GU_ZHEN_REN_PERSONAL_CARD_HEI_TIAN_DA_SHOU_YIN.description": "[gold]Rank {Rank}[/gold]\nAll enemies lose {BlockBreak} Block, then take {CurrentDamage} damage and gain {BaseVulnerable} Vulnerable; [gold]Broken Stance[/gold] targets gain {PoShiVulnerable} more. More Beast Phantoms increase the damage.{Rank7Exact:cond:>0?Gain 1 Energy per broken enemy, up to {PoShiEnergyCap}.|}{Rank8Exact:cond:>0?Gain 1 Energy per broken enemy, up to {PoShiEnergyCap}; if at least {HuiLanThreshold} break, deal {HuiLanDamage} damage to all enemies.|}{Rank9Exact:cond:>0?Gain 1 Energy per broken enemy, up to {PoShiEnergyCap}; if at least {HuiLanThreshold} break, deal {HuiLanDamage} damage to all; if all break, deal it once more.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_WAN_WO.description": "Power\nSeal all Beast Gu and consume all Beast Phantoms. Gain {CurrentWoLiPhantomCount} My Strength Phantom(s).",
+    "GU_ZHEN_REN_PERSONAL_CARD_WO_LI_XU_YING.description": "On gain, provide 5 temporary HP. The first manifestation is guaranteed; later manifestations have a {RepeatChance}% chance and copy half of the copyable effect.",
+    "GU_ZHEN_REN_PERSONAL_CARD_BAI_HONG_GUAN_RI.description": "Deal {Damage:diff()} damage; each Zhao Po consumed increases it by {DamagePerZhaoPo}, up to {MaxZhaoPoConsumed} stacks. With at least {GuangHuiCost} Radiance, automatically spend it and ignore up to {PierceCap} Block.",
+    "GU_ZHEN_REN_PERSONAL_CARD_JING_YUE_FAN_ZHAO.description": "{NextMirror:cond:>0?Mirror: gain {Block:diff()} Block.|}{NextMoon:cond:>0?Moon: deal {Damage:diff()} damage.|}{NextReflection:cond:>0?Reflection: gain {ReflectionBlock} Block, deal {ReflectionDamage} damage to ALL enemies{GuangHui:cond:>0?, and gain {GuangHui} Radiance|}.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_YUE_NI_CHANG.description": "Usable twice. Gain {Block:diff()} Block and {GuangHui} Radiance.{NormalMoonBlade:cond:>0?Gain 1 Moon Blade.|}{UpgradedMoonBlade:cond:>0?Gain 1 upgraded Moon Blade.|}{FullMoonBlade:cond:>0?Gain 1 Full Moon Blade.|}"
   },
   "characterNameOverrides": {
     "title": "Gu Yue Fang Yuan",
@@ -230,7 +274,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_KU_LI_POWER.description",
-      "text": "After an Attack fully resolves, deal Bitter Strength damage based on your current Injury tier. Higher ranks gain Strength the first time each new tier is entered."
+      "text": "After an Attack fully resolves, add Labor damage based on current Injury. Higher ranks grant Strength the first time you enter worse Injury tiers."
     },
     {
       "table": "powers",
@@ -240,7 +284,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_ZI_LI_GENG_SHENG_POWER.description",
-      "text": "Wait for the next Attack, then heal after it fully resolves based on the HP damage actually dealt to its primary target."
+      "text": "Wait for the next Attack to fully resolve, then heal based on actual HP damage to its main target. Higher ranks can include attached follow-up Strength Path damage."
     },
     {
       "table": "powers",
@@ -250,7 +294,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_WO_LI_POWER.description",
-      "text": "Counts beast phantom manifestations; every 3 (2 at rank 6+) grants 1 Strength. At rank 7+, 3 different kinds actually manifested in one turn grant 1 additional Strength (once per turn)."
+      "text": "Count Beast Phantom manifestations and gain 1 Strength at the listed threshold. Rank 7+ also grants 1 Strength when 3 different Beast Phantoms manifest in one turn, once per turn."
     },
     {
       "table": "powers",
@@ -260,7 +304,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_QUN_LI_POWER.description",
-      "text": "After any natural beast phantom manifestation, that phantom may repeatedly manifest again until a roll fails or the chain limit is reached. Extra manifestations cannot trigger Group Strength; at rank 6+ they count as actual manifestations."
+      "text": "After a Beast Phantom naturally manifests, roll the listed chance to continue until failure or the limit. Extra manifestations cannot retrigger Group Strength; Rank 6+ counts them as actual manifestations."
     },
     {
       "table": "powers",
@@ -300,7 +344,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_YUAN_POWER.description",
-      "text": "A personal character resource capped at 12. Only Blood Path Gu cards and their exclusive debuffs can gain or spend Blood Essence."
+      "text": "Blood Path resource, maximum 12."
     },
     {
       "table": "powers",
@@ -310,7 +354,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_YIN_POWER.description",
-      "text": "After taking unblocked damage from the applier’s Blood Path Gu Attack, remove 1 Blood Mark and lose 3 additional HP. Across the battlefield, each CardPlay grants at most 1 Blood Essence; Replay starts a new CardPlay."
+      "text": "When damaged by the applier’s Blood Path attack, consume 1 stack and lose 3 extra HP; each card play refunds at most 1 Blood Essence across all enemies."
     },
     {
       "table": "powers",
@@ -320,7 +364,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_LIU_XUE_POWER.description",
-      "text": "At the end of the owner’s turn, remove 1 Bleed, grant the applier 1 Blood Essence, and deal 3 damage to the owner."
+      "text": "At turn end, lose 1 stack and take 3 damage; the applier gains 1 Blood Essence."
     },
     {
       "table": "powers",
@@ -350,7 +394,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_LU_POWER.description",
-      "text": "Up to 3 stacks. Each strengthens Blood Path parasites, defenses, and Blade-Wing Blood Bat multi-hit attacks, but does not increase resource generation."
+      "text": "Maximum 3. Empowers some Blood Parasite, defense, and Blood Bat effects."
     },
     {
       "table": "powers",
@@ -360,7 +404,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_JI_POWER.description",
-      "text": "{Amount} card(s) carry an unresolved Blood Path parasite. The parasite triggers after the host’s final play and is then removed."
+      "text": "Attaches to a normal card and triggers after the host fully resolves; exhausting the host early removes the parasite and grants 1 Blood Essence."
     },
     {
       "table": "powers",
@@ -481,6 +525,16 @@
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_XI_YING_WATCHER_POWER.description",
       "text": "Hidden watcher for Past Echo cards."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_SHANG_LI_HUI_TIAN_POWER.title",
+      "text": "Return to Heaven"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_SHANG_LI_HUI_TIAN_POWER.description",
+      "text": "Records the highest actual HP damage dealt by a later single card. The first time you would die, heal the listed percentage and survive; otherwise heal after combat. Triggers once."
     }
   ],
   "OPTION_GU_ZHEN_REN_PERSONAL_GU_RANK_UP.description": "Select Gu Worms to refine in one go, mixing mortal and immortal freely. Each refinement has 4 slots: a mortal Gu Worm takes 1 slot and an immortal Gu Worm takes 2 slots, so you can refine up to 4 mortal or 2 immortal Gu Worms (e.g. 1 immortal + 2 mortal). Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",

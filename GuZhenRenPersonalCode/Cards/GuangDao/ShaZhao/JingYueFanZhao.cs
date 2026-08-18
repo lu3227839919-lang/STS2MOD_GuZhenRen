@@ -59,6 +59,31 @@ public sealed class JingYueFanZhao : AbstractShaZhaoCard
     public override int MaxStages =>
         GuRank >= 6 ? 3 : 2;
 
+    protected override void AddExtraArgsToDescription(
+        MegaCrit.Sts2.Core.Localization.LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        int nextStage = Math.Clamp(CurrentStage + 1, 1, MaxStages);
+        description.Add("NextMirror", nextStage == 1 ? 1 : 0);
+        description.Add("NextMoon", nextStage == 2 ? 1 : 0);
+        description.Add("NextReflection", nextStage >= 3 ? 1 : 0);
+        description.Add(
+            "ReflectionBlock",
+            (int)Math.Round(
+                DynamicVars.Block.BaseValue / 2m,
+                MidpointRounding.AwayFromZero
+            )
+        );
+        description.Add(
+            "ReflectionDamage",
+            (int)Math.Round(
+                DynamicVars.Damage.BaseValue / 2m,
+                MidpointRounding.AwayFromZero
+            )
+        );
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay

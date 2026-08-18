@@ -37,7 +37,12 @@ public sealed class XueFuWang : AbstractBloodBatToken
 
     internal void ConfigureConsumedRemains(int amount)
     {
-        DynamicVars[ConsumedRemainsVar].BaseValue =
-            Math.Clamp(amount, 0, 2);
+        int consumed = Math.Clamp(amount, 0, 2);
+        DynamicVars[ConsumedRemainsVar].BaseValue = consumed;
+
+        if (consumed >= 2)
+        {
+            AddKeyword(GuZhenRenKeywords.ZhuiJi);
+        }
     }
 }

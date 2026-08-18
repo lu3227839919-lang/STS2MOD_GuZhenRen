@@ -4,6 +4,7 @@ using GuZhenRen.Powers.LiDao;
 
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Localization;
 
 using STS2RitsuLib.Combat.SecondaryResources;
 using STS2RitsuLib.Interop.AutoRegistration;
@@ -23,6 +24,11 @@ public sealed class KuLiGu : AbstractGuWormCard
 
     public override int MaxGuRank => 7;
 
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        base.CanonicalKeywords
+            .Append(GuZhenRenKeywords.ShangShi)
+            .Distinct();
+
     public override int RecoveryDelayTurns => GuRank switch
     {
         <= 4 => 1,
@@ -41,6 +47,16 @@ public sealed class KuLiGu : AbstractGuWormCard
     {
         SetDao(Dao.LiDao);
         this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 2);
+    }
+
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add("LightDamage", ExtraDamageAtRank(GuRank, 1));
+        description.Add("HeavyDamage", ExtraDamageAtRank(GuRank, 2));
+        description.Add("CriticalDamage", ExtraDamageAtRank(GuRank, 3));
     }
 
     protected override Task OnPlay(

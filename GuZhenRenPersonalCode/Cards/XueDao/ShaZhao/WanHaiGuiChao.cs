@@ -35,7 +35,8 @@ public sealed class WanHaiGuiChao : AbstractShaZhaoCard
     [
         CardKeyword.Retain,
         CardKeyword.Exhaust,
-        GuZhenRenKeywords.GetShiHaiKeyword(3),
+        GuZhenRenKeywords.GetLianHaiKeyword(3),
+        GuZhenRenKeywords.ZongEDu,
     ];
 
     public override bool GainsBlock => true;

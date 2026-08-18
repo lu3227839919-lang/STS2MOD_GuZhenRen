@@ -51,6 +51,10 @@ public sealed class ChenJianChong : AbstractLiDaoCompanionCard
             "FirstAttackBonus",
             FirstAttackBonusAtRank(GuRank)
         );
+        description.Add(
+            "FirstAttackDamage",
+            DynamicVars.Damage.IntValue + FirstAttackBonusAtRank(GuRank)
+        );
     }
 
     protected override Task OnPlay(

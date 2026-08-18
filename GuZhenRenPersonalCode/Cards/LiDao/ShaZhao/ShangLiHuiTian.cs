@@ -50,7 +50,11 @@ public sealed class ShangLiHuiTian : AbstractShaZhaoCard
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        [CardKeyword.Retain, CardKeyword.Exhaust];
+        [
+            CardKeyword.Retain,
+            CardKeyword.Exhaust,
+            GuZhenRenKeywords.ShangShi,
+        ];
 
     public override ShaZhaoLifecycle Lifecycle =>
         ShaZhaoLifecycle.Instant;
@@ -78,6 +82,19 @@ public sealed class ShangLiHuiTian : AbstractShaZhaoCard
         description.Add("HeavyBonus", HeavyBonusAtRank(GuRank));
         description.Add("CriticalBonus", CriticalBonusAtRank(GuRank));
         description.Add("RecoveryPercent", RecoveryPercentAtRank(GuRank));
+
+        int currentDamage = BaseDamageAtRank(GuRank);
+        if (CombatState != null)
+        {
+            currentDamage += GetInjuryTier(Owner.Creature) switch
+            {
+                1 => LightBonusAtRank(GuRank),
+                2 => HeavyBonusAtRank(GuRank),
+                >= 3 => CriticalBonusAtRank(GuRank),
+                _ => 0,
+            };
+        }
+        description.Add("CurrentDamage", currentDamage);
     }
 
     protected override async Task OnPlay(

@@ -23,9 +23,8 @@ public abstract class AbstractGuWormCard
     public override bool CanBeGeneratedInCombat => false;
 
     /// <summary>
-    /// 所有蛊虫统一显示“恢复”关键词标签，悬浮提示会专门说明恢复
-    /// 机制的作用；再按当前转数附加各蛊虫自己的机制词。Distinct
-    /// 保证派生类再次追加同一关键词时不会重复显示。
+    /// 蛊虫只绑定单卡机制关键词。仙蛊、转数、冷却与合练属于
+    /// 卡面系统信息，不占机制关键词槽；每张牌的全部关键词上限为4。
     /// </summary>
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         base.CanonicalKeywords
@@ -44,14 +43,7 @@ public abstract class AbstractGuWormCard
         AbstractGuWormCard guWorm
     )
     {
-        // 恢复是蛊虫共有机制：卡面统一显示“恢复”标签，悬浮提示
-        // 专门说明催动耗尽后进入恢复、期间无法使用、回合数结束后
-        // 回到蛊牌堆。
-        if (guWorm is not ILiDaoBeastGuCard)
-        {
-            yield return GuZhenRenKeywords.HuiFu;
-        }
-
+        // 公共系统信息不进入卡牌关键词绑定，只返回真正的玩法机制。
         foreach (CardKeyword keyword in GetMechanicKeywords(guWorm))
         {
             yield return keyword;
@@ -151,18 +143,18 @@ public abstract class AbstractGuWormCard
             ],
             "XueQiGu" =>
             [
-                GuZhenRenKeywords.KeXue,
-                GuZhenRenKeywords.ZiShi,
+                GuZhenRenKeywords.XueJiCost,
+                GuZhenRenKeywords.XueQiCore,
             ],
             "XueYueGu" =>
             [
-                GuZhenRenKeywords.ZongEDu,
                 GuZhenRenKeywords.KeXue,
+                GuZhenRenKeywords.XueYueCore,
             ],
             "XueTaiGu" =>
             [
-                GuZhenRenKeywords.KeXue,
-                GuZhenRenKeywords.ZiShi,
+                GuZhenRenKeywords.XueJiCost,
+                GuZhenRenKeywords.XueTaiCore,
             ],
             "XueChiGu" =>
             [
@@ -172,19 +164,27 @@ public abstract class AbstractGuWormCard
             [
                 GuZhenRenKeywords.KeXue,
             ],
+            "XueLuGu" =>
+            [
+                GuZhenRenKeywords.GetLianHaiKeyword(
+                    guWorm.GuRank <= 3 ? 1 : guWorm.GuRank <= 6 ? 2 : 3
+                ),
+            ],
             "DaoChiXueFuGu" =>
             [
-                GuZhenRenKeywords.ZhuiJi,
-                GuZhenRenKeywords.GetShiHaiKeyword(2),
+                GuZhenRenKeywords.GetLianHaiKeyword(2),
             ],
             "XueFuWangGu" =>
             [
-                GuZhenRenKeywords.ZhuiJi,
-                GuZhenRenKeywords.GetShiHaiKeyword(2),
+                GuZhenRenKeywords.GetLianHaiKeyword(2),
             ],
             "XueHeJiaGu" =>
             [
                 GuZhenRenKeywords.KeXue,
+            ],
+            "KuLiGu" =>
+            [
+                GuZhenRenKeywords.ShangShi,
             ],
             "BaShan" =>
             [

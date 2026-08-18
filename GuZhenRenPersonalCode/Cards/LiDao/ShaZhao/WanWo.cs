@@ -83,6 +83,26 @@ public sealed class WanWo : AbstractShaZhaoCard
             RepeatManifestChanceAtRank(GuRank)
         );
         description.Add("CopyEffectRatio", 50);
+
+        int shadowCount = 1;
+        if (CombatState != null)
+        {
+            CardModel[] beastGu = EnumerateGuCards(Owner)
+                .Where(card => card is ILiDaoBeastGuCard)
+                .ToArray();
+            AbstractLiDaoXuYing[] beastPhantoms =
+                LiDaoPhantomSystem.GetPermanentPhantoms(Owner)
+                    .Where(phantom => phantom.BeastKind is not null)
+                    .ToArray();
+
+            int nv = beastPhantoms.Length;
+            int ng = beastGu
+                .Select(card => card.GetType())
+                .Distinct()
+                .Count();
+            shadowCount = 1 + nv + Math.Max(0, ng - nv) / 2;
+        }
+        description.Add("CurrentWoLiPhantomCount", shadowCount);
     }
 
     protected override async Task OnPlay(

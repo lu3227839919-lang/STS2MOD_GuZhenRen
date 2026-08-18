@@ -53,6 +53,17 @@ public abstract class AbstractBloodBatToken : AbstractXueDaoToken
 
     protected abstract bool TransfersOnKill { get; }
 
+    protected override void AddExtraArgsToDescription(
+        MegaCrit.Sts2.Core.Localization.LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add(
+            "TotalHits",
+            DynamicVars[HitsVar].IntValue + ExtraBaseHits
+        );
+    }
+
     protected AbstractBloodBatToken(int baseCost)
         : base(
             baseCost,

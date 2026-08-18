@@ -4,6 +4,7 @@ using GuZhenRen.Powers.LiDao;
 
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Localization;
 
 using STS2RitsuLib.Combat.SecondaryResources;
 using STS2RitsuLib.Interop.AutoRegistration;
@@ -44,6 +45,15 @@ public sealed class QunLiGu : AbstractGuWormCard
     {
         SetDao(Dao.LiDao);
         this.SecondaryCosts().Set(YuanQiSystem.ResourceId, YuanQiCost);
+    }
+
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add("GroupChance", GroupChanceAtRank(GuRank));
+        description.Add("RepeatLimit", GroupRepeatLimitAtRank(GuRank));
     }
 
     protected override Task OnPlay(
