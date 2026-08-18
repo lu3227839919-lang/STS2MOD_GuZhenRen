@@ -1,8 +1,8 @@
 {
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_CARDS.title": "Gu Hand",
-  "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_CARDS.description": "The Gu Hand has a fixed capacity of 5 and never grows with rank. Whenever any effect opens a slot, ready Gu refill immediately from the Storage FIFO with no per-turn limit. Gu Worms can be activated directly from here. Tune Gu: right-click a regular Gu to move it to the draw queue tail and refill from the current head.",
+  "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_CARDS.description": "The Gu Hand has a fixed capacity of 5 and never grows with rank. Whenever any effect opens a slot, ready Gu refill immediately from the Storage FIFO with no per-turn limit. Gu Worms can be activated directly from here.",
   "GU_ZHEN_REN_PERSONAL_TIAO_GU.title": "Tune Gu",
-  "GU_ZHEN_REN_PERSONAL_TIAO_GU.description": "Right-click a regular Gu in the Gu Hand to move it to the draw queue tail and immediately refill from the head. If no other candidate exists, the same Gu returns to the Gu Hand.",
+  "GU_ZHEN_REN_PERSONAL_TIAO_GU.description": "Move a regular Gu from the Gu Hand to the draw queue tail and immediately refill from the head. If no other candidate exists, the same Gu returns to the Gu Hand.",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_CARDS.empty": "The Gu Hand is empty.",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_DISCARD.title": "Gu Cooldown Pile",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_DISCARD.description": "Stores only Gu that are truly recovering. A recovered Gu joins the tail of the Storage queue. Materials of a completed Killer Move restart their full cooldown with +1 turn. Left-click to inspect.",

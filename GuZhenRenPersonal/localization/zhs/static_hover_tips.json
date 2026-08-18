@@ -1,8 +1,8 @@
 {
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_CARDS.title": "蛊手牌",
-  "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_CARDS.description": "蛊手牌固定最多5张，不随转数增加。任何原因产生空位时，立即按FIFO顺序从蛊存放牌堆补满，次数不限。蛊虫牌可从这里直接催动。调蛊：右键一只常规蛊，将其放入蛊抽牌队列尾并补入当前队首。",
+  "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_CARDS.description": "蛊手牌固定最多5张，不随转数增加。任何原因产生空位时，立即按FIFO顺序从蛊存放牌堆补满，次数不限。蛊虫牌可从这里直接催动。",
   "GU_ZHEN_REN_PERSONAL_TIAO_GU.title": "调蛊",
-  "GU_ZHEN_REN_PERSONAL_TIAO_GU.description": "右键蛊手牌中的一只常规蛊：该蛊进入蛊抽牌队列尾，并立即从队首补位。队列没有其他候选时，该蛊会重新回到蛊手牌。",
+  "GU_ZHEN_REN_PERSONAL_TIAO_GU.description": "将蛊手牌中的一只常规蛊放入蛊抽牌队列尾，并立即从队首补位。队列没有其他候选时，该蛊会重新回到蛊手牌。",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_CARDS.empty": "蛊手牌为空。",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_DISCARD.title": "蛊冷却堆",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_DISCARD.description": "只存放真正处于恢复中的蛊。冷却完成即进入蛊存放队列尾；杀招材料真正用完后从零开始完整冷却并额外+1。左键查看。",

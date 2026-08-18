@@ -7,8 +7,6 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 
-using STS2RitsuLib.Interactions.RightClick;
-
 namespace GuZhenRen.Cards;
 
 /// <summary>
@@ -22,14 +20,6 @@ public abstract class AbstractGuWormCard
       IGuWormCard,
       ICarouselCard
 {
-    public bool CanHandleRightClickLocal(
-        ModRightClickContext context
-    ) => TiaoGuSystem.CanTuneGu(this, context.Player);
-
-    public Task OnRightClick(
-        ModRightClickExecutionContext context
-    ) => TiaoGuSystem.TuneGuAsync(this, context.Player);
-
     public override bool CanBeGeneratedInCombat => false;
 
     /// <summary>
