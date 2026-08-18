@@ -215,6 +215,11 @@ internal static class GuActivationModePatch
     {
         GuActivationModeSystem.UpdateExtraHandLayout(__instance);
 
+        // 为蛊手牌 ExtraHand 安装原始输入桥。桥接节点只命中该容器
+        // 子树中的蛊牌 Hitbox，不扫描普通手牌；Node._Input 又早于
+        // GuiInput 分发，因此不会被 Holder 的既有点击逻辑提前吞掉。
+        TiaoGuSystem.EnsureGuHandRightClickBindings(__instance);
+
         // 玩家点击蛊牌后若取消/放弃目标选择，RitsuLib 会把牌移回蛊牌堆
         // 且不会通知本模组，_pendingCard 会残留并锁死其余蛊牌的选择。
         // 每帧兜底清理：pending 卡已回到蛊牌堆即视为选择已放弃。

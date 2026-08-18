@@ -861,7 +861,7 @@ public static class GuCardPileSystem
 
     /// <summary>
     /// 宙道【岁满】将一只正在恢复的蛊向前推进指定回合；若推进后
-    /// 已在当前回合就绪，则立即完成恢复，并在有空位时返回蛊手牌。
+    /// 已在当前回合就绪，则立即完成恢复，并加入蛊抽牌队列末端。
     /// </summary>
     internal static async Task<bool> AccelerateRecoveryAsync(
         Player owner,
@@ -906,7 +906,11 @@ public static class GuCardPileSystem
             acceleratedBySuiMan: true
         );
 
-        await RefillGuHandAsync(owner);
+        // 岁满通常在蛊牌仍处于出牌结算中时触发。此时 ExtraHand 会暂时
+        // 少一张牌；若在这里立即补位，岁满恢复的蛊会利用这个临时空位
+        // 直接进入蛊手牌，等原蛊返回后再把别的蛊挤到队尾，因而绕过
+        // “恢复蛊进入抽牌顺序末端”的规则。这里只负责入队；当前出牌或
+        // 回合恢复流程结束时的统一 RefillGuHandAsync 会从原队首正常补位。
 
         return true;
     }
