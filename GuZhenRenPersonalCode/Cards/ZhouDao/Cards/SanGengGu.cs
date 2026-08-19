@@ -30,6 +30,29 @@ public sealed class SanGengGu : AbstractZhouDaoGuCard
     {
     }
 
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+
+        (int energy, int draw, int years, int bonusEvents, int hpLoss) =
+            GuRank switch
+            {
+                5 => (1, 1, 1, 2, 4),
+                6 => (1, 1, 2, 2, 5),
+                7 => (1, 2, 2, 3, 6),
+                8 => (2, 2, 2, 3, 7),
+                _ => (2, 2, 3, 3, 8),
+            };
+
+        description.Add("EnergyGain", energy);
+        description.Add("DrawCount", draw);
+        description.Add("NianHuaGain", years);
+        description.Add("BonusEvents", bonusEvents);
+        description.Add("HpLoss", hpLoss);
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay

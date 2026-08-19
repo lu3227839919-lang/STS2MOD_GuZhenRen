@@ -35,6 +35,27 @@ public sealed class NianGu : AbstractZhouDaoCompanionGuCard
     {
     }
 
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+
+        int current = CombatState != null
+            ? ZhouDaoPowerSystem.GetNianHua(Owner)
+            : 0;
+        int gain = GuRank switch
+        {
+            <= 2 => 1,
+            <= 4 => 2,
+            5 => current <= 3 ? 3 : 2,
+            <= 7 => 3,
+            _ => 4,
+        };
+
+        description.Add("CurrentGain", gain);
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay

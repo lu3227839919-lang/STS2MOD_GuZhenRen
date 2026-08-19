@@ -30,6 +30,33 @@ public sealed class HuiSuGu : AbstractZhouDaoGuCard
     {
     }
 
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+
+        int inspect = GuRank switch
+        {
+            5 => 2,
+            6 or 7 => 3,
+            8 => 4,
+            _ => 5,
+        };
+        int delta = GuRank switch
+        {
+            <= 6 => 1,
+            <= 8 => 0,
+            _ => -1,
+        };
+
+        description.Add("InspectCount", inspect);
+        description.Add("CostHigher", delta > 0 ? 1 : 0);
+        description.Add("CostSame", delta == 0 ? 1 : 0);
+        description.Add("CostLower", delta < 0 ? 1 : 0);
+        description.Add("XiYingGain", GuRank >= 9 ? 2 : 1);
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay

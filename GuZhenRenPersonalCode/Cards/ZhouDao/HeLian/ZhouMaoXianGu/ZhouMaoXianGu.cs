@@ -34,6 +34,14 @@ public sealed class ZhouMaoXianGu : AbstractZhouDaoCompanionGuCard, ICardRewardE
     {
     }
 
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add("NianHuaGain", GuRank >= 8 ? 3 : 2);
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay

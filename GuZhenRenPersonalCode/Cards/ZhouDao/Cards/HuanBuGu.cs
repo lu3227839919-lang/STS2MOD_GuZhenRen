@@ -36,6 +36,32 @@ public sealed class HuanBuGu : AbstractZhouDaoGuCard
     {
     }
 
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+
+        (int reduction, int duration) = GuRank switch
+        {
+            3 => (4, 2),
+            4 => (5, 2),
+            5 => (6, 2),
+            6 => (7, 2),
+            7 => (8, 2),
+            8 => (10, 2),
+            _ => (12, 3),
+        };
+
+        description.Add("Reduction", reduction);
+        description.Add("Duration", duration);
+        description.Add("RepeatGain", GuRank >= 7 ? 2 : 1);
+        description.Add("HasRepeatGain", GuRank >= 5 ? 1 : 0);
+        description.Add("HasSplash", GuRank >= 8 ? 1 : 0);
+        description.Add("SplashReduction", GuRank >= 9 ? 6 : 4);
+        description.Add("SplashDuration", GuRank >= 9 ? 2 : 1);
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay

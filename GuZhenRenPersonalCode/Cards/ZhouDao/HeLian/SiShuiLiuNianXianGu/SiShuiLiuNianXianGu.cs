@@ -35,6 +35,15 @@ public sealed class SiShuiLiuNianXianGu : AbstractZhouDaoCompanionGuCard, ICardR
     {
     }
 
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add("NianHuaGain", GuRank >= 9 ? 5 : 4);
+        description.Add("PlusToken", GuRank >= 9 ? 1 : 0);
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay

@@ -72,19 +72,19 @@
     },
     "NianHua": {
       "title": "年华",
-      "description": "宙道资源，达到6点时触发岁满并归零，溢出年华继续结算。"
+      "description": "宙道资源，达到6点时触发岁满并归零；溢出的年华继续结算。"
     },
     "SuiMan": {
       "title": "岁满",
-      "description": "选择一只冷却中的蛊虫，使其冷却减少1回合；所有敌人的限时负面状态延长1回合。"
+      "description": "选择1只冷却中的蛊，使其冷却缩短1回合；所有敌人的限时负面状态延长1回合。"
     },
     "HuanBu": {
       "title": "缓步",
-      "description": "敌人一次攻击行动共享固定减伤额度；多段攻击不会让每一段都重复获得完整减伤。缓步按回合衰减，可被岁满延长。"
+      "description": "缓步X使该敌人每次攻击行动的总伤害减少X点，多段攻击共享；持续回合见卡面。"
     },
     "XiYing": {
       "title": "昔影",
-      "description": "回溯蛊生成的临时普通牌复制。昔影具有消耗，不能再次成为回溯目标；打出后按回溯蛊转数获得年华。"
+      "description": "回溯生成的临时普通牌，具有消耗且不能再次回溯；打出后获得年华，数值见回溯蛊。"
     },
     "PoShi": {
       "title": "破势",
@@ -236,7 +236,22 @@
     "GU_ZHEN_REN_PERSONAL_CARD_JING_HUI.description": "获得{Block:diff()}点格挡和[gold]映光[/gold]{ZhaoPoBonus}。",
     "GU_ZHEN_REN_PERSONAL_CARD_NING_JING_HUI.description": "获得{Block:diff()}点格挡、{LightBonus}点闪耀和[gold]映光[/gold]{ZhaoPoBonus}。{Rank:cond:>=7?获得1张返辉。|}",
     "GU_ZHEN_REN_PERSONAL_CARD_FAN_HUI.description": "获得1点光辉和{LightBonus}点闪耀。",
-    "GU_ZHEN_REN_PERSONAL_CARD_ZHOU_TIAN_JING_HUI.description": "获得{Block:diff()}点格挡，施加{ZhaoPoPower:diff()}层照破，并获得{LightBonus}点闪耀。"
+    "GU_ZHEN_REN_PERSONAL_CARD_ZHOU_TIAN_JING_HUI.description": "获得{Block:diff()}点格挡，施加{ZhaoPoPower:diff()}层照破，并获得{LightBonus}点闪耀。",
+    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{CurrentGain}点年华。{Rank9Exact:cond:>0?本次岁满后再获得1点年华。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_RI_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{CurrentGain}点年华。{Rank6Exact:cond:>0?本次岁满时抽1张牌。|}{Rank:cond:>=8?本次岁满后再获得1点年华。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_YUE_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{NowGain}点年华；{FollowingGain:cond:>0?之后两个回合开始各获得{NextGain}点|下回合开始再获得{NextGain}点}。",
+    "GU_ZHEN_REN_PERSONAL_CARD_HUAN_BU_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n施加[gold]缓步[/gold]{Reduction}，持续{Duration}回合。{HasRepeatGain:cond:>0?目标已有缓步时获得{RepeatGain}点年华。|}{HasSplash:cond:>0?其他敌人获得缓步{SplashReduction}，持续{SplashDuration}回合。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_SAN_GENG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{EnergyGain}点能量，抽{DrawCount}张牌并获得{NianHuaGain}点年华；接下来{BonusEvents}次获得年华时再获得1点。失去{HpLoss}点生命。",
+    "GU_ZHEN_REN_PERSONAL_CARD_HUI_SU_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n查看本回合最近{InspectCount}张合法普通攻击或技能，选择1张生成[gold]昔影[/gold]；{CostHigher:cond:>0?费用比原牌高1|}{CostSame:cond:>0?费用与原牌相同|}{CostLower:cond:>0?费用比原牌低1，最低0|}，打出后获得{XiYingGain}点年华。",
+    "GU_ZHEN_REN_PERSONAL_CARD_GUANG_YIN_REN_RAN_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]合练[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{BaseGain}点年华。{HasRecoveryGainBonus:cond:>0?本回合已有蛊完成冷却时改为{RecoveredGain}点。|}{Rank7Exact:cond:>0?本回合已有蛊完成冷却时，抽1张牌。|}{Rank8Exact:cond:>0?本次岁满后再获得1点年华。|}{Rank9Exact:cond:>0?本次岁满后再获得1点年华并抽1张牌。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_ZHOU_MAO_XIAN_GU.description": "仙蛊 · [gold]{RankCN}转[/gold] · [gold]合练[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{NianHuaGain}点年华。{Rank7Exact:cond:>0?本回合此前已岁满时，抽1张牌。|}{Rank9Exact:cond:>0?本次岁满时，抽1张牌。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_SI_SHUI_LIU_NIAN_XIAN_GU.description": "仙蛊 · [gold]{RankCN}转[/gold] · [gold]合练[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{NianHuaGain}点年华，并获得1张{PlusToken:cond:>0?年流+|年流}。",
+    "GU_ZHEN_REN_PERSONAL_CARD_GUANG_YIN_REN_RAN.description": "[gold]{RankCN}转[/gold] · [gold]伴生能力[/gold]\n每回合前{RecoveryLimit}只蛊完成冷却时，各获得1点年华。{HasAcceleratedBonus:cond:>0?本回合首次有蛊因岁满提前完成冷却时，再获得{AcceleratedBonus}点年华{DrawOnAccelerated:cond:>0?并抽1张牌|}。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_NIAN_SUI_SUI.description": "[gold]{RankCN}转[/gold] · [gold]伴生能力[/gold]\n{EveryTurn:cond:>0?每回合结束获得{TurnGain}点年华。|每{TurnInterval}个回合结束获得{TurnGain}点年华。|}{FirstSuiManOnly:cond:>0?本场首次岁满后再获得1点年华。|}{EverySecondSuiMan:cond:>0?每第2次岁满后再获得1点年华。|}{EverySuiMan:cond:>0?每次岁满后再获得1点年华。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_ZHOU_MAO.description": "[gold]{RankCN}转[/gold] · [gold]伴生能力[/gold]\n每次岁满后获得{NianHuaGain}点年华。{DrawEverySecond:cond:>0?每第2次岁满再抽1张牌。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_SI_SHUI_LIU_NIAN.description": "[gold]{RankCN}转[/gold] · [gold]伴生能力[/gold]\n每回合首次岁满时，获得1张{PlusToken:cond:>0?年流+|年流}。",
+    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU.description": "获得2点年华。",
+    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU_PLUS.description": "获得3点年华，抽1张牌。"
   },
   "characterNameOverrides": {
     "title": "古月方源",
@@ -505,7 +520,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_NIAN_HUA_POWER.description",
-      "text": "当前拥有{Amount}/6点年华。达到6点时触发岁满。"
+      "text": "当前拥有{Amount}/6点年华；达到6点时触发岁满。"
     },
     {
       "table": "powers",
@@ -515,7 +530,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_GUANG_YIN_REN_RAN_POWER.description",
-      "text": "蛊虫完成恢复时获得年华，效果随对应蛊虫转数提升。"
+      "text": "蛊完成冷却时获得年华；本回合可触发次数与额外岁满收益见对应伴生能力。"
     },
     {
       "table": "powers",
@@ -525,7 +540,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_NIAN_NIAN_SUI_SUI_POWER.description",
-      "text": "回合流逝时持续获得年华，效果随对应年蛊转数提升。"
+      "text": "按对应伴生能力的回合间隔获得年华，并可在岁满后追加年华。"
     },
     {
       "table": "powers",
@@ -535,7 +550,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_ZHOU_MAO_POWER.description",
-      "text": "岁满后保留一部分年华进度，高转可周期性抽牌。"
+      "text": "每次岁满后返还年华；高转每第2次岁满额外抽牌。"
     },
     {
       "table": "powers",
@@ -545,7 +560,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_SI_SHUI_LIU_NIAN_POWER.description",
-      "text": "每回合第一次岁满时生成年流。"
+      "text": "每回合首次岁满时获得对应年流。"
     },
     {
       "table": "powers",
@@ -555,7 +570,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_SAN_GENG_POWER.description",
-      "text": "接下来{Amount}次获得年华时，额外获得1点年华。"
+      "text": "接下来{Amount}次获得年华时，再获得1点年华。"
     },
     {
       "table": "powers",
@@ -565,7 +580,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_HUAN_BU_POWER.description",
-      "text": "每次攻击行动的总伤害最多降低固定额度；剩余{Amount}回合。"
+      "text": "每次攻击行动共享固定减伤额度；剩余{Amount}回合。"
     },
     {
       "table": "powers",

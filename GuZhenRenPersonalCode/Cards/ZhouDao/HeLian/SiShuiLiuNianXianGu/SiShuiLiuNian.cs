@@ -22,6 +22,14 @@ public sealed class SiShuiLiuNian : AbstractZhouDaoCompanionCard
     public override CardAssetProfile AssetProfile =>
         CardImageCatalog.Create(typeof(SiShuiLiuNianXianGu));
 
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add("PlusToken", GuRank >= 9 ? 1 : 0);
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay

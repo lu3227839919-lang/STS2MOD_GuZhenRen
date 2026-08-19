@@ -35,6 +35,28 @@ public sealed class YueGu : AbstractZhouDaoGuCard
     {
     }
 
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+
+        (int now, int next, int following) = GuRank switch
+        {
+            3 => (1, 1, 0),
+            4 => (1, 2, 0),
+            5 => (2, 2, 0),
+            6 => (2, 3, 0),
+            7 => (2, 2, 2),
+            8 => (2, 3, 3),
+            _ => (3, 3, 3),
+        };
+
+        description.Add("NowGain", now);
+        description.Add("NextGain", next);
+        description.Add("FollowingGain", following);
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay

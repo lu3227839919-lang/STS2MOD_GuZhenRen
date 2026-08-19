@@ -35,6 +35,27 @@ public sealed class RiGu : AbstractZhouDaoGuCard
     {
     }
 
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+
+        int current = CombatState != null
+            ? ZhouDaoPowerSystem.GetNianHua(Owner)
+            : 0;
+        int gain = GuRank switch
+        {
+            3 => 2,
+            4 => current <= 2 ? 3 : 2,
+            5 or 6 => 3,
+            7 or 8 => 4,
+            _ => 5,
+        };
+
+        description.Add("CurrentGain", gain);
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay

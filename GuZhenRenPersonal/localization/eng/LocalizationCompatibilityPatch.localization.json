@@ -72,19 +72,19 @@
     },
     "NianHua": {
       "title": "Years",
-      "description": "A Time Path resource. At 6, trigger Year Complete, reset to 0, and continue resolving overflow."
+      "description": "Time Path resource. At 6, trigger Yearful and reset to 0; excess Years continue resolving."
     },
     "SuiMan": {
-      "title": "Year Complete",
-      "description": "Choose a cooling-down Gu to reduce its cooldown by 1 turn; extend all duration-based enemy debuffs by 1 turn."
+      "title": "Yearful",
+      "description": "Choose 1 Gu in cooldown and shorten its cooldown by 1 turn; extend all timed enemy debuffs by 1 turn."
     },
     "HuanBu": {
-      "title": "Slow Steps",
-      "description": "An enemy attack shares one fixed damage-reduction budget across all hits. It ticks down by turns and can be extended by Year Complete."
+      "title": "Slow Step",
+      "description": "Slow Step X reduces the enemy's total damage for each attack action by X; multi-hit attacks share the amount. Duration is shown on the card."
     },
     "XiYing": {
       "title": "Past Echo",
-      "description": "A temporary copy created by Backtrack Gu. It Exhausts, cannot be Backtracked again, and grants Years when played."
+      "description": "A temporary normal-card copy created by Backtrack. It Exhausts and cannot be copied by Backtrack again; playing it grants Years as shown on Backtrack Gu."
     },
     "PoShi": {
       "title": "Break Stance",
@@ -236,7 +236,22 @@
     "GU_ZHEN_REN_PERSONAL_CARD_JING_HUI.description": "Gain {Block:diff()} Block and [gold]Imprinted Light[/gold] {ZhaoPoBonus}.",
     "GU_ZHEN_REN_PERSONAL_CARD_NING_JING_HUI.description": "Gain {Block:diff()} Block, {LightBonus} Shine, and [gold]Imprinted Light[/gold] {ZhaoPoBonus}.{Rank:cond:>=7? Gain 1 Returning Radiance.|}",
     "GU_ZHEN_REN_PERSONAL_CARD_FAN_HUI.description": "Gain 1 Radiance and {LightBonus} Shine.",
-    "GU_ZHEN_REN_PERSONAL_CARD_ZHOU_TIAN_JING_HUI.description": "Gain {Block:diff()} Block, apply {ZhaoPoPower:diff()} Zhao Po, and gain {LightBonus} Shine."
+    "GU_ZHEN_REN_PERSONAL_CARD_ZHOU_TIAN_JING_HUI.description": "Gain {Block:diff()} Block, apply {ZhaoPoPower:diff()} Zhao Po, and gain {LightBonus} Shine.",
+    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {CurrentGain} Years.{Rank9Exact:cond:>0? After this triggers Yearful, gain 1 more Year.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_RI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {CurrentGain} Years.{Rank6Exact:cond:>0? If this triggers Yearful, draw 1.|}{Rank:cond:>=8? After this triggers Yearful, gain 1 more Year.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_YUE_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {NowGain} Years; {FollowingGain:cond:>0?at the start of each of the next 2 turns, gain {NextGain}|at the start of next turn, gain {NextGain} more}.",
+    "GU_ZHEN_REN_PERSONAL_CARD_HUAN_BU_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nApply [gold]Slow Step[/gold] {Reduction} for {Duration} turns.{HasRepeatGain:cond:>0? If the target already has Slow Step, gain {RepeatGain} Years.|}{HasSplash:cond:>0? Other enemies gain Slow Step {SplashReduction} for {SplashDuration} turns.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_SAN_GENG_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {EnergyGain} Energy, draw {DrawCount}, and gain {NianHuaGain} Years; the next {BonusEvents} times you gain Years, gain 1 more. Lose {HpLoss} HP.",
+    "GU_ZHEN_REN_PERSONAL_CARD_HUI_SU_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nView the most recent {InspectCount} legal normal Attacks or Skills played this turn and choose 1 to create a [gold]Past Echo[/gold]; {CostHigher:cond:>0?its cost is 1 higher|}{CostSame:cond:>0?its cost is unchanged|}{CostLower:cond:>0?its cost is 1 lower, minimum 0|}, and playing it grants {XiYingGain} Years.",
+    "GU_ZHEN_REN_PERSONAL_CARD_GUANG_YIN_REN_RAN_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {BaseGain} Years.{HasRecoveryGainBonus:cond:>0? If a Gu finished cooldown this turn, gain {RecoveredGain} instead.|}{Rank7Exact:cond:>0? If a Gu finished cooldown this turn, draw 1.|}{Rank8Exact:cond:>0? After this triggers Yearful, gain 1 more Year.|}{Rank9Exact:cond:>0? After this triggers Yearful, gain 1 more Year and draw 1.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_ZHOU_MAO_XIAN_GU.description": "Immortal Gu · [gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {NianHuaGain} Years.{Rank7Exact:cond:>0? If Yearful already triggered this turn, draw 1.|}{Rank9Exact:cond:>0? If this triggers Yearful, draw 1.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_SI_SHUI_LIU_NIAN_XIAN_GU.description": "Immortal Gu · [gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {NianHuaGain} Years and 1 {PlusToken:cond:>0?Yearflow+|Yearflow}.",
+    "GU_ZHEN_REN_PERSONAL_CARD_GUANG_YIN_REN_RAN.description": "[gold]Rank {Rank}[/gold] · [gold]Companion Power[/gold]\nThe first {RecoveryLimit} Gu that finish cooldown each turn each grant 1 Year.{HasAcceleratedBonus:cond:>0? The first Gu each turn to finish early due to Yearful grants {AcceleratedBonus} more Years{DrawOnAccelerated:cond:>0? and draws 1|}.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_NIAN_SUI_SUI.description": "[gold]Rank {Rank}[/gold] · [gold]Companion Power[/gold]\n{EveryTurn:cond:>0?At each turn end, gain {TurnGain} Years.|Every {TurnInterval} turn ends, gain {TurnGain} Years.|}{FirstSuiManOnly:cond:>0? After the first Yearful this combat, gain 1 more Year.|}{EverySecondSuiMan:cond:>0? After every 2nd Yearful, gain 1 more Year.|}{EverySuiMan:cond:>0? After each Yearful, gain 1 more Year.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_ZHOU_MAO.description": "[gold]Rank {Rank}[/gold] · [gold]Companion Power[/gold]\nAfter each Yearful, gain {NianHuaGain} Years.{DrawEverySecond:cond:>0? Every 2nd Yearful also draws 1.|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_SI_SHUI_LIU_NIAN.description": "[gold]Rank {Rank}[/gold] · [gold]Companion Power[/gold]\nThe first Yearful each turn grants 1 {PlusToken:cond:>0?Yearflow+|Yearflow}.",
+    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU.description": "Gain 2 Years.",
+    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU_PLUS.description": "Gain 3 Years and draw 1."
   },
   "characterNameOverrides": {
     "title": "Gu Yue Fang Yuan",
@@ -505,7 +520,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_NIAN_HUA_POWER.description",
-      "text": "You have {Amount}/6 Years. Reaching 6 triggers Year Complete."
+      "text": "You have {Amount}/6 Years. At 6, trigger Yearful."
     },
     {
       "table": "powers",
@@ -515,7 +530,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_GUANG_YIN_REN_RAN_POWER.description",
-      "text": "Finishing Gu recovery grants Years; scales with the linked Gu rank."
+      "text": "Gain Years when Gu finish cooldown; trigger limits and extra Yearful rewards are shown on the matching Companion Power."
     },
     {
       "table": "powers",
@@ -525,7 +540,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_NIAN_NIAN_SUI_SUI_POWER.description",
-      "text": "Passing turns steadily grants Years; scales with Year Gu rank."
+      "text": "Gain Years on the interval shown by the matching Companion Power, with possible extra Years after Yearful."
     },
     {
       "table": "powers",
@@ -535,7 +550,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_ZHOU_MAO_POWER.description",
-      "text": "Retain some Years after Year Complete; higher ranks periodically draw cards."
+      "text": "After each Yearful, regain Years; higher ranks also draw on every 2nd Yearful."
     },
     {
       "table": "powers",
@@ -545,7 +560,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_SI_SHUI_LIU_NIAN_POWER.description",
-      "text": "The first Year Complete each turn creates a Year Flow."
+      "text": "The first Yearful each turn grants the matching Yearflow card."
     },
     {
       "table": "powers",
@@ -555,7 +570,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_SAN_GENG_POWER.description",
-      "text": "Your next {Amount} Year-gain events gain 1 extra Year."
+      "text": "The next {Amount} times you gain Years, gain 1 more."
     },
     {
       "table": "powers",
@@ -565,7 +580,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_HUAN_BU_POWER.description",
-      "text": "Each attack action loses up to a fixed total amount of damage. {Amount} turns remain."
+      "text": "Each attack action shares a fixed damage-reduction pool; {Amount} turns remaining."
     },
     {
       "table": "powers",

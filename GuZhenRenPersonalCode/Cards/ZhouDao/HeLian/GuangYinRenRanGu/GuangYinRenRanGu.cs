@@ -38,6 +38,31 @@ public sealed class GuangYinRenRanGu : AbstractZhouDaoCompanionGuCard, ICardRewa
     {
     }
 
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+
+        int baseGain = GuRank switch
+        {
+            <= 2 => 1,
+            <= 5 => 2,
+            <= 8 => 3,
+            _ => 4,
+        };
+
+        description.Add("BaseGain", baseGain);
+        description.Add(
+            "RecoveredGain",
+            baseGain + (GuRank is 2 or 4 or 5 ? 1 : 0)
+        );
+        description.Add(
+            "HasRecoveryGainBonus",
+            GuRank is 2 or 4 or 5 ? 1 : 0
+        );
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay

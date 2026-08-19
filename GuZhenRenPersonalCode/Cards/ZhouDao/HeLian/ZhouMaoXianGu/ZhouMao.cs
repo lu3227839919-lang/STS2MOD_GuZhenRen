@@ -22,6 +22,23 @@ public sealed class ZhouMao : AbstractZhouDaoCompanionCard
     public override CardAssetProfile AssetProfile =>
         CardImageCatalog.Create(typeof(ZhouMaoXianGu));
 
+    protected override void AddExtraArgsToDescription(
+        LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+
+        int gain = GuRank switch
+        {
+            6 => 1,
+            7 or 8 => 2,
+            _ => 3,
+        };
+
+        description.Add("NianHuaGain", gain);
+        description.Add("DrawEverySecond", GuRank >= 8 ? 1 : 0);
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay
