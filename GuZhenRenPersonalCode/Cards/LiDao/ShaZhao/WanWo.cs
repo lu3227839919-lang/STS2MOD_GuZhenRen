@@ -24,7 +24,7 @@ namespace GuZhenRen.Cards.ShaZhao;
 ///
 /// 打出万我时：
 /// 1. 快照 Nv（当前兽力虚影数量，不包含我力虚影）与 Ngu（兽力蛊总数量，同种可重复计数）。
-/// 2. 仅消耗所有兽力虚影；已有我力虚影保留。将所有兽力蛊移入蛊封存堆。
+/// 2. 仅消耗所有兽力虚影；已有我力虚影保留；其他兽力蛊留在原牌堆，不再封存。
 /// 3. 我力虚影数量 = 1 + Nv + ⌊max(0, Ngu − Nv) ÷ 2⌋。
 /// 4. 每个我力虚影提供 5 点临时生命，首次显化必定成功，
 ///    之后按转数 25/30/35/40% 显化，显化时复制动作 50% 效果。
@@ -145,16 +145,8 @@ public sealed class WanWo : AbstractShaZhaoCard
                 );
             }
 
-            // 所有兽力蛊移入蛊封存堆（按蛊封存堆系统规则处理）。
-            foreach (CardModel gu in beastGu)
-            {
-                await GuCardPileSystem.MoveCardToPileAsync(
-                    gu,
-                    GuCardPileSystem.GuSealedPileType,
-                    skipVisuals: false
-                );
-            }
-            await GuCardPileSystem.RefillGuHandAsync(owner);
+            // 兽力蛊只参与万我的数量计算，不再因打出万我而被额外封存。
+            // 它们保持在当前所在的蛊牌堆中；推演配方材料的永久封存规则不变。
 
             // 按兽力蛊总数量参与的新公式生成我力虚影，并叠加独立临时生命来源。
             await WoLiPhantomSystem.AddShadowsAsync(
