@@ -66,9 +66,9 @@ public sealed class ShangLiHuiTianPower : ModPowerTemplate
 
     public override PowerAssetProfile AssetProfile => new(
         IconPath:
-            "res://GuZhenRenPersonal/images/power/ZiLiGengShengPower-64x64.png",
+            "res://GuZhenRenPersonal/images/power/ShangLiHuiTianPower-64x64.png",
         BigIconPath:
-            "res://GuZhenRenPersonal/images/power/ZiLiGengShengPower-256x256.png"
+            "res://GuZhenRenPersonal/images/power/ShangLiHuiTianPower-256x256.png"
     );
 
     internal void Arm(int rank)

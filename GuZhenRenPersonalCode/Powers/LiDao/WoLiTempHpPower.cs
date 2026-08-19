@@ -64,8 +64,10 @@ public sealed class WoLiTempHpPower : ModPowerTemplate, IHealthBarVisualGraftSou
 
 
     /// <summary>
-    /// 将万我的独立临时生命显示为当前生命值右侧的额外血条。
-    /// 该接口只负责视觉显示，实际伤害吸收仍由本 Power 的伤害钩子处理。
+    /// 将万我的独立临时生命提供给 RitsuLib Visual Graft。
+    /// 当 CurrentHp + TempHp 超过 MaxHp 时，由 RitsuLib 扩展血条；
+    /// 未超过 MaxHp 时，由 WoLiTempHpHealthBarPatch 在当前生命右侧绘制蓝色临时生命段。
+    /// 两者都只负责视觉显示，实际伤害吸收仍由本 Power 的伤害钩子处理。
     /// </summary>
     public HealthBarVisualGraftMetrics GetHealthBarVisualGraft(
         HealthBarVisualGraftContext context
@@ -78,7 +80,7 @@ public sealed class WoLiTempHpPower : ModPowerTemplate, IHealthBarVisualGraftSou
 
         return new HealthBarVisualGraftMetrics(
             TempHp,
-            new Color("6dd7ff"),
+            new Color("FFB52E"),
             null
         );
     }

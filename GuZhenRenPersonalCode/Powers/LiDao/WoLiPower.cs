@@ -42,8 +42,8 @@ public sealed class WoLiPower : ModPowerTemplate
     ];
 
     public override PowerAssetProfile AssetProfile => new(
-        IconPath: "res://GuZhenRenPersonal/images/power/LiShiPower-64x64.png",
-        BigIconPath: "res://GuZhenRenPersonal/images/power/LiShiPower-256x256.png"
+        IconPath: "res://GuZhenRenPersonal/images/power/WoLiPower-64x64.png",
+        BigIconPath: "res://GuZhenRenPersonal/images/power/WoLiPower-256x256.png"
     );
 
     internal void ConfigureRank(int rank)

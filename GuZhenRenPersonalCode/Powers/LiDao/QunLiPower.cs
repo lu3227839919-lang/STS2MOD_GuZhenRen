@@ -33,8 +33,8 @@ public sealed class QunLiPower : ModPowerTemplate
         [new DynamicVar("Rank", 5m)];
 
     public override PowerAssetProfile AssetProfile => new(
-        IconPath: "res://GuZhenRenPersonal/images/power/LiDaoBattlePower-64x64.png",
-        BigIconPath: "res://GuZhenRenPersonal/images/power/LiDaoBattlePower-256x256.png"
+        IconPath: "res://GuZhenRenPersonal/images/power/QunLiPower-64x64.png",
+        BigIconPath: "res://GuZhenRenPersonal/images/power/QunLiPower-256x256.png"
     );
 
     internal void ConfigureRank(int rank)

@@ -49,6 +49,7 @@ public partial class Entry
         new(nameof(DeckCardSelectionManualConfirmationPatch), DeckCardSelectionManualConfirmationPatch.Initialize, DeckCardSelectionManualConfirmationPatch.Uninitialize),
         new(nameof(StartingDeckGuRankPatch), StartingDeckGuRankPatch.Initialize, StartingDeckGuRankPatch.Uninitialize),
         new(nameof(NCardGuEnergyIconPatch), NCardGuEnergyIconPatch.Initialize, NCardGuEnergyIconPatch.Uninitialize),
+        new(nameof(WoLiTempHpHealthBarPatch), WoLiTempHpHealthBarPatch.Initialize, WoLiTempHpHealthBarPatch.Uninitialize),
         new(nameof(GuRankRewardPatch), GuRankRewardPatch.Initialize, GuRankRewardPatch.Uninitialize),
         new(nameof(GuWormUpgradePatch), GuWormUpgradePatch.Initialize, GuWormUpgradePatch.Uninitialize),
         new(nameof(GuPotionCompatibilityPatch), GuPotionCompatibilityPatch.Initialize, GuPotionCompatibilityPatch.Uninitialize),
