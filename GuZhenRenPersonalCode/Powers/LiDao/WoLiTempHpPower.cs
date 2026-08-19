@@ -1,3 +1,5 @@
+using Godot;
+
 using GuZhenRen.Cards.LiDao;
 
 using MegaCrit.Sts2.Core.Commands;
@@ -10,6 +12,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
 
+using STS2RitsuLib.Combat.HealthBars;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
 
@@ -21,7 +24,7 @@ namespace GuZhenRen.Powers.LiDao;
 /// 消耗 1 个我力虚影。临时生命优先于真实生命吸收伤害。
 /// </summary>
 [RegisterPower]
-public sealed class WoLiTempHpPower : ModPowerTemplate
+public sealed class WoLiTempHpPower : ModPowerTemplate, IHealthBarVisualGraftSource
 {
     private const string TempHpVar = "TempHp";
     private const string LossRemainderVar = "LossRemainder";
@@ -57,6 +60,27 @@ public sealed class WoLiTempHpPower : ModPowerTemplate
 
         DynamicVars[TempHpVar].BaseValue = TempHp + count * 5;
         InvokeDisplayAmountChanged();
+    }
+
+
+    /// <summary>
+    /// 将万我的独立临时生命显示为当前生命值右侧的额外血条。
+    /// 该接口只负责视觉显示，实际伤害吸收仍由本 Power 的伤害钩子处理。
+    /// </summary>
+    public HealthBarVisualGraftMetrics GetHealthBarVisualGraft(
+        HealthBarVisualGraftContext context
+    )
+    {
+        if (!ReferenceEquals(context.Creature, Owner) || TempHp <= 0)
+        {
+            return new HealthBarVisualGraftMetrics(0);
+        }
+
+        return new HealthBarVisualGraftMetrics(
+            TempHp,
+            new Color("6dd7ff"),
+            null
+        );
     }
 
     public override decimal ModifyDamageAdditive(

@@ -23,9 +23,9 @@ namespace GuZhenRen.Cards.ShaZhao;
 /// （不返还、不进入消耗堆）；手牌中生成 1 张万我。
 ///
 /// 打出万我时：
-/// 1. 快照 Nv（当前兽力虚影数量，不包含我力虚影）与 Ng（不同兽力蛊种类数）。
+/// 1. 快照 Nv（当前兽力虚影数量，不包含我力虚影）与 Ngu（兽力蛊总数量，同种可重复计数）。
 /// 2. 仅消耗所有兽力虚影；已有我力虚影保留。将所有兽力蛊移入蛊封存堆。
-/// 3. 我力虚影数量 = 1 + Nv + ⌊max(0, Ng − Nv) ÷ 2⌋。
+/// 3. 我力虚影数量 = 1 + Nv + ⌊max(0, Ngu − Nv) ÷ 2⌋。
 /// 4. 每个我力虚影提供 5 点临时生命，首次显化必定成功，
 ///    之后按转数 25/30/35/40% 显化，显化时复制动作 50% 效果。
 ///
@@ -50,7 +50,7 @@ public sealed class WanWo : AbstractShaZhaoCard
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new DynamicVar("BeastPhantomCount", 0m),
-        new DynamicVar("BeastGuTypeCount", 0m),
+        new DynamicVar("BeastGuCount", 0m),
         new DynamicVar("WoLiPhantomCount", 0m),
         new DynamicVar("WoLiPhantomTempHp", 5m),
         new DynamicVar("FirstManifestChance", 100m),
@@ -96,11 +96,11 @@ public sealed class WanWo : AbstractShaZhaoCard
                     .ToArray();
 
             int nv = beastPhantoms.Length;
-            int ng = beastGu
-                .Select(card => card.GetType())
-                .Distinct()
-                .Count();
-            shadowCount = 1 + nv + Math.Max(0, ng - nv) / 2;
+            int beastGuCount = beastGu.Length;
+            shadowCount = CalculateWoLiPhantomCount(
+                nv,
+                beastGuCount
+            );
         }
         description.Add("CurrentWoLiPhantomCount", shadowCount);
     }
@@ -122,14 +122,14 @@ public sealed class WanWo : AbstractShaZhaoCard
                 .ToArray();
 
         int nv = beastPhantoms.Length;
-        int ng = beastGu
-            .Select(card => card.GetType())
-            .Distinct()
-            .Count();
-        int shadowCount = 1 + nv + Math.Max(0, ng - nv) / 2;
+        int beastGuCount = beastGu.Length;
+        int shadowCount = CalculateWoLiPhantomCount(
+            nv,
+            beastGuCount
+        );
 
         DynamicVars["BeastPhantomCount"].BaseValue = nv;
-        DynamicVars["BeastGuTypeCount"].BaseValue = ng;
+        DynamicVars["BeastGuCount"].BaseValue = beastGuCount;
         DynamicVars["WoLiPhantomCount"].BaseValue = shadowCount;
         DynamicVars["RepeatManifestChance"].BaseValue =
             RepeatManifestChanceAtRank(rank);
@@ -156,7 +156,7 @@ public sealed class WanWo : AbstractShaZhaoCard
             }
             await GuCardPileSystem.RefillGuHandAsync(owner);
 
-            // 按新公式生成我力虚影，并叠加独立临时生命来源。
+            // 按兽力蛊总数量参与的新公式生成我力虚影，并叠加独立临时生命来源。
             await WoLiPhantomSystem.AddShadowsAsync(
                 choiceContext,
                 owner,
@@ -171,6 +171,15 @@ public sealed class WanWo : AbstractShaZhaoCard
             ClearBoundMaterials();
         }
     }
+
+
+    private static int CalculateWoLiPhantomCount(
+        int beastPhantomCount,
+        int beastGuCount
+    ) =>
+        1
+        + beastPhantomCount
+        + Math.Max(0, beastGuCount - beastPhantomCount) / 2;
 
     internal static int RepeatManifestChanceAtRank(int rank) =>
         rank switch
