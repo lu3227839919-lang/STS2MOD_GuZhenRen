@@ -28,6 +28,9 @@ public sealed class XueJiPower : ModPowerTemplate
 
     public override PowerStackType StackType => PowerStackType.Counter;
 
+    // 血寄仅作为后台寄生结算监听器，不在角色 Power 栏显示。
+    protected override bool IsVisibleInternal => false;
+
     public override PowerAssetProfile AssetProfile => new(
         IconPath: "res://GuZhenRenPersonal/images/power/XueJiPower-64x64.png",
         BigIconPath: "res://GuZhenRenPersonal/images/power/XueJiPower-256x256.png"
