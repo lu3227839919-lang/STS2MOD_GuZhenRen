@@ -927,8 +927,9 @@ internal static class ShaZhaoTuiYanSystem
     /// <summary>
     /// 打出“杀招推演”系统牌的推演入口。
     ///
-    /// 成功返回 true（推演牌应消耗）；取消、配方无效或资源不足
-    /// 返回 false（推演牌回到手牌，不产生任何惩罚）。
+    /// 成功返回 true（推演牌应消耗），且只有成功收口时才实际消耗元气；
+    /// 取消、配方无效、资源不足或其他正常失败返回 false，
+    /// 推演牌回到手牌且不消耗元气。
     /// </summary>
     public static async Task<bool> DeriveFromCardAsync(
         PlayerChoiceContext choiceContext,
@@ -1059,22 +1060,9 @@ internal static class ShaZhaoTuiYanSystem
         }
         else
         {
-            bool spentYuanQi =
-                await SecondaryResourceCmd.Spend(
-                    player,
-                    YuanQiSystem.ResourceId,
-                    yuanQiCost,
-                    card: shaZhao,
-                    source: shaZhao
-                );
-
-            if (!spentYuanQi)
-            {
-                RemoveUncommittedResult(shaZhao);
-                ShowSynthesisFailure(player, "insufficientResources");
-                return false;
-            }
-
+            // 凡道杀招的元气这里只做过余额预检，不在此处实际扣除。
+            // 实际扣费统一延后到整个推演流程成功收口，确保取消、失败、
+            // 状态变化、创建失败或无法进入手牌等情况都不会消耗元气。
         }
 
         // “杀招推演”本身始终是一张 1 费普通牌。仅成功推演后扣除，
@@ -1117,6 +1105,31 @@ internal static class ShaZhaoTuiYanSystem
             throw new InvalidOperationException(
                 $"推演杀招 {shaZhao.Id} 无法进入普通手牌。"
             );
+        }
+
+        // 只有整个推演流程已经成功完成，才实际消耗凡道杀招的元气。
+        // 此处之前的所有取消/失败分支均不会执行 SecondaryResourceCmd.Spend。
+        if (!isImmortalShaZhao && yuanQiCost > 0)
+        {
+            bool spentYuanQi =
+                await SecondaryResourceCmd.Spend(
+                    player,
+                    YuanQiSystem.ResourceId,
+                    yuanQiCost,
+                    card: shaZhao,
+                    source: shaZhao
+                );
+
+            if (!spentYuanQi)
+            {
+                // 前面已经做过余额预检，正常流程不应到这里失败。
+                // 若资源在推演过程中被其他同步效果意外改变，明确抛错，
+                // 避免把“未支付元气”的结果静默视为成功。
+                throw new InvalidOperationException(
+                    $"杀招推演已完成，但元气扣除失败：" +
+                    $"需要 {yuanQiCost} 点元气。"
+                );
+            }
         }
 
         Entry.Logger.Info(
