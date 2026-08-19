@@ -24,11 +24,28 @@ public sealed class BaiHong : AbstractLiuGuangToken
         new PowerVar<ZhaoPoPower>(2m),
     ];
 
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        base.CanonicalKeywords
+            .Append(GuZhenRenKeywords.ZheGuangCore)
+            .Distinct();
+
     public override CardAssetProfile AssetProfile =>
         CardImageCatalog.Create(GetType());
 
     public BaiHong() : base(2)
     {
+    }
+
+    protected override void AddExtraArgsToDescription(
+        MegaCrit.Sts2.Core.Localization.LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add(
+            "DoubleRefractionDamage",
+            DynamicVars.Damage.IntValue +
+                DynamicVars["DoubleRefractionBonus"].IntValue
+        );
     }
 
     protected override async Task OnPlay(

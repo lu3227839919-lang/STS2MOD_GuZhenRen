@@ -82,6 +82,11 @@ public sealed class YueMangGu
         base.AddExtraArgsToDescription(description);
         description.Add("GuangHuiCost", GuangHuiCost);
         description.Add("RecoveryTurns", RecoveryDelayTurns);
+        description.Add(
+            "EmpoweredTotalHits",
+            DynamicVars["Hits"].IntValue +
+                DynamicVars["EmpoweredHits"].IntValue
+        );
     }
 
     protected override async Task OnPlay(

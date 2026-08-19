@@ -57,6 +57,17 @@ public sealed class TaiGuangGu : AbstractGuWormCard
         RefreshRankValues();
     }
 
+    protected override void AddExtraArgsToDescription(
+        MegaCrit.Sts2.Core.Localization.LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add(
+            "EmpoweredZhaoPo",
+            DynamicVars[typeof(ZhaoPoPower).Name].IntValue + 1
+        );
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay

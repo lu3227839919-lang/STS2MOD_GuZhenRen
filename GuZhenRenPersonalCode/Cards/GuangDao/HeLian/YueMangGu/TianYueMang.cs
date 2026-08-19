@@ -25,6 +25,11 @@ public sealed class TianYueMang : AbstractYueMangToken
         new PowerVar<ZhaoPoPower>(2m),
     ];
 
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        base.CanonicalKeywords
+            .Append(global::GuZhenRen.Cards.GuZhenRenKeywords.ZheGuangCore)
+            .Distinct();
+
     public TianYueMang() : base(2)
     {
     }

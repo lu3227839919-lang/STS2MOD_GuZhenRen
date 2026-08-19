@@ -24,7 +24,10 @@ public sealed class YueRen : AbstractGuZhenRenGeneratedCard
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        [CardKeyword.Exhaust];
+        [
+            CardKeyword.Exhaust,
+            GuZhenRenKeywords.ZhaoXi,
+        ];
 
     public override CardAssetProfile AssetProfile =>
         global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
@@ -39,6 +42,18 @@ public sealed class YueRen : AbstractGuZhenRenGeneratedCard
     {
         SetDao(Dao.GuangDao);
         RefreshRankValues();
+    }
+
+    protected override void AddExtraArgsToDescription(
+        MegaCrit.Sts2.Core.Localization.LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add(
+            "MarkedDamage",
+            DynamicVars.Damage.IntValue +
+                DynamicVars["ZhaoPoBonus"].IntValue
+        );
     }
 
     protected override async Task OnPlay(

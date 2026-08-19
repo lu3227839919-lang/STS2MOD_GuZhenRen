@@ -23,8 +23,29 @@ public sealed class NingYueMang : AbstractYueMangToken
         new RepeatVar("Hits", 2),
     ];
 
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        base.CanonicalKeywords
+            .Append(global::GuZhenRen.Cards.GuZhenRenKeywords.ZheGuangCore)
+            .Concat(
+                GuRank >= 7
+                    ? [global::GuZhenRen.Cards.GuZhenRenKeywords.ZhaoXi]
+                    : []
+            )
+            .Distinct();
+
     public NingYueMang() : base(1)
     {
+    }
+
+    protected override void AddExtraArgsToDescription(
+        MegaCrit.Sts2.Core.Localization.LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add(
+            "AfterSkillHits",
+            DynamicVars["Hits"].IntValue + 1
+        );
     }
 
     protected override async Task OnPlay(

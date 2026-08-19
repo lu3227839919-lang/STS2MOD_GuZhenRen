@@ -121,6 +121,34 @@
     "ShangShi": {
       "title": "伤势",
       "description": "按当前生命比例判定：生命不高于75%为轻伤，不高于50%为重伤，不高于25%为极重伤。"
+    },
+    "ZheGuangCore": {
+      "title": "折光",
+      "description": "光道牌与上一张标准牌类型不同时触发折光并获得1点光辉，每回合最多3点；部分牌会在折光后获得卡面强化。"
+    },
+    "ZhaoXi": {
+      "title": "照袭",
+      "description": "攻击已有照破的敌人时，触发卡面标注的照袭效果。"
+    },
+    "YanGuang": {
+      "title": "衍光",
+      "description": "进入冷却后生成本牌当前预览中的衍生牌；三转置入弃牌，四转起于冷却回合开始获得。"
+    },
+    "YingGuang": {
+      "title": "映光",
+      "description": "下一张攻击的第一段若命中已有照破的敌人，伤害提高卡面标注数值，然后移除。"
+    },
+    "ShouHui": {
+      "title": "守辉",
+      "description": "回合结束时仍有至少5点格挡，获得1点光辉。"
+    },
+    "PoHui": {
+      "title": "破辉",
+      "description": "本回合首次格挡被完全击破时，获得1点光辉。"
+    },
+    "ShiXue": {
+      "title": "嗜血",
+      "description": "初始目标已有流血时，额外攻击1次。"
     }
   },
   "cardDescriptionOverrides": {
@@ -141,9 +169,9 @@
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_HE_JIA_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]合练[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n血元不足4点时，获得{LowBloodGain}点血元与{LowBlock}点格挡；否则[gold]渴血[/gold]2，获得{HighBlock}点格挡，下回合再获得一半。每层血颅额外获得2点格挡。",
     "GU_ZHEN_REN_PERSONAL_CARD_WAN_HAI_GUI_CHAO.description": "[gold]炼骸 3[/gold]：造成{Damage:diff()}点[gold]总量[/gold]伤害并获得{Block:diff()}点格挡；每张遗骸分别使伤害提高{DamagePerRemains}点、格挡提高{BlockPerRemains}点。六转以上：消耗3张时，下回合获得本次格挡的一半。材料本场不返还。",
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_DI_ZI_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n对所有敌人造成{Damage:diff()}点伤害并施加{XueYinPower:diff()}层血印；仅剩1名敌人时额外施加1层。获得1张同转血云噬身。",
-    "GU_ZHEN_REN_PERSONAL_CARD_DAO_CHI_XUE_FU.description": "造成{Damage:diff()}点伤害{TotalHits}次；初始目标已有流血时额外攻击1次。随后施加{LiuXuePower:diff()}层流血。每层血颅使每段伤害提高1点。",
-    "GU_ZHEN_REN_PERSONAL_CARD_DAO_CHI_XUE_FU_QUN.description": "造成{Damage:diff()}点伤害{TotalHits}次，追击。初始目标已有流血时额外攻击1次。随后向受击且存活的敌人施加{LiuXuePower:diff()}层流血。每层血颅使每段伤害提高1点。",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_FU_WANG.description": "造成{Damage:diff()}点伤害{TotalHits}次。初始目标已有流血时额外攻击1次。每层血颅使每段伤害提高1点。",
+    "GU_ZHEN_REN_PERSONAL_CARD_DAO_CHI_XUE_FU.description": "造成{CurrentDamage}点伤害{TotalHits}次，随后施加{LiuXuePower:diff()}层流血。",
+    "GU_ZHEN_REN_PERSONAL_CARD_DAO_CHI_XUE_FU_QUN.description": "造成{CurrentDamage}点伤害{TotalHits}次，追击。随后向所有受击且存活的敌人施加{LiuXuePower:diff()}层流血。",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_FU_WANG.description": "造成{CurrentDamage}点伤害{TotalHits}次。",
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_YUN_SHI_SHEN.description": "对所有敌人造成{Damage:diff()}点伤害；出牌前已有血印者额外受到{ExtraHits}次攻击并获得{LiuXuePower:diff()}层流血。每触发1个血印，使来源血滴子冷却缩短1回合，本次最多缩短{BreedCap}回合。",
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_PIAO_LIU.description": "可使用2次。选择终点；血潮依次经过所有敌人，每站造成{Damage:diff()}点伤害，并消耗至多{MaxBleedConsumed}层流血强化伤害。每消耗1层，本次伤害提高{DamagePerBleed}点。剩余流血随血潮前进，最终汇入终点。六转以上：终点额外获得等同经过敌人数的流血。",
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_YUE_JI.description": "使用次数随转数提高，最多3次。选择1张血寄宿主，不打出宿主并提前结算1次血寄。九转：若因此完成血寄，获得2点血元。",
@@ -173,9 +201,42 @@
     "GU_ZHEN_REN_PERSONAL_CARD_HEI_TIAN_DA_SHOU_YIN.description": "[gold]{Rank}转[/gold]\n使所有敌人失去{BlockBreak}点格挡，随后造成{CurrentDamage}点伤害并施加{BaseVulnerable}层易伤；[gold]破势[/gold]者再获得{PoShiVulnerable}层易伤。兽力虚影越多，伤害越高。{Rank7Exact:cond:>0?每破势1名敌人回复1点能量，最多{PoShiEnergyCap}点。|}{Rank8Exact:cond:>0?每破势1名敌人回复1点能量，最多{PoShiEnergyCap}点；破势至少{HuiLanThreshold}名时，再造成{HuiLanDamage}点群体伤害。|}{Rank9Exact:cond:>0?每破势1名敌人回复1点能量，最多{PoShiEnergyCap}点；破势至少{HuiLanThreshold}名时，再造成{HuiLanDamage}点群体伤害；若全体破势，再造成{HuiLanDamage}点群体伤害。|}",
     "GU_ZHEN_REN_PERSONAL_CARD_WAN_WO.description": "能力\n封存所有兽力蛊并消耗所有兽力虚影，获得{CurrentWoLiPhantomCount}个我力虚影。",
     "GU_ZHEN_REN_PERSONAL_CARD_WO_LI_XU_YING.description": "获得时提供5点临时生命。首次必定显化；之后有{RepeatChance}%概率显化，复制本次可复制效果的一半。",
-    "GU_ZHEN_REN_PERSONAL_CARD_BAI_HONG_GUAN_RI.description": "造成{Damage:diff()}点伤害；每消耗1层照破提高{DamagePerZhaoPo}点，最多消耗{MaxZhaoPoConsumed}层。拥有至少{GuangHuiCost}点光辉时自动消耗，并无视至多{PierceCap}点格挡。",
+    "GU_ZHEN_REN_PERSONAL_CARD_BAI_HONG_GUAN_RI.description": "造成{Damage:diff()}点伤害；消耗目标至多{MaxZhaoPoConsumed}层照破，每层使伤害提高{DamagePerZhaoPo}点。光辉不少于{GuangHuiCost}点时自动消耗{GuangHuiCost}点，并无视至多{PierceCap}点格挡。",
     "GU_ZHEN_REN_PERSONAL_CARD_JING_YUE_FAN_ZHAO.description": "{NextMirror:cond:>0?镜相：获得{Block:diff()}点格挡。|}{NextMoon:cond:>0?月相：造成{Damage:diff()}点伤害。|}{NextReflection:cond:>0?返照：获得{ReflectionBlock}点格挡，对所有敌人造成{ReflectionDamage}点伤害{GuangHui:cond:>0?，获得{GuangHui}点光辉|}。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_YUE_NI_CHANG.description": "可使用2次。获得{Block:diff()}点格挡和{GuangHui}点光辉。{NormalMoonBlade:cond:>0?获得1张月刃。|}{UpgradedMoonBlade:cond:>0?获得1张升级的月刃。|}{FullMoonBlade:cond:>0?获得1张满月刃。|}"
+    "GU_ZHEN_REN_PERSONAL_CARD_YUE_NI_CHANG.description": "可使用2次。获得{Block:diff()}点格挡和{GuangHui}点光辉。{NormalMoonBlade:cond:>0?获得1张月刃。|}{UpgradedMoonBlade:cond:>0?获得1张升级的月刃。|}{FullMoonBlade:cond:>0?获得1张满月刃。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_YUE_GUANG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n造成{Damage:diff()}点伤害。{Rank:cond:>=2?[gold]照袭[/gold]：{MarkedDamage}点。|}[gold]耀化 2[/gold]：{EmpoweredDamage}点{Rank:cond:>=2?；照袭时{EmpoweredMarkedDamage}点|}，施加{ZhaoPoPower:diff()}层照破。{Rank:cond:>=6?耀化时重放1次。|}{Rank:cond:>=3?[gold]衍光[/gold]：月刃。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_XIAO_GUANG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n{Rank1Exact:cond:>0?本回合首次催动获得1点光辉；之后获得{FocusBonus}点闪耀。|}{Rank2Exact:cond:>0?获得{FocusBonus}点闪耀；本回合首次催动再获得1点光辉。|}{Rank3Exact:cond:>0?获得{FocusBonus}点闪耀；本回合首次催动再获得1点光辉。[gold]衍光[/gold]：微光。|}{Rank4Exact:cond:>0?获得{FocusBonus}点闪耀；本回合首次催动再获得1点光辉。[gold]衍光[/gold]：微光。|}{Rank5Exact:cond:>0?获得{FocusBonus}点闪耀；本回合首次催动再获得1点光辉。[gold]衍光[/gold]：微光。|}{Rank6Exact:cond:>0?获得{GuangHui}点光辉。[gold]衍光[/gold]：聚光。|}{Rank7Exact:cond:>0?获得{GuangHui}点光辉。[gold]衍光[/gold]：聚光。|}{Rank8Exact:cond:>0?获得{GuangHui}点光辉。[gold]衍光[/gold]：聚光。|}{Rank9Exact:cond:>0?获得{GuangHui}点光辉。[gold]衍光[/gold]：极光。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_JING_GUANG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{Block:diff()}点格挡。{Rank:cond:>=2?上张牌为攻击时改为{AttackBlock}点。|}{Rank:cond:>=5?获得1点光辉。|}{Rank:cond:>=3?[gold]衍光[/gold]：{Rank:cond:>=9?明镜|光镜}。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_DING_GUANG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n施加{ZhaoPoPower:diff()}层照破。{Rank:cond:>=2?获得[gold]映光[/gold]{ExposeBonus}。|}{Rank:cond:>=3?[gold]衍光[/gold]：{Rank:cond:>=9?日晕|定光符}。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_LIU_GUANG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n造成{Damage:diff()}点伤害。{Rank:cond:>=2?[gold]折光[/gold]后：{RefractedDamage}点。|}{Rank:cond:>=3?[gold]衍光[/gold]：{Rank:cond:>=9?白虹|流光}。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_YUE_MANG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]合练[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n造成{Damage:diff()}点伤害{Hits}次。{Rank:cond:>=5?[gold]耀化 2[/gold]：改为{EmpoweredTotalHits}次，并施加{ZhaoPoPower:diff()}层照破。|}[gold]衍光[/gold]：{Rank:cond:>=9?天月芒|{Rank:cond:>=6?凝月芒|月芒}}。",
+    "GU_ZHEN_REN_PERSONAL_CARD_JING_HUI_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]合练[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{Block:diff()}点格挡并施加{ZhaoPoPower:diff()}层照破。{Rank:cond:>=5?[gold]守辉[/gold]。|}{Rank:cond:>=8?[gold]破辉[/gold]。|}[gold]衍光[/gold]：{Rank:cond:>=9?周天镜辉|{Rank:cond:>=6?凝镜辉|镜辉}}。",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUN_DIAN_LIU_GUANG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n抽{Draw}张牌，再丢弃{Discard}张。[gold]耀化 2[/gold]：改为交换至多{Swap}只其他可用蛊与等量已完全冷却的待命蛊；无合法交换时不消耗光辉。",
+    "GU_ZHEN_REN_PERSONAL_CARD_TAI_GUANG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n可催动3次。对所有敌人造成{Damage:diff()}点伤害并施加{ZhaoPoPower:diff()}层照破。[gold]耀化 3[/gold]：伤害无视格挡，照破改为{EmpoweredZhaoPo}层。",
+    "GU_ZHEN_REN_PERSONAL_CARD_YUE_REN.description": "造成{Damage:diff()}点伤害。[gold]照袭[/gold]：{MarkedDamage}点。{Rank:cond:>=7?照袭后获得1张残月。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_CAN_YUE.description": "造成{Damage:diff()}点伤害。",
+    "GU_ZHEN_REN_PERSONAL_CARD_MAN_YUE_REN.description": "造成{Damage:diff()}点伤害；目标每层照破使伤害提高{PerZhaoPo}点，最多计算{MaxZhaoPo}层，满层时造成{MaxMarkedDamage}点。",
+    "GU_ZHEN_REN_PERSONAL_CARD_WEI_GUANG.description": "获得3点闪耀。",
+    "GU_ZHEN_REN_PERSONAL_CARD_JU_GUANG.description": "获得6点闪耀。{Rank:cond:>=8?获得1张余辉。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_YU_HUI.description": "获得3点闪耀。",
+    "GU_ZHEN_REN_PERSONAL_CARD_JI_GUANG.description": "获得2点光辉和8点闪耀。",
+    "GU_ZHEN_REN_PERSONAL_CARD_GUANG_JING.description": "获得{Block:diff()}点格挡和{LightBonus}点闪耀。{Rank:cond:>=7?获得1张返照。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_FAN_ZHAO.description": "造成{CurrentDamage}点伤害。",
+    "GU_ZHEN_REN_PERSONAL_CARD_MING_JING.description": "获得{Block:diff()}点格挡和2点光辉。",
+    "GU_ZHEN_REN_PERSONAL_CARD_DING_GUANG_FU.description": "获得[gold]映光[/gold]{BonusDamage}。{Rank:cond:>=7?获得1张光标。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_GUANG_BIAO.description": "获得{LightBonus}点闪耀。",
+    "GU_ZHEN_REN_PERSONAL_CARD_RI_YUN.description": "分配{TotalZhaoPo}层照破：所选敌人最多{TargetCap}层，剩余分给其他存活敌人。",
+    "GU_ZHEN_REN_PERSONAL_CARD_LIU_GUANG.description": "造成{Damage:diff()}点伤害。技能折光：{AfterSkillDamage}点。{Rank:cond:>=7?[gold]照袭[/gold]：获得1张流辉。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_LIU_HUI.description": "造成{Damage:diff()}点伤害。",
+    "GU_ZHEN_REN_PERSONAL_CARD_BAI_HONG.description": "造成{Damage:diff()}点伤害；本回合已折光2次时改为{DoubleRefractionDamage}点并施加{ZhaoPoPower:diff()}层照破。",
+    "GU_ZHEN_REN_PERSONAL_CARD_YUE_MANG.description": "造成{Damage:diff()}点伤害{Hits}次。技能折光：最后一段{LastHitDamage}点。",
+    "GU_ZHEN_REN_PERSONAL_CARD_NING_YUE_MANG.description": "造成{Damage:diff()}点伤害{Hits}次。技能折光：改为{AfterSkillHits}次。{Rank:cond:>=7?[gold]照袭[/gold]：获得1张残芒。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_CAN_MANG.description": "造成{Damage:diff()}点伤害；本回合已折光时改为{RefractionDamage}点。",
+    "GU_ZHEN_REN_PERSONAL_CARD_TIAN_YUE_MANG.description": "造成{Damage:diff()}点伤害{Hits}次；本回合已折光2次时，再造成{DoubleRefractionBonus}点伤害并施加{ZhaoPoPower:diff()}层照破。",
+    "GU_ZHEN_REN_PERSONAL_CARD_JING_HUI.description": "获得{Block:diff()}点格挡和[gold]映光[/gold]{ZhaoPoBonus}。",
+    "GU_ZHEN_REN_PERSONAL_CARD_NING_JING_HUI.description": "获得{Block:diff()}点格挡、{LightBonus}点闪耀和[gold]映光[/gold]{ZhaoPoBonus}。{Rank:cond:>=7?获得1张返辉。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_FAN_HUI.description": "获得1点光辉和{LightBonus}点闪耀。",
+    "GU_ZHEN_REN_PERSONAL_CARD_ZHOU_TIAN_JING_HUI.description": "获得{Block:diff()}点格挡，施加{ZhaoPoPower:diff()}层照破，并获得{LightBonus}点闪耀。"
   },
   "characterNameOverrides": {
     "title": "古月方源",

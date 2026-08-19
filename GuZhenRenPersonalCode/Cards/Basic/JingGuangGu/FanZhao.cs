@@ -28,6 +28,22 @@ public sealed class FanZhao : AbstractLightExpansionToken
     {
     }
 
+    protected override void AddExtraArgsToDescription(
+        MegaCrit.Sts2.Core.Localization.LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        int currentDamage = 0;
+        if (CombatState != null)
+        {
+            currentDamage = (int)Math.Min(
+                DynamicVars["MaxDamage"].BaseValue,
+                Owner.Creature.Block / 2m
+            );
+        }
+        description.Add("CurrentDamage", currentDamage);
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay

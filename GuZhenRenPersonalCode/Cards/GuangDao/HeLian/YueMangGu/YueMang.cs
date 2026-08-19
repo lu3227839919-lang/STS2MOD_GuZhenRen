@@ -24,8 +24,25 @@ public sealed class YueMang : AbstractYueMangToken
         new DynamicVar("RefractionBonus", 4m),
     ];
 
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        base.CanonicalKeywords
+            .Append(global::GuZhenRen.Cards.GuZhenRenKeywords.ZheGuangCore)
+            .Distinct();
+
     public YueMang() : base(1)
     {
+    }
+
+    protected override void AddExtraArgsToDescription(
+        MegaCrit.Sts2.Core.Localization.LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add(
+            "LastHitDamage",
+            DynamicVars.Damage.IntValue +
+                DynamicVars["RefractionBonus"].IntValue
+        );
     }
 
     protected override async Task OnPlay(

@@ -41,6 +41,19 @@ public sealed class ManYueRen : AbstractGuZhenRenGeneratedCard
         SetDao(Dao.GuangDao);
     }
 
+    protected override void AddExtraArgsToDescription(
+        MegaCrit.Sts2.Core.Localization.LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add(
+            "MaxMarkedDamage",
+            DynamicVars.Damage.IntValue +
+                DynamicVars["PerZhaoPo"].IntValue *
+                DynamicVars["MaxZhaoPo"].IntValue
+        );
+    }
+
     protected override async Task OnPlay(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay

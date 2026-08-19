@@ -23,6 +23,11 @@ public sealed class CanMang : AbstractYueMangToken
         new DynamicVar("RefractionDamage", 10m),
     ];
 
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        base.CanonicalKeywords
+            .Append(global::GuZhenRen.Cards.GuZhenRenKeywords.ZheGuangCore)
+            .Distinct();
+
     public CanMang() : base(0)
     {
     }

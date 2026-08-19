@@ -21,6 +21,11 @@ public sealed class DingGuangFu : AbstractLightExpansionToken
     protected override IEnumerable<DynamicVar> CanonicalVars =>
         [new DynamicVar("BonusDamage", 5m)];
 
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        base.CanonicalKeywords
+            .Append(GuZhenRenKeywords.YingGuang)
+            .Distinct();
+
     public override CardAssetProfile AssetProfile =>
         global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
 

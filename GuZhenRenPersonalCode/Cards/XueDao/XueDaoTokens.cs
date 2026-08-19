@@ -47,7 +47,11 @@ public abstract class AbstractBloodBatToken : AbstractXueDaoToken
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        [CardKeyword.Ethereal, CardKeyword.Exhaust];
+        [
+            CardKeyword.Ethereal,
+            CardKeyword.Exhaust,
+            GuZhenRenKeywords.ShiXue,
+        ];
 
     protected abstract int ExtraBaseHits { get; }
 
@@ -61,6 +65,13 @@ public abstract class AbstractBloodBatToken : AbstractXueDaoToken
         description.Add(
             "TotalHits",
             DynamicVars[HitsVar].IntValue + ExtraBaseHits
+        );
+        description.Add(
+            "CurrentDamage",
+            DynamicVars.Damage.IntValue +
+                (CombatState != null
+                    ? XueDaoPowerSystem.GetXueLu(Owner.Creature)
+                    : 0)
         );
     }
 

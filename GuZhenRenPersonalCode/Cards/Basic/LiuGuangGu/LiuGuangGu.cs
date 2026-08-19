@@ -81,6 +81,11 @@ public sealed class LiuGuangGu
     {
         base.AddExtraArgsToDescription(description);
         description.Add("RecoveryTurns", RecoveryDelayTurns);
+        description.Add(
+            "RefractedDamage",
+            DynamicVars.Damage.IntValue +
+                DynamicVars["RefractionBonus"].IntValue
+        );
     }
 
     protected override async Task OnPlay(

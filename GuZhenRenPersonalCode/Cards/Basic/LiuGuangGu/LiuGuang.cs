@@ -23,11 +23,33 @@ public sealed class LiuGuang : AbstractLiuGuangToken
         new DynamicVar("RefractionBonus", 4m),
     ];
 
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        base.CanonicalKeywords
+            .Append(GuZhenRenKeywords.ZheGuangCore)
+            .Concat(
+                GuRank >= 7
+                    ? [GuZhenRenKeywords.ZhaoXi]
+                    : []
+            )
+            .Distinct();
+
     public override CardAssetProfile AssetProfile =>
         CardImageCatalog.Create(GetType());
 
     public LiuGuang() : base(1)
     {
+    }
+
+    protected override void AddExtraArgsToDescription(
+        MegaCrit.Sts2.Core.Localization.LocString description
+    )
+    {
+        base.AddExtraArgsToDescription(description);
+        description.Add(
+            "AfterSkillDamage",
+            DynamicVars.Damage.IntValue +
+                DynamicVars["RefractionBonus"].IntValue
+        );
     }
 
     protected override async Task OnPlay(

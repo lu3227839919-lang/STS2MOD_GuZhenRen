@@ -26,6 +26,11 @@ public sealed class NingJingHui : AbstractJingHuiToken
 
     public override bool GainsBlock => true;
 
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        base.CanonicalKeywords
+            .Append(global::GuZhenRen.Cards.GuZhenRenKeywords.YingGuang)
+            .Distinct();
+
     public NingJingHui() : base(1)
     {
     }

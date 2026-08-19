@@ -72,6 +72,11 @@ public sealed class JingGuangGu
     {
         base.AddExtraArgsToDescription(description);
         description.Add("RecoveryTurns", RecoveryDelayTurns);
+        description.Add(
+            "AttackBlock",
+            DynamicVars.Block.IntValue +
+                DynamicVars["AttackSequenceBonus"].IntValue
+        );
     }
 
     protected override async Task OnPlay(
