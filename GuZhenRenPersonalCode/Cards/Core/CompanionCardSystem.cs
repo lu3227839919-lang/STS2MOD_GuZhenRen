@@ -59,12 +59,14 @@ public static class CompanionCardSystem
     /// </param>
     /// <param name="isCompanionCard">判断一张战斗牌是否为已生成的伴生牌。</param>
     /// <param name="companionKindName">日志/错误信息中使用的流派名（如"力道"）。</param>
+    /// <param name="configureCompanion">对每张实际配对伴生实例执行的可选配置。</param>
     internal static int GenerateForCombat(
         Player owner,
         CompanionPairingMode mode,
         Func<AbstractGuZhenRenCard, Type?> tryGetCompanionCardType,
         Func<CardModel, bool> isCompanionCard,
-        string companionKindName
+        string companionKindName,
+        Action<CardModel>? configureCompanion = null
     )
     {
         ArgumentNullException.ThrowIfNull(owner);
@@ -119,7 +121,8 @@ public static class CompanionCardSystem
                         sourceGroup,
                         drawPile,
                         isCompanionCard,
-                        companionKindName
+                        companionKindName,
+                        configureCompanion
                     )
                     : GenerateOnePerSourceType(
                         owner,
@@ -127,7 +130,8 @@ public static class CompanionCardSystem
                         sourceGroup,
                         drawPile,
                         isCompanionCard,
-                        companionKindName
+                        companionKindName,
+                        configureCompanion
                     );
         }
 
@@ -150,7 +154,8 @@ public static class CompanionCardSystem
             sourceGroup,
         CardPile drawPile,
         Func<CardModel, bool> isCompanionCard,
-        string companionKindName
+        string companionKindName,
+        Action<CardModel>? configureCompanion
     )
     {
         AbstractGuZhenRenCard[] sourceCards = sourceGroup
@@ -175,6 +180,7 @@ public static class CompanionCardSystem
         for (int index = 0; index < pairedCount; index++)
         {
             SetCompanionRank(companions[index], sourceCards[index].GuRank);
+            configureCompanion?.Invoke(companions[index]);
         }
 
         int generatedCount = 0;
@@ -198,6 +204,7 @@ public static class CompanionCardSystem
                     rankedCompanion,
                     sourceCards[index].GuRank
                 );
+                configureCompanion?.Invoke(rankedCompanion);
                 drawPile.AddInternal(companion, silent: true);
                 generatedCount++;
             }
@@ -221,7 +228,8 @@ public static class CompanionCardSystem
             sourceGroup,
         CardPile drawPile,
         Func<CardModel, bool> isCompanionCard,
-        string companionKindName
+        string companionKindName,
+        Action<CardModel>? configureCompanion
     )
     {
         int rank = sourceGroup.Max(item => item.Card.GuRank);
@@ -237,6 +245,7 @@ public static class CompanionCardSystem
         if (companion != null)
         {
             SetCompanionRank(companion, rank);
+            configureCompanion?.Invoke(companion);
             return 0;
         }
 
@@ -252,6 +261,7 @@ public static class CompanionCardSystem
             }
 
             SetCompanionRank(rankedCompanion, rank);
+            configureCompanion?.Invoke(rankedCompanion);
             drawPile.AddInternal(created, silent: true);
             return 1;
         }

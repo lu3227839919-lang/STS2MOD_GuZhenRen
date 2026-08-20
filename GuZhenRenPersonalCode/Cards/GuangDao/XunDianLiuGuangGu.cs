@@ -223,7 +223,7 @@ public sealed class XunDianLiuGuangGu : AbstractGuWormCard
                 card is IGuWormCard &&
                 GuCardUsageRules.CanUse(card) &&
                 !GuCardUsageRules.HasRecoverySchedule(card) &&
-                !ShaZhaoTuiYanSystem.IsMaterialSealed(card)
+                !GuSealSystem.IsSealed(card)
             )
             .OrderBy(GuZhenRenDeterminism.GetCardNetworkId)
             .ToArray();
@@ -236,7 +236,7 @@ public sealed class XunDianLiuGuangGu : AbstractGuWormCard
                 card is IGuWormCard &&
                 GuCardUsageRules.CanUse(card) &&
                 !GuCardUsageRules.HasRecoverySchedule(card) &&
-                !ShaZhaoTuiYanSystem.IsMaterialSealed(card)
+                !GuSealSystem.IsSealed(card)
             )
             .OrderBy(GuZhenRenDeterminism.GetCardNetworkId)
             .ToArray();

@@ -3,16 +3,11 @@ using GuZhenRen.Characters;
 using GuZhenRen.Combat;
 using GuZhenRen.Powers.LiDao;
 
-using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization;
-using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.Random;
-using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib.Combat.SecondaryResources;
 using STS2RitsuLib.Interop.AutoRegistration;
@@ -48,7 +43,7 @@ public abstract class AbstractLiDaoGuCard :
     {
         base.AddExtraArgsToDescription(description);
         description.Add(
-            "Training",
+            "TrainingRequired",
             LiDaoBeastTrainingSystem.TrainingRequired
         );
         description.Add(
@@ -56,25 +51,12 @@ public abstract class AbstractLiDaoGuCard :
             LiDaoBeastTrainingSystem.GetProgress(this)
         );
         description.Add(
-            "TrainingComplete",
-            LiDaoBeastTrainingSystem.IsTrainingComplete(this) ? 1 : 0
-        );
-        bool trainingComplete =
-            LiDaoBeastTrainingSystem.IsTrainingComplete(this);
-        bool canManifest =
-            LiDaoBeastTrainingSystem.WasCompleteAtCombatStart(this);
-
-        description.Add(
-            "CanManifestThisCombat",
-            canManifest ? 1 : 0
+            "TrainingUnlocked",
+            LiDaoBeastTrainingSystem.IsUnlocked(this) ? 1 : 0
         );
         description.Add(
-            "TrainingPending",
-            trainingComplete && !canManifest ? 1 : 0
-        );
-        description.Add(
-            "TrainingInProgress",
-            trainingComplete ? 0 : 1
+            "TrainingSealed",
+            LiDaoBeastTrainingSystem.IsTrainingSealed(this) ? 1 : 0
         );
     }
 
@@ -85,13 +67,6 @@ public abstract class AbstractLiDaoBeastGuCard :
     ILiDaoBeastGuCard
 
 {
-    /// <summary>
-    /// 炼力进度主存于卡牌 DynamicVars（随卡牌克隆与存档持久化，
-    /// 跨战斗、跨幕继承）；普通实例字段仅作兼容桥接。
-    /// GuLiTraining 变量由各具体兽力蛊在 CanonicalVars 中声明。
-    /// </summary>
-    internal int BeastTrainingProgressBridge { get; set; }
-
     protected AbstractLiDaoBeastGuCard(CardRarity rarity) : base(rarity)
     {
     }
@@ -114,30 +89,27 @@ public abstract class AbstractLiDaoBeastGuCard<TPhantom> :
         CardPlay cardPlay
     )
     {
-        bool canManifest = LiDaoBeastTrainingSystem.RecordEffectiveActivation(
-            this,
-            cardPlay
-        );
-        if (canManifest)
+        if (!cardPlay.IsFirstInSeries)
         {
-            await LiDaoPhantomSystem.ActivateBeastGuAsync<TPhantom>(
-                choiceContext,
-                this
+            return;
+        }
+
+        if (!LiDaoBeastTrainingSystem.IsUnlocked(this) ||
+            GuSealSystem.IsSealed(this))
+        {
+            Entry.Logger.Warn(
+                $"[兽力蛊] 拒绝催动尚未解封的 {Id}：" +
+                $"progress={LiDaoBeastTrainingSystem.GetProgress(this)}/" +
+                $"{LiDaoBeastTrainingSystem.TrainingRequired}, " +
+                $"seal={GuSealSystem.GetSealReason(this)}。"
             );
             return;
         }
 
-        // 未炼力成功：催动提供 1 点力量。
-        if (!LiDaoBeastTrainingSystem.IsTrainingComplete(this))
-        {
-            await PowerCmd.Apply<StrengthPower>(
-                choiceContext,
-                Owner.Creature,
-                1,
-                Owner.Creature,
-                this
-            );
-        }
+        await LiDaoPhantomSystem.ActivateBeastGuAsync<TPhantom>(
+            choiceContext,
+            this
+        );
     }
 
     public override IReadOnlyList<CardModel> GetCarouselCards() =>

@@ -34,6 +34,7 @@ public partial class Entry
         new(nameof(GuCardPileSystem), GuCardPileSystem.Initialize, GuCardPileSystem.Uninitialize),
         new(nameof(GuCardConsoleCommandPatch), GuCardConsoleCommandPatch.Initialize, GuCardConsoleCommandPatch.Uninitialize),
         new(nameof(GuCardPileCombatPatch), GuCardPileCombatPatch.Initialize, GuCardPileCombatPatch.Uninitialize),
+        new(nameof(LiDaoBeastTrainingPatch), LiDaoBeastTrainingPatch.Initialize, LiDaoBeastTrainingPatch.Uninitialize),
         new(nameof(GuCardPlaySyncPatch), GuCardPlaySyncPatch.Initialize, GuCardPlaySyncPatch.Uninitialize),
         new(nameof(GuActivationModePatch), GuActivationModePatch.Initialize, GuActivationModePatch.Uninitialize),
         new(nameof(YuanQiSystem), YuanQiSystem.Initialize, YuanQiSystem.Uninitialize),
@@ -49,6 +50,8 @@ public partial class Entry
         new(nameof(DeckCardSelectionManualConfirmationPatch), DeckCardSelectionManualConfirmationPatch.Initialize, DeckCardSelectionManualConfirmationPatch.Uninitialize),
         new(nameof(StartingDeckGuRankPatch), StartingDeckGuRankPatch.Initialize, StartingDeckGuRankPatch.Uninitialize),
         new(nameof(NCardGuEnergyIconPatch), NCardGuEnergyIconPatch.Initialize, NCardGuEnergyIconPatch.Uninitialize),
+        // v0.111.0 的伤害回调不接受框架转发的 null modifiers；按空集合兼容。
+        new(nameof(HpLossModifierNullGuardPatch), HpLossModifierNullGuardPatch.Initialize, HpLossModifierNullGuardPatch.Uninitialize),
         new(nameof(WoLiTempHpDamagePriorityPatch), WoLiTempHpDamagePriorityPatch.Initialize, WoLiTempHpDamagePriorityPatch.Uninitialize),
         new(nameof(WoLiTempHpHealthBarPatch), WoLiTempHpHealthBarPatch.Initialize, WoLiTempHpHealthBarPatch.Uninitialize),
         new(nameof(GuRankRewardPatch), GuRankRewardPatch.Initialize, GuRankRewardPatch.Uninitialize),

@@ -13,7 +13,7 @@ public enum LiDaoBeastKind
     ShiGui = 4,
 }
 
-/// <summary>拥有永久 0/3 炼力进度，炼成后催动可生成虚影的兽力蛊。</summary>
+/// <summary>每场战斗从 0/3 炼力，解封后催动可生成虚影的兽力蛊。</summary>
 public interface ILiDaoBeastGuCard : ICompanionSourceGuCard
 {
     Type PhantomCardType { get; }

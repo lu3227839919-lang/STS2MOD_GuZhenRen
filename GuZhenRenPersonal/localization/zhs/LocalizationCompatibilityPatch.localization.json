@@ -68,7 +68,7 @@
     },
     "LianLi": {
       "title": "炼力",
-      "description": "每回合首次有效催动推进1点永久进度；进度满3后，从下场战斗起催动改为获得对应虚影。"
+      "description": "兽力蛊开战时封存。对应伴生牌每次有效首次结算，使当前第一只同类型封存兽力蛊获得1点炼力；达到3点后立即解封并加入蛊抽取序列。进度仅在本场战斗有效。"
     },
     "NianHua": {
       "title": "年华",
@@ -175,11 +175,11 @@
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_YUN_SHI_SHEN.description": "对所有敌人造成{Damage:diff()}点伤害；出牌前已有血印者额外受到{ExtraHits}次攻击并获得{LiuXuePower:diff()}层流血。每触发1个血印，使来源血滴子冷却缩短1回合，本次最多缩短{BreedCap}回合。",
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_PIAO_LIU.description": "可使用2次。选择终点；血潮依次经过所有敌人，每站造成{Damage:diff()}点伤害，并消耗至多{MaxBleedConsumed}层流血强化伤害。每消耗1层，本次伤害提高{DamagePerBleed}点。剩余流血随血潮前进，最终汇入终点。六转以上：终点额外获得等同经过敌人数的流血。",
     "GU_ZHEN_REN_PERSONAL_CARD_XUE_YUE_JI.description": "使用次数随转数提高，最多3次。选择1张血寄宿主，不打出宿主并提前结算1次血寄。九转：若因此完成血寄，获得2点血元。",
-    "GU_ZHEN_REN_PERSONAL_CARD_BAI_ZHI_GU.description": "[gold]{RankCN}转[/gold] · [gold]能力[/gold]\n{CanManifestThisCombat:cond:>0?催动：获得1张白豕虚影。|}{TrainingPending:cond:>0?[gold]炼力[/gold]完成：下场战斗起催动获得1张白豕虚影。|}{TrainingInProgress:cond:>0?[gold]炼力[/gold]·进度{TrainingProgress}：催动获得1点力量。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_FEI_XIONG_ZHI_LI_GU.description": "[gold]{RankCN}转[/gold] · [gold]能力[/gold]\n{CanManifestThisCombat:cond:>0?催动：获得1张飞熊虚影。|}{TrainingPending:cond:>0?[gold]炼力[/gold]完成：下场战斗起催动获得1张飞熊虚影。|}{TrainingInProgress:cond:>0?[gold]炼力[/gold]·进度{TrainingProgress}：催动获得1点力量。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_E_LI_GU.description": "[gold]{RankCN}转[/gold] · [gold]能力[/gold]\n{CanManifestThisCombat:cond:>0?催动：获得1张鳄鱼虚影。|}{TrainingPending:cond:>0?[gold]炼力[/gold]完成：下场战斗起催动获得1张鳄鱼虚影。|}{TrainingInProgress:cond:>0?[gold]炼力[/gold]·进度{TrainingProgress}：催动获得1点力量。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_QING_NIU_LAO_LI_GU.description": "[gold]{RankCN}转[/gold] · [gold]能力[/gold]\n{CanManifestThisCombat:cond:>0?催动：获得1张青牛虚影。|}{TrainingPending:cond:>0?[gold]炼力[/gold]完成：下场战斗起催动获得1张青牛虚影。|}{TrainingInProgress:cond:>0?[gold]炼力[/gold]·进度{TrainingProgress}：催动获得1点力量。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_SHI_GUI_LI_GU.description": "[gold]{RankCN}转[/gold] · [gold]能力[/gold]\n{CanManifestThisCombat:cond:>0?催动：获得1张石龟虚影。|}{TrainingPending:cond:>0?[gold]炼力[/gold]完成：下场战斗起催动获得1张石龟虚影。|}{TrainingInProgress:cond:>0?[gold]炼力[/gold]·进度{TrainingProgress}：催动获得1点力量。|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_BAI_ZHI_GU.description": "[gold]{RankCN}转[/gold] · [gold]能力[/gold]\n催动：获得1张白豕虚影。{TrainingSealed:cond:>0?\n[gold]炼力[/gold] {TrainingProgress}/{TrainingRequired} · 封存|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_FEI_XIONG_ZHI_LI_GU.description": "[gold]{RankCN}转[/gold] · [gold]能力[/gold]\n催动：获得1张飞熊虚影。{TrainingSealed:cond:>0?\n[gold]炼力[/gold] {TrainingProgress}/{TrainingRequired} · 封存|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_E_LI_GU.description": "[gold]{RankCN}转[/gold] · [gold]能力[/gold]\n催动：获得1张鳄鱼虚影。{TrainingSealed:cond:>0?\n[gold]炼力[/gold] {TrainingProgress}/{TrainingRequired} · 封存|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_QING_NIU_LAO_LI_GU.description": "[gold]{RankCN}转[/gold] · [gold]能力[/gold]\n催动：获得1张青牛虚影。{TrainingSealed:cond:>0?\n[gold]炼力[/gold] {TrainingProgress}/{TrainingRequired} · 封存|}",
+    "GU_ZHEN_REN_PERSONAL_CARD_SHI_GUI_LI_GU.description": "[gold]{RankCN}转[/gold] · [gold]能力[/gold]\n催动：获得1张石龟虚影。{TrainingSealed:cond:>0?\n[gold]炼力[/gold] {TrainingProgress}/{TrainingRequired} · 封存|}",
     "GU_ZHEN_REN_PERSONAL_CARD_KU_LI_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]能力[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n{Rank3Exact:cond:>0?每回合首张攻击结算后|每张攻击结算后}，按[gold]伤势[/gold]追加苦力伤害：轻伤{LightDamage}点、重伤{HeavyDamage}点、极重伤{CriticalDamage}点。{Rank6Exact:cond:>0?首次进入更重伤势时获得1点力量。|}{Rank7Exact:cond:>0?首次进入轻伤或重伤获得1点力量，极重伤获得2点。|}",
     "GU_ZHEN_REN_PERSONAL_CARD_ZI_LI_GENG_SHENG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]能力[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得自力更生：下一张攻击完整结算后，回复主目标实际生命伤害的{HealingPercent}%，最多{HealingCap}点。{HasKillBonus:cond:>0?击杀时最多{KillHealingCap}点。|}",
     "GU_ZHEN_REN_PERSONAL_CARD_QUN_LI_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]能力[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n催动：获得群力。兽力虚影自然显化后，有{GroupChance}%概率连续显化，最多额外{RepeatLimit}次。",

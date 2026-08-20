@@ -1,6 +1,7 @@
 // 《杀戮尖塔2》的卡牌模型、卡牌类型、标签等基础类型。
 using MegaCrit.Sts2.Core.Models;
 using GuZhenRen.Characters;
+using GuZhenRen.Cards.LiDao;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Random; 
@@ -88,6 +89,23 @@ public abstract class AbstractGuZhenRenCard : ModCardTemplate, IGuRankProvider
                 suffix.Add(
                     "ShaZhao",
                     ShaZhaoTuiYanSystem.GetMaterialBindingTitle(this)
+                );
+                return displayTitle + suffix.GetFormattedText();
+            }
+
+            if (GuSealSystem.IsTrainingSealed(this))
+            {
+                LocString suffix = new(
+                    "cards",
+                    "GU_ZHEN_REN_PERSONAL_CARD_STATUS.trainingTitleSuffix"
+                );
+                suffix.Add(
+                    "Progress",
+                    LiDaoBeastTrainingSystem.GetProgress(this)
+                );
+                suffix.Add(
+                    "Required",
+                    LiDaoBeastTrainingSystem.TrainingRequired
                 );
                 return displayTitle + suffix.GetFormattedText();
             }

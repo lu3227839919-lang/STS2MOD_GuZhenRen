@@ -77,6 +77,9 @@ public static class LiDaoCompanionSystem
             for (int index = 0; index < pairedCount; index++)
             {
                 SetCompanionRank(companions[index], sourceCards[index].GuRank);
+                LiDaoBeastTrainingSystem.AllowCompanionTraining(
+                    companions[index]
+                );
             }
 
             for (int index = companions.Length;
@@ -100,6 +103,9 @@ public static class LiDaoCompanionSystem
                     SetCompanionRank(
                         rankedCompanion,
                         sourceCards[index].GuRank
+                    );
+                    LiDaoBeastTrainingSystem.AllowCompanionTraining(
+                        rankedCompanion
                     );
                     drawPile.AddInternal(companion, silent: true);
                     generatedCount++;

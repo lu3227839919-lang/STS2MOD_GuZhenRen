@@ -42,7 +42,7 @@ public sealed class TiaoGuSystem : ITiaoGuService
                 .Cards
                 .Contains(card) &&
             !GuCardPileSystem.IsTemporaryCapacityBypass(card) &&
-            !ShaZhaoTuiYanSystem.IsMaterialSealed(card);
+            !GuSealSystem.IsSealed(card);
     }
 
     public static async Task TuneGuAsync(

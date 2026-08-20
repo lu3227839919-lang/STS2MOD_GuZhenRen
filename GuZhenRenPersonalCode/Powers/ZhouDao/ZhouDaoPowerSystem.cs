@@ -217,7 +217,7 @@ public static class ZhouDaoPowerSystem
             .Where(card =>
                 card is IGuWormCard &&
                 GuCardUsageRules.HasRecoverySchedule(card) &&
-                !ShaZhaoTuiYanSystem.IsMaterialSealed(card))
+                !GuSealSystem.IsSealed(card))
             .OrderByDescending(GuCardUsageRules.GetRecoveryReadyTurn)
             .ThenBy(GuZhenRenDeterminism.GetCardNetworkId)
             .ToArray();

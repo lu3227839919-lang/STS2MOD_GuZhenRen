@@ -27,7 +27,6 @@ public sealed class ShiGuiLiGu :
     [
         new DynamicVar("Chance", 30m),
         new BlockVar(4m, ValueProp.Move),
-        new DynamicVar(LiDaoBeastTrainingSystem.ProgressVarName, 0m),
     ];
 
     public ShiGuiLiGu() : base(CardRarity.Uncommon) => RefreshRankValues();

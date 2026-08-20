@@ -251,7 +251,8 @@ internal static class GuCardPileCombatPatch
                         ? beastGu.CompanionCardType
                         : null,
                 static card => card is ILiDaoCompanionCard,
-                "力道"
+                "力道",
+                LiDaoBeastTrainingSystem.AllowCompanionTraining
             );
             int zhouDaoCount = CompanionCardSystem.GenerateForCombat(
                 player,

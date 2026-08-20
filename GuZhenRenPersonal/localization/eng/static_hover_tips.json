@@ -8,7 +8,7 @@
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_DISCARD.description": "Stores only Gu that are truly recovering. A recovered Gu joins the tail of the Storage queue. Materials of a completed Killer Move restart their full cooldown with +1 turn. Left-click to inspect.",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_DISCARD.empty": "The Gu Cooldown Pile is empty.",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_SEALED.title": "Sealed Gu Pile",
-  "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_SEALED.description": "Stores only material Gu occupied by Killer Moves. Sealing is not cooldown, so recovery acceleration and instant-recovery effects cannot touch them. Bindings finalize when a move truly completes, is dismantled, or is abnormally removed; permanent seals are exceptions.",
+  "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_SEALED.description": "Stores Beast Gu undergoing Strength Refinement and material Gu occupied by Killer Moves. Beast Gu unseal after 3 matching Companion plays; materials follow their Killer Move lifecycle. Sealing is not cooldown, so recovery effects cannot touch these Gu.",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_SEALED.empty": "No sealed Gu.",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_CARDS.selectionPrompt": "Select Gu Worm materials matching the selected Killer Move, then confirm.",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_CARDS.targetSelectionPrompt": "First select the Killer Move to deduce. Only matching materials will be shown next.",

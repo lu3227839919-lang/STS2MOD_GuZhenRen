@@ -27,7 +27,6 @@ public sealed class ELiGu : AbstractLiDaoBeastGuCard<EXuYing>
         new DynamicVar("Chance", 25m),
         new DamageVar(3m, ValueProp.Move),
         new DynamicVar("Hits", 2m),
-        new DynamicVar(LiDaoBeastTrainingSystem.ProgressVarName, 0m),
     ];
 
     public ELiGu() : base(CardRarity.Uncommon) => RefreshRankValues();

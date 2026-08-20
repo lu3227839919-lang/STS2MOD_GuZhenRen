@@ -529,6 +529,7 @@ internal static class ShaZhaoTuiYanSystem
     {
         if (card is not IGuWormCard ||
             !IsInEligibleMaterialPile(card) ||
+            GuSealSystem.IsSealed(card) ||
             card.Keywords.Contains(CardKeyword.Unplayable))
         {
             return false;
@@ -730,9 +731,15 @@ internal static class ShaZhaoTuiYanSystem
     /// </summary>
     public static bool IsMaterialSealed(CardModel card)
     {
-        return card is IGuWormCard &&
-            MaterialBoundShaZhaoState[card].Length > 0;
+        return GuSealSystem.IsShaZhaoMaterialSealed(card);
     }
+
+    /// <summary>
+    /// 仅供 GuSealSystem 兼容旧版 QuickSL；不得作为通用封存判断入口。
+    /// </summary>
+    internal static bool HasMaterialBindingState(CardModel card) =>
+        card is IGuWormCard &&
+        MaterialBoundShaZhaoState[card].Length > 0;
 
     internal static string GetMaterialBindingTitle(CardModel material)
     {
@@ -759,8 +766,18 @@ internal static class ShaZhaoTuiYanSystem
         CardModel shaZhao
     )
     {
+        if (GuSealSystem.IsSealed(material))
+        {
+            throw new InvalidOperationException(
+                $"蛊虫 {material.Id} 已因 " +
+                $"{GuSealSystem.GetSealReason(material)} 封存，" +
+                "不能再次作为杀招材料。"
+            );
+        }
+
         MaterialBoundShaZhaoState[material] =
             shaZhao.Id.ToString();
+        GuSealSystem.SealAsShaZhaoMaterial(material);
 
         // 材料从蛊手牌移入蛊封存堆（可见牌堆，位于原版
         // 消耗牌堆上方）：使用原版消耗牌动画（飞行动画）移动；
@@ -803,6 +820,10 @@ internal static class ShaZhaoTuiYanSystem
             foreach (CardModel material in materials)
             {
                 MaterialBoundShaZhaoState[material] = string.Empty;
+                GuSealSystem.ClearSeal(
+                    material,
+                    GuSealReason.ShaZhaoMaterial
+                );
             }
             shaZhao.ClearBoundMaterials();
             return;
@@ -838,6 +859,10 @@ internal static class ShaZhaoTuiYanSystem
             foreach (CardModel material in shaZhao.BoundMaterials)
             {
                 MaterialBoundShaZhaoState[material] = string.Empty;
+                GuSealSystem.ClearSeal(
+                    material,
+                    GuSealReason.ShaZhaoMaterial
+                );
             }
             shaZhao.ClearBoundMaterials();
         }
@@ -850,6 +875,10 @@ internal static class ShaZhaoTuiYanSystem
     {
         MaterialBoundShaZhaoState[material] =
             string.Empty;
+        GuSealSystem.ClearSeal(
+            material,
+            GuSealReason.ShaZhaoMaterial
+        );
 
         // 送回蛊恢复堆（飞行动画），并从当前回合开始从零强制恢复：
         // 无视封存前已有的恢复进度，完整恢复周期重新计算；

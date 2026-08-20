@@ -34,7 +34,7 @@
   "GU_ZHEN_REN_PERSONAL_KEYWORD_XU_YING.title": "Phantom",
   "GU_ZHEN_REN_PERSONAL_KEYWORD_XU_YING.description": "Automatically Retained and cannot be played manually. After a non-Phantom Attack resolves, manifests at the listed chance. Phantoms do not trigger other Phantoms.",
   "GU_ZHEN_REN_PERSONAL_KEYWORD_LIAN_LI.title": "Strength Refinement",
-  "GU_ZHEN_REN_PERSONAL_KEYWORD_LIAN_LI.description": "The first effective activation each turn advances permanent progress by 1. At progress 3, starting next combat, activation grants the matching Phantom.",
+  "GU_ZHEN_REN_PERSONAL_KEYWORD_LIAN_LI.description": "Beast Gu begin combat sealed. Each first effective resolution of the matching Companion advances the first sealed Gu of that type by 1. At 3, it immediately unseals and joins the Gu draw sequence. Progress lasts only for this combat.",
   "GU_ZHEN_REN_PERSONAL_KEYWORD_NIAN_HUA.title": "Years",
   "GU_ZHEN_REN_PERSONAL_KEYWORD_NIAN_HUA.description": "Time Path resource. At 6, trigger Yearful and reset to 0; excess Years continue resolving.",
   "GU_ZHEN_REN_PERSONAL_KEYWORD_SUI_MAN.title": "Yearful",

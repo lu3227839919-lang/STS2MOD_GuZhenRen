@@ -27,7 +27,6 @@ public sealed class BaiZhiGu :
     [
         new DynamicVar("Chance", 30m),
         new DamageVar(5m, ValueProp.Move),
-        new DynamicVar(LiDaoBeastTrainingSystem.ProgressVarName, 0m),
     ];
 
     public BaiZhiGu() : base(CardRarity.Common) => RefreshRankValues();

@@ -108,8 +108,8 @@ public static class GuCardUsageRules
     {
         ArgumentNullException.ThrowIfNull(card);
 
-        // 被杀招封装的材料不能催动。
-        if (ShaZhaoTuiYanSystem.IsMaterialSealed(card))
+        // 任何原因封存的蛊都不能催动。
+        if (GuSealSystem.IsSealed(card))
         {
             return false;
         }
@@ -128,7 +128,7 @@ public static class GuCardUsageRules
     {
         if (extraTurns <= 0 ||
             card is not IGuWormCard ||
-            ShaZhaoTuiYanSystem.IsMaterialSealed(card))
+            GuSealSystem.IsSealed(card))
         {
             return;
         }
@@ -149,7 +149,7 @@ public static class GuCardUsageRules
     {
         if (turns <= 0 ||
             card is not IGuWormCard ||
-            ShaZhaoTuiYanSystem.IsMaterialSealed(card))
+            GuSealSystem.IsSealed(card))
         {
             return;
         }
@@ -300,7 +300,7 @@ public static class GuCardUsageRules
     {
         ArgumentNullException.ThrowIfNull(card);
         if (card is not IGuWormCard ||
-            ShaZhaoTuiYanSystem.IsMaterialSealed(card))
+            GuSealSystem.IsSealed(card))
         {
             return;
         }
@@ -332,7 +332,7 @@ public static class GuCardUsageRules
     {
         ArgumentNullException.ThrowIfNull(card);
         if (card is not IGuWormCard guCard ||
-            ShaZhaoTuiYanSystem.IsMaterialSealed(card))
+            GuSealSystem.IsSealed(card))
         {
             return;
         }
@@ -345,7 +345,7 @@ public static class GuCardUsageRules
 
     public static bool HasRecoverySchedule(CardModel card) =>
         card is IGuWormCard &&
-        !ShaZhaoTuiYanSystem.IsMaterialSealed(card) &&
+        !GuSealSystem.IsSealed(card) &&
         RecoveryReadyTurnState[card] > 0;
 
     /// <summary>取得当前计划恢复回合；未安排恢复时返回0。</summary>
@@ -353,7 +353,7 @@ public static class GuCardUsageRules
     {
         ArgumentNullException.ThrowIfNull(card);
         return card is IGuWormCard &&
-            !ShaZhaoTuiYanSystem.IsMaterialSealed(card)
+            !GuSealSystem.IsSealed(card)
                 ? RecoveryReadyTurnState[card]
                 : 0;
     }
@@ -371,7 +371,7 @@ public static class GuCardUsageRules
         ArgumentNullException.ThrowIfNull(card);
         if (turns <= 0 ||
             card is not IGuWormCard ||
-            ShaZhaoTuiYanSystem.IsMaterialSealed(card))
+            GuSealSystem.IsSealed(card))
         {
             return GetRecoveryReadyTurn(card);
         }
@@ -394,7 +394,7 @@ public static class GuCardUsageRules
     )
     {
         if (card is not IGuWormCard ||
-            ShaZhaoTuiYanSystem.IsMaterialSealed(card))
+            GuSealSystem.IsSealed(card))
         {
             return false;
         }

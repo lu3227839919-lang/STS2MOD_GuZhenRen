@@ -1,6 +1,8 @@
+using GuZhenRen.Multiplayer;
+
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 
 using STS2RitsuLib.Utils;
@@ -8,222 +10,212 @@ using STS2RitsuLib.Utils;
 namespace GuZhenRen.Cards.LiDao;
 
 /// <summary>
-/// 新版兽力蛊的实例级永久炼力状态。
-///
-/// 永久进度主存于卡牌 DynamicVars（随卡牌克隆与存档持久化，跨战斗、
-/// 跨幕继承）；普通实例字段仅作兼容桥接。战斗牌增加进度时会同步写回
-/// 自己的 DeckVersion，因此同名多张蛊各自独立保存。
+/// 兽力蛊的战斗内炼力系统。每场战斗独立记录每张具体兽力蛊的
+/// 0/3 进度；对应伴生牌完成首次有效结算后，按稳定顺序逐只推进。
 /// </summary>
 public static class LiDaoBeastTrainingSystem
 {
     public const int TrainingRequired = 3;
 
-    /// <summary>
-    /// 炼力进度的隐藏 DynamicVar 名（不出现在卡面）。
-    /// </summary>
-    public const string ProgressVarName = "GuLiTraining";
-
-    /// <summary>
-    /// 炼力进度的权威存档状态。
-    ///
-    /// SavedAttachedState 会进入 CardModel 的 SavedProperties，因此
-    /// QuickSL、正常存读档和多人快照都能恢复。普通字段继续承担
-    /// Deck -> 战斗实例的 MutableClone 克隆桥，DynamicVar 仅用于
-    /// 卡面/旧版本兼容。
-    /// </summary>
     private static readonly SavedAttachedState<CardModel, int>
-        ProgressState = new(
-            Entry.ModId + ".li_dao.beast_training.progress",
+        TrainingProgressState = new(
+            Entry.ModId + ".li_dao.beast_training.combat_progress",
             static () => 0
         );
 
-    /// <summary>
-    /// 仅属于当前战斗实例的开战快照。达到 3/3 的同一场战斗中仍保持
-    /// false，确保虚影只能从下一场战斗开始生成。
-    /// </summary>
     private static readonly SavedAttachedState<CardModel, bool>
-        CompletedAtCombatStartState = new(
-            Entry.ModId + ".li_dao.beast_training.completed_at_combat_start",
+        TrainingUnlockedState = new(
+            Entry.ModId + ".li_dao.beast_training.combat_unlocked",
             static () => false
         );
 
     private static readonly SavedAttachedState<CardModel, bool>
-        CombatSnapshotInitializedState = new(
-            Entry.ModId + ".li_dao.beast_training.combat_snapshot_initialized",
+        CombatInitializedState = new(
+            Entry.ModId + ".li_dao.beast_training.combat_initialized_v2",
             static () => false
         );
 
     /// <summary>
-    /// 防止复制、重放或第三方效果让同一具体蛊虫在同一回合重复炼力。
+    /// 同一卡牌类型既可能是开战生成的正常伴生牌，也可能是普通临时牌。
+    /// 资格必须附着在具体战斗实例上，并进入 QuickSL/多人快照。
     /// </summary>
-    private static readonly SavedAttachedState<CardModel, int>
-        LastEffectiveActivationTurnState = new(
-            Entry.ModId + ".li_dao.beast_training.last_activation_turn",
-            static () => 0
+    private static readonly SavedAttachedState<CardModel, bool>
+        CanTrainBeastGuState = new(
+            Entry.ModId + ".li_dao.beast_training.companion_can_train",
+            static () => false
         );
 
     public static int GetProgress(CardModel card)
     {
         ArgumentNullException.ThrowIfNull(card);
-        if (card is not AbstractLiDaoBeastGuCard beastGu)
-        {
-            return 0;
-        }
-
-        int progress = ReadProgress(card);
-
-        // 统一回填三套状态：
-        // - SavedAttachedState：SL / 正常存读档的权威来源；
-        // - 普通字段：永久牌组 -> 战斗实例的 MutableClone 克隆桥；
-        // - DynamicVar：卡面以及旧版本存档兼容。
-        WriteProgress(beastGu, progress);
-        return progress;
+        return card is ILiDaoBeastGuCard
+            ? Math.Clamp(
+                TrainingProgressState[card],
+                0,
+                TrainingRequired
+            )
+            : 0;
     }
 
-    public static bool IsTrainingComplete(CardModel card) =>
-        GetProgress(card) >= TrainingRequired;
+    public static bool IsUnlocked(CardModel card) =>
+        card is ILiDaoBeastGuCard &&
+        TrainingUnlockedState[card];
 
-    public static bool WasCompleteAtCombatStart(CardModel card) =>
-        card is AbstractLiDaoBeastGuCard &&
-        CombatSnapshotInitializedState[card] &&
-        CompletedAtCombatStartState[card];
+    public static bool IsTrainingSealed(CardModel card) =>
+        card is ILiDaoBeastGuCard &&
+        GuSealSystem.IsTrainingSealed(card);
 
     /// <summary>
-    /// 仅在真正的新战斗初始化时调用。QuickSL 已保存的战斗实例不会覆盖
-    /// 既有快照，避免把本战刚达到的 3/3 误判成开战时已完成。
+    /// 新战斗只初始化一次。QuickSL 已恢复的战斗实例会保留当前进度、
+    /// 解封状态和所在牌堆；下一场的新战斗克隆则重新从 0/3 开始。
     /// </summary>
-    internal static void CaptureCombatStart(CardModel card)
+    internal static void InitializeForCombat(CardModel card)
     {
-        if (card is not AbstractLiDaoBeastGuCard ||
-            CombatSnapshotInitializedState[card])
+        if (card is not ILiDaoBeastGuCard ||
+            CombatInitializedState[card])
         {
             return;
         }
 
-        CompletedAtCombatStartState[card] = IsTrainingComplete(card);
-        CombatSnapshotInitializedState[card] = true;
-        LastEffectiveActivationTurnState[card] = 0;
+        ResetForCombat(card);
     }
 
     /// <summary>
-    /// 战斗中临时生成的兽力蛊不属于开战时已有的蛊，即使从某个已炼成
-    /// 实例复制而来，本战也不能立即获得虚影。
+    /// 战斗中临时生成或复制的兽力蛊默认不继承来源实例的解封状态。
     /// </summary>
     internal static void InitializeGeneratedForCurrentCombat(CardModel card)
     {
-        if (card is not AbstractLiDaoBeastGuCard ||
-            CombatSnapshotInitializedState[card])
+        if (card is ILiDaoBeastGuCard)
+        {
+            ResetForCombat(card);
+        }
+    }
+
+    internal static void ResetForCombat(CardModel card)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        if (card is not ILiDaoBeastGuCard)
         {
             return;
         }
 
-        CompletedAtCombatStartState[card] = false;
-        CombatSnapshotInitializedState[card] = true;
-        LastEffectiveActivationTurnState[card] = 0;
+        TrainingProgressState[card] = 0;
+        TrainingUnlockedState[card] = false;
+        CombatInitializedState[card] = true;
+        GuSealSystem.SealForTraining(card);
     }
 
     /// <summary>
-    /// 登记一次有效催动。返回 true 表示该蛊在本场开战时已经炼成，
-    /// 因而本次催动可以尝试生成虚影。
+    /// 显式允许一张临时伴生牌炼力（当前用于药水生成的伴生牌）。
+    /// 普通临时牌保持默认 false。
     /// </summary>
-    internal static bool RecordEffectiveActivation(
-        AbstractLiDaoBeastGuCard card,
+    internal static void AllowCompanionTraining(CardModel companion)
+    {
+        ArgumentNullException.ThrowIfNull(companion);
+        if (companion is ILiDaoCompanionCard)
+        {
+            CanTrainBeastGuState[companion] = true;
+        }
+    }
+
+    internal static bool CanTrainBeastGu(CardModel companion) =>
+        companion is ILiDaoCompanionCard &&
+        CanTrainBeastGuState[companion];
+
+    /// <summary>
+    /// 一张伴生牌完整结算后的统一入口。Replay 后续 CardPlay、无资格的
+    /// 临时牌以及已全部解封的类型都会被幂等忽略。
+    /// </summary>
+    internal static async Task<bool> RecordCompanionPlayAsync(
+        CardModel companion,
         CardPlay cardPlay
     )
     {
-        ArgumentNullException.ThrowIfNull(card);
+        ArgumentNullException.ThrowIfNull(companion);
         ArgumentNullException.ThrowIfNull(cardPlay);
 
-        if (!cardPlay.IsFirstInSeries)
+        if (companion is not ILiDaoCompanionCard companionCard ||
+            !ReferenceEquals(cardPlay.Card, companion) ||
+            !cardPlay.IsFirstInSeries ||
+            !CanTrainBeastGu(companion))
         {
             return false;
         }
 
-        if (!CombatSnapshotInitializedState[card])
-        {
-            InitializeGeneratedForCurrentCombat(card);
-        }
-
-        int turn = card.Owner.PlayerCombatState?.TurnNumber ?? 1;
-        if (LastEffectiveActivationTurnState[card] == turn)
+        AbstractLiDaoBeastGuCard? target =
+            FindCurrentTrainingTarget(
+                cardPlay.Player,
+                companionCard.SourceGuType
+            );
+        if (target == null)
         {
             return false;
         }
 
-        LastEffectiveActivationTurnState[card] = turn;
-        int progress = GetProgress(card);
+        return await AdvanceTrainingAsync(target);
+    }
+
+    internal static AbstractLiDaoBeastGuCard?
+        FindCurrentTrainingTarget(Player owner, Type sourceGuType)
+    {
+        ArgumentNullException.ThrowIfNull(owner);
+        ArgumentNullException.ThrowIfNull(sourceGuType);
+
+        return GuCardPileSystem.GuSealedPileType
+            .GetPile(owner)
+            .Cards
+            .OfType<AbstractLiDaoBeastGuCard>()
+            .Where(card =>
+                card.GetType() == sourceGuType &&
+                !IsUnlocked(card) &&
+                IsTrainingSealed(card)
+            )
+            .OrderBy(GuZhenRenDeterminism.GetDeckCardIndex)
+            .ThenBy(GuZhenRenDeterminism.GetCardNetworkId)
+            .ThenBy(
+                static card => card.Id.ToString(),
+                StringComparer.Ordinal
+            )
+            .FirstOrDefault();
+    }
+
+    private static async Task<bool> AdvanceTrainingAsync(
+        AbstractLiDaoBeastGuCard beastGu
+    )
+    {
+        if (IsUnlocked(beastGu) || !IsTrainingSealed(beastGu))
+        {
+            return false;
+        }
+
+        int progress = Math.Min(
+            TrainingRequired,
+            GetProgress(beastGu) + 1
+        );
+        TrainingProgressState[beastGu] = progress;
+        beastGu.Pile?.InvokeContentsChanged();
+
+        Entry.Logger.Info(
+            $"[炼力] {beastGu.Id}#" +
+            $"{GuZhenRenDeterminism.GetCardNetworkId(beastGu)} " +
+            $"进度 {progress}/{TrainingRequired}。"
+        );
+
         if (progress < TrainingRequired)
         {
-            SetProgress(card, progress + 1);
-            return false;
+            return true;
         }
 
-        return CompletedAtCombatStartState[card];
-    }
-
-    private static void SetProgress(
-        AbstractLiDaoBeastGuCard card,
-        int progress
-    )
-    {
-        int normalized = Math.Clamp(progress, 0, TrainingRequired);
-        WriteProgress(card, normalized);
-
-        if (card.DeckVersion is AbstractLiDaoBeastGuCard deckCard &&
-            !ReferenceEquals(deckCard, card))
-        {
-            WriteProgress(deckCard, normalized);
-        }
-    }
-
-    private static int ReadProgress(CardModel card)
-    {
-        // 读档导入的 SavedAttachedState 必须优先于普通字段，否则 QuickSL
-        // 若复用对象，内存中的旧 bridge 值可能覆盖存档快照。
-        if (ProgressState.TryGetValue(card, out int savedProgress))
-        {
-            return Math.Clamp(savedProgress, 0, TrainingRequired);
-        }
-
-        // 没有 SavedAttachedState 时说明是：
-        // 1. 永久牌组刚 MutableClone 出来的战斗实例；或
-        // 2. 旧版本存档。
-        // 这时从普通字段和旧 DynamicVar 中择高迁移。炼力只会递增，
-        // 因而该迁移策略不会丢失旧进度。
-        int bridgeProgress =
-            card is AbstractLiDaoBeastGuCard beastGu
-                ? beastGu.BeastTrainingProgressBridge
-                : 0;
-
-        int dynamicProgress = 0;
-        if (card.DynamicVars.TryGetValue(
-                ProgressVarName,
-                out DynamicVar? progressVar) &&
-            progressVar is not null)
-        {
-            dynamicProgress = progressVar.IntValue;
-        }
-
-        return Math.Clamp(
-            Math.Max(bridgeProgress, dynamicProgress),
-            0,
-            TrainingRequired
+        TrainingUnlockedState[beastGu] = true;
+        await GuCardPileSystem.ReleaseTrainingSealedGuAsync(
+            beastGu,
+            beastGu.Owner
         );
-    }
-
-    private static void WriteProgress(
-        AbstractLiDaoBeastGuCard card,
-        int progress
-    )
-    {
-        ProgressState[card] = progress;
-        card.BeastTrainingProgressBridge = progress;
-        if (card.DynamicVars.TryGetValue(
-                ProgressVarName,
-                out DynamicVar? progressVar) &&
-            progressVar is not null)
-        {
-            progressVar.BaseValue = progress;
-        }
+        Entry.Logger.Info(
+            $"[炼力完成] {beastGu.Id}#" +
+            $"{GuZhenRenDeterminism.GetCardNetworkId(beastGu)} " +
+            "已解封并进入蛊存放队列。"
+        );
+        return true;
     }
 }

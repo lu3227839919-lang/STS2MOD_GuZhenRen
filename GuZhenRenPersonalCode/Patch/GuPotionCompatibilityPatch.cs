@@ -339,6 +339,10 @@ internal static class GuPotionCompatibilityPatch
             );
         }
 
+        // 药水生成的力道伴生牌是明确允许炼力的临时牌；普通临时
+        // 伴生牌没有此实例标记，仍不会推进炼力。
+        LiDaoBeastTrainingSystem.AllowCompanionTraining(companion);
+
         await GuGeneratedCardFactory.AddToHandOrDiscard(
             companion,
             owner

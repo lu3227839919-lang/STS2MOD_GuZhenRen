@@ -34,7 +34,7 @@
   "GU_ZHEN_REN_PERSONAL_KEYWORD_XU_YING.title": "虚影",
   "GU_ZHEN_REN_PERSONAL_KEYWORD_XU_YING.description": "自动保留且不能主动打出；非虚影攻击结算后按卡面概率显化。虚影不会触发其他虚影。",
   "GU_ZHEN_REN_PERSONAL_KEYWORD_LIAN_LI.title": "炼力",
-  "GU_ZHEN_REN_PERSONAL_KEYWORD_LIAN_LI.description": "每回合首次有效催动推进1点永久进度；进度满3后，从下场战斗起催动改为获得对应虚影。",
+  "GU_ZHEN_REN_PERSONAL_KEYWORD_LIAN_LI.description": "兽力蛊开战时封存。对应伴生牌每次有效首次结算，使当前第一只同类型封存兽力蛊获得1点炼力；达到3点后立即解封并加入蛊抽取序列。进度仅在本场战斗有效。",
   "GU_ZHEN_REN_PERSONAL_KEYWORD_NIAN_HUA.title": "年华",
   "GU_ZHEN_REN_PERSONAL_KEYWORD_NIAN_HUA.description": "宙道资源，达到6点时触发岁满并归零；溢出的年华继续结算。",
   "GU_ZHEN_REN_PERSONAL_KEYWORD_SUI_MAN.title": "岁满",

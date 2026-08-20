@@ -8,7 +8,7 @@
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_DISCARD.description": "只存放真正处于恢复中的蛊。冷却完成即进入蛊存放队列尾；杀招材料真正用完后从零开始完整冷却并额外+1。左键查看。",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_DISCARD.empty": "蛊冷却堆为空。",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_SEALED.title": "蛊封存堆",
-  "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_SEALED.description": "只存放被杀招占用的材料蛊。封存不是冷却，恢复加速与立即恢复效果不能影响它们。杀招真正用完、主动解体或异常移出时统一解除绑定；永久封存型除外。",
+  "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_SEALED.description": "存放正在炼力的兽力蛊与被杀招占用的材料蛊。炼力蛊打出对应伴生牌3次后解封；杀招材料按杀招生命周期解除。封存不是冷却，恢复效果不能影响这里的蛊。",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_SEALED.empty": "蛊封存堆为空。",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_CARDS.selectionPrompt": "选择与已选杀招目标匹配的蛊虫材料，然后点击确认。",
   "GU_ZHEN_REN_PERSONAL_CARDPILE_GU_CARDS.targetSelectionPrompt": "先选择要推演的杀招。随后只显示能够匹配该杀招的材料。",
