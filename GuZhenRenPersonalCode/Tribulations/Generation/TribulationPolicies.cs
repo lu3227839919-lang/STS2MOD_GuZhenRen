@@ -117,7 +117,12 @@ public sealed class TribulationWeightResolver : ITribulationWeightResolver
         ApertureRunData data,
         TribulationBalanceConfig config)
     {
-        float weight = definition.BaseWeight;
+        float dangerWeight = config.DangerBaseWeights.TryGetValue(
+            definition.Danger,
+            out int configured)
+                ? configured
+                : 1f;
+        float weight = definition.BaseWeight * dangerWeight;
         int recentIndex = data.RecentTribulationIds.IndexOf(definition.Id);
         if (recentIndex >= 0 && recentIndex < config.RecentRepeatMultipliers.Count)
             weight *= config.RecentRepeatMultipliers[recentIndex];

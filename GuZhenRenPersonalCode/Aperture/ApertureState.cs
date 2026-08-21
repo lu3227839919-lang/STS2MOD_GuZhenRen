@@ -1,5 +1,7 @@
 namespace GuZhenRen.Aperture;
 
+using GuZhenRen.Tribulations.Runtime;
+
 /// <summary>
 /// 仙元发放事务状态。
 /// </summary>
@@ -94,7 +96,9 @@ public sealed class ApertureRunData
     public ulong ActiveTribulationSelectionSeedTag { get; set; }
     public bool ActiveTribulationApplied { get; set; }
     public bool ActiveTribulationVictoryResolved { get; set; }
+    public bool ActiveTribulationEndResolved { get; set; }
     public int OriginalLeaderMaxHp { get; set; }
+    public TribulationRuntimeState TribulationState { get; set; } = new();
     public List<string> RecentTribulationIds { get; set; } = [];
     public List<int> RecentTribulationTiers { get; set; } = [];
     public int HighestTierDryStreak { get; set; }
@@ -189,6 +193,8 @@ public sealed class ApertureRunData
         SameTierStreak = Math.Max(0, SameTierStreak);
         RecentTribulationIds ??= [];
         RecentTribulationTiers ??= [];
+        TribulationState ??= new TribulationRuntimeState();
+        TribulationState.Normalize();
         if (RecentTribulationIds.Count > 3)
             RecentTribulationIds.RemoveRange(3, RecentTribulationIds.Count - 3);
         if (RecentTribulationTiers.Count > 3)

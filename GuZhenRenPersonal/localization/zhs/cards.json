@@ -269,5 +269,17 @@
   "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU_PLUS.title": "年流+",
   "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU_PLUS.description": "获得3点年华，抽1张牌。",
   "GU_ZHEN_REN_PERSONAL_CARD_SHANG_LI_HUI_TIAN.title": "伤力回天",
-  "GU_ZHEN_REN_PERSONAL_CARD_SHANG_LI_HUI_TIAN.description": "[gold]{Rank}转[/gold]\n根据[gold]伤势[/gold]造成{CurrentDamage}点伤害。获得回天：记录之后单张牌造成的最高实际生命伤害；首次濒死时回复其中{RecoveryPercent}%并免死，否则战斗结束时回复。仅触发1次。"
+  "GU_ZHEN_REN_PERSONAL_CARD_SHANG_LI_HUI_TIAN.description": "[gold]{Rank}转[/gold]\n根据[gold]伤势[/gold]造成{CurrentDamage}点伤害。获得回天：记录之后单张牌造成的最高实际生命伤害；首次濒死时回复其中{RecoveryPercent}%并免死，否则战斗结束时回复。仅触发1次。",
+  "GU_ZHEN_REN_PERSONAL_CARD_YAN_SHI_STATUS_CARD.title": "盐蚀",
+  "GU_ZHEN_REN_PERSONAL_CARD_YAN_SHI_STATUS_CARD.description": "不能打出。本回合下一次获得元气时少获得1点。消耗。",
+  "GU_ZHEN_REN_PERSONAL_CARD_NI_ZHANG_STATUS_CARD.title": "泥障",
+  "GU_ZHEN_REN_PERSONAL_CARD_NI_ZHANG_STATUS_CARD.description": "不能打出。本回合下一次获得格挡时只获得一半。消耗。",
+  "GU_ZHEN_REN_PERSONAL_CARD_YUN_JIN_STATUS_CARD.title": "陨烬",
+  "GU_ZHEN_REN_PERSONAL_CARD_YUN_JIN_STATUS_CARD.description": "不能打出。回合结束时若在手牌，失去5点生命。消耗。",
+  "GU_ZHEN_REN_PERSONAL_CARD_FU_DI_LOU_DONG_STATUS_CARD.title": "伏地漏洞",
+  "GU_ZHEN_REN_PERSONAL_CARD_FU_DI_LOU_DONG_STATUS_CARD.description": "不能打出。抽到时失去1点元气。消耗。",
+  "GU_ZHEN_REN_PERSONAL_CARD_HAN_YUE_STATUS_CARD.title": "寒月",
+  "GU_ZHEN_REN_PERSONAL_CARD_HAN_YUE_STATUS_CARD.description": "不能打出。抽到时失去1点能量；留在手中直到回合结束。消耗。",
+  "GU_ZHEN_REN_PERSONAL_CARD_XUE_FENG_JIE_HEN_GU_CORRUPTION_CARD.title": "雪封劫痕",
+  "GU_ZHEN_REN_PERSONAL_CARD_XUE_FENG_JIE_HEN_GU_CORRUPTION_CARD.description": "蛊灾污染。不能打出，占据蛊手牌栏位；持续结束时生成寒月并增加积寒。"
 }

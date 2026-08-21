@@ -9,6 +9,7 @@ using GuZhenRen.Characters;
 using GuZhenRen.Combat;
 using GuZhenRen.Multiplayer;
 using GuZhenRen.Relics;
+using GuZhenRen.Tribulations.Core;
 
 using HarmonyLib;
 
@@ -1159,6 +1160,10 @@ internal static class ShaZhaoTuiYanSystem
                     $"需要 {yuanQiCost} 点元气。"
                 );
             }
+
+            await TribulationSystem.EventRouter.OnYuanQiSpentAsync(
+                player,
+                yuanQiCost);
         }
 
         Entry.Logger.Info(

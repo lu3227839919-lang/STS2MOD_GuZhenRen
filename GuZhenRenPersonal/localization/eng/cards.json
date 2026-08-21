@@ -269,5 +269,17 @@
   "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU_PLUS.title": "Year Flow+",
   "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU_PLUS.description": "Gain 3 Years and draw 1.",
   "GU_ZHEN_REN_PERSONAL_CARD_SHANG_LI_HUI_TIAN.title": "Injury Force Reversal",
-  "GU_ZHEN_REN_PERSONAL_CARD_SHANG_LI_HUI_TIAN.description": "[gold]Rank {Rank}[/gold]\nDeal {CurrentDamage} damage based on [gold]Injury[/gold]. Gain Return to Heaven: record the highest actual HP damage dealt by a later single card; the first time you would die, heal {RecoveryPercent}% of it and survive, otherwise heal after combat. Triggers once."
+  "GU_ZHEN_REN_PERSONAL_CARD_SHANG_LI_HUI_TIAN.description": "[gold]Rank {Rank}[/gold]\nDeal {CurrentDamage} damage based on [gold]Injury[/gold]. Gain Return to Heaven: record the highest actual HP damage dealt by a later single card; the first time you would die, heal {RecoveryPercent}% of it and survive, otherwise heal after combat. Triggers once.",
+  "GU_ZHEN_REN_PERSONAL_CARD_YAN_SHI_STATUS_CARD.title": "Salt Erosion",
+  "GU_ZHEN_REN_PERSONAL_CARD_YAN_SHI_STATUS_CARD.description": "Unplayable. The next time you gain Yuan Qi this turn, gain 1 less. Exhaust.",
+  "GU_ZHEN_REN_PERSONAL_CARD_NI_ZHANG_STATUS_CARD.title": "Mud Barrier",
+  "GU_ZHEN_REN_PERSONAL_CARD_NI_ZHANG_STATUS_CARD.description": "Unplayable. The next time you gain Block this turn, gain half as much. Exhaust.",
+  "GU_ZHEN_REN_PERSONAL_CARD_YUN_JIN_STATUS_CARD.title": "Meteor Cinder",
+  "GU_ZHEN_REN_PERSONAL_CARD_YUN_JIN_STATUS_CARD.description": "Unplayable. At end of turn, if in hand, lose 5 HP. Exhaust.",
+  "GU_ZHEN_REN_PERSONAL_CARD_FU_DI_LOU_DONG_STATUS_CARD.title": "Buried Fault",
+  "GU_ZHEN_REN_PERSONAL_CARD_FU_DI_LOU_DONG_STATUS_CARD.description": "Unplayable. When drawn, lose 1 Yuan Qi. Exhaust.",
+  "GU_ZHEN_REN_PERSONAL_CARD_HAN_YUE_STATUS_CARD.title": "Cold Moon",
+  "GU_ZHEN_REN_PERSONAL_CARD_HAN_YUE_STATUS_CARD.description": "Unplayable. When drawn, lose 1 Energy. Remains in hand until end of turn. Exhaust.",
+  "GU_ZHEN_REN_PERSONAL_CARD_XUE_FENG_JIE_HEN_GU_CORRUPTION_CARD.title": "Frozen Calamity Scar",
+  "GU_ZHEN_REN_PERSONAL_CARD_XUE_FENG_JIE_HEN_GU_CORRUPTION_CARD.description": "Gu corruption. Unplayable. Occupies Gu Hand slots; when its duration ends, creates Cold Moon and increases Accumulated Cold."
 }

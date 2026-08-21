@@ -1,4 +1,5 @@
 using GuZhenRen.Aperture;
+using GuZhenRen.Tribulations.EarthCalamities;
 using GuZhenRen.Tribulations.Generation;
 using GuZhenRen.Tribulations.Runtime;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -26,10 +27,12 @@ public static class TribulationSystem
 
     public static void Initialize()
     {
-        Entry.Logger.Info("[灾劫] 基础框架初始化完成；具体地灾按规范暂未注册。 ");
+        if (RegistryInstance.Definitions.Count == 0)
+            EarthCalamityCatalog.RegisterAll(RegistryInstance);
+        Entry.Logger.Info("[灾劫] 已注册 12 个地灾，统一事件路由已启用。");
     }
 
-    public static void Uninitialize() { }
+    public static void Uninitialize() => RegistryInstance.Clear();
 
     public static async Task TryPrepareCombatAsync(Player player)
     {
@@ -74,6 +77,9 @@ public static class TribulationSystem
     }
 
     public static Task ResolveVictoryAsync(Player player) => RuntimeInstance.ResolveVictoryAsync(player);
+
+    public static Task ResolveCombatEndAsync(Player player) =>
+        RuntimeInstance.ResolveCombatEndAsync(player);
 
     private static TribulationProgressStage ResolveStage(int xp, int requiredXp)
     {

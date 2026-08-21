@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using GuZhenRen.Cards.LiDao;
 using GuZhenRen.Multiplayer;
 using GuZhenRen.Powers.ZhouDao;
+using GuZhenRen.Tribulations.Contracts;
 
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Context;
@@ -1389,10 +1390,16 @@ public static class GuCardPileSystem
         PileType
             .GetPile(owner)
             .Cards
-            .Count(card =>
-                card is IGuWormCard &&
-                !BypassesActivePileCapacity(card)
-            );
+            .Sum(GetActiveSlotCost);
+
+    private static int GetActiveSlotCost(CardModel card)
+    {
+        if (BypassesActivePileCapacity(card))
+            return 0;
+        if (card is IGuActiveSlotOccupant occupant)
+            return Math.Max(0, occupant.OccupiedActiveSlots);
+        return card is IGuWormCard ? 1 : 0;
+    }
 
     private static int GetAvailableActiveSlots(Player owner) =>
         Math.Max(0, ActivePileCapacity - GetActiveGuCount(owner));
@@ -1406,13 +1413,19 @@ public static class GuCardPileSystem
         CardPile guPile = PileType.GetPile(owner);
         CardPile storagePile = StoragePileType.GetPile(owner);
         CardPile recoveryPile = RecoveryPileType.GetPile(owner);
-        CardModel[] overflowCards = guPile.Cards
-            .Where(card =>
-                card is IGuWormCard &&
-                !BypassesActivePileCapacity(card)
-            )
-            .Skip(ActivePileCapacity)
-            .ToArray();
+        int occupied = 0;
+        List<CardModel> overflow = [];
+        foreach (CardModel card in guPile.Cards)
+        {
+            int cost = GetActiveSlotCost(card);
+            if (cost <= 0)
+                continue;
+            if (occupied + cost <= ActivePileCapacity)
+                occupied += cost;
+            else
+                overflow.Add(card);
+        }
+        CardModel[] overflowCards = overflow.ToArray();
 
         if (overflowCards.Length == 0)
         {
@@ -1426,6 +1439,13 @@ public static class GuCardPileSystem
         foreach (CardModel card in overflowCards)
         {
             guPile.RemoveInternal(card, silent: true);
+
+            if (card is IGuSystemCorruptionCard)
+            {
+                storagePile.AddInternal(card, silent: true);
+                storageChanged = true;
+                continue;
+            }
 
             if (GuSealSystem.IsSealed(card))
             {

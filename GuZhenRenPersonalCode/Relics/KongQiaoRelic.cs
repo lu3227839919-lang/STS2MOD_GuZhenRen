@@ -19,6 +19,7 @@ using MegaCrit.Sts2.Core.Entities.RestSite;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Rewards;
+using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Combat.SecondaryResources;
@@ -207,6 +208,12 @@ public sealed class KongQiaoRelic
         await ApertureSystem.HandleCombatVictoryAsync(Owner, room);
     }
 
+    public override async Task AfterCombatEnd(CombatRoom room)
+    {
+        await TribulationSystem.ResolveCombatEndAsync(Owner);
+        await base.AfterCombatEnd(room);
+    }
+
     public override async Task AfterCardPlayed(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay
@@ -217,7 +224,19 @@ public sealed class KongQiaoRelic
             return;
         }
 
-        await TribulationSystem.EventRouter.OnCardPlayedAsync(Owner, cardPlay.Card);
+        await TribulationSystem.EventRouter.OnCardPlayedAsync(Owner, cardPlay);
+        if (cardPlay.IsFirstInSeries)
+        {
+            await TribulationSystem.EventRouter.OnNativeEnergySpentAsync(
+                Owner,
+                cardPlay.Resources.EnergySpent);
+            if (cardPlay.TryGetSecondaryResources(out var resources))
+            {
+                await TribulationSystem.EventRouter.OnYuanQiSpentAsync(
+                    Owner,
+                    resources.Spent(YuanQiSystem.ResourceId));
+            }
+        }
         if (cardPlay.Card is IGuWormCard && cardPlay.IsFirstInSeries)
         {
             await TribulationSystem.EventRouter.OnGuActivatedAsync(Owner, cardPlay.Card);
@@ -275,6 +294,168 @@ public sealed class KongQiaoRelic
             await ImmortalEssenceSystem
                 .ExhaustDepletedCardsAsync(Owner);
         }
+    }
+
+    public override Task AfterCardDrawn(
+        PlayerChoiceContext choiceContext,
+        CardModel card,
+        bool fromHandDraw) =>
+        ReferenceEquals(card.Owner, Owner)
+            ? TribulationSystem.EventRouter.OnCardDrawnAsync(Owner, card)
+            : Task.CompletedTask;
+
+    public override Task AfterCardDiscarded(
+        PlayerChoiceContext choiceContext,
+        CardModel card) =>
+        ReferenceEquals(card.Owner, Owner)
+            ? TribulationSystem.EventRouter.OnCardDiscardedAsync(Owner, card)
+            : Task.CompletedTask;
+
+    public override Task AfterPlayerTurnStart(
+        PlayerChoiceContext choiceContext,
+        Player player) =>
+        ReferenceEquals(player, Owner)
+            ? TribulationSystem.EventRouter.OnPlayerTurnStartAsync(
+                Owner,
+                Owner.PlayerCombatState?.TurnNumber ?? 1)
+            : Task.CompletedTask;
+
+    public override Task AfterSideTurnStart(
+        CombatSide side,
+        IReadOnlyList<Creature> participants,
+        ICombatState combatState) =>
+        side == CombatSide.Enemy
+            ? TribulationSystem.EventRouter.OnEnemyTurnStartAsync(
+                Owner,
+                combatState.RoundNumber)
+            : Task.CompletedTask;
+
+    public override Task BeforeSideTurnEnd(
+        PlayerChoiceContext choiceContext,
+        CombatSide side,
+        IEnumerable<Creature> participants) =>
+        side == CombatSide.Player
+            ? TribulationSystem.EventRouter.OnPlayerTurnEndAsync(
+                Owner,
+                Owner.PlayerCombatState?.TurnNumber ?? 1)
+            : TribulationSystem.EventRouter.OnEnemyTurnEndAsync(
+                Owner,
+                Owner.Creature.CombatState?.RoundNumber ?? 1);
+
+    public override Task BeforeBlockGained(
+        Creature creature,
+        decimal amount,
+        ValueProp props,
+        CardModel? cardSource) =>
+        TribulationSystem.EventRouter.OnBeforeBlockGainedAsync(
+            Owner,
+            creature,
+            amount,
+            props,
+            cardSource);
+
+    public override Task AfterBlockGained(
+        Creature creature,
+        decimal amount,
+        ValueProp props,
+        CardModel? cardSource) =>
+        TribulationSystem.EventRouter.OnBlockGainedAsync(
+            Owner,
+            creature,
+            amount,
+            props,
+            cardSource);
+
+    public override Task AfterDamageReceived(
+        PlayerChoiceContext choiceContext,
+        Creature target,
+        DamageResult result,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource) =>
+        TribulationSystem.EventRouter.OnDamageResolvedAsync(
+            Owner,
+            new GuZhenRen.Tribulations.Contracts.TribulationDamageEvent(
+                target,
+                dealer,
+                result,
+                props,
+                cardSource,
+                CardPlay: null));
+
+    public override Task AfterCurrentHpChanged(Creature creature, decimal delta) =>
+        ReferenceEquals(creature, Owner.Creature) && delta < 0m
+            ? TribulationSystem.EventRouter.OnPlayerHpLostAsync(Owner, -delta)
+            : Task.CompletedTask;
+
+    public override decimal ModifyDamageAdditive(
+        Creature? target,
+        decimal amount,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource,
+        CardPlay? cardPlay) =>
+        TribulationSystem.EventRouter.ModifyDamageAdditive(
+            Owner, target, amount, props, dealer, cardSource, cardPlay);
+
+    public override decimal ModifyDamageMultiplicative(
+        Creature? target,
+        decimal amount,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource,
+        CardPlay? cardPlay) =>
+        TribulationSystem.EventRouter.ModifyDamageMultiplicative(
+            Owner, target, amount, props, dealer, cardSource, cardPlay);
+
+    public override decimal ModifyDamageCap(
+        Creature? target,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource,
+        CardPlay? cardPlay) =>
+        TribulationSystem.EventRouter.ModifyDamageCap(
+            Owner, target, props, dealer, cardSource, cardPlay);
+
+    public override decimal ModifyBlockMultiplicative(
+        Creature target,
+        decimal block,
+        ValueProp props,
+        CardModel? cardSource,
+        CardPlay? cardPlay)
+    {
+        if (block <= 0m)
+            return 1m;
+        decimal modified = TribulationSystem.EventRouter.ModifyPlayerBlockGain(
+            Owner, target, block, props, cardSource, cardPlay);
+        return modified / block;
+    }
+
+    public override bool TryModifyPowerAmountReceived(
+        PowerModel canonicalPower,
+        Creature target,
+        decimal amount,
+        Creature? applier,
+        out decimal modifiedAmount)
+    {
+        bool baseModified = base.TryModifyPowerAmountReceived(
+            canonicalPower,
+            target,
+            amount,
+            applier,
+            out modifiedAmount);
+        decimal input = modifiedAmount;
+        bool tribulationModified =
+            TribulationSystem.EventRouter.TryModifyPowerAmountReceived(
+                Owner,
+                canonicalPower,
+                target,
+                input,
+                applier,
+                out decimal tribulationAmount);
+        if (tribulationModified)
+            modifiedAmount = tribulationAmount;
+        return baseModified || tribulationModified;
     }
 
     /// <summary>
@@ -352,6 +533,17 @@ public sealed class KongQiaoRelic
                 $"元气不足，无法催动 {cardPlay.Card.Id}。";
             GuActivationModeSystem.Cancel(message);
             throw new InvalidOperationException(message);
+        }
+
+        // Legacy AutoPlay/script entry points do not populate RitsuLib's
+        // secondary-resource ledger. Report their successful fallback payment
+        // here so the unified tribulation router observes every real Yuan Qi
+        // expenditure exactly once.
+        if (!paidByNativePipeline && yuanQiCost > 0 && !freeByBrilliantScarf)
+        {
+            await TribulationSystem.EventRouter.OnYuanQiSpentAsync(
+                Owner,
+                yuanQiCost);
         }
 
         if (guCard.GuRank >= ApertureProgression.ImmortalRank)
@@ -460,6 +652,11 @@ public sealed class KongQiaoRelic
             ? ApertureProgression.GetYuanQiStartAmount(rank)
             : currentAmount +
               ApertureProgression.GetYuanQiRecovery(rank);
+        int requestedGain = Math.Max(0, targetAmount - currentAmount);
+        int modifiedGain = TribulationSystem.EventRouter.ModifyYuanQiGain(
+            player,
+            requestedGain);
+        targetAmount = currentAmount + modifiedGain;
 
         await SecondaryResourceCmd.Set(
             player,

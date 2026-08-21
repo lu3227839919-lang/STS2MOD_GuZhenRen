@@ -1,3 +1,11 @@
+// ============================================================================
+// 中文维护说明
+// 文件职责：实现蛊真人卡牌、衍生牌及其战斗结算逻辑。
+// 主要类型：AbstractLiDaoXuYing、BaiZhiXuYing、EXuYing、QingNiuXuYing、ShiGuiXuYing、FeiXiongXuYing、LiDaoBeastEffectExecutor、RuntimeState。
+// 实现要点：注册特性把卡牌加入对应卡池，构造器只声明静态费用、类型与目标。
+// 实现补充：战斗变更通过命令队列并等待完成，不直接绕过游戏同步层修改结果。
+// 维护约定：修改数值或关键词时同步检查 zhs/eng 本地化；异步战斗效果必须 await。
+// ============================================================================
 using System.Runtime.CompilerServices;
 
 using GuZhenRen.Characters;

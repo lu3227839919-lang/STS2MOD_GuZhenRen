@@ -568,7 +568,9 @@ public static class ApertureSystem
             data.ActiveTribulationSelectionSeedTag = selection.SelectionSeedTag;
             data.ActiveTribulationApplied = false;
             data.ActiveTribulationVictoryResolved = false;
+            data.ActiveTribulationEndResolved = false;
             data.OriginalLeaderMaxHp = Math.Max(1, originalLeaderMaxHp);
+            data.TribulationState = new GuZhenRen.Tribulations.Runtime.TribulationRuntimeState();
             onCommitted?.Invoke(data);
         });
     }
@@ -594,6 +596,17 @@ public static class ApertureSystem
             data.Normalize();
             if (data.ActiveTribulationFloor == floor)
                 data.ActiveTribulationVictoryResolved = true;
+        });
+    }
+
+    internal static void MarkTribulationEndResolved(Player player, int floor)
+    {
+        EnsureAvailable();
+        _savedData!.Modify(player, data =>
+        {
+            data.Normalize();
+            if (data.ActiveTribulationFloor == floor)
+                data.ActiveTribulationEndResolved = true;
         });
     }
 

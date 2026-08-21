@@ -1,3 +1,10 @@
+// ============================================================================
+// 中文维护说明
+// 文件职责：协调休息点自定义选项的顺序执行、去重与会话隔离。
+// 主要类型：GuRestSiteChoiceCoordinator、QueueState、RestSiteOptionReferenceComparer、PlayerRestSiteKey。
+// 实现要点：共享状态受锁保护；异步入口还需保持同一玩家的操作顺序。
+// 维护约定：保持公开签名、存档键和多人确定性；异步命令必须等待结算完成。
+// ============================================================================
 using System.Runtime.CompilerServices;
 
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -7,13 +14,12 @@ using MegaCrit.Sts2.Core.Runs;
 namespace GuZhenRen.RestSite;
 
 /// <summary>
-/// Serializes custom rest-site choices per player.
-///
-/// The 0.110 synchronizer starts remote ChooseOption tasks without awaiting the
-/// previous message. A duplicated or rapidly-following packet can therefore
-/// execute against a list that is being changed by another selection. This
-/// coordinator keeps each player's custom choices ordered and deduplicates the
-/// same option object while it is in flight.
+/// 按玩家串行执行自定义休息点选择。
+/// <para>
+/// 0.110 同步器启动远端 <c>ChooseOption</c> 任务时不会等待上一条消息；
+/// 重复包或紧邻到达的消息可能并发修改同一选项列表。本协调器为每名玩家维护
+/// 独立队尾，并在同一选项对象执行期间去重。
+/// </para>
 /// </summary>
 internal static class GuRestSiteChoiceCoordinator
 {
@@ -21,6 +27,7 @@ internal static class GuRestSiteChoiceCoordinator
     private static readonly Dictionary<PlayerRestSiteKey, QueueState> States = [];
     private static long _generation;
 
+    /// <summary>开始新休息点会话；代数递增会让旧会话中仍在等待的任务自动失效。</summary>
     internal static void BeginRestSiteSession()
     {
         lock (SyncRoot)
@@ -30,6 +37,10 @@ internal static class GuRestSiteChoiceCoordinator
         }
     }
 
+    /// <summary>
+    /// 把一次选择接到该玩家的队尾。同一选项对象已在途时直接返回原任务，
+    /// 从而让重复网络消息共享同一结果。
+    /// </summary>
     internal static Task<bool> EnqueueChoice(
         Player player,
         RestSiteOption selectedOption,
@@ -109,9 +120,10 @@ internal static class GuRestSiteChoiceCoordinator
             }
             catch
             {
-                // A previous failed choice must not permanently poison the queue.
+                // 前一选择失败不应永久污染队列；当前选择仍需获得一次执行机会。
             }
 
+            // 会话切换后旧任务只返回 false，禁止作用到新休息点的选项列表。
             if (!IsCurrent(key, state))
             {
                 completion.TrySetResult(false);
