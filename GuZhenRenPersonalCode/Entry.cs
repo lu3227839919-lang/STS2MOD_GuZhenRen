@@ -5,6 +5,7 @@ using GuZhenRen.Cards;
 using GuZhenRen.Combat;
 using GuZhenRen.Patches;
 using GuZhenRen.Ui;
+using GuZhenRen.Tribulations.Core;
 
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Modding;
@@ -39,6 +40,7 @@ public partial class Entry
         new(nameof(GuActivationModePatch), GuActivationModePatch.Initialize, GuActivationModePatch.Uninitialize),
         new(nameof(YuanQiSystem), YuanQiSystem.Initialize, YuanQiSystem.Uninitialize),
         new(nameof(ApertureSystem), ApertureSystem.Initialize, ApertureSystem.Uninitialize),
+        new(nameof(TribulationSystem), TribulationSystem.Initialize, TribulationSystem.Uninitialize),
         // 按当前游戏语言延迟加载外部 zhs/eng JSON。
         new(
             nameof(LocalizationCompatibilityPatch),

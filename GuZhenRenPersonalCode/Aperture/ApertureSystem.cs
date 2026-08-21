@@ -67,7 +67,7 @@ public static class ApertureSystem
                             static () => new ApertureRunData(),
                             options: new RunSavedDataOptions
                             {
-                                SchemaVersion = 1,
+                                SchemaVersion = 2,
                             }
                         );
                 }
@@ -539,6 +539,73 @@ public static class ApertureSystem
         return canonical == null
             ? null
             : combatState.CreateCard(canonical, owner);
+    }
+
+    internal static void SaveTribulationSelection(
+        Player player,
+        GuZhenRen.Tribulations.Core.TribulationSelection selection,
+        int originalLeaderMaxHp,
+        Action<ApertureRunData>? onCommitted = null
+    )
+    {
+        EnsureAvailable();
+        _savedData!.Modify(player, data =>
+        {
+            data.Normalize();
+            if (data.LastTribulationGeneratedFloor == selection.Floor &&
+                data.ActiveTribulationFloor == selection.Floor)
+            {
+                return;
+            }
+
+            data.LastTribulationGeneratedFloor = selection.Floor;
+            data.ActiveTribulationFloor = selection.Floor;
+            data.ActiveTribulationId = selection.TribulationId;
+            data.ActiveTribulationTier = (int)selection.Tier;
+            data.ActiveTribulationDanger = (int)selection.Danger;
+            data.ActiveLeaderCombatId = selection.LeaderCombatId;
+            data.ActiveTribulationMaxHpMultiplier = selection.MaxHpMultiplier;
+            data.ActiveTribulationSelectionSeedTag = selection.SelectionSeedTag;
+            data.ActiveTribulationApplied = false;
+            data.ActiveTribulationVictoryResolved = false;
+            data.OriginalLeaderMaxHp = Math.Max(1, originalLeaderMaxHp);
+            onCommitted?.Invoke(data);
+        });
+    }
+
+    internal static void MarkTribulationApplied(
+        Player player, int floor, int originalLeaderMaxHp)
+    {
+        EnsureAvailable();
+        _savedData!.Modify(player, data =>
+        {
+            data.Normalize();
+            if (data.ActiveTribulationFloor != floor) return;
+            data.OriginalLeaderMaxHp = Math.Max(1, originalLeaderMaxHp);
+            data.ActiveTribulationApplied = true;
+        });
+    }
+
+    internal static void MarkTribulationVictoryResolved(Player player, int floor)
+    {
+        EnsureAvailable();
+        _savedData!.Modify(player, data =>
+        {
+            data.Normalize();
+            if (data.ActiveTribulationFloor == floor)
+                data.ActiveTribulationVictoryResolved = true;
+        });
+    }
+
+    internal static void ModifyTribulationData(
+        Player player, Action<ApertureRunData> modifier)
+    {
+        EnsureAvailable();
+        _savedData!.Modify(player, data =>
+        {
+            data.Normalize();
+            modifier(data);
+        });
     }
 
     private static int GetVictoryXp(CombatRoom room)

@@ -83,6 +83,23 @@ public sealed class ApertureRunData
     /// </summary>
     public int ShaZhaoDerivationsThisCombat { get; set; }
 
+    // 灾劫系统：按 Floor 保存随机选择与应用事务，支持 QuickSL/重连幂等恢复。
+    public int LastTribulationGeneratedFloor { get; set; } = -1;
+    public int ActiveTribulationFloor { get; set; } = -1;
+    public string ActiveTribulationId { get; set; } = string.Empty;
+    public int ActiveTribulationTier { get; set; }
+    public int ActiveTribulationDanger { get; set; }
+    public uint ActiveLeaderCombatId { get; set; }
+    public float ActiveTribulationMaxHpMultiplier { get; set; } = 1f;
+    public ulong ActiveTribulationSelectionSeedTag { get; set; }
+    public bool ActiveTribulationApplied { get; set; }
+    public bool ActiveTribulationVictoryResolved { get; set; }
+    public int OriginalLeaderMaxHp { get; set; }
+    public List<string> RecentTribulationIds { get; set; } = [];
+    public List<int> RecentTribulationTiers { get; set; } = [];
+    public int HighestTierDryStreak { get; set; }
+    public int SameTierStreak { get; set; }
+
     public bool NeedsNormalization()
     {
         int normalizedRank = Math.Clamp(
@@ -164,6 +181,18 @@ public sealed class ApertureRunData
             0,
             ShaZhaoDerivationsThisCombat
         );
+        LastTribulationGeneratedFloor = Math.Max(-1, LastTribulationGeneratedFloor);
+        ActiveTribulationFloor = Math.Max(-1, ActiveTribulationFloor);
+        ActiveTribulationMaxHpMultiplier = Math.Max(1f, ActiveTribulationMaxHpMultiplier);
+        OriginalLeaderMaxHp = Math.Max(0, OriginalLeaderMaxHp);
+        HighestTierDryStreak = Math.Max(0, HighestTierDryStreak);
+        SameTierStreak = Math.Max(0, SameTierStreak);
+        RecentTribulationIds ??= [];
+        RecentTribulationTiers ??= [];
+        if (RecentTribulationIds.Count > 3)
+            RecentTribulationIds.RemoveRange(3, RecentTribulationIds.Count - 3);
+        if (RecentTribulationTiers.Count > 3)
+            RecentTribulationTiers.RemoveRange(3, RecentTribulationTiers.Count - 3);
 
         if (Rank >= ApertureProgression.MaximumImplementedRank)
         {

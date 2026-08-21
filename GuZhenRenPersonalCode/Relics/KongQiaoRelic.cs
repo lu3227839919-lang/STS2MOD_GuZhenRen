@@ -6,6 +6,8 @@ using GuZhenRen.Combat;
 using GuZhenRen.Powers.GuangDao;
 using GuZhenRen.RestSite;
 
+using GuZhenRen.Tribulations.Core;
+
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -114,6 +116,7 @@ public sealed class KongQiaoRelic
     public override async Task BeforeCombatStart()
     {
         ApertureSystem.HandleCombatStarting(Owner);
+        await TribulationSystem.TryPrepareCombatAsync(Owner);
         await GuangDaoPowerSystem.EnsureZheGuang(Owner);
     }
 
@@ -198,9 +201,10 @@ public sealed class KongQiaoRelic
         );
     }
 
-    public override Task AfterCombatVictory(CombatRoom room)
+    public override async Task AfterCombatVictory(CombatRoom room)
     {
-        return ApertureSystem.HandleCombatVictoryAsync(Owner, room);
+        await TribulationSystem.ResolveVictoryAsync(Owner);
+        await ApertureSystem.HandleCombatVictoryAsync(Owner, room);
     }
 
     public override async Task AfterCardPlayed(
@@ -211,6 +215,12 @@ public sealed class KongQiaoRelic
         if (!ReferenceEquals(cardPlay.Card.Owner, Owner))
         {
             return;
+        }
+
+        await TribulationSystem.EventRouter.OnCardPlayedAsync(Owner, cardPlay.Card);
+        if (cardPlay.Card is IGuWormCard && cardPlay.IsFirstInSeries)
+        {
+            await TribulationSystem.EventRouter.OnGuActivatedAsync(Owner, cardPlay.Card);
         }
 
         if (cardPlay.Card is IGuWormCard &&
