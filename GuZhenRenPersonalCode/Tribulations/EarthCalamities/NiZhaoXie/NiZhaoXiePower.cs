@@ -14,6 +14,8 @@ namespace GuZhenRen.Tribulations.EarthCalamities.NiZhaoXie;
 [RegisterPower]
 public sealed class NiZhaoXiePower : EarthCalamityPower
 {
+    protected override string IconBaseName => nameof(NiZhaoXiePower);
+
     protected override string PrimaryCounterKey =>
         TribulationStateStore.Key(TribulationIds.NiZhaoXie, "silt");
 }

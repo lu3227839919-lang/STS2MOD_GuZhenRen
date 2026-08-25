@@ -14,6 +14,8 @@ namespace GuZhenRen.Tribulations.EarthCalamities.MeiLanDianYing;
 [RegisterPower]
 public sealed class MeiLanDianYingPower : EarthCalamityPower
 {
+    protected override string IconBaseName => nameof(MeiLanDianYingPower);
+
     protected override string PrimaryCounterKey =>
         TribulationStateStore.Key(TribulationIds.MeiLanDianYing, "hunt");
 }

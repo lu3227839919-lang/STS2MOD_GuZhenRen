@@ -14,6 +14,8 @@ namespace GuZhenRen.Tribulations.EarthCalamities.XuanBaiFeiYan;
 [RegisterPower]
 public sealed class XuanBaiFeiYanPower : EarthCalamityPower
 {
+    protected override string IconBaseName => nameof(XuanBaiFeiYanPower);
+
     protected override string PrimaryCounterKey =>
         TribulationStateStore.Key(TribulationIds.XuanBaiFeiYan, "salt_shell");
 }

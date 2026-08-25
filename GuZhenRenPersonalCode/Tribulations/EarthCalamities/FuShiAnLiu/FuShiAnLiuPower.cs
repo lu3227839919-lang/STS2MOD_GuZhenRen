@@ -14,6 +14,8 @@ namespace GuZhenRen.Tribulations.EarthCalamities.FuShiAnLiu;
 [RegisterPower]
 public sealed class FuShiAnLiuPower : EarthCalamityPower
 {
+    protected override string IconBaseName => nameof(FuShiAnLiuPower);
+
     protected override string PrimaryCounterKey =>
         TribulationStateStore.Key(TribulationIds.FuShiAnLiu, "breach");
 }

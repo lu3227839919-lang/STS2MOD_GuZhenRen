@@ -14,6 +14,8 @@ namespace GuZhenRen.Tribulations.EarthCalamities.XueGuai;
 [RegisterPower]
 public sealed class XueGuaiPower : EarthCalamityPower
 {
+    protected override string IconBaseName => nameof(XueGuaiPower);
+
     protected override string PrimaryCounterKey =>
         TribulationStateStore.Key(TribulationIds.XueGuai, "nurture_snow");
 }

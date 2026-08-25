@@ -30,7 +30,7 @@ public sealed class GuZhenRenDefend
         [CardTag.Defend];
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
-        [new BlockVar(6m, ValueProp.Move)];
+        [new BlockVar(4m, ValueProp.Move)];
 
     public override bool GainsBlock => true;
 

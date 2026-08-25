@@ -14,6 +14,8 @@ namespace GuZhenRen.Tribulations.EarthCalamities.FengHua;
 [RegisterPower]
 public sealed class FengHuaPower : EarthCalamityPower
 {
+    protected override string IconBaseName => nameof(FengHuaPower);
+
     protected override string PrimaryCounterKey =>
         TribulationStateStore.Key(TribulationIds.FengHua, "wind_eye");
 }

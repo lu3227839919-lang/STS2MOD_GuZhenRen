@@ -22,7 +22,7 @@ public sealed class GuZhenRenStrike
         [CardTag.Strike];
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
-        [new DamageVar(6m, ValueProp.Move)];
+        [new DamageVar(4m, ValueProp.Move)];
 
     public override CardAssetProfile AssetProfile =>
         global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());

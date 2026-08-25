@@ -14,6 +14,8 @@ namespace GuZhenRen.Tribulations.EarthCalamities.XueYue;
 [RegisterPower]
 public sealed class XueYuePower : EarthCalamityPower
 {
+    protected override string IconBaseName => nameof(XueYuePower);
+
     protected override string PrimaryCounterKey =>
         TribulationStateStore.Key(TribulationIds.XueYue, "accumulated_cold");
 }

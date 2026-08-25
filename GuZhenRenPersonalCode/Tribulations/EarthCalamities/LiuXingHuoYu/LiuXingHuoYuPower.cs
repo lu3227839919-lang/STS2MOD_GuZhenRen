@@ -14,6 +14,8 @@ namespace GuZhenRen.Tribulations.EarthCalamities.LiuXingHuoYu;
 [RegisterPower]
 public sealed class LiuXingHuoYuPower : EarthCalamityPower
 {
+    protected override string IconBaseName => nameof(LiuXingHuoYuPower);
+
     protected override string PrimaryCounterKey =>
         TribulationStateStore.Key(TribulationIds.LiuXingHuoYu, "fire_intensity");
 }

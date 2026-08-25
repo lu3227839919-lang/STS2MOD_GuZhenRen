@@ -9,6 +9,7 @@
 // ============================================================================
 using GuZhenRen.Cards;
 using GuZhenRen.Aperture;
+using GuZhenRen.Powers.GuangDao;
 using GuZhenRen.Tribulations.Contracts;
 using GuZhenRen.Tribulations.Core;
 using GuZhenRen.Tribulations.Runtime;
@@ -138,9 +139,19 @@ public abstract class EarthCalamityPower : ModPowerTemplate
         ? TribulationStateStore.ReadLeaderCounter(Owner, PrimaryCounterKey)
         : 0;
 
+    /// <summary>
+    /// 灾劫 Power 的图标基名（不含尺寸后缀）。每个地灾在 images/power 下
+    /// 有同名图标（如 XueYuePower-64x64.png / XueYuePower-256x256.png）。
+    /// 基类默认使用光辉占位图标；具体地灾覆盖为各自类名。
+    /// </summary>
+    protected virtual string IconBaseName => nameof(GuangHuiPower);
+
     public override PowerAssetProfile AssetProfile => new(
-        IconPath: "res://GuZhenRenPersonal/images/power/GuangHuiPower-64x64.png",
-        BigIconPath: "res://GuZhenRenPersonal/images/power/GuangHuiPower-256x256.png");
+        IconPath:
+            $"res://GuZhenRenPersonal/images/power/{IconBaseName}-64x64.png",
+        BigIconPath:
+            $"res://GuZhenRenPersonal/images/power/{IconBaseName}-256x256.png"
+    );
 
     public void RefreshDisplay() => InvokeDisplayAmountChanged();
 }

@@ -14,6 +14,8 @@ namespace GuZhenRen.Tribulations.EarthCalamities.ChunXiaoCuiLi;
 [RegisterPower]
 public sealed class ChunXiaoCuiLiPower : EarthCalamityPower
 {
+    protected override string IconBaseName => nameof(ChunXiaoCuiLiPower);
+
     protected override string PrimaryCounterKey =>
         TribulationStateStore.Key(TribulationIds.ChunXiaoCuiLi, "spring_growth");
 }

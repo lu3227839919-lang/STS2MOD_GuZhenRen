@@ -14,6 +14,8 @@ namespace GuZhenRen.Tribulations.EarthCalamities.YinYunBaiHai;
 [RegisterPower]
 public sealed class YinYunBaiHaiPower : EarthCalamityPower
 {
+    protected override string IconBaseName => nameof(YinYunBaiHaiPower);
+
     protected override string PrimaryCounterKey =>
         TribulationStateStore.Key(TribulationIds.YinYunBaiHai, "assimilation_level");
 }

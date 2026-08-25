@@ -14,6 +14,8 @@ namespace GuZhenRen.Tribulations.EarthCalamities.RongDi;
 [RegisterPower]
 public sealed class RongDiPower : EarthCalamityPower
 {
+    protected override string IconBaseName => nameof(RongDiPower);
+
     protected override string PrimaryCounterKey =>
         TribulationStateStore.Key(TribulationIds.RongDi, "overheat");
 }

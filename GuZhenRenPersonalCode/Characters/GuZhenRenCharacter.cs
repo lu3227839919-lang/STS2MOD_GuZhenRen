@@ -54,7 +54,7 @@ public sealed class GuZhenRenCharacter : ModCharacterTemplate<GuZhenRenGuCardPoo
             // 人物头像路径。
             IconTexturePath: $"{ImageRoot}/GuZhenRen_character_icon.png",
             // 人物头像轮廓。
-            IconOutlineTexturePath: $"{ImageRoot}/GuZhenRen_character_icon_outline.png",
+            // IconOutlineTexturePath: $"{ImageRoot}/GuZhenRen_character_icon_outline.png",
             // 人物选择背景。
             CharacterSelectBgPath: CharacterSelectBgScenePath,
             // 人物选择图标。

@@ -14,6 +14,8 @@ namespace GuZhenRen.Tribulations.EarthCalamities.HeiYanXingZhui;
 [RegisterPower]
 public sealed class HeiYanXingZhuiPower : EarthCalamityPower
 {
+    protected override string IconBaseName => nameof(HeiYanXingZhuiPower);
+
     protected override string PrimaryCounterKey =>
         TribulationStateStore.Key(TribulationIds.HeiYanXingZhui, "black_flame");
 }
