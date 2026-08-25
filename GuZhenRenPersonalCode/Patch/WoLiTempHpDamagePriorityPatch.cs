@@ -49,16 +49,14 @@ internal static class WoLiTempHpDamagePriorityPatch
                     BindingFlags.Public |
                     BindingFlags.NonPublic
                 )
-                .Where(method =>
-                    method.Name == ModifyHpLostMethodName &&
-                    method.ReturnType == typeof(decimal))
+                .Where(IsCompatibleModifyHpLost)
                 .ToArray();
 
-        if (candidates.Length == 0)
+        if (candidates.Length != 1)
         {
-            throw new MissingMethodException(
-                HookTypeName,
-                ModifyHpLostMethodName
+            throw new InvalidOperationException(
+                $"期望唯一匹配 {HookTypeName}.{ModifyHpLostMethodName}，" +
+                $"实际匹配 {candidates.Length} 个。"
             );
         }
 
@@ -74,13 +72,10 @@ internal static class WoLiTempHpDamagePriorityPatch
                 priority = Priority.Last,
             };
 
-            foreach (MethodInfo method in candidates)
-            {
-                harmony.Patch(
-                    method,
-                    postfix: postfix
-                );
-            }
+            harmony.Patch(
+                candidates[0],
+                postfix: postfix
+            );
 
             _initialized = true;
         }
@@ -97,25 +92,41 @@ internal static class WoLiTempHpDamagePriorityPatch
         _initialized = false;
     }
 
+    private static bool IsCompatibleModifyHpLost(
+        MethodInfo method
+    )
+    {
+        ParameterInfo[] parameters =
+            method.GetParameters();
+
+        return
+            method.Name == ModifyHpLostMethodName &&
+            method.ReturnType == typeof(decimal) &&
+            parameters.Length == 9 &&
+            parameters[2].ParameterType == typeof(Creature) &&
+            parameters[7].ParameterType.IsEnum &&
+            parameters[7].ParameterType.Name == "HpLossHookPhase" &&
+            parameters[8].IsOut;
+    }
+
+    /// <summary>
+    /// 只绑定实际需要的入参。这里不能使用 Harmony 的 __args：
+    /// ModifyHpLost 含有 out modifiers，而 __args 在原方法执行前建立快照；
+    /// Postfix 结束时 Harmony 会把快照写回，导致原方法生成的 modifiers
+    /// 被旧的 null 覆盖。
+    /// </summary>
     private static void Postfix(
-        MethodBase __originalMethod,
-        object[] __args,
+        [HarmonyArgument(2)] Creature target,
+        [HarmonyArgument(7)] object phase,
         ref decimal __result
     )
     {
         if (__result <= 0m ||
-            !IsAfterOstyPhase(__args))
-        {
-            return;
-        }
-
-        Creature? target =
-            FindTarget(
-                __originalMethod,
-                __args
-            );
-
-        if (target is null)
+            !string.Equals(
+                phase.ToString(),
+                "AfterOsty",
+                StringComparison.Ordinal
+            ))
         {
             return;
         }
@@ -145,67 +156,4 @@ internal static class WoLiTempHpDamagePriorityPatch
         );
     }
 
-    private static bool IsAfterOstyPhase(
-        object[] args
-    )
-    {
-        foreach (object? argument in args)
-        {
-            if (argument is not Enum phase ||
-                phase.GetType().Name !=
-                    "HpLossHookPhase")
-            {
-                continue;
-            }
-
-            string phaseName =
-                phase.ToString();
-
-            return phaseName.Contains(
-                "AfterOsty",
-                StringComparison.Ordinal
-            );
-        }
-
-        return false;
-    }
-
-    private static Creature? FindTarget(
-        MethodBase originalMethod,
-        object[] args
-    )
-    {
-        ParameterInfo[] parameters =
-            originalMethod.GetParameters();
-
-        int count = Math.Min(
-            parameters.Length,
-            args.Length
-        );
-
-        for (int index = 0;
-             index < count;
-             index++)
-        {
-            if (string.Equals(
-                    parameters[index].Name,
-                    "target",
-                    StringComparison.OrdinalIgnoreCase
-                ) &&
-                args[index] is Creature target)
-            {
-                return target;
-            }
-        }
-
-        foreach (object? argument in args)
-        {
-            if (argument is Creature creature)
-            {
-                return creature;
-            }
-        }
-
-        return null;
-    }
 }

@@ -18,8 +18,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace GuZhenRen.RestSite;
 
 /// <summary>
-/// 篝火选项：每次升炼共有 4 个槽位，凡蛊各占 1 个、仙蛊各占 2 个，
-/// 最多可升炼 4 只凡蛊或 2 只仙蛊，凡仙可混合（如 1 只仙蛊＋2 只凡蛊）。
+/// 篝火选项：每次升炼共有 2 个槽位，凡蛊各占 1 个、仙蛊各占 2 个，
+/// 最多可升炼 2 只凡蛊或 1 只仙蛊（凡仙不混合，因仙蛊已占满 2 槽）。
 /// 玩家在单次选牌界面直接混合选择，无需先选再追加；
 /// 槽位上限由 DeckCardSelectionManualConfirmationPatch 在选牌界面强制。
 /// 五转升六转同样由升炼完成。
@@ -122,10 +122,10 @@ public sealed class GuRankUpRestSiteOption
             return false;
         }
 
-        // 升炼共有 4 个槽位：凡蛊每只占 1 个（最多 4 只）、仙蛊每只占 2 个
-        // （最多 2 只），凡仙可混合。玩家在单次选牌界面直接混合选择；
+        // 升炼共有 2 个槽位：凡蛊每只占 1 个（最多 2 只）、仙蛊每只占 2 个
+        // （最多 1 只）。玩家在单次选牌界面直接混合选择；
         // 槽位上限由 DeckCardSelectionManualConfirmationPatch 在点击时动态强制。
-        const int totalSlots = 4;
+        const int totalSlots = 2;
 
         CardSelectorPrefs prefs = new(
             SelectionPrompt,

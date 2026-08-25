@@ -192,9 +192,8 @@ internal static class DeckCardSelectionManualConfirmationPatch
             return false;
         }
 
-        // 升炼共有 4 个槽位：凡蛊每只占 1 个（最多 4 只）、仙蛊每只占 2 个
-        // （最多 2 只），凡仙可混合（如 1 只仙蛊＋2 只凡蛊）。
-        // 玩家在单次选择中直接混合选牌，累计槽位超过 4 后拒绝再选。
+        // 升炼共有 2 个槽位：凡蛊每只占 1 个（最多 2 只）、仙蛊每只占 2 个
+        // （最多 1 只）。玩家在单次选择中直接混合选牌，累计槽位超过 2 后拒绝再选。
         if (!isAlreadySelected &&
             IsGuRankUpSelection(prefs))
         {
@@ -213,7 +212,7 @@ internal static class DeckCardSelectionManualConfirmationPatch
                     ? IsMortalGu(guCard) ? 1 : 2
                     : 0;
 
-            if (slotsUsed + newCardSlots > 4)
+            if (slotsUsed + newCardSlots > 2)
             {
                 refreshConfirmButtonVisibility.Invoke(
                     __instance,
@@ -234,7 +233,7 @@ internal static class DeckCardSelectionManualConfirmationPatch
             grid.HighlightCard(card);
         }
 
-        // 选择任意数量（0 至 4 槽位）时都保持在选牌界面。
+        // 选择任意数量（0 至 2 槽位）时都保持在选牌界面。
         // 不在达到 MaxSelect 时自动进入预览；由玩家点击确认按钮。
         refreshConfirmButtonVisibility.Invoke(
             __instance,
