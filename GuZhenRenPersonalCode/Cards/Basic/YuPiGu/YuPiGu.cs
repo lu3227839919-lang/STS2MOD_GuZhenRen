@@ -1,6 +1,5 @@
 using GuZhenRen.Characters;
 using GuZhenRen.Combat;
-using GuZhenRen.Powers.GuangDao;
 
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -43,11 +42,6 @@ public sealed class YuPiGu
         _ => 4,
     };
 
-    protected override IEnumerable<CardTag> AdditionalCanonicalTags =>
-        GuRank >= 5
-            ? [GuZhenRenTags.GuangDao]
-            : [];
-
     protected override IEnumerable<DynamicVar> CanonicalVars =>
         [new BlockVar(8m, ValueProp.Move)];
 
@@ -88,15 +82,6 @@ public sealed class YuPiGu
             cardPlay
         );
 
-        // 五转开始以玉面反光支持光道，但不提供永久敏捷。
-        if (GuRank >= 5 && cardPlay.PlayIndex == 0)
-        {
-            await GuangDaoPowerSystem.GainGuangHui(
-                choiceContext,
-                this,
-                1
-            );
-        }
     }
 
     public void ResetRecoveryEffectState()

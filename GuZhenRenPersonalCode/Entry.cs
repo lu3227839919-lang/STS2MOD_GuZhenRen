@@ -56,6 +56,7 @@ public partial class Entry
         new(nameof(WoLiTempHpHealthBarPatch), WoLiTempHpHealthBarPatch.Initialize, WoLiTempHpHealthBarPatch.Uninitialize),
         new(nameof(GuRankRewardPatch), GuRankRewardPatch.Initialize, GuRankRewardPatch.Uninitialize),
         new(nameof(GuWormUpgradePatch), GuWormUpgradePatch.Initialize, GuWormUpgradePatch.Uninitialize),
+        new(nameof(GuRankUpPreviewPatch), GuRankUpPreviewPatch.Initialize, GuRankUpPreviewPatch.Uninitialize),
         new(nameof(GuPotionCompatibilityPatch), GuPotionCompatibilityPatch.Initialize, GuPotionCompatibilityPatch.Uninitialize),
         new(nameof(CardUniquenessPatch), CardUniquenessPatch.Initialize, CardUniquenessPatch.Uninitialize),
         new(nameof(HandCapacityExemptionPatch), HandCapacityExemptionPatch.Initialize, HandCapacityExemptionPatch.Uninitialize),

@@ -108,6 +108,23 @@ public abstract class AbstractGuWormCard
     )
     {
         List<CardKeyword> common = [];
+        if (guWorm is IRefractionRelevantCard)
+        {
+            common.Add(GuZhenRenKeywords.ZheGuangCore);
+        }
+        if (guWorm is IJuGuangCard)
+        {
+            common.Add(GuZhenRenKeywords.JuGuangCore);
+        }
+        if (guWorm is ITiaoGuCard)
+        {
+            common.Add(GuZhenRenKeywords.TiaoGuCore);
+        }
+        if (guWorm is IMoonlightCard)
+        {
+            common.Add(GuZhenRenKeywords.YueHuaCore);
+        }
+
         if (guWorm is AbstractGuZhenRenCard ranked &&
             ranked.CurrentDao == AbstractGuZhenRenCard.Dao.ZhouDao)
         {
@@ -125,79 +142,6 @@ public abstract class AbstractGuWormCard
 
         IEnumerable<CardKeyword> specific = guWorm.GetType().Name switch
         {
-            "YueGuangGu" when guWorm.GuRank >= 3 =>
-            [
-                GuZhenRenKeywords.GetYaoHuaKeyword(2),
-                GuZhenRenKeywords.ZhaoXi,
-                GuZhenRenKeywords.YanGuang,
-            ],
-            "YueGuangGu" when guWorm.GuRank >= 2 =>
-            [
-                GuZhenRenKeywords.GetYaoHuaKeyword(2),
-                GuZhenRenKeywords.ZhaoXi,
-            ],
-            "YueGuangGu" =>
-            [
-                GuZhenRenKeywords.GetYaoHuaKeyword(2),
-            ],
-            "XiaoGuangGu" when guWorm.GuRank >= 3 =>
-            [
-                GuZhenRenKeywords.YanGuang,
-            ],
-            "JingGuangGu" when guWorm.GuRank >= 3 =>
-            [
-                GuZhenRenKeywords.YanGuang,
-            ],
-            "DingGuangGu" when guWorm.GuRank >= 3 =>
-            [
-                GuZhenRenKeywords.YingGuang,
-                GuZhenRenKeywords.YanGuang,
-            ],
-            "DingGuangGu" when guWorm.GuRank >= 2 =>
-            [
-                GuZhenRenKeywords.YingGuang,
-            ],
-            "LiuGuangGu" when guWorm.GuRank >= 3 =>
-            [
-                GuZhenRenKeywords.ZheGuangCore,
-                GuZhenRenKeywords.YanGuang,
-            ],
-            "LiuGuangGu" when guWorm.GuRank >= 2 =>
-            [
-                GuZhenRenKeywords.ZheGuangCore,
-            ],
-            "XunDianLiuGuangGu" =>
-            [
-                GuZhenRenKeywords.GetYaoHuaKeyword(2),
-            ],
-            "TaiGuangGu" =>
-            [
-                GuZhenRenKeywords.GetYaoHuaKeyword(3),
-            ],
-            "YueMangGu" when guWorm.GuRank >= 5 =>
-            [
-                GuZhenRenKeywords.GetYaoHuaKeyword(2),
-                GuZhenRenKeywords.YanGuang,
-            ],
-            "YueMangGu" =>
-            [
-                GuZhenRenKeywords.YanGuang,
-            ],
-            "JingHuiGu" when guWorm.GuRank >= 8 =>
-            [
-                GuZhenRenKeywords.YanGuang,
-                GuZhenRenKeywords.ShouHui,
-                GuZhenRenKeywords.PoHui,
-            ],
-            "JingHuiGu" when guWorm.GuRank >= 5 =>
-            [
-                GuZhenRenKeywords.YanGuang,
-                GuZhenRenKeywords.ShouHui,
-            ],
-            "JingHuiGu" =>
-            [
-                GuZhenRenKeywords.YanGuang,
-            ],
             "XueQiGu" =>
             [
                 GuZhenRenKeywords.XueJiCost,

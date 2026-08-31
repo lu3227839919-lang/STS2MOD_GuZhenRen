@@ -22,5 +22,7 @@
   "GU_ZHEN_REN_PERSONAL_POWER_CHUN_XIAO_CUI_LI_POWER.title": "Verdant Dawn",
   "GU_ZHEN_REN_PERSONAL_POWER_CHUN_XIAO_CUI_LI_POWER.description": "Aberrant Earth Calamity. Below 55% HP, the leader permanently enters Full Bloom. Amount is Spring Growth.",
   "GU_ZHEN_REN_PERSONAL_POWER_HEI_YAN_XING_ZHUI_POWER.title": "Blackflame Starfall",
-  "GU_ZHEN_REN_PERSONAL_POWER_HEI_YAN_XING_ZHUI_POWER.description": "Aberrant Earth Calamity. Losing HP accumulates Black Flame. Amount is current Black Flame."
+  "GU_ZHEN_REN_PERSONAL_POWER_HEI_YAN_XING_ZHUI_POWER.description": "Aberrant Earth Calamity. Losing HP accumulates Black Flame. Amount is current Black Flame.",
+  "GU_ZHEN_REN_PERSONAL_POWER_JU_GUANG_POWER.title": "Focus",
+  "GU_ZHEN_REN_PERSONAL_POWER_JU_GUANG_POWER.description": "The next card that truly triggers Refraction and has a Refraction effect consumes 1 Focus to resolve that Refraction effect one additional time."
 }

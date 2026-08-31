@@ -5,7 +5,6 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using GuZhenRen.Characters;
 using STS2RitsuLib.Utils;
@@ -27,38 +26,6 @@ namespace GuZhenRen.Cards;
 public abstract class AbstractShaZhaoCard
     : AbstractGuZhenRenCard
 {
-    public override string Title
-    {
-        get
-        {
-            string title = base.Title;
-            Type[] materialTypes = OrderedMaterialTypes.ToArray();
-            if (materialTypes.Length == 0)
-            {
-                return title;
-            }
-
-            CardModel[] guTemplates =
-                ModelDb.CardPool<GuZhenRenGuCardPool>()
-                    .AllCards
-                    .ToArray();
-            string materials = string.Join(
-                " / ",
-                materialTypes.Select(type =>
-                    guTemplates.FirstOrDefault(card =>
-                        card.GetType() == type
-                    )?.Title ?? type.Name
-                )
-            );
-            LocString suffix = new(
-                "cards",
-                "GU_ZHEN_REN_PERSONAL_CARD_STATUS.shaZhaoMaterialsSuffix"
-            );
-            suffix.Add("Materials", materials);
-            return title + suffix.GetFormattedText();
-        }
-    }
-
     /// <summary>
     /// 杀招牌固定属于杀招隐藏卡池。
     /// </summary>

@@ -9,7 +9,6 @@
 // ============================================================================
 using GuZhenRen.Cards;
 using GuZhenRen.Aperture;
-using GuZhenRen.Powers.GuangDao;
 using GuZhenRen.Tribulations.Contracts;
 using GuZhenRen.Tribulations.Core;
 using GuZhenRen.Tribulations.Runtime;
@@ -142,9 +141,9 @@ public abstract class EarthCalamityPower : ModPowerTemplate
     /// <summary>
     /// 灾劫 Power 的图标基名（不含尺寸后缀）。每个地灾在 images/power 下
     /// 有同名图标（如 XueYuePower-64x64.png / XueYuePower-256x256.png）。
-    /// 基类默认使用光辉占位图标；具体地灾覆盖为各自类名。
+    /// 基类默认使用通用战斗占位图标；具体地灾覆盖为各自类名。
     /// </summary>
-    protected virtual string IconBaseName => nameof(GuangHuiPower);
+    protected virtual string IconBaseName => "LiDaoBattlePower";
 
     public override PowerAssetProfile AssetProfile => new(
         IconPath:

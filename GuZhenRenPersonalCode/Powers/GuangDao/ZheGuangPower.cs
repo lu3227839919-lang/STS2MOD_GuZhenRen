@@ -1,7 +1,4 @@
-using System.Runtime.CompilerServices;
-
 using GuZhenRen.Cards;
-using GuZhenRen.Cards.Basic;
 
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -16,51 +13,43 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace GuZhenRen.Powers.GuangDao;
 
 /// <summary>
-/// 折光：追踪同一玩家本回合打出的上一张标准类型卡牌。
-/// 当前牌为光道牌且类型改变时获得 1 点光辉，每回合最多获得 3 点。
-/// 上一张牌可以来自任意流派。
+/// 隐藏的玩家级折光战斗状态。所有会影响结算的字段均保存在 Power 的
+/// DynamicVars 中，使读档、克隆与多人快照使用同一份战斗真值。
 /// </summary>
 [RegisterPower]
 public sealed class ZheGuangPower : ModPowerTemplate
-{    private sealed class EarlyResolutionState
-    {
-        public int PlayIndex = -1;
-        public bool Resolved;
-    }
-
-    private static readonly ConditionalWeakTable<
-        CardModel,
-        EarlyResolutionState
-    > EarlyResolutionStates = new();
-
+{
     private const string PreviousTypeKey = "PreviousCardType";
-    private const string GainedThisTurnKey = "GainedThisTurn";
-    private const string XiaoGuangClaimedThisTurnKey =
-        "XiaoGuangClaimedThisTurn";
-    private const int MaximumGainPerTurn = 3;
+    private const string TotalSerialKey = "TotalRefractionSerial";
+    private const string ForceNextKey = "ForceNextGuangDaoRefraction";
+    private const string CurrentTriggeredKey = "CurrentTriggered";
+    private const string CurrentEffectCountKey = "CurrentEffectCount";
+    private const string CurrentEffectResolvedKey = "CurrentEffectResolved";
 
     public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Single;
 
-    // 内部光道状态：保留战斗钩子，但不产生任何 Power 展示。
     protected override bool IsVisibleInternal => false;
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new DynamicVar(PreviousTypeKey, (int)CardType.None),
-        new DynamicVar(GainedThisTurnKey, 0),
-        new DynamicVar(XiaoGuangClaimedThisTurnKey, 0),
+        new DynamicVar(TotalSerialKey, 0),
+        new DynamicVar(ForceNextKey, 0),
+        new DynamicVar(CurrentTriggeredKey, 0),
+        new DynamicVar(CurrentEffectCountKey, 0),
+        new DynamicVar(CurrentEffectResolvedKey, 0),
     ];
 
     public CardType PreviousCardType =>
-        (CardType)(int)DynamicVars[PreviousTypeKey].BaseValue;
+        (CardType)DynamicVars[PreviousTypeKey].IntValue;
 
-    public int GuangHuiGainedThisTurn =>
-        (int)DynamicVars[GainedThisTurnKey].BaseValue;
+    public int TotalRefractionSerial =>
+        Math.Max(0, DynamicVars[TotalSerialKey].IntValue);
 
-    public bool PreviousCardWas(CardType type) =>
-        PreviousCardType == type;
+    internal bool CurrentEffectWasResolved =>
+        DynamicVars[CurrentEffectResolvedKey].IntValue != 0;
 
     public override Task AfterEnergyReset(Player player)
     {
@@ -68,147 +57,101 @@ public sealed class ZheGuangPower : ModPowerTemplate
         {
             DynamicVars[PreviousTypeKey].BaseValue =
                 (int)CardType.None;
-            DynamicVars[GainedThisTurnKey].BaseValue = 0;
-            DynamicVars[XiaoGuangClaimedThisTurnKey].BaseValue = 0;
+            ClearCurrentResult();
         }
 
         return Task.CompletedTask;
     }
 
-    /// <summary>
-    /// 小光蛊每回合仅第一次获得光辉；后续小光蛊改为获得闪耀。
-    /// 该标记必须属于战斗模型本身，避免多人端因本机 Player 对象生命周期
-    /// 或 ExtraHand 的提前移牌路径不同而产生未参与同步的隐藏状态。
-    /// </summary>
-    internal bool TryClaimXiaoGuangFirstGainThisTurn()
+    public override Task BeforeCardPlayed(CardPlay cardPlay)
     {
-        if ((int)DynamicVars[XiaoGuangClaimedThisTurnKey].BaseValue != 0)
+        if (cardPlay.IsAutoPlay ||
+            !ReferenceEquals(cardPlay.Player.Creature, Owner) ||
+            !IsStandardType(cardPlay.Card.Type))
         {
-            return false;
+            return Task.CompletedTask;
         }
 
-        DynamicVars[XiaoGuangClaimedThisTurnKey].BaseValue = 1;
-        return true;
+        ClearCurrentResult();
+        if (!cardPlay.IsFirstInSeries)
+        {
+            return Task.CompletedTask;
+        }
+
+        CardModel card = cardPlay.Card;
+        bool isGuangDao = GuangDaoPowerSystem.IsGuangDaoCard(card);
+        bool forced = isGuangDao &&
+            DynamicVars[ForceNextKey].IntValue != 0;
+
+        // 下一张光道牌处理到统一入口时即消费标记。自然折光与强制
+        // 折光同时成立也只产生一个真实折光事件。
+        if (forced)
+        {
+            DynamicVars[ForceNextKey].BaseValue = 0;
+        }
+
+        bool natural = isGuangDao &&
+            PreviousCardType != CardType.None &&
+            PreviousCardType != card.Type;
+        bool triggered = natural || forced;
+        if (!triggered)
+        {
+            return Task.CompletedTask;
+        }
+
+        DynamicVars[CurrentTriggeredKey].BaseValue = 1;
+        DynamicVars[CurrentEffectCountKey].BaseValue = 1;
+        DynamicVars[TotalSerialKey].BaseValue =
+            TotalRefractionSerial + 1;
+        return Task.CompletedTask;
     }
 
-    /// <summary>
-    /// 自动支付型光道牌会在自己的 OnPlay 前调用此入口，提前结算
-    /// “本张牌触发的折光”。这样刚好达到光辉阈值时也能立即耀化。
-    /// </summary>
-    internal async Task ResolveBeforeAutoSpend(
+    public override Task AfterCardPlayed(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay
     )
     {
-        if (!cardPlay.IsFirstInSeries ||
-            !TryGetTrackedCard(cardPlay, out CardModel card))
+        if (!cardPlay.IsAutoPlay &&
+            ReferenceEquals(cardPlay.Player.Creature, Owner) &&
+            cardPlay.IsLastInSeries &&
+            IsStandardType(cardPlay.Card.Type))
         {
-            return;
+            // Replay 的全部段落完成后才提交真实出牌历史。
+            DynamicVars[PreviousTypeKey].BaseValue =
+                (int)cardPlay.Card.Type;
+            ClearCurrentResult();
         }
 
-        EarlyResolutionState state =
-            EarlyResolutionStates.GetValue(
-                card,
-                static _ => new EarlyResolutionState()
-            );
-
-        if (state.Resolved && state.PlayIndex == cardPlay.PlayIndex)
-        {
-            return;
-        }
-
-        // 即使已经达到光辉上限、实际获得量为 0，也要标记为已提前
-        // 结算；否则自动支付把光辉降下来后，AfterCardPlayed 会错误地
-        // 再补发一次本应在支付前被上限截断的折光光辉。
-        state.PlayIndex = cardPlay.PlayIndex;
-        state.Resolved = true;
-
-        await TryGainRefractionGuangHui(choiceContext, card);
+        return Task.CompletedTask;
     }
 
-    public override async Task AfterCardPlayed(
-        PlayerChoiceContext choiceContext,
-        CardPlay cardPlay
-    )
+    internal RefractionResult GetCurrentResult() => new(
+        DynamicVars[CurrentTriggeredKey].IntValue != 0,
+        Math.Max(0, DynamicVars[CurrentEffectCountKey].IntValue)
+    );
+
+    internal void MarkCurrentEffectResolved()
     {
-        if (!cardPlay.IsFirstInSeries ||
-            !TryGetTrackedCard(cardPlay, out CardModel card))
-        {
-            return;
-        }
-
-        bool resolvedEarly =
-            EarlyResolutionStates.TryGetValue(
-                card,
-                out EarlyResolutionState? state
-            ) &&
-            state.Resolved &&
-            state.PlayIndex == cardPlay.PlayIndex;
-
-        if (!resolvedEarly)
-        {
-            await TryGainRefractionGuangHui(choiceContext, card);
-        }
-        else
-        {
-            state!.Resolved = false;
-            state.PlayIndex = -1;
-        }
-
-        // 无论上一张牌属于哪个流派，都作为下一次折光的类型参照。
-        DynamicVars[PreviousTypeKey].BaseValue = (int)card.Type;
+        DynamicVars[CurrentEffectResolvedKey].BaseValue = 1;
     }
 
-    private async Task TryGainRefractionGuangHui(
-        PlayerChoiceContext choiceContext,
-        CardModel card
-    )
+    internal void MarkCurrentEffectDoubled()
     {
-        CardType previous = PreviousCardType;
-        int gainedThisTurn = GuangHuiGainedThisTurn;
-
-        if (previous == CardType.None ||
-            previous == card.Type ||
-            gainedThisTurn >= MaximumGainPerTurn ||
-            !GuangDaoPowerSystem.IsGuangDaoCard(card))
-        {
-            return;
-        }
-
-        int gained = await GuangDaoPowerSystem.GainGuangHui(
-            choiceContext,
-            card,
-            1
-        );
-
-        if (gained <= 0)
-        {
-            return;
-        }
-
-        DynamicVars[GainedThisTurnKey].BaseValue += gained;
-        Flash();
+        DynamicVars[CurrentEffectCountKey].BaseValue = 2;
     }
 
-    private bool TryGetTrackedCard(
-        CardPlay cardPlay,
-        out CardModel card
-    )
+    internal void ArmForcedRefraction()
     {
-        card = cardPlay.Card;
-
-        // 记录打出的标准类型牌（攻击/技能/能力），用于折光判定。
-        if (!ReferenceEquals(card.Owner, Owner.Player) ||
-            card.Type is not (
-                CardType.Attack or
-                CardType.Skill or
-                CardType.Power
-            ))
-        {
-            card = null!;
-            return false;
-        }
-
-        return true;
+        DynamicVars[ForceNextKey].BaseValue = 1;
     }
+
+    private void ClearCurrentResult()
+    {
+        DynamicVars[CurrentTriggeredKey].BaseValue = 0;
+        DynamicVars[CurrentEffectCountKey].BaseValue = 0;
+        DynamicVars[CurrentEffectResolvedKey].BaseValue = 0;
+    }
+
+    private static bool IsStandardType(CardType type) => type is
+        CardType.Attack or CardType.Skill or CardType.Power;
 }

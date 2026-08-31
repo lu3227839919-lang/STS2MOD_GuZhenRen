@@ -17,6 +17,7 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Entities.RestSite;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.ValueProps;
@@ -61,6 +62,21 @@ public sealed class KongQiaoRelic
             }
         }
     }
+
+    protected override IEnumerable<DynamicVar> CanonicalVars =>
+        base.CanonicalVars.Concat(
+            [
+                new IntVar("Rank", ApertureProgression.MinimumRank),
+                new IntVar("CurrentXp", 0),
+                new IntVar(
+                    "RequiredXp",
+                    ApertureProgression.GetRequiredXp(
+                        ApertureProgression.MinimumRank
+                    )
+                ),
+                new IntVar("CultivationComplete", 0),
+            ]
+        );
 
     /// <summary>
     /// 所有图片路径均显式声明为非空值。
@@ -119,67 +135,6 @@ public sealed class KongQiaoRelic
         ApertureSystem.HandleCombatStarting(Owner);
         await TribulationSystem.TryPrepareCombatAsync(Owner);
         await GuangDaoPowerSystem.EnsureZheGuang(Owner);
-    }
-
-    /// <summary>
-    /// 光辉与照破只能由光道卡牌改变。这里位于原生 PowerCmd 的
-    /// giver 修正链中，因此也会拦住绕过 GuangDaoPowerSystem 的误调用；
-    /// 同时保证光辉初次施加时不超过 9 点。
-    /// </summary>
-    public override decimal ModifyPowerAmountGivenAdditive(
-        PowerModel power,
-        Creature giver,
-        decimal amount,
-        Creature? target,
-        CardModel? cardSource
-    )
-    {
-        if (!ReferenceEquals(giver, Owner.Creature) ||
-            power is not GuangHuiPower ||
-            amount <= 0 ||
-            !ReferenceEquals(target, Owner.Creature) ||
-            !GuangDaoPowerSystem.IsGuangDaoCard(cardSource))
-        {
-            return 0;
-        }
-
-        int existing = Owner.Creature
-            .GetPower<GuangHuiPower>()?.Amount ?? 0;
-        decimal allowed = Math.Min(
-            amount,
-            Math.Max(0, GuangHuiPower.MaximumAmount - existing)
-        );
-        return allowed - amount;
-    }
-
-    public override decimal ModifyPowerAmountGivenMultiplicative(
-        PowerModel power,
-        Creature giver,
-        decimal amount,
-        Creature? target,
-        CardModel? cardSource
-    )
-    {
-        if (!ReferenceEquals(giver, Owner.Creature) ||
-            power is not (GuangHuiPower or ZhaoPoPower))
-        {
-            return 1;
-        }
-
-        bool validTarget = power switch
-        {
-            GuangHuiPower => ReferenceEquals(
-                target,
-                Owner.Creature
-            ),
-            ZhaoPoPower => target?.IsEnemy == true,
-            _ => false,
-        };
-
-        return validTarget &&
-            GuangDaoPowerSystem.IsGuangDaoCard(cardSource)
-                ? 1
-                : 0;
     }
 
     /// <summary>
@@ -732,6 +687,13 @@ public sealed class KongQiaoRelic
             _lastVisualRank = data.Rank;
             RelicIconChanged();
         }
+
+        DynamicVars["Rank"].BaseValue = data.Rank;
+        DynamicVars["CurrentXp"].BaseValue = data.Xp;
+        DynamicVars["RequiredXp"].BaseValue =
+            ApertureProgression.GetRequiredXp(data.Rank);
+        DynamicVars["CultivationComplete"].BaseValue =
+            data.IsCultivationComplete ? 1 : 0;
 
         InvokeDisplayAmountChanged();
     }

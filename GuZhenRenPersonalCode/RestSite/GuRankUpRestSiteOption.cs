@@ -1,6 +1,7 @@
 using Godot;
 
 using GuZhenRen.Cards;
+using GuZhenRen.Patches;
 
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
@@ -20,10 +21,9 @@ namespace GuZhenRen.RestSite;
 /// <summary>
 /// 篝火选项：每次升炼共有 2 个槽位，凡蛊各占 1 个、仙蛊各占 2 个，
 /// 最多可升炼 2 只凡蛊或 1 只仙蛊（凡仙不混合，因仙蛊已占满 2 槽）。
-/// 玩家在单次选牌界面直接混合选择，无需先选再追加；
-/// 槽位上限由 DeckCardSelectionManualConfirmationPatch 在选牌界面强制。
-/// 五转升六转同样由升炼完成。
-/// 选择 0 张并确认等同于取消；每个休息点只能成功使用一次。
+/// 每张牌都通过原生升级前后预览单独确认；五转升六转也由专用预览
+/// 范围支持。取消后续选择会保留本次已经确认的升炼结果。
+/// 每个休息点只能成功使用一次。
 /// </summary>
 public sealed class GuRankUpRestSiteOption
     : ModRestSiteOptionTemplate
@@ -122,50 +122,63 @@ public sealed class GuRankUpRestSiteOption
             return false;
         }
 
-        // 升炼共有 2 个槽位：凡蛊每只占 1 个（最多 2 只）、仙蛊每只占 2 个
-        // （最多 1 只）。玩家在单次选牌界面直接混合选择；
-        // 槽位上限由 DeckCardSelectionManualConfirmationPatch 在点击时动态强制。
-        const int totalSlots = 2;
+        // 使用原生升级选择界面逐张确认，玩家会看到明确的升转前后
+        // 预览。凡蛊消耗 1 槽，仙蛊消耗 2 槽；已升炼的牌不会在
+        // 本次休息点的下一轮选择中再次出现。
+        int remainingSlots = 2;
+        HashSet<CardModel> handledCards = [];
 
-        CardSelectorPrefs prefs = new(
-            SelectionPrompt,
-            0,
-            totalSlots
-        )
+        while (remainingSlots > 0)
         {
-            Cancelable = true,
-            RequireManualConfirmation = true
-        };
-
-        IEnumerable<CardModel> selection =
-            await CardSelectCmd.FromDeckGeneric(
-                player: Owner,
-                prefs: prefs,
-                filter: IsEligibleCard,
-                sortingOrder: card =>
-                    card is AbstractGuZhenRenCard gu
-                        ? gu.GuRank
-                        : int.MaxValue
+            bool hasCandidate = Owner.Deck.Cards.Any(card =>
+                !handledCards.Contains(card) &&
+                IsEligibleCard(card) &&
+                GetSlotCost(card) <= remainingSlots
             );
 
-        List<AbstractGuZhenRenCard> selectedGuCards =
-            selection
-                .OfType<AbstractGuZhenRenCard>()
-                .Take(totalSlots)
-                .ToList();
+            if (!hasCandidate)
+            {
+                break;
+            }
 
-        if (selectedGuCards.Count == 0)
-        {
-            Entry.Logger.Info(
-                "本次篝火升炼未选择蛊牌，已取消。"
-            );
-            return false;
-        }
+            CardSelectorPrefs prefs = new(
+                SelectionPrompt,
+                1
+            )
+            {
+                Cancelable = true,
+                // 即使只剩一张候选，也必须打开前后预览供玩家确认。
+                RequireManualConfirmation = true,
+            };
 
-        foreach (AbstractGuZhenRenCard selectedGu in
-                 selectedGuCards)
-        {
-            if (!selectedGu.TryIncreaseGuRank())
+            CardModel? selected;
+            using (
+                GuRankUpPreviewPatch.Begin(
+                    remainingSlots,
+                    handledCards
+                )
+            )
+            {
+                selected = (
+                    await CardSelectCmd.FromDeckForUpgrade(
+                        Owner,
+                        prefs
+                    )
+                ).FirstOrDefault();
+            }
+
+            if (selected is not AbstractGuZhenRenCard selectedGu ||
+                selected is not IGuWormCard)
+            {
+                break;
+            }
+
+            handledCards.Add(selectedGu);
+            int slotCost = GetSlotCost(selectedGu);
+            int previousRank = selectedGu.GuRank;
+
+            if (slotCost > remainingSlots ||
+                !selectedGu.TryIncreaseGuRank())
             {
                 Entry.Logger.Info(
                     "篝火升炼跳过未能提升的蛊牌：" +
@@ -174,13 +187,22 @@ public sealed class GuRankUpRestSiteOption
                 continue;
             }
 
+            remainingSlots -= slotCost;
             _lastLocalVfxCards.Add(selectedGu);
 
             Entry.Logger.Info(
                 "篝火升炼完成：" +
-                $"{selectedGu.Id} 提升至 " +
+                $"{selectedGu.Id} 从 {previousRank} 转提升至 " +
                 $"{selectedGu.GuRank} 转。"
             );
+        }
+
+        if (_lastLocalVfxCards.Count == 0)
+        {
+            Entry.Logger.Info(
+                "本次篝火升炼未选择蛊牌，已取消。"
+            );
+            return false;
         }
 
         Entry.Logger.Info(
@@ -259,4 +281,10 @@ public sealed class GuRankUpRestSiteOption
                 gu.GuRank + 1
             );
     }
+
+    private static int GetSlotCost(CardModel card) =>
+        card is IGuRankProvider rankProvider &&
+        rankProvider.GuRank < GuZhenRenCardRules.XianGuRank
+            ? 1
+            : 2;
 }

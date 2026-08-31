@@ -8,7 +8,6 @@
 // 维护约定：修改数值或关键词时同步检查 zhs/eng 本地化；异步战斗效果必须 await。
 // ============================================================================
 using GuZhenRen.Characters;
-using GuZhenRen.Powers.GuangDao;
 
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -44,11 +43,6 @@ public sealed class ZheGuang : AbstractYuPiToken
             Owner.Creature,
             DynamicVars.Block,
             cardPlay
-        );
-        await GuangDaoPowerSystem.GainGuangHui(
-            choiceContext,
-            this,
-            1
         );
     }
 

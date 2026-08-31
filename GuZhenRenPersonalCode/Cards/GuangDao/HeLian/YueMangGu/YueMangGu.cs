@@ -1,14 +1,4 @@
-// ============================================================================
-// 中文维护说明
-// 文件职责：实现蛊真人卡牌、衍生牌及其战斗结算逻辑；对应本地化名称“月芒蛊”。
-// 主要类型：YueMangGu。
-// 实现要点：OnPlay 使用同步后的 CardPlay 目标和序号执行实际效果。
-// 实现补充：升转、复制或读档后通过 OnGuRankChanged 重算品阶相关数值。
-// 实现补充：恢复期按重置、进入冷却、回合开始、恢复完成四段钩子推进。
-// 维护约定：修改数值或关键词时同步检查 zhs/eng 本地化；异步战斗效果必须 await。
-// ============================================================================
 using GuZhenRen.Cards.GuangDao;
-using GuZhenRen.Characters;
 using GuZhenRen.Combat;
 using GuZhenRen.Powers.GuangDao;
 
@@ -22,7 +12,6 @@ using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib.Combat.SecondaryResources;
 using STS2RitsuLib.Scaffolding.Content;
-using STS2RitsuLib.Utils;
 
 namespace GuZhenRen.Cards.HeLian;
 
@@ -30,72 +19,45 @@ namespace GuZhenRen.Cards.HeLian;
     typeof(YueGuangGu),
     typeof(XiaoGuangGu),
     typeof(XiaoGuangGu),
-    MinimumMaterialRank = 3
+    MinimumMaterialRank = 2
 )]
 public sealed class YueMangGu
     : AbstractHeLianGuCard,
-      IGuRecoveryEffectSource
+      IRefractionEffectCard,
+      IRefractionRelevantCard,
+      IJuGuangCard
 {
-    private const int GuangHuiCost = 2;
+    public override int MinimumAvailableGuRank => 3;
 
-    private static readonly SavedAttachedState<CardModel, bool>
-        RecoveryHandledState = new(
-            Entry.ModId + ".yue_mang.recovery_handled",
-            static () => false
-        );
-
-    private static readonly SavedAttachedState<CardModel, bool>
-        PendingGenerationState = new(
-            Entry.ModId + ".yue_mang.pending_generation",
-            static () => false
-        );
+    public override int MaxGuRank => 6;
 
     public override int MaxUses => 1;
 
-    public override int RecoveryDelayTurns => GuRank switch
-    {
-        <= 5 => 2,
-        <= 8 => 3,
-        _ => 4,
-    };
+    public override int RecoveryDelayTurns => GuRank >= 6 ? 3 : 2;
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(4m, ValueProp.Move),
-        new RepeatVar("Hits", 2),
-        new DynamicVar("EmpoweredHits", 1m),
-        new PowerVar<ZhaoPoPower>(1m),
+        new DamageVar(1, ValueProp.Move),
+        new RepeatVar("BaseHits", 5),
+        new DynamicVar("RefractionBonusHits", 3),
+        new DynamicVar("JuGuang", 1),
     ];
 
     public override CardAssetProfile AssetProfile =>
-        global::GuZhenRen.Cards.CardImageCatalog.Create(GetType());
+        CardImageCatalog.Create(GetType());
 
     public YueMangGu()
         : base(
-            baseCost: 0,
-            type: CardType.Attack,
-            rarity: CardRarity.Uncommon,
-            target: TargetType.AnyEnemy
+            0,
+            CardType.Attack,
+            CardRarity.Uncommon,
+            TargetType.AnyEnemy
         )
     {
         SetDao(Dao.GuangDao);
         this.SecondaryCosts().Set(YuanQiSystem.ResourceId, 2);
         SetGuRank(3);
         RefreshRankValues();
-    }
-
-    protected override void AddExtraArgsToDescription(
-        MegaCrit.Sts2.Core.Localization.LocString description
-    )
-    {
-        base.AddExtraArgsToDescription(description);
-        description.Add("GuangHuiCost", GuangHuiCost);
-        description.Add("RecoveryTurns", RecoveryDelayTurns);
-        description.Add(
-            "EmpoweredTotalHits",
-            DynamicVars["Hits"].IntValue +
-                DynamicVars["EmpoweredHits"].IntValue
-        );
     }
 
     protected override async Task OnPlay(
@@ -109,122 +71,51 @@ public sealed class YueMangGu
             return;
         }
 
-        bool empowered = GuRank >= 5 &&
-            await GuangDaoPowerSystem.TryAutoSpendGuangHui(
+        RefractionResult refraction =
+            await GuangDaoPowerSystem.ResolveRefractionEffectAsync(
                 choiceContext,
                 this,
-                cardPlay,
-                GuangHuiCost
+                cardPlay
             );
+        int hitCount = DynamicVars["BaseHits"].IntValue +
+            DynamicVars["RefractionBonusHits"].IntValue *
+            refraction.EffectResolutionCount;
 
-        int hitCount = DynamicVars["Hits"].IntValue +
-            (empowered
-                ? DynamicVars["EmpoweredHits"].IntValue
-                : 0);
-
-        for (int hit = 0; hit < hitCount; hit++)
+        for (int hit = 0; hit < hitCount && !target.IsDead; hit++)
         {
-            await DamageCmd
-                .Attack(DynamicVars.Damage.BaseValue)
+            await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
                 .FromCard(this, cardPlay)
                 .Targeting(target)
                 .WithHitFx("vfx/vfx_attack_slash")
                 .Execute(choiceContext);
-
-            if (target.IsDead)
-            {
-                break;
-            }
         }
 
-        if (empowered && cardPlay.IsFirstInSeries && !target.IsDead)
+        if (refraction.Triggered)
         {
-            await GuangDaoPowerSystem.ApplyZhaoPo(
+            await PowerCmd.Apply<JuGuangPower>(
                 choiceContext,
-                this,
-                target,
-                DynamicVars[typeof(ZhaoPoPower).Name].IntValue
+                Owner.Creature,
+                DynamicVars["JuGuang"].IntValue,
+                Owner.Creature,
+                this
             );
         }
-    }
-
-    public void ResetRecoveryEffectState()
-    {
-        RecoveryHandledState[this] = false;
-        PendingGenerationState[this] = false;
-    }
-
-    public async Task OnEnteredRecoveryAsync()
-    {
-        if (RecoveryHandledState[this])
-        {
-            return;
-        }
-
-        RecoveryHandledState[this] = true;
-        if (GuRank < 3)
-        {
-            return;
-        }
-
-        if (GuRank == 3)
-        {
-            YueMang token = CreatePrimaryToken<YueMang>();
-            await GuCardPileSystem.AddGeneratedCardToDiscard(
-                token,
-                Owner
-            );
-            return;
-        }
-
-        PendingGenerationState[this] = true;
-    }
-
-    public async Task OnRecoveryTurnStartAsync(int turnNumber)
-    {
-        if (!PendingGenerationState[this])
-        {
-            return;
-        }
-
-        PendingGenerationState[this] = false;
-        AbstractGuZhenRenCard primary = GuRank >= 9
-            ? CreatePrimaryToken<TianYueMang>()
-            : GuRank >= 6
-                ? CreatePrimaryToken<NingYueMang>()
-                : CreatePrimaryToken<YueMang>();
-
-        await GuGeneratedCardFactory.AddToHandOrDiscard(
-            primary,
-            Owner
-        );
-
-        if (GuRank == 8)
-        {
-            NingYueMang second = CreatePrimaryToken<NingYueMang>();
-            await GuCardPileSystem.AddGeneratedCardToDiscard(
-                second,
-                Owner
-            );
-        }
-    }
-
-    public Task OnRecoveredAsync()
-    {
-        RecoveryHandledState[this] = false;
-        PendingGenerationState[this] = false;
-        return Task.CompletedTask;
     }
 
     protected override int CalculateHeLianResultRank(
         IReadOnlyList<CardModel> materials
     )
     {
-        return materials
-            .OfType<IGuRankProvider>()
-            .Select(provider => provider.GuRank)
-            .DefaultIfEmpty(3)
-            .Min();
+        if (materials.Count != 3 ||
+            materials.OfType<IGuRankProvider>()
+                .Any(provider => provider.GuRank < 2))
+        {
+            throw new InvalidOperationException(
+                "月芒蛊需要三只至少二转的指定合练材料。"
+            );
+        }
+
+        return 3;
     }
 
     protected override void OnGuRankChanged()
@@ -233,83 +124,15 @@ public sealed class YueMangGu
         RefreshRankValues();
     }
 
-    public override IReadOnlyList<CardModel> GetCarouselCards()
-    {
-        if (GuRank < 3)
-        {
-            return [];
-        }
-
-        if (GuRank >= 9)
-        {
-            return
-            [
-                GuCardReferenceFactory.Create<TianYueMang>(
-                    this,
-                    false
-                ),
-            ];
-        }
-
-        if (GuRank >= 6)
-        {
-            List<CardModel> cards =
-            [
-                GuCardReferenceFactory.Create<NingYueMang>(
-                    this,
-                    false
-                ),
-            ];
-
-            if (GuRank >= 7)
-            {
-                cards.Add(
-                    GuCardReferenceFactory.Create<CanMang>(this)
-                );
-            }
-
-            return cards;
-        }
-
-        return
-        [
-            GuCardReferenceFactory.Create<YueMang>(
-                this,
-                false
-            ),
-        ];
-    }
-
-    private T CreatePrimaryToken<T>()
-        where T : AbstractGuZhenRenCard
-    {
-        return GuGeneratedCardFactory.Create<T>(
-            Owner,
-            GuRank,
-            upgraded: false
-        );
-    }
-
     private void RefreshRankValues()
     {
         DynamicVars.Damage.BaseValue = GuRank switch
         {
-            <= 3 => 4,
-            4 => 5,
-            5 => 5,
-            6 => 6,
-            7 => 7,
-            8 => 7,
-            _ => 8,
+            <= 3 => 1,
+            <= 5 => 2,
+            _ => 3,
         };
-        DynamicVars["Hits"].BaseValue = GuRank switch
-        {
-            <= 4 => 2,
-            <= 7 => 3,
-            _ => 4,
-        };
-        DynamicVars["EmpoweredHits"].BaseValue = GuRank >= 9
-            ? 2
-            : 1;
+        DynamicVars["BaseHits"].BaseValue = 5;
+        DynamicVars["RefractionBonusHits"].BaseValue = 3;
     }
 }

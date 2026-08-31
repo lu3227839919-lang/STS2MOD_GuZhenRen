@@ -22,15 +22,6 @@ namespace GuZhenRen.Cards;
 [RegisterOwnedCardKeyword(nameof(XueQiCore), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(XueYueCore), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(XueTaiCore), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
-[RegisterOwnedCardKeyword(nameof(YaoHua1), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
-[RegisterOwnedCardKeyword(nameof(YaoHua2), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
-[RegisterOwnedCardKeyword(nameof(YaoHua3), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
-[RegisterOwnedCardKeyword(nameof(YaoHua4), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
-[RegisterOwnedCardKeyword(nameof(YaoHua5), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
-[RegisterOwnedCardKeyword(nameof(YaoHua6), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
-[RegisterOwnedCardKeyword(nameof(YaoHua7), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
-[RegisterOwnedCardKeyword(nameof(YaoHua8), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
-[RegisterOwnedCardKeyword(nameof(YaoHua9), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(ZongEDu), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(YiChu), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(ZhuiJi), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
@@ -38,11 +29,9 @@ namespace GuZhenRen.Cards;
 [RegisterOwnedCardKeyword(nameof(XuYing), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(LianLi), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(ZheGuangCore), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
-[RegisterOwnedCardKeyword(nameof(ZhaoXi), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
-[RegisterOwnedCardKeyword(nameof(YanGuang), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
-[RegisterOwnedCardKeyword(nameof(YingGuang), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
-[RegisterOwnedCardKeyword(nameof(ShouHui), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
-[RegisterOwnedCardKeyword(nameof(PoHui), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
+[RegisterOwnedCardKeyword(nameof(JuGuangCore), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
+[RegisterOwnedCardKeyword(nameof(TiaoGuCore), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
+[RegisterOwnedCardKeyword(nameof(YueHuaCore), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(ShiXue), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(ShangShi), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
 [RegisterOwnedCardKeyword(nameof(NianHua), CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.None)]
@@ -61,15 +50,6 @@ public sealed class GuZhenRenKeywords
     public static readonly CardKeyword XueQiCore = Create(nameof(XueQiCore));
     public static readonly CardKeyword XueYueCore = Create(nameof(XueYueCore));
     public static readonly CardKeyword XueTaiCore = Create(nameof(XueTaiCore));
-    public static readonly CardKeyword YaoHua1 = Create(nameof(YaoHua1));
-    public static readonly CardKeyword YaoHua2 = Create(nameof(YaoHua2));
-    public static readonly CardKeyword YaoHua3 = Create(nameof(YaoHua3));
-    public static readonly CardKeyword YaoHua4 = Create(nameof(YaoHua4));
-    public static readonly CardKeyword YaoHua5 = Create(nameof(YaoHua5));
-    public static readonly CardKeyword YaoHua6 = Create(nameof(YaoHua6));
-    public static readonly CardKeyword YaoHua7 = Create(nameof(YaoHua7));
-    public static readonly CardKeyword YaoHua8 = Create(nameof(YaoHua8));
-    public static readonly CardKeyword YaoHua9 = Create(nameof(YaoHua9));
     public static readonly CardKeyword ZongEDu = Create(nameof(ZongEDu));
     public static readonly CardKeyword YiChu = Create(nameof(YiChu));
     public static readonly CardKeyword ZhuiJi = Create(nameof(ZhuiJi));
@@ -77,11 +57,9 @@ public sealed class GuZhenRenKeywords
     public static readonly CardKeyword XuYing = Create(nameof(XuYing));
     public static readonly CardKeyword LianLi = Create(nameof(LianLi));
     public static readonly CardKeyword ZheGuangCore = Create(nameof(ZheGuangCore));
-    public static readonly CardKeyword ZhaoXi = Create(nameof(ZhaoXi));
-    public static readonly CardKeyword YanGuang = Create(nameof(YanGuang));
-    public static readonly CardKeyword YingGuang = Create(nameof(YingGuang));
-    public static readonly CardKeyword ShouHui = Create(nameof(ShouHui));
-    public static readonly CardKeyword PoHui = Create(nameof(PoHui));
+    public static readonly CardKeyword JuGuangCore = Create(nameof(JuGuangCore));
+    public static readonly CardKeyword TiaoGuCore = Create(nameof(TiaoGuCore));
+    public static readonly CardKeyword YueHuaCore = Create(nameof(YueHuaCore));
     public static readonly CardKeyword ShiXue = Create(nameof(ShiXue));
     public static readonly CardKeyword ShangShi = Create(nameof(ShangShi));
     public static readonly CardKeyword NianHua = Create(nameof(NianHua));
@@ -105,6 +83,20 @@ public sealed class GuZhenRenKeywords
             Create("YuanQi"),
             Create("GuangHui"),
             Create("YaoHua"),
+            Create("YaoHua1"),
+            Create("YaoHua2"),
+            Create("YaoHua3"),
+            Create("YaoHua4"),
+            Create("YaoHua5"),
+            Create("YaoHua6"),
+            Create("YaoHua7"),
+            Create("YaoHua8"),
+            Create("YaoHua9"),
+            Create("ZhaoXi"),
+            Create("YanGuang"),
+            Create("YingGuang"),
+            Create("ShouHui"),
+            Create("PoHui"),
             Create("Rank1"),
             Create("Rank2"),
             Create("Rank3"),
@@ -143,14 +135,6 @@ public sealed class GuZhenRenKeywords
             Create("TunJi"),
         };
 
-    public static IReadOnlySet<CardKeyword> YaoHuaKeywords { get; } =
-        new HashSet<CardKeyword>
-        {
-            YaoHua1, YaoHua2, YaoHua3,
-            YaoHua4, YaoHua5, YaoHua6,
-            YaoHua7, YaoHua8, YaoHua9,
-        };
-
     /// <summary>
     /// 本模组注册的全部自定义关键词。
     /// UI 可见性补丁只过滤这个集合，不影响游戏本体的消耗、保留等提示。
@@ -162,34 +146,12 @@ public sealed class GuZhenRenKeywords
             KeXue, XueJiCost,
             LianHai1, LianHai2, LianHai3,
             XueQiCore, XueYueCore, XueTaiCore,
-            YaoHua1, YaoHua2, YaoHua3,
-            YaoHua4, YaoHua5, YaoHua6,
-            YaoHua7, YaoHua8, YaoHua9,
             ZongEDu, YiChu, ZhuiJi, PoShi,
             XuYing, LianLi, ShangShi,
-            ZheGuangCore, ZhaoXi, YanGuang, YingGuang,
-            ShouHui, PoHui, ShiXue,
+            ZheGuangCore, JuGuangCore, TiaoGuCore, YueHuaCore,
+            ShiXue,
             NianHua, SuiMan, HuanBu, XiYing,
         };
-
-    public static CardKeyword GetYaoHuaKeyword(int threshold) =>
-        threshold switch
-    {
-        1 => YaoHua1,
-        2 => YaoHua2,
-        3 => YaoHua3,
-        4 => YaoHua4,
-        5 => YaoHua5,
-        6 => YaoHua6,
-        7 => YaoHua7,
-        8 => YaoHua8,
-        9 => YaoHua9,
-        _ => throw new ArgumentOutOfRangeException(
-            nameof(threshold),
-            threshold,
-            "耀化阈值必须位于一至九点。"
-        ),
-    };
 
     public static CardKeyword GetLianHaiKeyword(int maximum) =>
         maximum switch
