@@ -4,6 +4,7 @@ using GuZhenRen.Aperture;
 using GuZhenRen.Cards;
 using GuZhenRen.Combat;
 using GuZhenRen.Patches;
+using GuZhenRen.Persistence;
 using GuZhenRen.Ui;
 using GuZhenRen.Tribulations.Core;
 
@@ -121,6 +122,10 @@ public partial class Entry
         }
 
         Assembly assembly = Assembly.GetExecutingAssembly();
+
+        // 旧存档的历史卡牌快照可能仍引用已删除玩法的保存字段。
+        // 必须在原版网络 ID 表冻结前保留这些名字，不能等读档后再补。
+        LegacySavedPropertyCompatibility.Register();
         ModTypeDiscoveryHub.RegisterModAssembly(ModId, assembly);
 
         // PCK 场景包含 OrbPreview.cs，因此需要注册 Godot C# 脚本。

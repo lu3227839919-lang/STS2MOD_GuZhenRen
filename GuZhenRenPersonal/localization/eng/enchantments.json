@@ -1,6 +1,6 @@
 {
   "GU_ZHEN_REN_PERSONAL_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.title": "Blood Parasite",
-  "GU_ZHEN_REN_PERSONAL_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.description": "A parasite enchantment that persists, clones, and renders with its host without consuming the normal enchantment slot. Its kind, stage, and values are shown in the host card text.",
+  "GU_ZHEN_REN_PERSONAL_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.description": "A separate enchantment slot stores parasite kind, rank, and stage without affecting ordinary enchantments.",
   "GU_ZHEN_REN_PERSONAL_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.title": "Blood Parasite Composite",
   "GU_ZHEN_REN_PERSONAL_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.description": "Internal carrier for one normal enchantment and one Blood Parasite enchantment."
 }

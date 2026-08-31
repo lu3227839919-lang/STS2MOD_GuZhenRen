@@ -142,46 +142,13 @@ public abstract class AbstractGuWormCard
 
         IEnumerable<CardKeyword> specific = guWorm.GetType().Name switch
         {
-            "XueQiGu" =>
+            "XueQiGu" or "XueJingGu" or "XueBenXianGu" =>
             [
-                GuZhenRenKeywords.XueJiCost,
                 GuZhenRenKeywords.XueQiCore,
             ],
             "XueYueGu" =>
             [
-                GuZhenRenKeywords.KeXue,
                 GuZhenRenKeywords.XueYueCore,
-            ],
-            "XueTaiGu" =>
-            [
-                GuZhenRenKeywords.XueJiCost,
-                GuZhenRenKeywords.XueTaiCore,
-            ],
-            "XueChiGu" =>
-            [
-                GuZhenRenKeywords.YiChu,
-            ],
-            "XuePiGu" =>
-            [
-                GuZhenRenKeywords.KeXue,
-            ],
-            "XueLuGu" =>
-            [
-                GuZhenRenKeywords.GetLianHaiKeyword(
-                    guWorm.GuRank <= 3 ? 1 : guWorm.GuRank <= 6 ? 2 : 3
-                ),
-            ],
-            "DaoChiXueFuGu" =>
-            [
-                GuZhenRenKeywords.GetLianHaiKeyword(2),
-            ],
-            "XueFuWangGu" =>
-            [
-                GuZhenRenKeywords.GetLianHaiKeyword(2),
-            ],
-            "XueHeJiaGu" =>
-            [
-                GuZhenRenKeywords.KeXue,
             ],
             "KuLiGu" =>
             [

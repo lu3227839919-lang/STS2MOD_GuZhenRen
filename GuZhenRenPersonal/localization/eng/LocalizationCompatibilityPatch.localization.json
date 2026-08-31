@@ -10,17 +10,9 @@
       "title": "Fusion",
       "description": "Consumes the specified Gu materials to refine a new Gu. Its rank follows the recipe and it is normally excluded from rewards."
     },
-    "KeXue": {
-      "title": "Bloodthirst",
-      "description": "Spend the listed Blood Essence to trigger the stated effect."
-    },
     "ZongEDu": {
       "title": "Shared Total",
       "description": "The listed amount is shared among all living enemies."
-    },
-    "YiChu": {
-      "title": "Overflow",
-      "description": "Amount above the resource cap converts as stated on the card."
     },
     "ZhuiJi": {
       "title": "Pursuit",
@@ -90,10 +82,6 @@
       "title": "Break Stance",
       "description": "Triggers when this effect reduces an enemy's existing Block to 0."
     },
-    "XueJiCost": {
-      "title": "Blood Rite",
-      "description": "Spend the listed Blood Essence first; each missing point costs 2 HP instead, leaving at least 1 HP."
-    },
     "LianHai1": {
       "title": "Refine Remains 1",
       "description": "Consume up to 1 Remains; see the card for the payoff."
@@ -107,16 +95,12 @@
       "description": "Consume up to 3 Remains; see the card for the payoff."
     },
     "XueQiCore": {
-      "title": "Blood Qi",
-      "description": "Triggers an effect based on the host type and may trigger multiple times."
+      "title": "Blood Parasite",
+      "description": "An ordinary Blood Parasite triggers as I, II, then III when its host is actively played, and hatches after III. Attacks deal damage and Bleed; Skills gain Block and draw 1 on hatch."
     },
     "XueYueCore": {
-      "title": "Blood Moon",
-      "description": "Progresses through Crescent, Waxing, and Full Moon, advancing one stage each trigger."
-    },
-    "XueTaiCore": {
-      "title": "Blood Fetus",
-      "description": "Triggers by host type, may devour another parasite to inherit progress, and triggers its final effect at progress 3."
+      "title": "Blood Moon Parasite",
+      "description": "A Blood Moon Parasite has no stages. After its host is actively played, choose another ordinary Blood Parasite to trigger and advance immediately."
     },
     "ShangShi": {
       "title": "Injury",
@@ -124,11 +108,11 @@
     },
     "ZheGuangCore": {
       "title": "Refraction",
-      "description": "An actively played standard Attack, Skill, or Power triggers Refraction when its type differs from the previous fully resolved standard card this turn. Non-Light cards only update history. Forced Refraction ignores the type condition and persists until the next Light Path card. Replays and multi-hit effects never count twice."
+      "description": "Trigger Refraction when your previously actively played Attack, Skill, or Power has a different type from this Light-path card. Forced Refraction ignores this condition; replays do not retrigger it."
     },
     "JuGuangCore": {
       "title": "Focus",
-      "description": "Stacks. The next card that truly triggers Refraction and has a Refraction effect consumes 1 Focus to resolve that effect one additional time. It does not copy the card, its base effect, or after-Refraction events."
+      "description": "The next card to trigger Refraction consumes 1 stack and resolves its Refraction effect 1 additional time."
     },
     "TiaoGuCore": {
       "title": "Tune Gu",
@@ -157,10 +141,6 @@
     "PoHui": {
       "title": "Broken Radiance",
       "description": "The first time your Block is fully broken this turn, gain 1 Radiance."
-    },
-    "ShiXue": {
-      "title": "Blood Hunt",
-      "description": "If the initial target already has Bleed, attack 1 additional time."
     }
   },
   "cardDescriptionOverrides": {
@@ -170,23 +150,9 @@
     "GU_ZHEN_REN_PERSONAL_CARD_HONG_ZAO_XIAN_YUAN.description": "Retain as immortal essence. Equals two Green Grape essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
     "GU_ZHEN_REN_PERSONAL_CARD_BAI_LI_XIAN_YUAN.description": "Retain as immortal essence. Equals two Red Date essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
     "GU_ZHEN_REN_PERSONAL_CARD_HUANG_XING_XIAN_YUAN.description": "Retain as immortal essence. Equals two White Litchi essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_QI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\n[gold]Blood Rite[/gold] {BloodCost}: implant [gold]Blood Qi[/gold] into 1 normal card in hand; it may trigger {TriggerCount} times.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_YUE_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\n[gold]Bloodthirst[/gold] 2: implant [gold]Blood Moon[/gold] into 1 normal card in hand. Later stages are stronger.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_CHI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {XueYuanPower:diff()} Blood Essence; each [gold]Overflow[/gold] converts into {OverflowBlock} Block.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_PI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {Block:diff()} Block; [gold]Bloodthirst[/gold] 1: gain {EmpoweredBlock} more. Each Blood Skull grants 2 more Block.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_LU_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {Block:diff()} Block; [gold]Refine Remains {MaxAbsorb}[/gold]: each grants 1 Blood Skull; at the cap, heal {Heal:diff()} HP instead.",
-    "GU_ZHEN_REN_PERSONAL_CARD_DAO_CHI_XUE_FU_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain 1 same-rank Blade-Wing Blood Bat; [gold]Refine Remains 2[/gold]: gain Blood Bat Swarm instead.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_TAI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\n[gold]Blood Rite[/gold] 2: implant [gold]Blood Fetus[/gold] into 1 normal card in hand; it may devour another parasite.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_FU_WANG_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\n[gold]Refine Remains 2[/gold]: gain 1 same-rank Blood Bat King. Each Remains adds 2 attacks and 1 Blood Skull; using 2 grants Pursuit. At the Blood Skull cap, each excess Remains heals 3 HP.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_HE_JIA_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nWith fewer than 4 Blood Essence, gain {LowBloodGain} Blood Essence and {LowBlock} Block; otherwise [gold]Bloodthirst[/gold] 2: gain {HighBlock} Block, then gain half that amount next turn. Each Blood Skull grants 2 more Block.",
-    "GU_ZHEN_REN_PERSONAL_CARD_WAN_HAI_GUI_CHAO.description": "[gold]Refine Remains 3[/gold]: deal {Damage:diff()} [gold]Shared Total[/gold] damage and gain {Block:diff()} Block; each Remains increases damage by {DamagePerRemains} and Block by {BlockPerRemains}. Rank 6+: consuming 3 grants half this Block next turn. Materials do not return this combat.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_DI_ZI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nDeal {Damage:diff()} damage to ALL enemies and apply {XueYinPower:diff()} Blood Mark to each; if only 1 enemy remains, apply 1 more. Gain 1 same-rank Blood Cloud Devour.",
-    "GU_ZHEN_REN_PERSONAL_CARD_DAO_CHI_XUE_FU.description": "Deal {CurrentDamage} damage {TotalHits} times, then apply {LiuXuePower:diff()} Bleed.",
-    "GU_ZHEN_REN_PERSONAL_CARD_DAO_CHI_XUE_FU_QUN.description": "Deal {CurrentDamage} damage {TotalHits} times with Pursuit. Then apply {LiuXuePower:diff()} Bleed to each surviving enemy hit.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_FU_WANG.description": "Deal {CurrentDamage} damage {TotalHits} times.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_YUN_SHI_SHEN.description": "Deal {Damage:diff()} damage to ALL enemies; enemies that had Blood Mark before this play take {ExtraHits} extra hit(s) and gain {LiuXuePower:diff()} Bleed. Each triggered Mark shortens the source Blood Drop Gu cooldown by 1 turn, up to {BreedCap} turns this play.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_PIAO_LIU.description": "Usable twice. Choose a destination; the tide passes through all enemies, dealing {Damage:diff()} damage at each stop and consuming up to {MaxBleedConsumed} Bleed to empower it. Each Bleed consumed increases that damage by {DamagePerBleed}. Remaining Bleed moves onward and ends at the destination. Rank 6+: add Bleed there equal to the number of enemies passed.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_YUE_JI.description": "Uses increase with rank, up to 3. Choose a Blood Parasite host and resolve its parasite once without playing the host. Rank 9: if this completes the parasite, gain 2 Blood Essence.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_QI_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nChoose an Attack or Skill without a parasite and implant an ordinary [gold]Blood Parasite[/gold]. I/II/III: {ParasiteI}/{ParasiteII}/{ParasiteIII}; hatch {HatchValue}. Attacks deal damage and Bleed; Skills gain equal Block and draw 1 on hatch.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_YUE_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nChoose an Attack or Skill without a parasite and implant a [gold]Blood Moon Parasite[/gold]. After its host is actively played, choose another ordinary parasite to trigger and advance immediately.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_CHI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {EnergyGain} Energy; refine up to {MaxRefine} Remains. Gain 1 [gold]Blood Pool[/gold] for each Remains permanently consumed. You may cancel and consume none.",
     "GU_ZHEN_REN_PERSONAL_CARD_BAI_ZHI_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Power[/gold]\nActivate: gain 1 White Boar Phantom.{TrainingSealed:cond:>0?\n[gold]Strength Refinement[/gold] {TrainingProgress}/{TrainingRequired} · Sealed|}",
     "GU_ZHEN_REN_PERSONAL_CARD_FEI_XIONG_ZHI_LI_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Power[/gold]\nActivate: gain 1 Flying Bear Phantom.{TrainingSealed:cond:>0?\n[gold]Strength Refinement[/gold] {TrainingProgress}/{TrainingRequired} · Sealed|}",
     "GU_ZHEN_REN_PERSONAL_CARD_E_LI_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Power[/gold]\nActivate: gain 1 Crocodile Phantom.{TrainingSealed:cond:>0?\n[gold]Strength Refinement[/gold] {TrainingProgress}/{TrainingRequired} · Sealed|}",
@@ -264,7 +230,11 @@
     "GU_ZHEN_REN_PERSONAL_CARD_ZHOU_MAO.description": "[gold]Rank {Rank}[/gold] · [gold]Companion Power[/gold]\nAfter each Yearful, gain {NianHuaGain} Years.{DrawEverySecond:cond:>0? Every 2nd Yearful also draws 1.|}",
     "GU_ZHEN_REN_PERSONAL_CARD_SI_SHUI_LIU_NIAN.description": "[gold]Rank {Rank}[/gold] · [gold]Companion Power[/gold]\nThe first Yearful each turn grants 1 {PlusToken:cond:>0?Yearflow+|Yearflow}.",
     "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU.description": "Gain 2 Years.",
-    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU_PLUS.description": "Gain 3 Years and draw 1."
+    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU_PLUS.description": "Gain 3 Years and draw 1.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_ROU_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {Block:diff()} Block.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_JING_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nChoose an Attack or Skill without a parasite and implant an ordinary [gold]Blood Parasite[/gold]. I/II/III: {ParasiteI}/{ParasiteII}/{ParasiteIII}; hatch {HatchValue}.",
+    "GU_ZHEN_REN_PERSONAL_CARD_XUE_BEN_XIAN_GU.description": "Immortal Gu · [gold]Rank 6[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nImplant a rank-6 ordinary [gold]Blood Parasite[/gold]. I/II/III: {ParasiteI}/{ParasiteII}/{ParasiteIII}; hatch {HatchValue}. Leaves a [gold]Blood Seed[/gold] after hatching.",
+    "GU_ZHEN_REN_PERSONAL_CARD_YI_HAI.description": "A 0-cost Status. Retain. Cannot be played or parasitized. Permanently enters the deck after victory (maximum 4) and can only be permanently removed by refining it."
   },
   "characterNameOverrides": {
     "title": "Gu Yue Fang Yuan",
@@ -426,46 +396,6 @@
       "text": "The next time a single hit from an Attack card deals damage, take 3 additional damage and remove 1 Illumination Break. Multi-hit attacks can consume multiple stacks."
     },
     {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_YUAN_POWER.title",
-      "text": "Blood Essence"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_YUAN_POWER.description",
-      "text": "Blood Path resource, maximum 12."
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_YIN_POWER.title",
-      "text": "Blood Mark"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_YIN_POWER.description",
-      "text": "When damaged by the applier’s Blood Path attack, consume 1 stack and lose 3 extra HP; each card play refunds at most 1 Blood Essence across all enemies."
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_LIU_XUE_POWER.title",
-      "text": "Bleed"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_LIU_XUE_POWER.description",
-      "text": "At turn end, lose 1 stack and take 3 damage; the applier gains 1 Blood Essence."
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_QI_RECOVERY_POWER.title",
-      "text": "Blood Qi Recovery"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_QI_RECOVERY_POWER.description",
-      "text": "At the start of your next turn, heal {Amount} HP, then remove this effect."
-    },
-    {
       "table": "secondary_resources",
       "key": "GU_ZHEN_REN_PERSONAL_SECONDARY_RESOURCE_YUAN_QI.title",
       "text": "Primeval Essence"
@@ -474,46 +404,6 @@
       "table": "secondary_resources",
       "key": "GU_ZHEN_REN_PERSONAL_SECONDARY_RESOURCE_YUAN_QI.description",
       "text": "Primeval essence stored in a Gu Master's aperture. Begin each combat with the amount granted by your aperture rank (rank 1: 4, rank 9: 8); from turn 2 onward, restore 2-4 each turn by rank (1-2: 2, 3-5: 3, 6-9: 4). Maximum essence rises with aperture rank: 5/5/6/6/7/7/8/8/9."
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_LU_POWER.title",
-      "text": "Blood Skull"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_LU_POWER.description",
-      "text": "Maximum 3. Empowers some Blood Parasite, defense, and Blood Bat effects."
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_JI_POWER.title",
-      "text": "Blood Parasite"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_JI_POWER.description",
-      "text": "Attaches to a normal card and triggers after the host fully resolves; exhausting the host early removes the parasite and grants 1 Blood Essence."
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_HE_JIA_CARRY_POWER.title",
-      "text": "Blood River After-Armor"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_HE_JIA_CARRY_POWER.description",
-      "text": "At the start of your next turn, gain {Amount} Block, then remove this effect."
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_WAN_HAI_GUI_CHAO_RETAIN_BLOCK_POWER.title",
-      "text": "Myriad Remains After-Armor"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_WAN_HAI_GUI_CHAO_RETAIN_BLOCK_POWER.description",
-      "text": "At the start of your next turn, gain {Amount} Block, then remove this effect."
     },
     {
       "table": "powers",
@@ -624,6 +514,36 @@
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_SHANG_LI_HUI_TIAN_POWER.description",
       "text": "Records the highest actual HP damage dealt by a later single card. The first time you would die, heal the listed percentage and survive; otherwise heal after combat. Triggers once."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_LIU_XUE_POWER.title",
+      "text": "Bleed"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_LIU_XUE_POWER.description",
+      "text": "At the end of the holder’s turn, lose 1 stack and take 3 damage."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_JI_POWER.title",
+      "text": "Blood Parasite"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_JI_POWER.description",
+      "text": "Background listener for Blood Parasite resolution."
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_CHI_POWER.title",
+      "text": "Blood Pool"
+    },
+    {
+      "table": "powers",
+      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_CHI_POWER.description",
+      "text": "The next actively played card that successfully triggers a Blood Parasite repeats that parasite effect. All stacks are consumed atomically on that hit."
     }
   ],
   "OPTION_GU_ZHEN_REN_PERSONAL_GU_RANK_UP.description": "Select Gu Worms to refine in one go. Each refinement has 2 slots: a mortal Gu Worm takes 1 slot and an immortal Gu Worm takes 2 slots, so you can refine up to 2 mortal or 1 immortal Gu Worm. Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",

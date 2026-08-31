@@ -24,5 +24,11 @@
   "GU_ZHEN_REN_PERSONAL_POWER_HEI_YAN_XING_ZHUI_POWER.title": "Blackflame Starfall",
   "GU_ZHEN_REN_PERSONAL_POWER_HEI_YAN_XING_ZHUI_POWER.description": "Aberrant Earth Calamity. Losing HP accumulates Black Flame. Amount is current Black Flame.",
   "GU_ZHEN_REN_PERSONAL_POWER_JU_GUANG_POWER.title": "Focus",
-  "GU_ZHEN_REN_PERSONAL_POWER_JU_GUANG_POWER.description": "The next card that truly triggers Refraction and has a Refraction effect consumes 1 Focus to resolve that Refraction effect one additional time."
+  "GU_ZHEN_REN_PERSONAL_POWER_JU_GUANG_POWER.description": "The next card that truly triggers Refraction and has a Refraction effect consumes 1 Focus to resolve that Refraction effect one additional time.",
+  "GU_ZHEN_REN_PERSONAL_POWER_LIU_XUE_POWER.title": "Bleed",
+  "GU_ZHEN_REN_PERSONAL_POWER_LIU_XUE_POWER.description": "At the end of the holder’s turn, lose 1 stack and take 3 damage.",
+  "GU_ZHEN_REN_PERSONAL_POWER_XUE_JI_POWER.title": "Blood Parasite",
+  "GU_ZHEN_REN_PERSONAL_POWER_XUE_JI_POWER.description": "Background listener for Blood Parasite resolution.",
+  "GU_ZHEN_REN_PERSONAL_POWER_XUE_CHI_POWER.title": "Blood Pool",
+  "GU_ZHEN_REN_PERSONAL_POWER_XUE_CHI_POWER.description": "The next actively played card that successfully triggers a Blood Parasite repeats that parasite effect. All stacks are consumed atomically on that hit."
 }

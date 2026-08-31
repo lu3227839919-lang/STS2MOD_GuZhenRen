@@ -1,5 +1,3 @@
-using System.Linq;
-
 using GuZhenRen.Cards.XueDao;
 
 using MegaCrit.Sts2.Core.Combat;
@@ -14,10 +12,6 @@ using STS2RitsuLib.Scaffolding.Content;
 
 namespace GuZhenRen.Powers.XueDao;
 
-/// <summary>
-/// 流血：持有者回合结束时移除一层，施加者获得一点血元，
-/// 然后持有者受到三点伤害。
-/// </summary>
 [RegisterPower]
 public sealed class LiuXuePower : ModPowerTemplate
 {
@@ -31,7 +25,7 @@ public sealed class LiuXuePower : ModPowerTemplate
         PowerInstanceType.InstancedPerApplier;
 
     public override PowerAssetProfile AssetProfile => new(
-        IconPath: "res://GuZhenRenPersonal//images//power//LiuXuePower-64x64.png",
+        IconPath: "res://GuZhenRenPersonal/images/power/LiuXuePower-64x64.png",
         BigIconPath: "res://GuZhenRenPersonal/images/power/LiuXuePower-256x256.png"
     );
 
@@ -49,34 +43,26 @@ public sealed class LiuXuePower : ModPowerTemplate
         Creature target = Owner;
         Creature? applier = Applier;
         Flash();
-
         await PowerCmd.Decrement(this);
-        await XueDaoPowerSystem.GainXueYuanFromEffect(
+
+        if (target.IsDead)
+        {
+            return;
+        }
+
+        await CreatureCmd.Damage(
             choiceContext,
-            applier,
-            1
+            target,
+            DamagePerTick,
+            ValueProp.Unpowered,
+            dealer: null,
+            cardSource: null,
+            cardPlay: null
         );
 
-        if (!target.IsDead)
+        if (target.IsDead && applier?.Player is { } owner)
         {
-            await CreatureCmd.Damage(
-                choiceContext,
-                target,
-                DamagePerTick,
-                ValueProp.Unpowered,
-                dealer: null,
-                cardSource: null,
-                cardPlay: null
-            );
-
-            // 流血造成怪物死亡时同样产生遗骸（受永久牌堆 4 张上限约束）。
-            // 只有真正造成本次致命伤害的流血实例会触发：目标已死后其他
-            // 实例会因上方 IsDead 检查跳过伤害，不会重复生成。
-            if (target.IsDead &&
-                applier?.Player is { } owner)
-            {
-                await XueDaoCardSystem.AddRemains(owner, 1);
-            }
+            await XueDaoCardSystem.AddRemains(owner, 1);
         }
     }
 }

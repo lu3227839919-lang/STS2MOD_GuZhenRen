@@ -9,13 +9,6 @@ using STS2RitsuLib.Scaffolding.Content;
 
 namespace GuZhenRen.Cards.XueDao;
 
-/// <summary>
-/// 血道寄生的原生附魔模型。
-///
-/// 种类、来源转数、阶段和触发次数全部作为 SavedProperty 跟随附魔
-/// 存档、克隆和多人序列化。XueDaoCompositeEnchantment 将本模型
-/// 保存在内置寄生槽中，因此普通附魔和寄生可作为两个实例独立存在。
-/// </summary>
 [RegisterEnchantment]
 public sealed class XueDaoParasiteEnchantment : ModEnchantmentTemplate
 {
@@ -25,6 +18,7 @@ public sealed class XueDaoParasiteEnchantment : ModEnchantmentTemplate
     [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
     private int SavedRank { get; set; }
 
+    // 旧快照字段继续注册，保证原网络属性 ID 可以读取。
     [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
     private bool SavedSourceWasUpgraded { get; set; }
 
@@ -41,8 +35,6 @@ public sealed class XueDaoParasiteEnchantment : ModEnchantmentTemplate
 
     public override int DisplayAmount => Rank;
 
-    // 血寄正文由 XueDaoParasiteSystem 按阶段动态生成；这里关闭静态
-    // extraCardText，避免直接附魔与复合附魔路径重复显示。
     public override bool HasExtraCardText => false;
 
     public override EnchantmentAssetProfile AssetProfile =>
@@ -51,7 +43,7 @@ public sealed class XueDaoParasiteEnchantment : ModEnchantmentTemplate
             XueDaoParasiteSystem.ParasiteKind.BloodMoon => new(
                 IconPath: $"{Entry.ResPath}/images/enchantments/XueDaoParasiteBloodMoonEnchantment.png"
             ),
-            XueDaoParasiteSystem.ParasiteKind.BloodFetus => new(
+            XueDaoParasiteSystem.ParasiteKind.BloodSeed => new(
                 IconPath: $"{Entry.ResPath}/images/enchantments/XueDaoParasiteBloodFetusEnchantment.png"
             ),
             _ => new(
@@ -59,70 +51,45 @@ public sealed class XueDaoParasiteEnchantment : ModEnchantmentTemplate
             ),
         };
 
-    internal XueDaoParasiteSystem.ParasiteKind Kind
-    {
-        get
-        {
-            int value = SavedKind;
-            return Enum.IsDefined(
-                typeof(XueDaoParasiteSystem.ParasiteKind),
-                value
-            )
-                ? (XueDaoParasiteSystem.ParasiteKind)value
-                : XueDaoParasiteSystem.ParasiteKind.None;
-        }
-    }
+    internal XueDaoParasiteSystem.ParasiteKind Kind =>
+        XueDaoParasiteSystem.NormalizePersistedKind(SavedKind);
 
-    internal int Rank => Math.Max(0, SavedRank > 0 ? SavedRank : Amount);
-
-    internal bool SourceWasUpgraded => SavedSourceWasUpgraded;
+    internal int Rank => Math.Max(1, SavedRank > 0 ? SavedRank : Amount);
 
     internal int Stage => Math.Max(0, SavedStage);
-
-    internal int TriggersRemaining => Math.Max(0, SavedTriggersRemaining);
-
-    internal int TriggersCompleted => Math.Max(0, SavedTriggersCompleted);
 
     internal void Configure(
         XueDaoParasiteSystem.ParasiteKind kind,
         int rank,
-        bool sourceWasUpgraded,
-        int stage,
-        int triggersRemaining,
-        int triggersCompleted
+        int stage
     )
     {
         AssertMutable();
-
         SavedKind = (int)kind;
-        SavedRank = Math.Max(1, rank);
-        SavedSourceWasUpgraded = sourceWasUpgraded;
+        SavedRank = Math.Clamp(rank, 1, 6);
+        SavedSourceWasUpgraded = false;
         SavedStage = Math.Max(0, stage);
-        SavedTriggersRemaining = Math.Max(0, triggersRemaining);
-        SavedTriggersCompleted = Math.Max(0, triggersCompleted);
+        SavedTriggersCompleted =
+            kind == XueDaoParasiteSystem.ParasiteKind.Ordinary
+                ? Math.Clamp(SavedStage - 1, 0, 2)
+                : 0;
+        SavedTriggersRemaining =
+            kind == XueDaoParasiteSystem.ParasiteKind.Ordinary
+                ? Math.Clamp(4 - SavedStage, 0, 3)
+                : 0;
         Amount = SavedRank;
     }
 
-    internal void Advance(int completed, int totalStages)
+    internal void AdvanceTo(int stage)
     {
         AssertMutable();
-
-        SavedTriggersCompleted = Math.Clamp(completed, 0, totalStages);
-        SavedStage = SavedTriggersCompleted;
-        SavedTriggersRemaining = Math.Max(
-            0,
-            totalStages - SavedTriggersCompleted
-        );
+        SavedStage = Math.Clamp(stage, 1, 3);
+        SavedTriggersCompleted = SavedStage - 1;
+        SavedTriggersRemaining = 4 - SavedStage;
     }
 
-    public override bool CanEnchant(CardModel card)
-    {
-        if (!base.CanEnchant(card))
-        {
-            return false;
-        }
-
-        return XueDaoParasiteSystem.IsEligibleHost(card) &&
-            !XueDaoEnchantmentSlotPatch.HasParasiteCarrier(card);
-    }
+    public override bool CanEnchant(CardModel card) =>
+        base.CanEnchant(card) &&
+        XueDaoParasiteSystem.IsEligibleHost(card) &&
+        !XueDaoEnchantmentSlotPatch.HasParasiteCarrier(card);
 }

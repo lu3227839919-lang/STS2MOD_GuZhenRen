@@ -24,5 +24,11 @@
   "GU_ZHEN_REN_PERSONAL_POWER_HEI_YAN_XING_ZHUI_POWER.title": "黑焰星坠",
   "GU_ZHEN_REN_PERSONAL_POWER_HEI_YAN_XING_ZHUI_POWER.description": "异变地灾。失去生命会积累黑焰；层数为当前黑焰。",
   "GU_ZHEN_REN_PERSONAL_POWER_JU_GUANG_POWER.title": "聚光",
-  "GU_ZHEN_REN_PERSONAL_POWER_JU_GUANG_POWER.description": "下一张真正触发折光且拥有折光效果的牌消耗1层聚光，使该牌的折光效果额外结算1次。"
+  "GU_ZHEN_REN_PERSONAL_POWER_JU_GUANG_POWER.description": "下一张真正触发折光且拥有折光效果的牌消耗1层聚光，使该牌的折光效果额外结算1次。",
+  "GU_ZHEN_REN_PERSONAL_POWER_LIU_XUE_POWER.title": "流血",
+  "GU_ZHEN_REN_PERSONAL_POWER_LIU_XUE_POWER.description": "持有者回合结束时失去1层并受到3点伤害。",
+  "GU_ZHEN_REN_PERSONAL_POWER_XUE_JI_POWER.title": "血寄",
+  "GU_ZHEN_REN_PERSONAL_POWER_XUE_JI_POWER.description": "血寄的后台结算监听器。",
+  "GU_ZHEN_REN_PERSONAL_POWER_XUE_CHI_POWER.title": "血池",
+  "GU_ZHEN_REN_PERSONAL_POWER_XUE_CHI_POWER.description": "下一张由你主动打出且成功触发血寄效果的牌，额外触发其血寄效果。命中后一次性消耗全部层数。"
 }

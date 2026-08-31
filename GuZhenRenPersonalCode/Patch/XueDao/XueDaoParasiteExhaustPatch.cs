@@ -184,7 +184,7 @@ internal static class XueDaoParasiteExhaustPatch
     {
         if (XueDaoParasiteSystem.HasParasite(card))
         {
-            await XueDaoParasiteSystem.BreakIfExhaustedAsync(
+            await XueDaoParasiteSystem.ClearIfExhaustedAsync(
                 choiceContext,
                 card
             );
