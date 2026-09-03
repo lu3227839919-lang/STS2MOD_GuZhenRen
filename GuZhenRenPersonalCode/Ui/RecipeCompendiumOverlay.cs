@@ -72,7 +72,7 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
     private RecipeCompendiumTopBarButton? _topBarButton;
     private NTopBarMapButton? _mapButton;
     private NodePath _originalMapFocusNeighborLeft = new();
-    private double _anchorScanCountdown;
+    private Godot.Timer _anchorScanTimer = null!;
 
     internal bool IsDialogOpen => _backdrop.Visible;
 
@@ -82,21 +82,26 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
         ProcessMode = ProcessModeEnum.Always;
 
         BuildDialog();
+        RefreshTopBarButton();
 
-        _anchorScanCountdown = 0d;
-        SetProcess(true);
+        // 原实现为了每 0.25 秒找一次顶栏锚点而常驻 _Process。
+        // 改用 Timer 后，关闭/闲置配方大全时不再每帧进入 C#。
+        _anchorScanTimer = new Godot.Timer
+        {
+            Name = "RecipeCompendiumAnchorScanTimer",
+            WaitTime = 0.25d,
+            OneShot = false,
+            Autostart = true,
+            ProcessMode = ProcessModeEnum.Always,
+        };
+        _anchorScanTimer.Timeout += OnAnchorScanTimerTimeout;
+        AddChild(_anchorScanTimer);
+
         SetProcessInput(true);
     }
 
-    public override void _Process(double delta)
+    private void OnAnchorScanTimerTimeout()
     {
-        _anchorScanCountdown -= delta;
-        if (_anchorScanCountdown > 0d)
-        {
-            return;
-        }
-
-        _anchorScanCountdown = 0.25d;
         RefreshTopBarButton();
 
         if (_backdrop.Visible &&
@@ -126,6 +131,13 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
 
     public override void _ExitTree()
     {
+        if (_anchorScanTimer != null &&
+            GodotObject.IsInstanceValid(_anchorScanTimer))
+        {
+            _anchorScanTimer.Timeout -= OnAnchorScanTimerTimeout;
+            _anchorScanTimer.Stop();
+        }
+
         RemoveTopBarButton();
     }
 
@@ -525,7 +537,6 @@ internal sealed partial class RecipeCompendiumOverlay : CanvasLayer
         _backdrop.Visible = false;
         ClearCardPreview();
         _topBarButton?.RefreshOpenState();
-        _anchorScanCountdown = 0d;
     }
 
     internal void ToggleDialog()

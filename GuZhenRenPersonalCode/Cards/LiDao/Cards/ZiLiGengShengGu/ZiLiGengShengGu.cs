@@ -32,7 +32,7 @@ public sealed class ZiLiGengShengGu : AbstractGuWormCard
 
     public ZiLiGengShengGu()
         : base(
-            1,
+            0,
             CardType.Power,
             CardRarity.Uncommon,
             TargetType.Self

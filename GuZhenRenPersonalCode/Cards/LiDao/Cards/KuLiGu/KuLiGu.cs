@@ -39,7 +39,7 @@ public sealed class KuLiGu : AbstractGuWormCard
 
     public KuLiGu()
         : base(
-            1,
+            0,
             CardType.Power,
             CardRarity.Uncommon,
             TargetType.Self

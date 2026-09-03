@@ -36,7 +36,7 @@ public sealed class BaShan : AbstractGuWormCard
 
     public BaShan()
         : base(
-            1,
+            0,
             CardType.Attack,
             CardRarity.Uncommon,
             TargetType.Self

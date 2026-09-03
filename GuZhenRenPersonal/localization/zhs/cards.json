@@ -96,7 +96,7 @@
   "GU_ZHEN_REN_PERSONAL_CARD_HUANG_XING_XIAN_YUAN.title": "黄杏仙元",
   "GU_ZHEN_REN_PERSONAL_CARD_HUANG_XING_XIAN_YUAN.description": "仙元，保留，等于两张白荔仙元。提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗。",
   "GU_ZHEN_REN_PERSONAL_CARD_YUE_GUANG_GU.title": "月光蛊",
-  "GU_ZHEN_REN_PERSONAL_CARD_YUE_GUANG_GU.description": "[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n造成{Damage:diff()}点伤害。[gold]折光[/gold]：额外造成{RefractionDamage}点伤害。",
+  "GU_ZHEN_REN_PERSONAL_CARD_YUE_GUANG_GU.description": "[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n造成{Damage:diff()}点伤害。[gold]折光[/gold]：本次伤害增加{RefractionDamage}点。",
   "GU_ZHEN_REN_PERSONAL_CARD_XIAO_GUANG_GU.title": "小光蛊",
   "GU_ZHEN_REN_PERSONAL_CARD_XIAO_GUANG_GU.description": "[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{JuGuang}层聚光。{Rank2Exact:cond:>0?[gold]折光[/gold]：额外获得{RefractionJuGuang}层聚光。|}",
   "GU_ZHEN_REN_PERSONAL_CARD_YU_PI_GU.title": "玉皮蛊",

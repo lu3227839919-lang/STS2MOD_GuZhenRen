@@ -70,25 +70,17 @@ public sealed class YueGuangGu
                 cardPlay
             );
 
+        decimal damage = DynamicVars.Damage.BaseValue +
+            (refraction.Triggered
+                ? DynamicVars["RefractionDamage"].BaseValue
+                : 0m);
+
         await AttackAsync(
             choiceContext,
             cardPlay,
             target,
-            DynamicVars.Damage.BaseValue
+            damage
         );
-
-        for (int resolution = 0;
-             resolution < refraction.EffectResolutionCount &&
-             !target.IsDead;
-             resolution++)
-        {
-            await AttackAsync(
-                choiceContext,
-                cardPlay,
-                target,
-                DynamicVars["RefractionDamage"].BaseValue
-            );
-        }
     }
 
     protected override void OnGuRankChanged()

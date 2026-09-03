@@ -33,7 +33,7 @@ public static class GuActivationModeSystem
 
     // 鼠标离开普通手牌与蛊手牌区域时，两套手牌一起下移 40px；
     // 鼠标进入任意一套手牌区域时，两套一起恢复到现有位置。
-    private const float HandAutoHideDistance = 60f;
+    private const float HandAutoHideDistance = 40f;
 
     // 40px 约 0.125 秒完成，避免瞬移，同时保持响应足够快。
     private const float HandAutoHideSpeed = 320f;
@@ -41,6 +41,14 @@ public static class GuActivationModeSystem
     // 悬停只按每张卡真正接收鼠标输入的 Hitbox 判断；四周仅保留少量容错，
     // 避免 NPlayerHand / NModExtraHand 或 NHandCardHolder 自身的布局区域过大。
     private const float HandHoverPadding = 8f;
+
+    // Hover 命中不需要跟随渲染帧率。30Hz 已足够跟手，同时把矩形/
+    // Transform 检查从 60/120/144Hz 降下来。
+    private const double HandHoverScanIntervalSeconds = 1d / 30d;
+
+    // 手牌节点树只有在抽牌/弃牌等结构变化时才需要重新递归扫描。
+    // 平时直接复用缓存的 Hitbox，避免每帧 GetChildren() 遍历整棵 UI 树。
+    private const double HandHitboxCacheRefreshIntervalSeconds = 0.25d;
 
     private const int ExtraHandZGap = 0;
 
@@ -62,6 +70,15 @@ public static class GuActivationModeSystem
         public Vector2 AppliedPosition { get; set; }
     }
 
+    private sealed class HandHoverCacheState
+    {
+        public List<Control> Hitboxes { get; } = [];
+
+        public bool HasSnapshot { get; set; }
+
+        public double RefreshCountdown { get; set; }
+    }
+
     private static readonly ConditionalWeakTable<
         NModExtraHand,
         ExtraHandLayoutState
@@ -72,8 +89,16 @@ public static class GuActivationModeSystem
         PrimaryHandLayoutState
     > PrimaryHandLayoutStates = new();
 
+    private static readonly ConditionalWeakTable<
+        CanvasItem,
+        HandHoverCacheState
+    > HandHoverCacheStates = new();
+
     // 普通手牌与蛊手牌共用同一个收起偏移，确保两套 UI 始终同步移动。
     private static float _handAutoHideOffsetY;
+    private static double _handHoverScanAccumulator =
+        HandHoverScanIntervalSeconds;
+    private static bool _cachedMouseOverAnyHand;
 
     // RitsuLib 在开始原生目标选择前，会把额外手牌中的卡牌临时移动到
     // 后端 PileType.Hand。记录当前被点击/结算的蛊牌，使它在这段短暂
@@ -304,10 +329,12 @@ public static class GuActivationModeSystem
         }
 
         _handAutoHideOffsetY = 0f;
+        _handHoverScanAccumulator = HandHoverScanIntervalSeconds;
+        _cachedMouseOverAnyHand = false;
     }
 
     /// <summary>
-    /// 每帧清理已失效的 pending 记录。蛊牌被点击后 RitsuLib 会把它临时
+    /// 定期清理已失效的 pending 记录。蛊牌被点击后 RitsuLib 会把它临时
     /// 移入原版 Hand 走原生目标选择（目标选择/出牌排队期间卡停留在
     /// Hand）；若玩家取消或放弃目标选择（右键、Esc、拖拽回手等），
     /// RitsuLib 会把卡移回蛊牌堆，但本模组没有对应的取消 hook，
@@ -344,7 +371,8 @@ public static class GuActivationModeSystem
     /// 的布局基准，避免逐帧重复叠加位移。
     /// </summary>
     internal static void UpdateExtraHandLayout(
-        NModExtraHand extraHand
+        NModExtraHand extraHand,
+        double deltaSeconds
     )
     {
         ArgumentNullException.ThrowIfNull(extraHand);
@@ -356,12 +384,17 @@ public static class GuActivationModeSystem
             return;
         }
 
+        double safeDeltaSeconds = Math.Max(0d, deltaSeconds);
+
         ExtraHandLayoutState state =
             ExtraHandLayoutStates.GetOrCreateValue(extraHand);
 
         Vector2 currentPosition = extraHand.Position;
-        if (!state.HasApplied ||
-            !currentPosition.IsEqualApprox(state.AppliedPosition))
+        bool extraHandWasRelayout =
+            !state.HasApplied ||
+            !currentPosition.IsEqualApprox(state.AppliedPosition);
+
+        if (extraHandWasRelayout)
         {
             // RitsuLib 初次布局或分辨率变化后给出的新基准位置。
             state.BasePosition = currentPosition;
@@ -384,56 +417,83 @@ public static class GuActivationModeSystem
             return;
         }
 
-        if (!primaryState.HasApplied ||
+        bool primaryHandWasRelayout =
+            !primaryState.HasApplied ||
             !primaryCurrentPosition.IsEqualApprox(
-                primaryState.AppliedPosition))
+                primaryState.AppliedPosition);
+
+        if (primaryHandWasRelayout)
         {
             // 原版手牌首次布局、分辨率变化或游戏自身重新布局后，
             // 记录最新的“完全展开”基准位置。
             primaryState.BasePosition = primaryCurrentPosition;
         }
 
-        // 先把两套手牌放到上一帧对应的展示位置，再进行 hover 判断。
-        // 这样 GetLocalMousePosition() 使用的坐标系与玩家实际看到的一致。
         Vector2 extraExpandedPosition =
             state.BasePosition + ExtraHandDownOffset;
-        Vector2 extraPresentationPosition =
-            extraExpandedPosition +
-            Vector2.Down * _handAutoHideOffsetY;
 
-        if (!extraHand.Position.IsEqualApprox(
-                extraPresentationPosition))
+        // 只有首次布局或外部重新布局时，先恢复到当前自动收起偏移。
+        // 正常帧不再像旧实现那样先写“上一帧位置”再写“本帧位置”。
+        if (extraHandWasRelayout)
         {
-            extraHand.Position = extraPresentationPosition;
+            Vector2 normalizedExtraPosition =
+                extraExpandedPosition +
+                Vector2.Down * _handAutoHideOffsetY;
+
+            if (!extraHand.Position.IsEqualApprox(
+                    normalizedExtraPosition))
+            {
+                extraHand.Position = normalizedExtraPosition;
+            }
         }
 
-        Vector2 primaryPresentationPosition =
-            primaryState.BasePosition +
-            Vector2.Down * _handAutoHideOffsetY;
-
-        SetCanvasItemPosition(
-            primaryHand,
-            primaryPresentationPosition
-        );
-
-        bool isMouseOverAnyHand =
-            IsMouseOverHandCards(
-                extraHand,
-                _handAutoHideOffsetY
-            ) ||
-            IsMouseOverHandCards(
+        if (primaryHandWasRelayout)
+        {
+            SetCanvasItemPosition(
                 primaryHand,
-                _handAutoHideOffsetY
+                primaryState.BasePosition +
+                    Vector2.Down * _handAutoHideOffsetY
             );
+        }
+
+        // 卡牌 hover 检测固定为 30Hz；两套手牌的动画位移仍按实际帧率
+        // 更新，所以不会把收起/展开动画降成 30FPS。
+        _handHoverScanAccumulator += safeDeltaSeconds;
+        if (_handHoverScanAccumulator >=
+            HandHoverScanIntervalSeconds)
+        {
+            double hoverElapsed = _handHoverScanAccumulator;
+            _handHoverScanAccumulator = 0d;
+
+            Vector2 mousePosition =
+                extraHand.GetGlobalMousePosition();
+
+            bool isMouseOverExtraHand =
+                IsMouseOverHandCards(
+                    extraHand,
+                    mousePosition,
+                    _handAutoHideOffsetY,
+                    hoverElapsed
+                );
+
+            bool isMouseOverPrimaryHand =
+                IsMouseOverHandCards(
+                    primaryHand,
+                    mousePosition,
+                    _handAutoHideOffsetY,
+                    hoverElapsed
+                );
+
+            _cachedMouseOverAnyHand =
+                isMouseOverExtraHand ||
+                isMouseOverPrimaryHand;
+        }
 
         float targetAutoHideOffset =
-            isMouseOverAnyHand ? 0f : HandAutoHideDistance;
+            _cachedMouseOverAnyHand ? 0f : HandAutoHideDistance;
 
-        float deltaSeconds = Math.Max(
-            0f,
-            (float)extraHand.GetProcessDeltaTime()
-        );
-        float maxStep = HandAutoHideSpeed * deltaSeconds;
+        float maxStep =
+            HandAutoHideSpeed * (float)safeDeltaSeconds;
 
         _handAutoHideOffsetY = MoveTowards(
             _handAutoHideOffsetY,
@@ -466,111 +526,146 @@ public static class GuActivationModeSystem
         primaryState.AppliedPosition = primaryDesiredPosition;
         primaryState.HasApplied = true;
 
-        // 0.4.9 的缩放/淡化方案已撤回，恢复原始完整尺寸。
-        extraHand.Scale = Vector2.One;
-        extraHand.Modulate = Colors.White;
+        // 这些属性只在值发生变化时写入，避免每帧把同一状态重新标脏。
+        if (!extraHand.Scale.IsEqualApprox(Vector2.One))
+        {
+            extraHand.Scale = Vector2.One;
+        }
 
-        // 使用绝对 Z 值，确保蛊牌及其悬停放大仍位于第一手牌之后。
-        extraHand.ZAsRelative = false;
-        extraHand.ZIndex = Math.Max(
+        if (extraHand.Modulate != Colors.White)
+        {
+            extraHand.Modulate = Colors.White;
+        }
+
+        if (extraHand.ZAsRelative)
+        {
+            extraHand.ZAsRelative = false;
+        }
+
+        int desiredZIndex = Math.Max(
             -4000,
             GetEffectiveZIndex(primaryHand) - ExtraHandZGap
         );
+
+        if (extraHand.ZIndex != desiredZIndex)
+        {
+            extraHand.ZIndex = desiredZIndex;
+        }
     }
 
     /// <summary>
-    /// 逐张检测 NHandCardHolder 内真正接收鼠标输入的 Hitbox。
-    ///
-    /// 原版 NHandCardHolder 本身主要负责摆放、旋转和缩放，真正的鼠标
-    /// 交互区域是其公开的 Hitbox（NClickableControl）。因此不能依赖
-    /// Holder.Size，否则某些场景中尺寸可能为 0 或与实际卡牌点击区不符，
-    /// 会导致手牌能收起却永远无法通过鼠标重新展开。
-    ///
-    /// 每张卡独立检测，不再把整手卡牌合并成一个大矩形，因此卡牌之间
-    /// 的空白区域不会额外触发展开。
+    /// 使用缓存的 NHandCardHolder.Hitbox 进行 hover 检测。缓存低频刷新，
+    /// 抽牌/弃牌造成的节点变化最多约 0.25 秒后被发现；实际 hover 命中
+    /// 则以 30Hz 计算，避免逐帧递归遍历两套手牌节点树。
     /// </summary>
     private static bool IsMouseOverHandCards(
         CanvasItem handRoot,
-        float currentAutoHideOffsetY
-    )
-    {
-        Vector2 mousePosition =
-            handRoot.GetGlobalMousePosition();
-
-        return IsMouseOverHandCardsRecursive(
-            handRoot,
-            mousePosition,
-            currentAutoHideOffsetY
-        );
-    }
-
-    private static bool IsMouseOverHandCardsRecursive(
-        Node root,
         Vector2 mousePosition,
-        float currentAutoHideOffsetY
+        float currentAutoHideOffsetY,
+        double elapsedSeconds
     )
     {
-        foreach (Node child in root.GetChildren())
+        HandHoverCacheState cache =
+            HandHoverCacheStates.GetOrCreateValue(handRoot);
+
+        cache.RefreshCountdown -= elapsedSeconds;
+        if (!cache.HasSnapshot ||
+            cache.RefreshCountdown <= 0d)
         {
-            if (child is NHandCardHolder holder &&
-                GodotObject.IsInstanceValid(holder) &&
-                holder.IsVisibleInTree() &&
-                holder.IsNodeReady())
+            RebuildHandHitboxCache(handRoot, cache);
+        }
+
+        foreach (Control hitbox in cache.Hitboxes)
+        {
+            if (!GodotObject.IsInstanceValid(hitbox))
             {
-                Control hitbox = holder.Hitbox;
-
-                if (hitbox != null &&
-                    GodotObject.IsInstanceValid(hitbox) &&
-                    hitbox.IsVisibleInTree() &&
-                    hitbox.Size.X > 0f &&
-                    hitbox.Size.Y > 0f)
-                {
-                    Rect2 hitboxRect =
-                        GetControlGlobalAabb(hitbox);
-
-                    // hitboxRect 位于当前实际展示位置。
-                    // 收起时向上补回已经移动的距离，让鼠标仍能从原来的
-                    // 卡牌位置附近“叫回”手牌；同时向下补剩余行程，
-                    // 避免展开/收起过程中反复抖动。
-                    float topExtra =
-                        currentAutoHideOffsetY +
-                        HandHoverPadding;
-
-                    float bottomExtra =
-                        (HandAutoHideDistance -
-                         currentAutoHideOffsetY) +
-                        HandHoverPadding;
-
-                    Rect2 hoverRect = new(
-                        hitboxRect.Position -
-                            new Vector2(
-                                HandHoverPadding,
-                                topExtra
-                            ),
-                        hitboxRect.Size +
-                            new Vector2(
-                                HandHoverPadding * 2f,
-                                topExtra + bottomExtra
-                            )
-                    );
-
-                    if (hoverRect.HasPoint(mousePosition))
-                    {
-                        return true;
-                    }
-                }
+                // 下次 hover 扫描立即重建，避免继续持有已释放节点。
+                cache.RefreshCountdown = 0d;
+                continue;
             }
 
-            if (IsMouseOverHandCardsRecursive(
-                    child,
-                    mousePosition,
-                    currentAutoHideOffsetY))
+            if (!hitbox.IsVisibleInTree() ||
+                hitbox.Size.X <= 0f ||
+                hitbox.Size.Y <= 0f)
+            {
+                continue;
+            }
+
+            Rect2 hitboxRect = GetControlGlobalAabb(hitbox);
+
+            // hitboxRect 位于当前实际展示位置。收起时向上补回已经移动
+            // 的距离，让鼠标仍能从原来的卡牌位置附近“叫回”手牌；同时
+            // 向下补剩余行程，避免展开/收起过程中反复抖动。
+            float topExtra =
+                currentAutoHideOffsetY + HandHoverPadding;
+
+            float bottomExtra =
+                (HandAutoHideDistance -
+                 currentAutoHideOffsetY) +
+                HandHoverPadding;
+
+            Rect2 hoverRect = new(
+                hitboxRect.Position -
+                    new Vector2(
+                        HandHoverPadding,
+                        topExtra
+                    ),
+                hitboxRect.Size +
+                    new Vector2(
+                        HandHoverPadding * 2f,
+                        topExtra + bottomExtra
+                    )
+            );
+
+            if (hoverRect.HasPoint(mousePosition))
             {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private static void RebuildHandHitboxCache(
+        CanvasItem handRoot,
+        HandHoverCacheState cache
+    )
+    {
+        cache.Hitboxes.Clear();
+        CollectHandHitboxesRecursive(
+            handRoot,
+            cache.Hitboxes
+        );
+        cache.HasSnapshot = true;
+        cache.RefreshCountdown =
+            HandHitboxCacheRefreshIntervalSeconds;
+    }
+
+    private static void CollectHandHitboxesRecursive(
+        Node root,
+        List<Control> hitboxes
+    )
+    {
+        foreach (Node child in root.GetChildren())
+        {
+            if (child is NHandCardHolder holder &&
+                GodotObject.IsInstanceValid(holder) &&
+                holder.IsNodeReady())
+            {
+                Control hitbox = holder.Hitbox;
+                if (hitbox != null &&
+                    GodotObject.IsInstanceValid(hitbox))
+                {
+                    hitboxes.Add(hitbox);
+                }
+
+                // NHandCardHolder 自身已提供最终 Hitbox，无需继续扫描
+                // 它的卡面/文本/特效子树。
+                continue;
+            }
+
+            CollectHandHitboxesRecursive(child, hitboxes);
+        }
     }
 
     /// <summary>
@@ -642,11 +737,13 @@ public static class GuActivationModeSystem
     {
         switch (item)
         {
-            case Control control:
+            case Control control
+                when !control.Position.IsEqualApprox(position):
                 control.Position = position;
                 break;
 
-            case Node2D node2D:
+            case Node2D node2D
+                when !node2D.Position.IsEqualApprox(position):
                 node2D.Position = position;
                 break;
         }
@@ -685,7 +782,7 @@ public static class GuActivationModeSystem
             zIndex += parentCanvasItem.ZIndex;
             if (!parentCanvasItem.ZAsRelative)
             {
-                
+                break;
             }
 
             parent = parentCanvasItem.GetParent();

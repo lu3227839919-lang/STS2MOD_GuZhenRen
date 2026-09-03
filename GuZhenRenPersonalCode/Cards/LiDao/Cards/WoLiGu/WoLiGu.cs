@@ -34,7 +34,7 @@ public sealed class WoLiGu : AbstractGuWormCard
 
     public WoLiGu()
         : base(
-            1,
+            0,
             CardType.Power,
             CardRarity.Rare,
             TargetType.Self

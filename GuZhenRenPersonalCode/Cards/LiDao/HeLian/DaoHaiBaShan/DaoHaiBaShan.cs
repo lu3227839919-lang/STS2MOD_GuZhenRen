@@ -47,7 +47,7 @@ public sealed class DaoHaiBaShan : AbstractHeLianGuCard
 
     public DaoHaiBaShan()
         : base(
-            2,
+            0,
             CardType.Attack,
             CardRarity.Rare,
             TargetType.Self

@@ -96,7 +96,7 @@
   "GU_ZHEN_REN_PERSONAL_CARD_HUANG_XING_XIAN_YUAN.title": "Yellow Apricot Immortal Essence",
   "GU_ZHEN_REN_PERSONAL_CARD_HUANG_XING_XIAN_YUAN.description": "Immortal essence, Retain, equal to two White Lychee essences. Provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhausts when depleted.",
   "GU_ZHEN_REN_PERSONAL_CARD_YUE_GUANG_GU.title": "Moonlight Gu",
-  "GU_ZHEN_REN_PERSONAL_CARD_YUE_GUANG_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nDeal {Damage:diff()} damage. [gold]Refraction[/gold]: deal {RefractionDamage} additional damage.",
+  "GU_ZHEN_REN_PERSONAL_CARD_YUE_GUANG_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nDeal {Damage:diff()} damage. [gold]Refraction[/gold]: increase this damage by {RefractionDamage}.",
   "GU_ZHEN_REN_PERSONAL_CARD_XIAO_GUANG_GU.title": "Little Light Gu",
   "GU_ZHEN_REN_PERSONAL_CARD_XIAO_GUANG_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {JuGuang} Focus. {Rank2Exact:cond:>0?[gold]Refraction[/gold]: gain {RefractionJuGuang} additional Focus.|}",
   "GU_ZHEN_REN_PERSONAL_CARD_YU_PI_GU.title": "Jade Skin Gu",

@@ -37,7 +37,7 @@ public sealed class QunLiGu : AbstractGuWormCard
 
     public QunLiGu()
         : base(
-            1,
+            0,
             CardType.Power,
             CardRarity.Uncommon,
             TargetType.Self

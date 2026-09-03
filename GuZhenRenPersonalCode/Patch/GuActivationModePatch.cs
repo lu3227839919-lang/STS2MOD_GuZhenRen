@@ -25,7 +25,10 @@ internal static class GuActivationModePatch
     private const string HarmonyId =
         Entry.ModId + ".GuActivationMode";
 
+    private const double PendingSweepIntervalSeconds = 0.10d;
+
     private static bool _initialized;
+    private static double _pendingSweepCountdown;
 
     internal static void Initialize()
     {
@@ -139,6 +142,7 @@ internal static class GuActivationModePatch
         {
             harmony.UnpatchAll(HarmonyId);
             GuActivationModeSystem.ResetWithoutUi();
+            _pendingSweepCountdown = 0d;
             throw;
         }
     }
@@ -152,6 +156,7 @@ internal static class GuActivationModePatch
         finally
         {
             GuActivationModeSystem.ResetWithoutUi();
+            _pendingSweepCountdown = 0d;
             _initialized = false;
         }
     }
@@ -213,11 +218,25 @@ internal static class GuActivationModePatch
         NModExtraHand __instance
     )
     {
-        GuActivationModeSystem.UpdateExtraHandLayout(__instance);
+        double deltaSeconds = Math.Max(
+            0d,
+            __instance.GetProcessDeltaTime()
+        );
 
-        // 玩家点击蛊牌后若取消/放弃目标选择，RitsuLib 会把牌移回蛊牌堆
-        // 且不会通知本模组，_pendingCard 会残留并锁死其余蛊牌的选择。
-        // 每帧兜底清理：pending 卡已回到蛊牌堆即视为选择已放弃。
+        GuActivationModeSystem.UpdateExtraHandLayout(
+            __instance,
+            deltaSeconds
+        );
+
+        // pending 清理不需要逐帧执行。100ms 的检查周期对取消目标选择
+        // 足够及时，同时避免在 ExtraHand 的每个 _Process 都进入锁。
+        _pendingSweepCountdown -= deltaSeconds;
+        if (_pendingSweepCountdown > 0d)
+        {
+            return;
+        }
+
+        _pendingSweepCountdown = PendingSweepIntervalSeconds;
         GuActivationModeSystem.SweepStalePending();
     }
 
