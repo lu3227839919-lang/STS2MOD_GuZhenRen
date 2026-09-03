@@ -14,8 +14,6 @@ using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
 
-using STS2RitsuLib.Utils;
-
 namespace GuZhenRen.Cards.XueDao;
 
 public static class XueDaoParasiteSystem
@@ -24,27 +22,9 @@ public static class XueDaoParasiteSystem
     {
         None = 0,
         Ordinary = 1,
-        LegacyCrescentMoon = 2,
         BloodMoon = 3,
-        LegacyBloodFetus = 4,
         BloodSeed = 5,
     }
-
-    // 旧版旁路键字符串不得更换。
-    private static readonly SavedAttachedState<CardModel, int> LegacyKindState =
-        new("lu_gu_zhen_ren.xue_dao.parasite_kind", static () => 0);
-    private static readonly SavedAttachedState<CardModel, int> LegacyRankState =
-        new("lu_gu_zhen_ren.xue_dao.parasite_rank", static () => 0);
-    private static readonly SavedAttachedState<CardModel, bool> LegacyUpgradedState =
-        new("lu_gu_zhen_ren.xue_dao.parasite_upgraded", static () => false);
-    private static readonly SavedAttachedState<CardModel, int> LegacyStageState =
-        new("lu_gu_zhen_ren.xue_dao.parasite_stage", static () => 0);
-    private static readonly SavedAttachedState<CardModel, int> LegacyTriggersRemainingState =
-        new("lu_gu_zhen_ren.xue_dao.parasite_triggers_remaining", static () => 0);
-    private static readonly SavedAttachedState<CardModel, int> LegacyTriggersCompletedState =
-        new("lu_gu_zhen_ren.xue_dao.parasite_triggers_completed", static () => 0);
-    private static readonly SavedAttachedState<CardModel, bool> LegacyResolvingState =
-        new("lu_gu_zhen_ren.xue_dao.parasite_resolving", static () => false);
 
     private sealed class ResolvingFlag
     {
@@ -53,16 +33,6 @@ public static class XueDaoParasiteSystem
 
     private static readonly ConditionalWeakTable<CardModel, ResolvingFlag>
         ResolvingStates = new();
-
-    internal static ParasiteKind NormalizePersistedKind(int rawKind) =>
-        rawKind switch
-        {
-            1 => ParasiteKind.Ordinary,
-            2 or 3 => ParasiteKind.BloodMoon,
-            4 => ParasiteKind.Ordinary,
-            5 => ParasiteKind.BloodSeed,
-            _ => ParasiteKind.None,
-        };
 
     public static bool HasParasite(CardModel? card) =>
         card != null && GetKind(card) != ParasiteKind.None;
@@ -111,8 +81,6 @@ public static class XueDaoParasiteSystem
             kind == ParasiteKind.Ordinary ? 1 : 0
         );
         XueDaoEnchantmentSlotPatch.NotifyParasiteChanged(parasite);
-        ClearLegacyState(host);
-
         await PowerCmd.Apply<XueJiPower>(
             choiceContext,
             sourceCard.Owner.Creature,
@@ -217,7 +185,6 @@ public static class XueDaoParasiteSystem
 
     internal static void MarkResolving(CardModel card, bool resolving)
     {
-        LegacyResolvingState[card] = false;
         if (resolving)
         {
             ResolvingStates.GetOrCreateValue(card).Value = true;
@@ -453,11 +420,12 @@ public static class XueDaoParasiteSystem
 
         if (bleed > 0 && target.IsAlive)
         {
-            await XueDaoPowerSystem.ApplyLiuXue(
+            await PowerCmd.Apply<LiuXuePower>(
                 choiceContext,
-                effectSource,
                 target,
-                bleed
+                bleed,
+                effectSource.Owner.Creature,
+                effectSource
             );
         }
     }
@@ -553,7 +521,6 @@ public static class XueDaoParasiteSystem
     )
     {
         XueDaoEnchantmentSlotPatch.RemoveParasite(host);
-        ClearLegacyState(host);
         ResolvingStates.Remove(host);
 
         if (host.Owner.Creature.GetPower<XueJiPower>() is { } power)
@@ -570,47 +537,5 @@ public static class XueDaoParasiteSystem
 
     private static XueDaoParasiteEnchantment? GetParasiteEnchantment(
         CardModel card
-    ) =>
-        XueDaoEnchantmentSlotPatch.TryGetParasite(card) ??
-        TryMigrateLegacyParasite(card);
-
-    private static XueDaoParasiteEnchantment? TryMigrateLegacyParasite(
-        CardModel card
-    )
-    {
-        ParasiteKind kind = NormalizePersistedKind(LegacyKindState[card]);
-        if (kind == ParasiteKind.None ||
-            card.IsCanonical ||
-            !IsEligibleHost(card))
-        {
-            return null;
-        }
-
-        int rank = Math.Clamp(LegacyRankState[card], 1, 6);
-        int legacyStage = Math.Max(
-            LegacyStageState[card],
-            LegacyTriggersCompletedState[card]
-        );
-        int stage = kind == ParasiteKind.Ordinary
-            ? Math.Clamp(legacyStage + 1, 1, 3)
-            : 0;
-
-        XueDaoParasiteEnchantment parasite =
-            XueDaoEnchantmentSlotPatch.AttachOrRefreshParasite(card, rank);
-        parasite.Configure(kind, rank, stage);
-        XueDaoEnchantmentSlotPatch.NotifyParasiteChanged(parasite);
-        ClearLegacyState(card);
-        return parasite;
-    }
-
-    private static void ClearLegacyState(CardModel card)
-    {
-        LegacyKindState[card] = 0;
-        LegacyRankState[card] = 0;
-        LegacyUpgradedState[card] = false;
-        LegacyStageState[card] = 0;
-        LegacyTriggersRemainingState[card] = 0;
-        LegacyTriggersCompletedState[card] = 0;
-        LegacyResolvingState[card] = false;
-    }
+    ) => XueDaoEnchantmentSlotPatch.TryGetParasite(card);
 }

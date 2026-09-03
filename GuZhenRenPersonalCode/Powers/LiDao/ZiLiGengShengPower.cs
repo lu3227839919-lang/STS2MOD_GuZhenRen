@@ -27,7 +27,6 @@ public sealed class ZiLiGengShengPower : ModPowerTemplate
     private Creature? _primaryTarget;
     private int _actualDamage;
     private bool _killedPrimaryTarget;
-    private int _attachedLiDaoDamageDepth;
 
     public override PowerType Type => PowerType.Buff;
 
@@ -58,22 +57,6 @@ public sealed class ZiLiGengShengPower : ModPowerTemplate
         InvokeDisplayAmountChanged();
     }
 
-    internal void BeginAttachedLiDaoDamage(CardModel sourceCard)
-    {
-        if (_trackingAttack && sourceCard == _trackedCard)
-        {
-            _attachedLiDaoDamageDepth++;
-        }
-    }
-
-    internal void EndAttachedLiDaoDamage(CardModel sourceCard)
-    {
-        if (sourceCard == _trackedCard && _attachedLiDaoDamageDepth > 0)
-        {
-            _attachedLiDaoDamageDepth--;
-        }
-    }
-
     public override Task BeforeCardPlayed(CardPlay cardPlay)
     {
         if (!_armed ||
@@ -91,7 +74,6 @@ public sealed class ZiLiGengShengPower : ModPowerTemplate
         _primaryTarget = GetPrimaryTarget(cardPlay);
         _actualDamage = 0;
         _killedPrimaryTarget = false;
-        _attachedLiDaoDamageDepth = 0;
         InvokeDisplayAmountChanged();
         return Task.CompletedTask;
     }
@@ -109,12 +91,6 @@ public sealed class ZiLiGengShengPower : ModPowerTemplate
             dealer != Owner ||
             target != _primaryTarget ||
             cardSource != _trackedCard)
-        {
-            return Task.CompletedTask;
-        }
-
-        if (_attachedLiDaoDamageDepth > 0 &&
-            !ZiLiGengShengGu.CountsAttachedLiDaoDamageAtRank(Rank))
         {
             return Task.CompletedTask;
         }
@@ -169,6 +145,5 @@ public sealed class ZiLiGengShengPower : ModPowerTemplate
         _primaryTarget = null;
         _actualDamage = 0;
         _killedPrimaryTarget = false;
-        _attachedLiDaoDamageDepth = 0;
     }
 }

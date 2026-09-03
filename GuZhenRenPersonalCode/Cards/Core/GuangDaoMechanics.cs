@@ -12,11 +12,6 @@ public readonly record struct RefractionResult(
     public static RefractionResult None => new(false, 0);
 }
 
-/// <summary>声明该牌具有可被聚光复制的折光效果。</summary>
-public interface IRefractionEffectCard
-{
-}
-
 /// <summary>声明该牌需要展示新版折光说明。</summary>
 public interface IRefractionRelevantCard
 {

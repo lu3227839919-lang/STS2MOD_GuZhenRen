@@ -12,7 +12,7 @@ using STS2RitsuLib.Interop.AutoRegistration;
 namespace GuZhenRen.Cards.LiDao;
 
 /// <summary>
-/// 苦力蛊：伤势越重，攻击牌结算后追加的苦力伤害越高。
+/// 苦力蛊：伤势越重，攻击牌第一段伤害获得的苦力加成越高。
 /// 本蛊不属于兽力虚影蛊，不参与炼力、虚影容量或衍生牌系统。
 /// </summary>
 [RegisterCard(typeof(GuZhenRenGuCardPool))]

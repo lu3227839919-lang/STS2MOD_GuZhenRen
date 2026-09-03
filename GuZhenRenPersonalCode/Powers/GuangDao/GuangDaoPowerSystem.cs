@@ -14,9 +14,6 @@ namespace GuZhenRen.Powers.GuangDao;
 /// </summary>
 public static class GuangDaoPowerSystem
 {
-    public static bool IsGuangDaoCard(CardModel? card) =>
-        card?.Tags.Contains(GuZhenRenTags.GuangDao) == true;
-
     public static RefractionResult GetRefractionResult(
         CardModel card,
         CardPlay cardPlay
@@ -37,9 +34,8 @@ public static class GuangDaoPowerSystem
     }
 
     /// <summary>
-    /// 返回卡牌本次折光效果的结算次数。聚光只在实现
-    /// <see cref="IRefractionEffectCard"/> 的牌真正折光时消费一层；
-    /// 黄金月等没有折光效果的牌仍记录真实折光，但不会空耗聚光。
+    /// 返回卡牌本次折光效果的结算次数。只有主动调用该入口的折光效果牌
+    /// 才会消费聚光；黄金月等只记录真实折光，不会空耗聚光。
     /// </summary>
     public static async Task<RefractionResult>
         ResolveRefractionEffectAsync(
@@ -53,7 +49,7 @@ public static class GuangDaoPowerSystem
         ArgumentNullException.ThrowIfNull(cardPlay);
 
         RefractionResult result = GetRefractionResult(card, cardPlay);
-        if (!result.Triggered || card is not IRefractionEffectCard)
+        if (!result.Triggered)
         {
             return result;
         }

@@ -17,7 +17,6 @@ namespace GuZhenRen.Cards.GuangDao;
 [RegisterCharacterStarterCard(typeof(GuZhenRenCharacter), 2)]
 public sealed class XiaoGuangGu
     : AbstractGuWormCard,
-      IRefractionEffectCard,
       IRefractionRelevantCard,
       IJuGuangCard
 {

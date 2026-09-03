@@ -23,7 +23,6 @@ namespace GuZhenRen.Cards.HeLian;
 )]
 public sealed class YueMangGu
     : AbstractHeLianGuCard,
-      IRefractionEffectCard,
       IRefractionRelevantCard,
       IJuGuangCard
 {

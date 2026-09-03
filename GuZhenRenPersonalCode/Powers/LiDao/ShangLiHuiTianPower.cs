@@ -17,7 +17,7 @@ namespace GuZhenRen.Powers.LiDao;
 ///
 /// 从杀招结算完成后开始，按 CardPlay 统计每张后续牌完整结算期间
 /// 对敌人造成的实际生命伤害总和，并只保存其中最高的一次。
-/// 卡牌来源相同的苦力追加伤害等后续伤害会自然并入该次统计。
+/// 苦力加伤已经并入攻击牌第一段，因此会自然计入该牌的伤害统计。
 ///
 /// 本 Power 的回复只能结算一次。濒死时由
 /// ShangLiHuiTianTriggerPatch 抢占 ShouldDie，并在

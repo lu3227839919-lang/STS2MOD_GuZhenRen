@@ -21,7 +21,7 @@ namespace GuZhenRen.Cards.XueDao;
 ///
 /// 原版 CardModel 只有一个 Enchantment 字段；本模型占用该物理字段，
 /// 将普通附魔和寄生分别保存、深拷贝并转发生命周期，因此玩法与界面上
-/// 仍是彼此独立的两个槽位，也兼容 0.9.0～0.9.7 的历史存档。
+/// 仍是彼此独立的两个槽位。
 /// </summary>
 [RegisterEnchantment]
 public sealed class XueDaoCompositeEnchantment : ModEnchantmentTemplate

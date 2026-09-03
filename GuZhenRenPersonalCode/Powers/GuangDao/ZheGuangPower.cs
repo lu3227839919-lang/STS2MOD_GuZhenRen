@@ -79,7 +79,7 @@ public sealed class ZheGuangPower : ModPowerTemplate
         }
 
         CardModel card = cardPlay.Card;
-        bool isGuangDao = GuangDaoPowerSystem.IsGuangDaoCard(card);
+        bool isGuangDao = card.Tags.Contains(GuZhenRenTags.GuangDao);
         bool forced = isGuangDao &&
             DynamicVars[ForceNextKey].IntValue != 0;
 

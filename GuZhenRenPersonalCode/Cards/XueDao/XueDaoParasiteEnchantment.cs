@@ -18,18 +18,8 @@ public sealed class XueDaoParasiteEnchantment : ModEnchantmentTemplate
     [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
     private int SavedRank { get; set; }
 
-    // 旧快照字段继续注册，保证原网络属性 ID 可以读取。
-    [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
-    private bool SavedSourceWasUpgraded { get; set; }
-
     [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
     private int SavedStage { get; set; }
-
-    [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
-    private int SavedTriggersRemaining { get; set; }
-
-    [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
-    private int SavedTriggersCompleted { get; set; }
 
     public override bool ShowAmount => true;
 
@@ -51,8 +41,13 @@ public sealed class XueDaoParasiteEnchantment : ModEnchantmentTemplate
             ),
         };
 
-    internal XueDaoParasiteSystem.ParasiteKind Kind =>
-        XueDaoParasiteSystem.NormalizePersistedKind(SavedKind);
+    internal XueDaoParasiteSystem.ParasiteKind Kind => SavedKind switch
+    {
+        1 => XueDaoParasiteSystem.ParasiteKind.Ordinary,
+        3 => XueDaoParasiteSystem.ParasiteKind.BloodMoon,
+        5 => XueDaoParasiteSystem.ParasiteKind.BloodSeed,
+        _ => XueDaoParasiteSystem.ParasiteKind.None,
+    };
 
     internal int Rank => Math.Max(1, SavedRank > 0 ? SavedRank : Amount);
 
@@ -67,16 +62,7 @@ public sealed class XueDaoParasiteEnchantment : ModEnchantmentTemplate
         AssertMutable();
         SavedKind = (int)kind;
         SavedRank = Math.Clamp(rank, 1, 6);
-        SavedSourceWasUpgraded = false;
         SavedStage = Math.Max(0, stage);
-        SavedTriggersCompleted =
-            kind == XueDaoParasiteSystem.ParasiteKind.Ordinary
-                ? Math.Clamp(SavedStage - 1, 0, 2)
-                : 0;
-        SavedTriggersRemaining =
-            kind == XueDaoParasiteSystem.ParasiteKind.Ordinary
-                ? Math.Clamp(4 - SavedStage, 0, 3)
-                : 0;
         Amount = SavedRank;
     }
 
@@ -84,8 +70,6 @@ public sealed class XueDaoParasiteEnchantment : ModEnchantmentTemplate
     {
         AssertMutable();
         SavedStage = Math.Clamp(stage, 1, 3);
-        SavedTriggersCompleted = SavedStage - 1;
-        SavedTriggersRemaining = 4 - SavedStage;
     }
 
     public override bool CanEnchant(CardModel card) =>

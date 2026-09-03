@@ -22,16 +22,8 @@ internal static class XueDaoRemainsKillPatch
         internal int Granted { get; set; }
     }
 
-    private static ConditionalWeakTable<CardPlay, GrantState> _grants = new();
-
-    internal static void Initialize()
-    {
-    }
-
-    internal static void Uninitialize()
-    {
-        _grants = new ConditionalWeakTable<CardPlay, GrantState>();
-    }
+    private static readonly ConditionalWeakTable<CardPlay, GrantState>
+        Grants = new();
 
     internal static async Task GrantForBloodDamageKillAsync(
         CardPlay? cardPlay,
@@ -49,7 +41,7 @@ internal static class XueDaoRemainsKillPatch
             return;
         }
 
-        GrantState state = _grants.GetOrCreateValue(cardPlay);
+        GrantState state = Grants.GetOrCreateValue(cardPlay);
         if (state.Granted >= MaxRemainsPerPlay)
         {
             return;

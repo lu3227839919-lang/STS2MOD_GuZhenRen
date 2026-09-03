@@ -1,330 +1,14 @@
 {
   "schemaVersion": 1,
   "language": "zhs",
-  "keywords": {
-    "CuiDong": {
-      "title": "催动",
-      "description": "可从蛊手牌直接打出；次数耗尽后进入冷却。"
-    },
-    "HeLian": {
-      "title": "合练",
-      "description": "消耗指定蛊虫材料炼成新蛊。"
-    },
-    "ZongEDu": {
-      "title": "总量",
-      "description": "标注数值由所有存活敌人共享。"
-    },
-    "ZhuiJi": {
-      "title": "追击",
-      "description": "目标死亡后，剩余攻击转向其他敌人。"
-    },
-    "YaoHua1": {
-      "title": "耀化 1",
-      "description": "光辉≥1时，消耗1点光辉触发耀化。"
-    },
-    "YaoHua2": {
-      "title": "耀化 2",
-      "description": "光辉≥2时，消耗2点光辉触发耀化。"
-    },
-    "YaoHua3": {
-      "title": "耀化 3",
-      "description": "光辉≥3时，消耗3点光辉触发耀化。"
-    },
-    "YaoHua4": {
-      "title": "耀化 4",
-      "description": "光辉≥4时，消耗4点光辉触发耀化。"
-    },
-    "YaoHua5": {
-      "title": "耀化 5",
-      "description": "光辉≥5时，消耗5点光辉触发耀化。"
-    },
-    "YaoHua6": {
-      "title": "耀化 6",
-      "description": "光辉≥6时，消耗6点光辉触发耀化。"
-    },
-    "YaoHua7": {
-      "title": "耀化 7",
-      "description": "光辉≥7时，消耗7点光辉触发耀化。"
-    },
-    "YaoHua8": {
-      "title": "耀化 8",
-      "description": "光辉≥8时，消耗8点光辉触发耀化。"
-    },
-    "YaoHua9": {
-      "title": "耀化 9",
-      "description": "光辉≥9时，消耗9点光辉触发耀化。"
-    },
-    "XuYing": {
-      "title": "虚影",
-      "description": "自动保留，不能主动打出；攻击后按概率显化。"
-    },
-    "LianLi": {
-      "title": "炼力",
-      "description": "对应伴生牌结算时获得炼力；达到3点后解封。"
-    },
-    "NianHua": {
-      "title": "年华",
-      "description": "达到6点触发岁满并归零，溢出继续结算。"
-    },
-    "SuiMan": {
-      "title": "岁满",
-      "description": "1只蛊冷却-1；敌人限时负面状态+1回合。"
-    },
-    "HuanBu": {
-      "title": "缓步",
-      "description": "敌人每次攻击的总伤害减少X。"
-    },
-    "XiYing": {
-      "title": "昔影",
-      "description": "回溯生成的临时牌；消耗且不能再次回溯。"
-    },
-    "PoShi": {
-      "title": "破势",
-      "description": "将敌人原有格挡降至0时触发。"
-    },
-    "LianHai1": {
-      "title": "炼骸 1",
-      "description": "最多消耗1张遗骸，收益见卡面。"
-    },
-    "LianHai2": {
-      "title": "炼骸 2",
-      "description": "最多消耗2张遗骸，收益见卡面。"
-    },
-    "LianHai3": {
-      "title": "炼骸 3",
-      "description": "最多消耗3张遗骸，收益见卡面。"
-    },
-    "XueQiCore": {
-      "title": "血寄",
-      "description": "宿主主动打出时依次触发Ⅰ、Ⅱ、Ⅲ，Ⅲ后化生。"
-    },
-    "XueYueCore": {
-      "title": "血月寄",
-      "description": "宿主主动打出后，使另一张普通血寄触发并成长。"
-    },
-    "ShangShi": {
-      "title": "伤势",
-      "description": "生命≤75%/50%/25%时，视为轻伤/重伤/极重伤。"
-    },
-    "ZheGuangCore": {
-      "title": "折光",
-      "description": "上一张主动打出的牌与本牌类型不同时触发。"
-    },
-    "JuGuangCore": {
-      "title": "聚光",
-      "description": "消耗1层，使下一次折光额外结算1次。"
-    },
-    "TiaoGuCore": {
-      "title": "调蛊",
-      "description": "将1只蛊移至存放队列尾，并从队首补位。"
-    },
-    "YueHuaCore": {
-      "title": "月华",
-      "description": "黄金月蛊每触发1次折光，月华+1。"
-    },
-    "ZhaoXi": {
-      "title": "照袭",
-      "description": "攻击已有照破的敌人时触发。"
-    },
-    "YanGuang": {
-      "title": "衍光",
-      "description": "进入冷却后生成对应衍生牌。"
-    },
-    "YingGuang": {
-      "title": "映光",
-      "description": "下一次攻击命中照破敌人时伤害提高。"
-    },
-    "ShouHui": {
-      "title": "守辉",
-      "description": "回合结束时格挡≥5，获得1点光辉。"
-    },
-    "PoHui": {
-      "title": "破辉",
-      "description": "本回合首次格挡被击破时，获得1点光辉。"
-    }
-  },
-  "cardDescriptionOverrides": {
-    "GU_ZHEN_REN_PERSONAL_CARD_SHA_ZHAO_TUI_YAN.description": "支付1点能量，选择杀招与材料进行推演。取消或失败不收费。推演出的杀招首次打出不耗能；用尽后材料完整冷却，并额外增加1回合。",
-    "GU_ZHEN_REN_PERSONAL_CARD_BAI_SHI_GU.description": "获得{Dexterity:diff()}层临时[gold]敏捷[/gold]。{BlockRetentionTurns:cond:>0?接下来{BlockRetentionTurns}个回合，防御不会在你的回合开始时消失。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_QING_TI_XIAN_YUAN.description": "作为仙元保留在手中。可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
-    "GU_ZHEN_REN_PERSONAL_CARD_HONG_ZAO_XIAN_YUAN.description": "作为仙元保留在手中。等于两张青提仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
-    "GU_ZHEN_REN_PERSONAL_CARD_BAI_LI_XIAN_YUAN.description": "作为仙元保留在手中。等于两张红枣仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
-    "GU_ZHEN_REN_PERSONAL_CARD_HUANG_XING_XIAN_YUAN.description": "作为仙元保留在手中。等于两张白荔仙元，可提供{RemainingActivationUnits}/{ActivationUnits}个六转催动单位；耗尽时消耗此牌。",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_QI_GU.description": "[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n选择一张没有寄生效果的攻击或技能，植入普通[gold]血寄[/gold]。Ⅰ/Ⅱ/Ⅲ：{ParasiteI}/{ParasiteII}/{ParasiteIII}；化生{HatchValue}。攻击造成伤害并按阶段施加流血，技能获得等量格挡且化生时抽1张。",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_YUE_GU.description": "[gold]{RankCN}转[/gold] · [gold]合练[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n选择一张没有寄生效果的攻击或技能，植入[gold]血月寄[/gold]。宿主主动打出后，选择另一张普通血寄立即触发并成长。",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_CHI_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{EnergyGain}点能量；可炼骸至多{MaxRefine}张。每永久消耗1张遗骸，获得1层[gold]血池[/gold]。可以取消并消耗0张。",
-    "GU_ZHEN_REN_PERSONAL_CARD_BAI_ZHI_GU.description": "[gold]{RankCN}转[/gold] · [gold]能力[/gold]\n催动：获得1张白豕虚影。{TrainingSealed:cond:>0?\n[gold]炼力[/gold] {TrainingProgress}/{TrainingRequired} · 封存|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_FEI_XIONG_ZHI_LI_GU.description": "[gold]{RankCN}转[/gold] · [gold]能力[/gold]\n催动：获得1张飞熊虚影。{TrainingSealed:cond:>0?\n[gold]炼力[/gold] {TrainingProgress}/{TrainingRequired} · 封存|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_E_LI_GU.description": "[gold]{RankCN}转[/gold] · [gold]能力[/gold]\n催动：获得1张鳄鱼虚影。{TrainingSealed:cond:>0?\n[gold]炼力[/gold] {TrainingProgress}/{TrainingRequired} · 封存|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_QING_NIU_LAO_LI_GU.description": "[gold]{RankCN}转[/gold] · [gold]能力[/gold]\n催动：获得1张青牛虚影。{TrainingSealed:cond:>0?\n[gold]炼力[/gold] {TrainingProgress}/{TrainingRequired} · 封存|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_SHI_GUI_LI_GU.description": "[gold]{RankCN}转[/gold] · [gold]能力[/gold]\n催动：获得1张石龟虚影。{TrainingSealed:cond:>0?\n[gold]炼力[/gold] {TrainingProgress}/{TrainingRequired} · 封存|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_KU_LI_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]能力[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n{Rank3Exact:cond:>0?每回合首张攻击结算后|每张攻击结算后}，按[gold]伤势[/gold]追加苦力伤害：轻伤{LightDamage}点、重伤{HeavyDamage}点、极重伤{CriticalDamage}点。{Rank6Exact:cond:>0?首次进入更重伤势时获得1点力量。|}{Rank7Exact:cond:>0?首次进入轻伤或重伤获得1点力量，极重伤获得2点。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_ZI_LI_GENG_SHENG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]能力[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得自力更生：下一张攻击完整结算后，回复主目标实际生命伤害的{HealingPercent}%，最多{HealingCap}点。{HasKillBonus:cond:>0?击杀时最多{KillHealingCap}点。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_QUN_LI_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]能力[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n催动：获得群力。兽力虚影自然显化后，有{GroupChance}%概率连续显化，最多额外{RepeatLimit}次。",
-    "GU_ZHEN_REN_PERSONAL_CARD_WO_LI_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]能力[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n催动：获得我力。每累计{ManifestsPerStrength}次兽力虚影显化，获得1点力量。{HasDistinctBonus:cond:>0?本回合显化{DistinctThreshold}种不同兽力虚影时，再获得1点力量。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_CHEN_JIAN_CHONG.description": "[gold]{RankCN}转[/gold]\n造成{Damage:diff()}点伤害。{FirstAttackRange:cond:>0?若为本回合首张攻击，改为造成{FirstAttackDamage}点。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_FEI_XIONG_ZHUANG.description": "[gold]{RankCN}转[/gold]\n造成{Damage:diff()}点伤害；目标有格挡时改为造成{BlockedDamage}点。",
-    "GU_ZHEN_REN_PERSONAL_CARD_JIAO_SHUAI.description": "[gold]{RankCN}转[/gold]\n先造成{Damage:diff()}点伤害，再造成{SecondHitRange:cond:>0?{SecondHitDamage}|{Damage:diff()}}点伤害。",
-    "GU_ZHEN_REN_PERSONAL_CARD_NIU_JIAO_DING.description": "[gold]{RankCN}转[/gold]\n造成{Damage:diff()}点伤害，获得{Block:diff()}点格挡。",
-    "GU_ZHEN_REN_PERSONAL_CARD_CHEN_ZHUANG.description": "[gold]{RankCN}转[/gold]\n获得{Block:diff()}点格挡。{AttackBonusRange:cond:>0?本回合已打出攻击牌时再获得{AttackBonus:diff()}点。|}{NoBlockRange:cond:>0?打出前没有格挡时再获得{NoBlockBonus}点。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_BAI_ZHI_XU_YING.description": "{Chance}%显化：造成{Damage:diff()}点伤害。{FirstBonus:cond:>0?每回合首次显化改为造成{FirstManifestDamage}点。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_FEI_XIONG_XU_YING.description": "{Chance}%显化：造成{Damage:diff()}点伤害；目标有格挡时改为造成{BlockedDamage}点。",
-    "GU_ZHEN_REN_PERSONAL_CARD_E_XU_YING.description": "{Chance}%显化：先造成{Damage:diff()}点伤害，再造成{SecondHitDamage}点伤害。",
-    "GU_ZHEN_REN_PERSONAL_CARD_QING_NIU_XU_YING.description": "{Chance}%显化：造成{Damage:diff()}点伤害并获得{Block:diff()}点格挡。{HitBlockBonus:cond:>0?伤害穿透格挡时改为获得{HitBlockTotal}点格挡。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_SHI_GUI_XU_YING.description": "{Chance}%显化：获得{Block:diff()}点格挡。{NoBlockBonus:cond:>0?当前没有格挡时改为获得{NoBlockTotal}点。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_BA_SHAN.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n使所有敌人失去{BlockBreak}点格挡，随后造成{Damage}点伤害并施加{BaseVulnerable}层易伤；[gold]破势[/gold]者再获得{BreakVulnerableBonus}层易伤。",
-    "GU_ZHEN_REN_PERSONAL_CARD_WAN_LAN.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n造成{Damage}点伤害{Hits}次。每2次攻击伤及生命，回复1点能量。{Rank7Exact:cond:>0?全部攻击均伤及生命时，再回复1点。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_DAO_HAI_BA_SHAN.description": "仙蛊 · [gold]{RankCN}转[/gold] · [gold]合练[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n使所有敌人失去{BlockBreak}点格挡，随后造成{Damage}点伤害3次；[gold]破势[/gold]者获得{BreakVulnerable}层易伤。每破势1名敌人回复1点能量，最多{EnergyCap}点。{Rank8Exact:cond:>0?破势至少2名敌人时，再造成{ReboundDamage}点群体伤害。|}{Rank9Exact:cond:>0?破势至少2名敌人时，再造成{ReboundDamage}点群体伤害；若全体破势，再造成{ReboundDamage}点群体伤害。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_SHANG_LI_HUI_TIAN.description": "[gold]{Rank}转[/gold]\n根据[gold]伤势[/gold]造成{CurrentDamage}点伤害。获得回天：记录之后单张牌造成的最高实际生命伤害；首次濒死时回复其中{RecoveryPercent}%并免死，否则战斗结束时回复。仅触发1次。",
-    "GU_ZHEN_REN_PERSONAL_CARD_HEI_TIAN_DA_SHOU_YIN.description": "[gold]{Rank}转[/gold]\n使所有敌人失去{BlockBreak}点格挡，随后造成{CurrentDamage}点伤害并施加{BaseVulnerable}层易伤；[gold]破势[/gold]者再获得{PoShiVulnerable}层易伤。兽力虚影越多，伤害越高。{Rank7Exact:cond:>0?每破势1名敌人回复1点能量，最多{PoShiEnergyCap}点。|}{Rank8Exact:cond:>0?每破势1名敌人回复1点能量，最多{PoShiEnergyCap}点；破势至少{HuiLanThreshold}名时，再造成{HuiLanDamage}点群体伤害。|}{Rank9Exact:cond:>0?每破势1名敌人回复1点能量，最多{PoShiEnergyCap}点；破势至少{HuiLanThreshold}名时，再造成{HuiLanDamage}点群体伤害；若全体破势，再造成{HuiLanDamage}点群体伤害。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_WAN_WO.description": "能力\n封存所有兽力蛊并消耗所有兽力虚影，获得{CurrentWoLiPhantomCount}个我力虚影。",
-    "GU_ZHEN_REN_PERSONAL_CARD_WO_LI_XU_YING.description": "获得时提供5点临时生命。首次必定显化；之后有{RepeatChance}%概率显化，复制本次可复制效果的一半。",
-    "GU_ZHEN_REN_PERSONAL_CARD_BAI_HONG_GUAN_RI.description": "造成{Damage:diff()}点伤害；消耗目标至多{MaxZhaoPoConsumed}层照破，每层使伤害提高{DamagePerZhaoPo}点。光辉不少于{GuangHuiCost}点时自动消耗{GuangHuiCost}点，并无视至多{PierceCap}点格挡。",
-    "GU_ZHEN_REN_PERSONAL_CARD_JING_YUE_FAN_ZHAO.description": "{NextMirror:cond:>0?镜相：获得{Block:diff()}点格挡。|}{NextMoon:cond:>0?月相：造成{Damage:diff()}点伤害。|}{NextReflection:cond:>0?返照：获得{ReflectionBlock}点格挡，对所有敌人造成{ReflectionDamage}点伤害{GuangHui:cond:>0?，获得{GuangHui}点光辉|}。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_YUE_NI_CHANG.description": "可使用2次。获得{Block:diff()}点格挡和{GuangHui}点光辉。{NormalMoonBlade:cond:>0?获得1张月刃。|}{UpgradedMoonBlade:cond:>0?获得1张升级的月刃。|}{FullMoonBlade:cond:>0?获得1张满月刃。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_YUE_GUANG_GU.description": "[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n造成{Damage:diff()}点伤害。[gold]折光[/gold]：本次伤害增加{RefractionDamage}点。",
-    "GU_ZHEN_REN_PERSONAL_CARD_XIAO_GUANG_GU.description": "[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{JuGuang}层聚光。{Rank2Exact:cond:>0?[gold]折光[/gold]：额外获得{RefractionJuGuang}层聚光。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_JING_GUANG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{Block:diff()}点格挡。{Rank:cond:>=2?上张牌为攻击时改为{AttackBlock}点。|}{Rank:cond:>=5?获得1点光辉。|}{Rank:cond:>=3?[gold]衍光[/gold]：{Rank:cond:>=9?明镜|光镜}。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_DING_GUANG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n施加{ZhaoPoPower:diff()}层照破。{Rank:cond:>=2?获得[gold]映光[/gold]{ExposeBonus}。|}{Rank:cond:>=3?[gold]衍光[/gold]：{Rank:cond:>=9?日晕|定光符}。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_LIU_GUANG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n{Rank6Exact:cond:>0?调蛊至多2次。|调蛊1次。}{Rank:cond:>=5?你的下一张光道牌必定触发折光。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_YUE_MANG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]合练[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n造成{Damage:diff()}点伤害{BaseHits}次。[gold]折光[/gold]：攻击次数+{RefractionBonusHits}。若本次触发折光，获得{JuGuang}层聚光。",
-    "GU_ZHEN_REN_PERSONAL_CARD_HUANG_JIN_YUE_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]合练[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n造成{Damage:diff()}点伤害{BaseHits}次。每有1点月华，本次攻击次数+1（当前{Moonlight}，共{TotalHits}次）。催动后失去全部月华。",
-    "GU_ZHEN_REN_PERSONAL_CARD_JING_HUI_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]合练[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{Block:diff()}点格挡并施加{ZhaoPoPower:diff()}层照破。{Rank:cond:>=5?[gold]守辉[/gold]。|}{Rank:cond:>=8?[gold]破辉[/gold]。|}[gold]衍光[/gold]：{Rank:cond:>=9?周天镜辉|{Rank:cond:>=6?凝镜辉|镜辉}}。",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUN_DIAN_LIU_GUANG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n抽{Draw}张牌，再丢弃{Discard}张。[gold]耀化 2[/gold]：改为交换至多{Swap}只其他可用蛊与等量已完全冷却的待命蛊；无合法交换时不消耗光辉。",
-    "GU_ZHEN_REN_PERSONAL_CARD_TAI_GUANG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n可催动3次。对所有敌人造成{Damage:diff()}点伤害并施加{ZhaoPoPower:diff()}层照破。[gold]耀化 3[/gold]：伤害无视格挡，照破改为{EmpoweredZhaoPo}层。",
-    "GU_ZHEN_REN_PERSONAL_CARD_YUE_REN.description": "造成{Damage:diff()}点伤害。[gold]照袭[/gold]：{MarkedDamage}点。{Rank:cond:>=7?照袭后获得1张残月。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_CAN_YUE.description": "造成{Damage:diff()}点伤害。",
-    "GU_ZHEN_REN_PERSONAL_CARD_MAN_YUE_REN.description": "造成{Damage:diff()}点伤害；目标每层照破使伤害提高{PerZhaoPo}点，最多计算{MaxZhaoPo}层，满层时造成{MaxMarkedDamage}点。",
-    "GU_ZHEN_REN_PERSONAL_CARD_WEI_GUANG.description": "获得3点闪耀。",
-    "GU_ZHEN_REN_PERSONAL_CARD_JU_GUANG.description": "获得6点闪耀。{Rank:cond:>=8?获得1张余辉。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_YU_HUI.description": "获得3点闪耀。",
-    "GU_ZHEN_REN_PERSONAL_CARD_JI_GUANG.description": "获得2点光辉和8点闪耀。",
-    "GU_ZHEN_REN_PERSONAL_CARD_GUANG_JING.description": "获得{Block:diff()}点格挡和{LightBonus}点闪耀。{Rank:cond:>=7?获得1张返照。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_FAN_ZHAO.description": "造成{CurrentDamage}点伤害。",
-    "GU_ZHEN_REN_PERSONAL_CARD_MING_JING.description": "获得{Block:diff()}点格挡和2点光辉。",
-    "GU_ZHEN_REN_PERSONAL_CARD_DING_GUANG_FU.description": "获得[gold]映光[/gold]{BonusDamage}。{Rank:cond:>=7?获得1张光标。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_GUANG_BIAO.description": "获得{LightBonus}点闪耀。",
-    "GU_ZHEN_REN_PERSONAL_CARD_RI_YUN.description": "分配{TotalZhaoPo}层照破：所选敌人最多{TargetCap}层，剩余分给其他存活敌人。",
-    "GU_ZHEN_REN_PERSONAL_CARD_LIU_GUANG.description": "造成{Damage:diff()}点伤害。技能折光：{AfterSkillDamage}点。{Rank:cond:>=7?[gold]照袭[/gold]：获得1张流辉。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_LIU_HUI.description": "造成{Damage:diff()}点伤害。",
-    "GU_ZHEN_REN_PERSONAL_CARD_BAI_HONG.description": "造成{Damage:diff()}点伤害；本回合已折光2次时改为{DoubleRefractionDamage}点并施加{ZhaoPoPower:diff()}层照破。",
-    "GU_ZHEN_REN_PERSONAL_CARD_YUE_MANG.description": "造成{Damage:diff()}点伤害{Hits}次。技能折光：最后一段{LastHitDamage}点。",
-    "GU_ZHEN_REN_PERSONAL_CARD_NING_YUE_MANG.description": "造成{Damage:diff()}点伤害{Hits}次。技能折光：改为{AfterSkillHits}次。{Rank:cond:>=7?[gold]照袭[/gold]：获得1张残芒。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_CAN_MANG.description": "造成{Damage:diff()}点伤害；本回合已折光时改为{RefractionDamage}点。",
-    "GU_ZHEN_REN_PERSONAL_CARD_TIAN_YUE_MANG.description": "造成{Damage:diff()}点伤害{Hits}次；本回合已折光2次时，再造成{DoubleRefractionBonus}点伤害并施加{ZhaoPoPower:diff()}层照破。",
-    "GU_ZHEN_REN_PERSONAL_CARD_JING_HUI.description": "获得{Block:diff()}点格挡和[gold]映光[/gold]{ZhaoPoBonus}。",
-    "GU_ZHEN_REN_PERSONAL_CARD_NING_JING_HUI.description": "获得{Block:diff()}点格挡、{LightBonus}点闪耀和[gold]映光[/gold]{ZhaoPoBonus}。{Rank:cond:>=7?获得1张返辉。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_FAN_HUI.description": "获得1点光辉和{LightBonus}点闪耀。",
-    "GU_ZHEN_REN_PERSONAL_CARD_ZHOU_TIAN_JING_HUI.description": "获得{Block:diff()}点格挡，施加{ZhaoPoPower:diff()}层照破，并获得{LightBonus}点闪耀。",
-    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{CurrentGain}点年华。{Rank9Exact:cond:>0?本次岁满后再获得1点年华。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_RI_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{CurrentGain}点年华。{Rank6Exact:cond:>0?本次岁满时抽1张牌。|}{Rank:cond:>=8?本次岁满后再获得1点年华。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_YUE_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{NowGain}点年华；{FollowingGain:cond:>0?之后两个回合开始各获得{NextGain}点|下回合开始再获得{NextGain}点}。",
-    "GU_ZHEN_REN_PERSONAL_CARD_HUAN_BU_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n施加[gold]缓步[/gold]{Reduction}，持续{Duration}回合。{HasRepeatGain:cond:>0?目标已有缓步时获得{RepeatGain}点年华。|}{HasSplash:cond:>0?其他敌人获得缓步{SplashReduction}，持续{SplashDuration}回合。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_SAN_GENG_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{EnergyGain}点能量，抽{DrawCount}张牌并获得{NianHuaGain}点年华；接下来{BonusEvents}次获得年华时再获得1点。失去{HpLoss}点生命。",
-    "GU_ZHEN_REN_PERSONAL_CARD_HUI_SU_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n查看本回合最近{InspectCount}张合法普通攻击或技能，选择1张生成[gold]昔影[/gold]；{CostHigher:cond:>0?费用比原牌高1|}{CostSame:cond:>0?费用与原牌相同|}{CostLower:cond:>0?费用比原牌低1，最低0|}，打出后获得{XiYingGain}点年华。",
-    "GU_ZHEN_REN_PERSONAL_CARD_GUANG_YIN_REN_RAN_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]合练[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{BaseGain}点年华。{HasRecoveryGainBonus:cond:>0?本回合已有蛊完成冷却时改为{RecoveredGain}点。|}{Rank7Exact:cond:>0?本回合已有蛊完成冷却时，抽1张牌。|}{Rank8Exact:cond:>0?本次岁满后再获得1点年华。|}{Rank9Exact:cond:>0?本次岁满后再获得1点年华并抽1张牌。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_ZHOU_MAO_XIAN_GU.description": "仙蛊 · [gold]{RankCN}转[/gold] · [gold]合练[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{NianHuaGain}点年华。{Rank7Exact:cond:>0?本回合此前已岁满时，抽1张牌。|}{Rank9Exact:cond:>0?本次岁满时，抽1张牌。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_SI_SHUI_LIU_NIAN_XIAN_GU.description": "仙蛊 · [gold]{RankCN}转[/gold] · [gold]合练[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{NianHuaGain}点年华，并获得1张{PlusToken:cond:>0?年流+|年流}。",
-    "GU_ZHEN_REN_PERSONAL_CARD_GUANG_YIN_REN_RAN.description": "[gold]{RankCN}转[/gold] · [gold]伴生能力[/gold]\n每回合前{RecoveryLimit}只蛊完成冷却时，各获得1点年华。{HasAcceleratedBonus:cond:>0?本回合首次有蛊因岁满提前完成冷却时，再获得{AcceleratedBonus}点年华{DrawOnAccelerated:cond:>0?并抽1张牌|}。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_NIAN_SUI_SUI.description": "[gold]{RankCN}转[/gold] · [gold]伴生能力[/gold]\n{EveryTurn:cond:>0?每回合结束获得{TurnGain}点年华。|每{TurnInterval}个回合结束获得{TurnGain}点年华。|}{FirstSuiManOnly:cond:>0?本场首次岁满后再获得1点年华。|}{EverySecondSuiMan:cond:>0?每第2次岁满后再获得1点年华。|}{EverySuiMan:cond:>0?每次岁满后再获得1点年华。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_ZHOU_MAO.description": "[gold]{RankCN}转[/gold] · [gold]伴生能力[/gold]\n每次岁满后获得{NianHuaGain}点年华。{DrawEverySecond:cond:>0?每第2次岁满再抽1张牌。|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_SI_SHUI_LIU_NIAN.description": "[gold]{RankCN}转[/gold] · [gold]伴生能力[/gold]\n每回合首次岁满时，获得1张{PlusToken:cond:>0?年流+|年流}。",
-    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU.description": "获得2点年华。",
-    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU_PLUS.description": "获得3点年华，抽1张牌。",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_ROU_GU.description": "{Rank:cond:>=6?仙蛊 · |}[gold]{RankCN}转[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n获得{Block:diff()}点格挡。",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_JING_GU.description": "[gold]{RankCN}转[/gold] · [gold]合练[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n选择一张没有寄生效果的攻击或技能，植入普通[gold]血寄[/gold]。Ⅰ/Ⅱ/Ⅲ：{ParasiteI}/{ParasiteII}/{ParasiteIII}；化生{HatchValue}。",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_BEN_XIAN_GU.description": "仙蛊 · [gold]六转[/gold] · [gold]合练[/gold] · [gold]冷却[/gold]{RecoveryTurnsCN}\n植入六转普通[gold]血寄[/gold]。Ⅰ/Ⅱ/Ⅲ：{ParasiteI}/{ParasiteII}/{ParasiteIII}；化生{HatchValue}。化生后留下[gold]血种[/gold]。",
-    "GU_ZHEN_REN_PERSONAL_CARD_YI_HAI.description": "0费状态牌。保留。不能主动打出，不能寄生；胜利后永久进入牌组（上限4张），只能通过炼骸永久清理。"
-  },
+  "keywords": {},
+  "cardDescriptionOverrides": {},
   "characterNameOverrides": {
     "title": "古月方源",
     "titleObject": "古月方源"
   },
-  "restSiteLocalizationFallbacks": {
-    "OPTION_GU_ZHEN_REN_PERSONAL_GU_RANK_UP.name": "升炼",
-    "OPTION_GU_ZHEN_REN_PERSONAL_GU_RANK_UP.description": "直接选择本次升炼的蛊牌。本次升炼共有2个槽位：凡蛊每只占1个、仙蛊每只占2个，最多可升炼2只凡蛊或1只仙蛊。每只所选蛊各提升一转，五转升六转同样由升炼完成。选择0只并确认将取消；本休息点只能成功升炼一次。",
-    "OPTION_GU_ZHEN_REN_PERSONAL_GU_RANK_UP.selectionPrompt": "选择本次升炼的蛊牌（凡蛊每只占1槽、仙蛊每只占2槽，共2槽），也可以选择0只。",
-    "OPTION_GU_ZHEN_REN_PERSONAL_HE_LIAN.name": "合练",
-    "OPTION_GU_ZHEN_REN_PERSONAL_HE_LIAN.description": "先选择一张当前可合成的蛊牌，再选择与目标匹配的蛊虫材料。材料种类和数量完整匹配后才会消耗材料并获得结果；失败不会消耗本次机会。每个休息点只能成功合练一次。",
-    "OPTION_GU_ZHEN_REN_PERSONAL_HE_LIAN.selectionPrompt": "选择与目标蛊牌匹配的材料，然后点击确认。",
-    "OPTION_GU_ZHEN_REN_PERSONAL_HE_LIAN.targetSelectionPrompt": "先选择要合成的蛊牌。随后只显示能够匹配该目标的材料。"
-  },
+  "restSiteLocalizationFallbacks": {},
   "combatInterfaceLocalizationFallbacks": [
-    {
-      "table": "enchantments",
-      "key": "GU_ZHEN_REN_PERSONAL_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.title",
-      "text": "血寄"
-    },
-    {
-      "table": "enchantments",
-      "key": "GU_ZHEN_REN_PERSONAL_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.description",
-      "text": "寄生附魔。跟随宿主保存、克隆并显示；不会占用普通附魔栏位。具体种类、阶段与数值显示在宿主牌正文。"
-    },
-    {
-      "table": "enchantments",
-      "key": "GU_ZHEN_REN_PERSONAL_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.title",
-      "text": "血寄复合附魔"
-    },
-    {
-      "table": "enchantments",
-      "key": "GU_ZHEN_REN_PERSONAL_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.description",
-      "text": "内部载体：同时保存一项普通附魔和血寄附魔。"
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardPileId}.title",
-      "text": "蛊手牌"
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardPileId}.description",
-      "text": "蛊手牌最多5张。存在空位时，按冷却完成顺序从蛊存放牌堆补入可用蛊虫；杀招推演只可使用蛊手牌中的材料。"
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardPileId}.empty",
-      "text": "蛊手牌为空。"
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardPileId}.selectionPrompt",
-      "text": "选择与已选杀招目标匹配的蛊虫材料，然后点击确认。"
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardPileId}.targetSelectionPrompt",
-      "text": "先选择要推演的杀招。随后只显示能够匹配该杀招的材料。"
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardStoragePileId}.title",
-      "text": "蛊存放牌堆"
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardStoragePileId}.description",
-      "text": "专门存放已经冷却完毕、等待进入蛊手牌的蛊。蛊手牌存在空位时，按冷却完成顺序补入。左键查看。"
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardStoragePileId}.empty",
-      "text": "蛊存放牌堆为空。"
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardRecoveryPileId}.title",
-      "text": "蛊冷却堆"
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardRecoveryPileId}.description",
-      "text": "只存放正在冷却的蛊。催动次数耗尽后进入此处；冷却完成后返回蛊存放牌堆。左键查看。"
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardRecoveryPileId}.empty",
-      "text": "蛊冷却堆为空。"
-    },
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_KU_LI_POWER.title",
@@ -333,7 +17,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_KU_LI_POWER.description",
-      "text": "攻击牌完整结算后，根据当前伤势追加苦力伤害；高转首次进入更重伤势时获得力量。"
+      "text": "根据当前伤势提高攻击牌第一段伤害；高转首次进入更重伤势时获得力量。"
     },
     {
       "table": "powers",
@@ -343,7 +27,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_ZI_LI_GENG_SHENG_POWER.description",
-      "text": "等待下一张攻击牌完整结算，并按其对主目标造成的实际生命伤害回复生命；高转可计入同牌附带的后续力道伤害。"
+      "text": "等待下一张攻击牌完整结算，并按其对主目标造成的实际生命伤害回复生命。"
     },
     {
       "table": "powers",
@@ -364,56 +48,6 @@
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_QUN_LI_POWER.description",
       "text": "兽力虚影自然显化后，按卡面概率尝试连续显化，直至失败或达到上限；额外显化不会再次发动群力，六转起视为实际显化。"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_WO_LI_TEMP_HP_POWER.title",
-      "text": "我力临时生命"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_WO_LI_TEMP_HP_POWER.description",
-      "text": "我力虚影提供的独立临时生命；每累计损失5点该来源临时生命，消耗1个我力虚影。"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_GUANG_HUI_POWER.title",
-      "text": "光辉"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_GUANG_HUI_POWER.description",
-      "text": "角色资源，上限为9点。光辉不会在回合结束时消失；光道卡牌可以获得或消耗光辉。折光：上一张打出的标准类型牌与当前光道牌类型不同时，获得1点光辉（每回合至多3次）。"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZHAO_PO_POWER.title",
-      "text": "照破"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZHAO_PO_POWER.description",
-      "text": "下一次受到攻击牌的单段伤害时，额外受到3点伤害并移除1层照破。多段攻击可以连续消耗多层。"
-    },
-    {
-      "table": "secondary_resources",
-      "key": "GU_ZHEN_REN_PERSONAL_SECONDARY_RESOURCE_YUAN_QI.title",
-      "text": "元气"
-    },
-    {
-      "table": "secondary_resources",
-      "key": "GU_ZHEN_REN_PERSONAL_SECONDARY_RESOURCE_YUAN_QI.description",
-      "text": "储存在蛊师空窍中的元气。每场战斗开始时拥有当前空窍转数对应的元气量（一转4点~九转8点）；从第2回合起按转数每回合恢复2~4点（一至二转2、三至五转3、六至九转4）。元气上限随空窍转数提升：5/5/6/6/7/7/8/8/9。"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_JU_GUANG_POWER.title",
-      "text": "闪耀"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_JU_GUANG_POWER.description",
-      "text": "下一张光道攻击的第一段伤害提高{Amount}点。多段攻击只获得一次加成。"
     },
     {
       "table": "powers",
@@ -487,26 +121,6 @@
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_YUE_GU_DELAY_POWER.title",
-      "text": "月积"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_YUE_GU_DELAY_POWER.description",
-      "text": "月蛊安排的年华将在后续回合开始时兑现。"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XI_YING_WATCHER_POWER.title",
-      "text": "昔影回响"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XI_YING_WATCHER_POWER.description",
-      "text": "监听昔影的隐性效果。"
-    },
-    {
-      "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_SHANG_LI_HUI_TIAN_POWER.title",
       "text": "回天"
     },
@@ -514,38 +128,6 @@
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_SHANG_LI_HUI_TIAN_POWER.description",
       "text": "记录之后单张牌完整结算造成的最高实际生命伤害。首次濒死时按卡面比例回复并避免死亡；若未触发，战斗结束时回复。仅触发1次。"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_LIU_XUE_POWER.title",
-      "text": "流血"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_LIU_XUE_POWER.description",
-      "text": "持有者回合结束时失去1层并受到3点伤害。"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_JI_POWER.title",
-      "text": "血寄"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_JI_POWER.description",
-      "text": "血寄的后台结算监听器。"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_CHI_POWER.title",
-      "text": "血池"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_CHI_POWER.description",
-      "text": "下一张由你主动打出且成功触发血寄效果的牌，额外触发其血寄效果。命中后一次性消耗全部层数。"
     }
-  ],
-  "OPTION_GU_ZHEN_REN_PERSONAL_GU_RANK_UP.description": "直接选择本次升炼的蛊牌。本次升炼共有2个槽位：凡蛊每只占1个、仙蛊每只占2个，最多可升炼2只凡蛊或1只仙蛊。每只所选蛊各提升一转，五转升六转同样由升炼完成。选择0只并确认将取消；本休息点只能成功升炼一次。",
-  "OPTION_GU_ZHEN_REN_PERSONAL_GU_RANK_UP.selectionPrompt": "选择本次升炼的蛊牌（凡蛊每只占1槽、仙蛊每只占2槽，共2槽），也可以选择0只。"
+  ]
 }

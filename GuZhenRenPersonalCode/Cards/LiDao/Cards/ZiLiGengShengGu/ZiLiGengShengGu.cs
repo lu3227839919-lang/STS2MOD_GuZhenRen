@@ -82,7 +82,4 @@ public sealed class ZiLiGengShengGu : AbstractGuWormCard
             6 => 12,
             _ => killedTarget ? 20 : 16,
         };
-
-    internal static bool CountsAttachedLiDaoDamageAtRank(int rank) =>
-        rank >= 6;
 }

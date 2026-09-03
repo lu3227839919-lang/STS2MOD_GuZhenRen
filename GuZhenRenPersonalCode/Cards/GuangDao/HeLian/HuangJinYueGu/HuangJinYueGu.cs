@@ -149,18 +149,8 @@ public sealed class HuangJinYueGu
 
     private int GetCurrentMoonlight(int totalSerial)
     {
-        int baseline = LastConsumedRefractionSerial[this];
-
-        return CalculateMoonlight(totalSerial, baseline);
-    }
-
-    internal static int CalculateMoonlight(
-        int totalSerial,
-        int baseline
-    )
-    {
         totalSerial = Math.Max(0, totalSerial);
-        baseline = Math.Max(0, baseline);
+        int baseline = Math.Max(0, LastConsumedRefractionSerial[this]);
 
         // 新战斗的折光序号从零开始；上一场的卡牌基线不得压住本场累计。
         if (baseline > totalSerial)
@@ -168,22 +158,17 @@ public sealed class HuangJinYueGu
             baseline = 0;
         }
 
-        // 每次真实折光令总序号恰好 +1，因此序号差直接等于月华数量。
         return totalSerial - baseline;
     }
 
     private void RefreshRankValues()
     {
-        DynamicVars.Damage.BaseValue = DamageAtRank(GuRank);
-        DynamicVars["BaseHits"].BaseValue = BaseHitsAtRank(GuRank);
+        DynamicVars.Damage.BaseValue = 2;
+        DynamicVars["BaseHits"].BaseValue = GuRank switch
+        {
+            <= 5 => 5,
+            6 => 6,
+            _ => 7,
+        };
     }
-
-    internal static int DamageAtRank(int rank) => 2;
-
-    internal static int BaseHitsAtRank(int rank) => rank switch
-    {
-        <= 5 => 5,
-        6 => 6,
-        _ => 7,
-    };
 }

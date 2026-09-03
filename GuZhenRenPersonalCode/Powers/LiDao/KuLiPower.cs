@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
+using MegaCrit.Sts2.Core.ValueProps;
 
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
@@ -16,7 +17,8 @@ namespace GuZhenRen.Powers.LiDao;
 
 /// <summary>
 /// 苦力蛊的持续战斗状态。伤势按当前生命比例分为健康、轻伤、
-/// 重伤、极重伤四档；追加伤害每张攻击牌只结算一次。
+/// 重伤、极重伤四档；苦力加伤并入攻击牌第一段伤害，不再额外
+/// 生成一段伤害。
 /// </summary>
 [RegisterPower]
 public sealed class KuLiPower : ModPowerTemplate
@@ -27,7 +29,9 @@ public sealed class KuLiPower : ModPowerTemplate
     private int _enteredInjuryMask;
     private CardModel? _pendingAttackCard;
     private Creature? _pendingPrimaryTarget;
+    private int _pendingPlayIndex = -1;
     private bool _pendingShouldTrigger;
+    private bool _pendingBonusConsumed;
 
     public override PowerType Type => PowerType.Buff;
 
@@ -99,7 +103,9 @@ public sealed class KuLiPower : ModPowerTemplate
         int turn = CurrentTurn;
         _pendingAttackCard = cardPlay.Card;
         _pendingPrimaryTarget = GetPrimaryTarget(cardPlay);
+        _pendingPlayIndex = cardPlay.PlayIndex;
         _pendingShouldTrigger = Rank >= 4 || _lastTriggeredTurn != turn;
+        _pendingBonusConsumed = false;
         if (_pendingShouldTrigger && Rank == 3)
         {
             _lastTriggeredTurn = turn;
@@ -112,43 +118,77 @@ public sealed class KuLiPower : ModPowerTemplate
         return Task.CompletedTask;
     }
 
-    public override async Task AfterCardPlayed(
+    public override decimal ModifyDamageAdditive(
+        Creature? target,
+        decimal amount,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource,
+        CardPlay? cardPlay
+    )
+    {
+        if (!_pendingShouldTrigger ||
+            _pendingBonusConsumed ||
+            amount <= 0m ||
+            cardPlay == null ||
+            cardPlay.PlayIndex != _pendingPlayIndex ||
+            !ReferenceEquals(cardPlay.Card, _pendingAttackCard) ||
+            !ReferenceEquals(cardSource, _pendingAttackCard) ||
+            !ReferenceEquals(dealer, Owner) ||
+            !ReferenceEquals(target, _pendingPrimaryTarget))
+        {
+            return 0m;
+        }
+
+        return GetPendingBonusDamage();
+    }
+
+    public override Task AfterDamageGiven(
+        PlayerChoiceContext choiceContext,
+        Creature? dealer,
+        DamageResult result,
+        ValueProp props,
+        Creature target,
+        CardModel? cardSource
+    )
+    {
+        if (_pendingShouldTrigger &&
+            !_pendingBonusConsumed &&
+            cardSource != null &&
+            ReferenceEquals(cardSource, _pendingAttackCard) &&
+            ReferenceEquals(dealer, Owner) &&
+            ReferenceEquals(target, _pendingPrimaryTarget) &&
+            cardSource.CurrentPlayIndex == _pendingPlayIndex)
+        {
+            _pendingBonusConsumed = true;
+            Entry.Logger.Info(
+                $"[苦力] 苦力加伤已并入第一段：damage={GetPendingBonusDamage()} " +
+                $"rank={Rank} injury={InjuryTier} target={target.CombatId}。"
+            );
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public override Task AfterCardPlayed(
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay
     )
     {
         if (!cardPlay.IsLastInSeries ||
-            cardPlay.Card != _pendingAttackCard)
+            cardPlay.PlayIndex != _pendingPlayIndex ||
+            !ReferenceEquals(cardPlay.Card, _pendingAttackCard))
         {
-            Entry.Logger.Info(
-                $"[苦力] AfterCardPlayed 跳过：card={cardPlay.Card.Id} " +
-                $"lastInSeries={cardPlay.IsLastInSeries} " +
-                $"pending={(_pendingAttackCard?.Id.ToString() ?? "null")}。"
-            );
-            return;
+            return Task.CompletedTask;
         }
 
-        Creature? target = _pendingPrimaryTarget;
-        bool shouldTrigger = _pendingShouldTrigger;
         ClearPendingAttack();
-        if (!shouldTrigger || target == null || !target.IsAlive)
-        {
-            Entry.Logger.Info(
-                $"[苦力] AfterCardPlayed 放弃：shouldTrigger={shouldTrigger} " +
-                $"target={target?.CombatId ?? 0} alive={target?.IsAlive}。"
-            );
-            return;
-        }
+        return Task.CompletedTask;
+    }
 
+    private int GetPendingBonusDamage()
+    {
         int damage = KuLiGu.ExtraDamageAtRank(Rank, InjuryTier);
-        if (damage <= 0)
-        {
-            Entry.Logger.Info(
-                $"[苦力] AfterCardPlayed 伤害为 0：rank={Rank} injury={InjuryTier} " +
-                $"hp={Owner.CurrentHp}/{Owner.MaxHp}。"
-            );
-            return;
-        }
         if (_boostedTurn == CurrentTurn)
         {
             damage = (int)Math.Round(
@@ -156,26 +196,7 @@ public sealed class KuLiPower : ModPowerTemplate
                 MidpointRounding.AwayFromZero
             );
         }
-
-        Entry.Logger.Info(
-            $"[苦力] 结算苦力伤害 damage={damage} rank={Rank} " +
-            $"injury={InjuryTier} target={target.CombatId}。"
-        );
-        ZiLiGengShengPower? selfReliance =
-            Owner.GetPower<ZiLiGengShengPower>();
-        selfReliance?.BeginAttachedLiDaoDamage(cardPlay.Card);
-        try
-        {
-            await DamageCmd.Attack(damage)
-                .FromCard(cardPlay.Card, cardPlay)
-                .Targeting(target)
-                .Unpowered()
-                .Execute(choiceContext);
-        }
-        finally
-        {
-            selfReliance?.EndAttachedLiDaoDamage(cardPlay.Card);
-        }
+        return damage;
     }
 
     public override async Task AfterCurrentHpChanged(
@@ -242,6 +263,8 @@ public sealed class KuLiPower : ModPowerTemplate
     {
         _pendingAttackCard = null;
         _pendingPrimaryTarget = null;
+        _pendingPlayIndex = -1;
         _pendingShouldTrigger = false;
+        _pendingBonusConsumed = false;
     }
 }

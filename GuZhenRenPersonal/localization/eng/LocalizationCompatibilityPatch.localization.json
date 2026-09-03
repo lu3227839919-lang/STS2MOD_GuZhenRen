@@ -1,330 +1,14 @@
 {
   "schemaVersion": 1,
   "language": "eng",
-  "keywords": {
-    "CuiDong": {
-      "title": "Activation",
-      "description": "Gu cards can be played directly from the Gu Hand. After all available activations are spent, they enter the Gu Cooldown Pile."
-    },
-    "HeLian": {
-      "title": "Fusion",
-      "description": "Consumes the specified Gu materials to refine a new Gu. Its rank follows the recipe and it is normally excluded from rewards."
-    },
-    "ZongEDu": {
-      "title": "Shared Total",
-      "description": "The listed amount is shared among all living enemies."
-    },
-    "ZhuiJi": {
-      "title": "Pursuit",
-      "description": "If the target dies, remaining hits move to another enemy."
-    },
-    "YaoHua1": {
-      "title": "Illumination 1",
-      "description": "When you have at least 1 Radiance, automatically spend 1 Radiance and trigger this card’s Illumination effect."
-    },
-    "YaoHua2": {
-      "title": "Illumination 2",
-      "description": "When you have at least 2 Radiance, automatically spend 2 Radiance and trigger this card’s Illumination effect."
-    },
-    "YaoHua3": {
-      "title": "Illumination 3",
-      "description": "When you have at least 3 Radiance, automatically spend 3 Radiance and trigger this card’s Illumination effect."
-    },
-    "YaoHua4": {
-      "title": "Illumination 4",
-      "description": "When you have at least 4 Radiance, automatically spend 4 Radiance and trigger this card’s Illumination effect."
-    },
-    "YaoHua5": {
-      "title": "Illumination 5",
-      "description": "When you have at least 5 Radiance, automatically spend 5 Radiance and trigger this card’s Illumination effect."
-    },
-    "YaoHua6": {
-      "title": "Illumination 6",
-      "description": "When you have at least 6 Radiance, automatically spend 6 Radiance and trigger this card’s Illumination effect."
-    },
-    "YaoHua7": {
-      "title": "Illumination 7",
-      "description": "When you have at least 7 Radiance, automatically spend 7 Radiance and trigger this card’s Illumination effect."
-    },
-    "YaoHua8": {
-      "title": "Illumination 8",
-      "description": "When you have at least 8 Radiance, automatically spend 8 Radiance and trigger this card’s Illumination effect."
-    },
-    "YaoHua9": {
-      "title": "Illumination 9",
-      "description": "When you have at least 9 Radiance, automatically spend 9 Radiance and trigger this card’s Illumination effect."
-    },
-    "XuYing": {
-      "title": "Phantom",
-      "description": "Automatically Retained and cannot be played manually. After a non-Phantom Attack resolves, manifests at the listed chance. Phantoms do not trigger other Phantoms."
-    },
-    "LianLi": {
-      "title": "Strength Refinement",
-      "description": "Beast Gu begin combat sealed. Each first effective resolution of the matching Companion advances the first sealed Gu of that type by 1. At 3, it immediately unseals and joins the Gu draw sequence. Progress lasts only for this combat."
-    },
-    "NianHua": {
-      "title": "Years",
-      "description": "Time Path resource. At 6, trigger Yearful and reset to 0; excess Years continue resolving."
-    },
-    "SuiMan": {
-      "title": "Yearful",
-      "description": "Choose 1 Gu in cooldown and shorten its cooldown by 1 turn; extend all timed enemy debuffs by 1 turn."
-    },
-    "HuanBu": {
-      "title": "Slow Step",
-      "description": "Slow Step X reduces the enemy's total damage for each attack action by X; multi-hit attacks share the amount. Duration is shown on the card."
-    },
-    "XiYing": {
-      "title": "Past Echo",
-      "description": "A temporary normal-card copy created by Backtrack. It Exhausts and cannot be copied by Backtrack again; playing it grants Years as shown on Backtrack Gu."
-    },
-    "PoShi": {
-      "title": "Break Stance",
-      "description": "Triggers when this effect reduces an enemy's existing Block to 0."
-    },
-    "LianHai1": {
-      "title": "Refine Remains 1",
-      "description": "Consume up to 1 Remains; see the card for the payoff."
-    },
-    "LianHai2": {
-      "title": "Refine Remains 2",
-      "description": "Consume up to 2 Remains; see the card for the payoff."
-    },
-    "LianHai3": {
-      "title": "Refine Remains 3",
-      "description": "Consume up to 3 Remains; see the card for the payoff."
-    },
-    "XueQiCore": {
-      "title": "Blood Parasite",
-      "description": "An ordinary Blood Parasite triggers as I, II, then III when its host is actively played, and hatches after III. Attacks deal damage and Bleed; Skills gain Block and draw 1 on hatch."
-    },
-    "XueYueCore": {
-      "title": "Blood Moon Parasite",
-      "description": "A Blood Moon Parasite has no stages. After its host is actively played, choose another ordinary Blood Parasite to trigger and advance immediately."
-    },
-    "ShangShi": {
-      "title": "Injury",
-      "description": "Based on current HP: 75% or less is Light Injury, 50% or less Heavy Injury, and 25% or less Critical Injury."
-    },
-    "ZheGuangCore": {
-      "title": "Refraction",
-      "description": "Trigger Refraction when your previously actively played Attack, Skill, or Power has a different type from this Light-path card. Forced Refraction ignores this condition; replays do not retrigger it."
-    },
-    "JuGuangCore": {
-      "title": "Focus",
-      "description": "The next card to trigger Refraction consumes 1 stack and resolves its Refraction effect 1 additional time."
-    },
-    "TiaoGuCore": {
-      "title": "Tune Gu",
-      "description": "Move one eligible regular Gu from the Gu Hand to the tail of Gu Storage, then refill from the current head."
-    },
-    "YueHuaCore": {
-      "title": "Moonlight",
-      "description": "Since Golden Moon Gu's last activation, each true Refraction grants 1 Moonlight. There is no limit."
-    },
-    "ZhaoXi": {
-      "title": "Marked Strike",
-      "description": "When attacking an enemy that already has Zhao Po, trigger the listed Marked Strike effect."
-    },
-    "YanGuang": {
-      "title": "Light Spawn",
-      "description": "After entering cooldown, generate the derived card shown in this card's current preview. At Rank 3 it goes to discard; Rank 4+ grants it at the start of a cooldown turn."
-    },
-    "YingGuang": {
-      "title": "Imprinted Light",
-      "description": "The first hit of your next Attack gains the listed damage if it hits an enemy that already has Zhao Po, then this effect is removed."
-    },
-    "ShouHui": {
-      "title": "Guarded Radiance",
-      "description": "At turn end, if you still have at least 5 Block, gain 1 Radiance."
-    },
-    "PoHui": {
-      "title": "Broken Radiance",
-      "description": "The first time your Block is fully broken this turn, gain 1 Radiance."
-    }
-  },
-  "cardDescriptionOverrides": {
-    "GU_ZHEN_REN_PERSONAL_CARD_SHA_ZHAO_TUI_YAN.description": "Pay 1 Energy to choose a Killer Move and its materials. Canceling or failing costs nothing. The deduced move's first play costs no Energy; when it is exhausted, its materials enter full cooldown with 1 extra turn.",
-    "GU_ZHEN_REN_PERSONAL_CARD_BAI_SHI_GU.description": "Gain {Dexterity:diff()} temporary [gold]Dexterity[/gold]. {BlockRetentionTurns:cond:>0?For the next {BlockRetentionTurns} turn(s), your Block is not removed at the start of your turn.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_QING_TI_XIAN_YUAN.description": "Retain as immortal essence. Provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
-    "GU_ZHEN_REN_PERSONAL_CARD_HONG_ZAO_XIAN_YUAN.description": "Retain as immortal essence. Equals two Green Grape essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
-    "GU_ZHEN_REN_PERSONAL_CARD_BAI_LI_XIAN_YUAN.description": "Retain as immortal essence. Equals two Red Date essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
-    "GU_ZHEN_REN_PERSONAL_CARD_HUANG_XING_XIAN_YUAN.description": "Retain as immortal essence. Equals two White Litchi essences and provides {RemainingActivationUnits}/{ActivationUnits} rank-6 activation units; Exhaust this card when depleted.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_QI_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nChoose an Attack or Skill without a parasite and implant an ordinary [gold]Blood Parasite[/gold]. I/II/III: {ParasiteI}/{ParasiteII}/{ParasiteIII}; hatch {HatchValue}. Attacks deal damage and Bleed; Skills gain equal Block and draw 1 on hatch.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_YUE_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nChoose an Attack or Skill without a parasite and implant a [gold]Blood Moon Parasite[/gold]. After its host is actively played, choose another ordinary parasite to trigger and advance immediately.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_CHI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {EnergyGain} Energy; refine up to {MaxRefine} Remains. Gain 1 [gold]Blood Pool[/gold] for each Remains permanently consumed. You may cancel and consume none.",
-    "GU_ZHEN_REN_PERSONAL_CARD_BAI_ZHI_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Power[/gold]\nActivate: gain 1 White Boar Phantom.{TrainingSealed:cond:>0?\n[gold]Strength Refinement[/gold] {TrainingProgress}/{TrainingRequired} · Sealed|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_FEI_XIONG_ZHI_LI_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Power[/gold]\nActivate: gain 1 Flying Bear Phantom.{TrainingSealed:cond:>0?\n[gold]Strength Refinement[/gold] {TrainingProgress}/{TrainingRequired} · Sealed|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_E_LI_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Power[/gold]\nActivate: gain 1 Crocodile Phantom.{TrainingSealed:cond:>0?\n[gold]Strength Refinement[/gold] {TrainingProgress}/{TrainingRequired} · Sealed|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_QING_NIU_LAO_LI_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Power[/gold]\nActivate: gain 1 Green Ox Phantom.{TrainingSealed:cond:>0?\n[gold]Strength Refinement[/gold] {TrainingProgress}/{TrainingRequired} · Sealed|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_SHI_GUI_LI_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Power[/gold]\nActivate: gain 1 Stone Turtle Phantom.{TrainingSealed:cond:>0?\n[gold]Strength Refinement[/gold] {TrainingProgress}/{TrainingRequired} · Sealed|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_KU_LI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Power[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\n{Rank3Exact:cond:>0?After the first Attack each turn|After each Attack}, add Labor damage by [gold]Injury[/gold]: {LightDamage} Light, {HeavyDamage} Heavy, {CriticalDamage} Critical.{Rank6Exact:cond:>0?Gain 1 Strength the first time you enter each worse Injury tier.|}{Rank7Exact:cond:>0?First entering Light or Heavy grants 1 Strength; Critical grants 2.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_ZI_LI_GENG_SHENG_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Power[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain Self-Reliance: after your next Attack fully resolves, heal {HealingPercent}% of actual HP damage to its main target, up to {HealingCap}.{HasKillBonus:cond:>0?If it kills the target, the cap is {KillHealingCap}.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_QUN_LI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Power[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nActivate: gain Group Strength. After a Beast Phantom naturally manifests, it has a {GroupChance}% chance to continue, up to {RepeatLimit} extra time(s).",
-    "GU_ZHEN_REN_PERSONAL_CARD_WO_LI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Power[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nActivate: gain My Strength. Every {ManifestsPerStrength} Beast Phantom manifestations grant 1 Strength.{HasDistinctBonus:cond:>0?Manifesting {DistinctThreshold} different Beast Phantoms this turn grants 1 more Strength.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_CHEN_JIAN_CHONG.description": "[gold]Rank {Rank}[/gold]\nDeal {Damage:diff()} damage.{FirstAttackRange:cond:>0?If this is your first Attack this turn, deal {FirstAttackDamage} instead.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_FEI_XIONG_ZHUANG.description": "[gold]Rank {Rank}[/gold]\nDeal {Damage:diff()} damage; if the target has Block, deal {BlockedDamage} instead.",
-    "GU_ZHEN_REN_PERSONAL_CARD_JIAO_SHUAI.description": "[gold]Rank {Rank}[/gold]\nDeal {Damage:diff()} damage, then deal {SecondHitRange:cond:>0?{SecondHitDamage}|{Damage:diff()}} damage.",
-    "GU_ZHEN_REN_PERSONAL_CARD_NIU_JIAO_DING.description": "[gold]Rank {Rank}[/gold]\nDeal {Damage:diff()} damage and gain {Block:diff()} Block.",
-    "GU_ZHEN_REN_PERSONAL_CARD_CHEN_ZHUANG.description": "[gold]Rank {Rank}[/gold]\nGain {Block:diff()} Block.{AttackBonusRange:cond:>0?If you played an Attack this turn, gain {AttackBonus:diff()} more.|}{NoBlockRange:cond:>0?If you had no Block before playing this, gain {NoBlockBonus} more.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_BAI_ZHI_XU_YING.description": "{Chance}% manifest: deal {Damage:diff()} damage.{FirstBonus:cond:>0?The first manifestation each turn deals {FirstManifestDamage} instead.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_FEI_XIONG_XU_YING.description": "{Chance}% manifest: deal {Damage:diff()} damage; if the target has Block, deal {BlockedDamage} instead.",
-    "GU_ZHEN_REN_PERSONAL_CARD_E_XU_YING.description": "{Chance}% manifest: deal {Damage:diff()} damage, then {SecondHitDamage} damage.",
-    "GU_ZHEN_REN_PERSONAL_CARD_QING_NIU_XU_YING.description": "{Chance}% manifest: deal {Damage:diff()} damage and gain {Block:diff()} Block.{HitBlockBonus:cond:>0?If the hit reaches HP, gain {HitBlockTotal} Block instead.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_SHI_GUI_XU_YING.description": "{Chance}% manifest: gain {Block:diff()} Block.{NoBlockBonus:cond:>0?If you have no Block, gain {NoBlockTotal} instead.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_BA_SHAN.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nAll enemies lose {BlockBreak} Block, then take {Damage} damage and gain {BaseVulnerable} Vulnerable; [gold]Broken Stance[/gold] targets gain {BreakVulnerableBonus} more.",
-    "GU_ZHEN_REN_PERSONAL_CARD_WAN_LAN.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nDeal {Damage} damage {Hits} times. For every 2 hits that reach HP, gain 1 Energy.{Rank7Exact:cond:>0?If every hit reaches HP, gain 1 more Energy.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_DAO_HAI_BA_SHAN.description": "Immortal Gu · [gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nAll enemies lose {BlockBreak} Block, then take {Damage} damage 3 times; [gold]Broken Stance[/gold] targets gain {BreakVulnerable} Vulnerable. Gain 1 Energy per broken enemy, up to {EnergyCap}.{Rank8Exact:cond:>0?If at least 2 enemies break, deal {ReboundDamage} damage to all enemies.|}{Rank9Exact:cond:>0?If at least 2 enemies break, deal {ReboundDamage} damage to all; if all break, deal it once more.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_SHANG_LI_HUI_TIAN.description": "[gold]Rank {Rank}[/gold]\nDeal {CurrentDamage} damage based on [gold]Injury[/gold]. Gain Return to Heaven: record the highest actual HP damage dealt by a later single card; the first time you would die, heal {RecoveryPercent}% of it and survive, otherwise heal after combat. Triggers once.",
-    "GU_ZHEN_REN_PERSONAL_CARD_HEI_TIAN_DA_SHOU_YIN.description": "[gold]Rank {Rank}[/gold]\nAll enemies lose {BlockBreak} Block, then take {CurrentDamage} damage and gain {BaseVulnerable} Vulnerable; [gold]Broken Stance[/gold] targets gain {PoShiVulnerable} more. More Beast Phantoms increase the damage.{Rank7Exact:cond:>0?Gain 1 Energy per broken enemy, up to {PoShiEnergyCap}.|}{Rank8Exact:cond:>0?Gain 1 Energy per broken enemy, up to {PoShiEnergyCap}; if at least {HuiLanThreshold} break, deal {HuiLanDamage} damage to all enemies.|}{Rank9Exact:cond:>0?Gain 1 Energy per broken enemy, up to {PoShiEnergyCap}; if at least {HuiLanThreshold} break, deal {HuiLanDamage} damage to all; if all break, deal it once more.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_WAN_WO.description": "Power\nSeal all Beast Gu and consume all Beast Phantoms. Gain {CurrentWoLiPhantomCount} My Strength Phantom(s).",
-    "GU_ZHEN_REN_PERSONAL_CARD_WO_LI_XU_YING.description": "On gain, provide 5 temporary HP. The first manifestation is guaranteed; later manifestations have a {RepeatChance}% chance and copy half of the copyable effect.",
-    "GU_ZHEN_REN_PERSONAL_CARD_BAI_HONG_GUAN_RI.description": "Deal {Damage:diff()} damage; consume up to {MaxZhaoPoConsumed} Zhao Po from the target, adding {DamagePerZhaoPo} per stack. With at least {GuangHuiCost} Radiance, automatically spend {GuangHuiCost} and ignore up to {PierceCap} Block.",
-    "GU_ZHEN_REN_PERSONAL_CARD_JING_YUE_FAN_ZHAO.description": "{NextMirror:cond:>0?Mirror: gain {Block:diff()} Block.|}{NextMoon:cond:>0?Moon: deal {Damage:diff()} damage.|}{NextReflection:cond:>0?Reflection: gain {ReflectionBlock} Block, deal {ReflectionDamage} damage to ALL enemies{GuangHui:cond:>0?, and gain {GuangHui} Radiance|}.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_YUE_NI_CHANG.description": "Usable twice. Gain {Block:diff()} Block and {GuangHui} Radiance.{NormalMoonBlade:cond:>0?Gain 1 Moon Blade.|}{UpgradedMoonBlade:cond:>0?Gain 1 upgraded Moon Blade.|}{FullMoonBlade:cond:>0?Gain 1 Full Moon Blade.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_YUE_GUANG_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nDeal {Damage:diff()} damage. [gold]Refraction[/gold]: increase this damage by {RefractionDamage}.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XIAO_GUANG_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {JuGuang} Focus. {Rank2Exact:cond:>0?[gold]Refraction[/gold]: gain {RefractionJuGuang} additional Focus.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_JING_GUANG_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {Block:diff()} Block.{Rank:cond:>=2? If the previous card was an Attack, gain {AttackBlock} instead.|}{Rank:cond:>=5? Gain 1 Radiance.|}{Rank:cond:>=3? [gold]Light Spawn[/gold]: {Rank:cond:>=9?Bright Mirror|Light Mirror}.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_DING_GUANG_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nApply {ZhaoPoPower:diff()} Zhao Po.{Rank:cond:>=2? Gain [gold]Imprinted Light[/gold] {ExposeBonus}.|}{Rank:cond:>=3? [gold]Light Spawn[/gold]: {Rank:cond:>=9?Halo|Fixed-Light Talisman}.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_LIU_GUANG_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\n{Rank6Exact:cond:>0?Tune Gu up to 2 times.|Tune Gu once.}{Rank:cond:>=5? Your next Light Path card is guaranteed to trigger Refraction.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_YUE_MANG_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nDeal {Damage:diff()} damage {BaseHits} times. [gold]Refraction[/gold]: +{RefractionBonusHits} hits. If this card triggers Refraction, gain {JuGuang} Focus.",
-    "GU_ZHEN_REN_PERSONAL_CARD_HUANG_JIN_YUE_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nDeal {Damage:diff()} damage {BaseHits} times. For each Moonlight, attack 1 additional time (currently {Moonlight}; {TotalHits} total). Lose all Moonlight after activation.",
-    "GU_ZHEN_REN_PERSONAL_CARD_JING_HUI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {Block:diff()} Block and apply {ZhaoPoPower:diff()} Zhao Po.{Rank:cond:>=5? [gold]Guarded Radiance[/gold].|}{Rank:cond:>=8? [gold]Broken Radiance[/gold].|} [gold]Light Spawn[/gold]: {Rank:cond:>=9?Cyclic Mirror Radiance|{Rank:cond:>=6?Condensed Mirror Radiance|Mirror Radiance}}.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUN_DIAN_LIU_GUANG_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nDraw {Draw}, then discard {Discard}. [gold]Radiant Shift 2[/gold]: instead swap up to {Swap} other ready Gu with the same number of fully cooled standby Gu; if none are valid, spend no Radiance.",
-    "GU_ZHEN_REN_PERSONAL_CARD_TAI_GUANG_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nUsable 3 times. Deal {Damage:diff()} damage to ALL enemies and apply {ZhaoPoPower:diff()} Zhao Po. [gold]Radiant Shift 3[/gold]: damage ignores Block and Zhao Po becomes {EmpoweredZhaoPo}.",
-    "GU_ZHEN_REN_PERSONAL_CARD_YUE_REN.description": "Deal {Damage:diff()} damage. [gold]Marked Strike[/gold]: {MarkedDamage}.{Rank:cond:>=7? After Marked Strike, gain 1 Crescent Moon.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_CAN_YUE.description": "Deal {Damage:diff()} damage.",
-    "GU_ZHEN_REN_PERSONAL_CARD_MAN_YUE_REN.description": "Deal {Damage:diff()} damage; each Zhao Po on the target adds {PerZhaoPo}, up to {MaxZhaoPo} stacks. At the cap, deal {MaxMarkedDamage}.",
-    "GU_ZHEN_REN_PERSONAL_CARD_WEI_GUANG.description": "Gain 3 Shine.",
-    "GU_ZHEN_REN_PERSONAL_CARD_JU_GUANG.description": "Gain 6 Shine.{Rank:cond:>=8? Gain 1 Afterglow.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_YU_HUI.description": "Gain 3 Shine.",
-    "GU_ZHEN_REN_PERSONAL_CARD_JI_GUANG.description": "Gain 2 Radiance and 8 Shine.",
-    "GU_ZHEN_REN_PERSONAL_CARD_GUANG_JING.description": "Gain {Block:diff()} Block and {LightBonus} Shine.{Rank:cond:>=7? Gain 1 Reflection.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_FAN_ZHAO.description": "Deal {CurrentDamage} damage.",
-    "GU_ZHEN_REN_PERSONAL_CARD_MING_JING.description": "Gain {Block:diff()} Block and 2 Radiance.",
-    "GU_ZHEN_REN_PERSONAL_CARD_DING_GUANG_FU.description": "Gain [gold]Imprinted Light[/gold] {BonusDamage}.{Rank:cond:>=7? Gain 1 Light Marker.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_GUANG_BIAO.description": "Gain {LightBonus} Shine.",
-    "GU_ZHEN_REN_PERSONAL_CARD_RI_YUN.description": "Distribute {TotalZhaoPo} Zhao Po: the chosen enemy gets at most {TargetCap}; distribute the rest among other living enemies.",
-    "GU_ZHEN_REN_PERSONAL_CARD_LIU_GUANG.description": "Deal {Damage:diff()} damage. Skill Refraction: {AfterSkillDamage}.{Rank:cond:>=7? [gold]Marked Strike[/gold]: gain 1 Flowing Radiance.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_LIU_HUI.description": "Deal {Damage:diff()} damage.",
-    "GU_ZHEN_REN_PERSONAL_CARD_BAI_HONG.description": "Deal {Damage:diff()} damage; if Refraction has triggered twice this turn, deal {DoubleRefractionDamage} instead and apply {ZhaoPoPower:diff()} Zhao Po.",
-    "GU_ZHEN_REN_PERSONAL_CARD_YUE_MANG.description": "Deal {Damage:diff()} damage {Hits} times. Skill Refraction: the final hit deals {LastHitDamage}.",
-    "GU_ZHEN_REN_PERSONAL_CARD_NING_YUE_MANG.description": "Deal {Damage:diff()} damage {Hits} times. Skill Refraction: attack {AfterSkillHits} times.{Rank:cond:>=7? [gold]Marked Strike[/gold]: gain 1 Fading Ray.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_CAN_MANG.description": "Deal {Damage:diff()} damage; if Refraction has triggered this turn, deal {RefractionDamage} instead.",
-    "GU_ZHEN_REN_PERSONAL_CARD_TIAN_YUE_MANG.description": "Deal {Damage:diff()} damage {Hits} times; if Refraction has triggered twice this turn, deal {DoubleRefractionBonus} extra damage and apply {ZhaoPoPower:diff()} Zhao Po.",
-    "GU_ZHEN_REN_PERSONAL_CARD_JING_HUI.description": "Gain {Block:diff()} Block and [gold]Imprinted Light[/gold] {ZhaoPoBonus}.",
-    "GU_ZHEN_REN_PERSONAL_CARD_NING_JING_HUI.description": "Gain {Block:diff()} Block, {LightBonus} Shine, and [gold]Imprinted Light[/gold] {ZhaoPoBonus}.{Rank:cond:>=7? Gain 1 Returning Radiance.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_FAN_HUI.description": "Gain 1 Radiance and {LightBonus} Shine.",
-    "GU_ZHEN_REN_PERSONAL_CARD_ZHOU_TIAN_JING_HUI.description": "Gain {Block:diff()} Block, apply {ZhaoPoPower:diff()} Zhao Po, and gain {LightBonus} Shine.",
-    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {CurrentGain} Years.{Rank9Exact:cond:>0? After this triggers Yearful, gain 1 more Year.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_RI_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {CurrentGain} Years.{Rank6Exact:cond:>0? If this triggers Yearful, draw 1.|}{Rank:cond:>=8? After this triggers Yearful, gain 1 more Year.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_YUE_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {NowGain} Years; {FollowingGain:cond:>0?at the start of each of the next 2 turns, gain {NextGain}|at the start of next turn, gain {NextGain} more}.",
-    "GU_ZHEN_REN_PERSONAL_CARD_HUAN_BU_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nApply [gold]Slow Step[/gold] {Reduction} for {Duration} turns.{HasRepeatGain:cond:>0? If the target already has Slow Step, gain {RepeatGain} Years.|}{HasSplash:cond:>0? Other enemies gain Slow Step {SplashReduction} for {SplashDuration} turns.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_SAN_GENG_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {EnergyGain} Energy, draw {DrawCount}, and gain {NianHuaGain} Years; the next {BonusEvents} times you gain Years, gain 1 more. Lose {HpLoss} HP.",
-    "GU_ZHEN_REN_PERSONAL_CARD_HUI_SU_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nView the most recent {InspectCount} legal normal Attacks or Skills played this turn and choose 1 to create a [gold]Past Echo[/gold]; {CostHigher:cond:>0?its cost is 1 higher|}{CostSame:cond:>0?its cost is unchanged|}{CostLower:cond:>0?its cost is 1 lower, minimum 0|}, and playing it grants {XiYingGain} Years.",
-    "GU_ZHEN_REN_PERSONAL_CARD_GUANG_YIN_REN_RAN_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {BaseGain} Years.{HasRecoveryGainBonus:cond:>0? If a Gu finished cooldown this turn, gain {RecoveredGain} instead.|}{Rank7Exact:cond:>0? If a Gu finished cooldown this turn, draw 1.|}{Rank8Exact:cond:>0? After this triggers Yearful, gain 1 more Year.|}{Rank9Exact:cond:>0? After this triggers Yearful, gain 1 more Year and draw 1.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_ZHOU_MAO_XIAN_GU.description": "Immortal Gu · [gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {NianHuaGain} Years.{Rank7Exact:cond:>0? If Yearful already triggered this turn, draw 1.|}{Rank9Exact:cond:>0? If this triggers Yearful, draw 1.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_SI_SHUI_LIU_NIAN_XIAN_GU.description": "Immortal Gu · [gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {NianHuaGain} Years and 1 {PlusToken:cond:>0?Yearflow+|Yearflow}.",
-    "GU_ZHEN_REN_PERSONAL_CARD_GUANG_YIN_REN_RAN.description": "[gold]Rank {Rank}[/gold] · [gold]Companion Power[/gold]\nThe first {RecoveryLimit} Gu that finish cooldown each turn each grant 1 Year.{HasAcceleratedBonus:cond:>0? The first Gu each turn to finish early due to Yearful grants {AcceleratedBonus} more Years{DrawOnAccelerated:cond:>0? and draws 1|}.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_NIAN_SUI_SUI.description": "[gold]Rank {Rank}[/gold] · [gold]Companion Power[/gold]\n{EveryTurn:cond:>0?At each turn end, gain {TurnGain} Years.|Every {TurnInterval} turn ends, gain {TurnGain} Years.|}{FirstSuiManOnly:cond:>0? After the first Yearful this combat, gain 1 more Year.|}{EverySecondSuiMan:cond:>0? After every 2nd Yearful, gain 1 more Year.|}{EverySuiMan:cond:>0? After each Yearful, gain 1 more Year.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_ZHOU_MAO.description": "[gold]Rank {Rank}[/gold] · [gold]Companion Power[/gold]\nAfter each Yearful, gain {NianHuaGain} Years.{DrawEverySecond:cond:>0? Every 2nd Yearful also draws 1.|}",
-    "GU_ZHEN_REN_PERSONAL_CARD_SI_SHUI_LIU_NIAN.description": "[gold]Rank {Rank}[/gold] · [gold]Companion Power[/gold]\nThe first Yearful each turn grants 1 {PlusToken:cond:>0?Yearflow+|Yearflow}.",
-    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU.description": "Gain 2 Years.",
-    "GU_ZHEN_REN_PERSONAL_CARD_NIAN_LIU_PLUS.description": "Gain 3 Years and draw 1.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_ROU_GU.description": "{Rank:cond:>=6?Immortal Gu · |}[gold]Rank {Rank}[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nGain {Block:diff()} Block.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_JING_GU.description": "[gold]Rank {Rank}[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nChoose an Attack or Skill without a parasite and implant an ordinary [gold]Blood Parasite[/gold]. I/II/III: {ParasiteI}/{ParasiteII}/{ParasiteIII}; hatch {HatchValue}.",
-    "GU_ZHEN_REN_PERSONAL_CARD_XUE_BEN_XIAN_GU.description": "Immortal Gu · [gold]Rank 6[/gold] · [gold]Fusion[/gold] · [gold]Cooldown[/gold] {RecoveryTurns}\nImplant a rank-6 ordinary [gold]Blood Parasite[/gold]. I/II/III: {ParasiteI}/{ParasiteII}/{ParasiteIII}; hatch {HatchValue}. Leaves a [gold]Blood Seed[/gold] after hatching.",
-    "GU_ZHEN_REN_PERSONAL_CARD_YI_HAI.description": "A 0-cost Status. Retain. Cannot be played or parasitized. Permanently enters the deck after victory (maximum 4) and can only be permanently removed by refining it."
-  },
+  "keywords": {},
+  "cardDescriptionOverrides": {},
   "characterNameOverrides": {
     "title": "Gu Yue Fang Yuan",
     "titleObject": "Gu Yue Fang Yuan"
   },
-  "restSiteLocalizationFallbacks": {
-    "OPTION_GU_ZHEN_REN_PERSONAL_GU_RANK_UP.name": "Gu Refinement",
-    "OPTION_GU_ZHEN_REN_PERSONAL_GU_RANK_UP.description": "Select Gu Worms to refine in one go. Each refinement has 2 slots: a mortal Gu Worm takes 1 slot and an immortal Gu Worm takes 2 slots, so you can refine up to 2 mortal or 1 immortal Gu Worm. Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",
-    "OPTION_GU_ZHEN_REN_PERSONAL_GU_RANK_UP.selectionPrompt": "Select Gu Worms to refine (mortal takes 1 slot each, immortal takes 2 slots each, 2 slots total). You may also confirm with 0 selected.",
-    "OPTION_GU_ZHEN_REN_PERSONAL_HE_LIAN.name": "Gu Fusion",
-    "OPTION_GU_ZHEN_REN_PERSONAL_HE_LIAN.description": "First select a currently craftable Gu card, then select Gu Worm materials matching that target. Materials are consumed and the result is created only when both types and quantities match; failed attempts do not consume the use. Fusion can succeed once per rest site.",
-    "OPTION_GU_ZHEN_REN_PERSONAL_HE_LIAN.selectionPrompt": "Select materials matching the target Gu card, then confirm.",
-    "OPTION_GU_ZHEN_REN_PERSONAL_HE_LIAN.targetSelectionPrompt": "First select the Gu card to craft. Only materials that can match the target will be shown next."
-  },
+  "restSiteLocalizationFallbacks": {},
   "combatInterfaceLocalizationFallbacks": [
-    {
-      "table": "enchantments",
-      "key": "GU_ZHEN_REN_PERSONAL_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.title",
-      "text": "Blood Parasite"
-    },
-    {
-      "table": "enchantments",
-      "key": "GU_ZHEN_REN_PERSONAL_ENCHANTMENT_XUE_DAO_PARASITE_ENCHANTMENT.description",
-      "text": "A parasite enchantment that persists, clones, and renders with its host without consuming the normal enchantment slot. Its kind, stage, and values are shown in the host card text."
-    },
-    {
-      "table": "enchantments",
-      "key": "GU_ZHEN_REN_PERSONAL_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.title",
-      "text": "Blood Parasite Composite"
-    },
-    {
-      "table": "enchantments",
-      "key": "GU_ZHEN_REN_PERSONAL_ENCHANTMENT_XUE_DAO_COMPOSITE_ENCHANTMENT.description",
-      "text": "Internal carrier for one normal enchantment and one Blood Parasite enchantment."
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardPileId}.title",
-      "text": "Gu Hand"
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardPileId}.description",
-      "text": "The Gu Hand holds up to 5 usable Gu Worms. When space is available, Gu enter from the Gu Storage Pile in cooldown-completion order. Killer Move deduction can use only materials in the Gu Hand."
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardPileId}.empty",
-      "text": "The Gu Hand is empty."
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardPileId}.selectionPrompt",
-      "text": "Select Gu Worm materials matching the selected Killer Move, then confirm."
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardPileId}.targetSelectionPrompt",
-      "text": "First select the Killer Move to deduce. Only matching materials will be shown next."
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardStoragePileId}.title",
-      "text": "Gu Storage Pile"
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardStoragePileId}.description",
-      "text": "Stores fully cooled Gu waiting to enter the Gu Hand. When the Gu Hand has room, they enter in cooldown-completion order. Left-click to inspect."
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardStoragePileId}.empty",
-      "text": "The Gu Storage Pile is empty."
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardRecoveryPileId}.title",
-      "text": "Gu Cooldown Pile"
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardRecoveryPileId}.description",
-      "text": "Stores only Gu that are still cooling down. After all activations are spent, a Gu enters this pile; when cooldown completes it returns to the Gu Storage Pile. Left-click to inspect."
-    },
-    {
-      "table": "static_hover_tips",
-      "key": "{GuCardRecoveryPileId}.empty",
-      "text": "The Gu Cooldown Pile is empty."
-    },
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_KU_LI_POWER.title",
@@ -333,7 +17,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_KU_LI_POWER.description",
-      "text": "After an Attack fully resolves, add Labor damage based on current Injury. Higher ranks grant Strength the first time you enter worse Injury tiers."
+      "text": "Increase the first damage hit of an Attack based on current Injury. Higher ranks grant Strength the first time you enter worse Injury tiers."
     },
     {
       "table": "powers",
@@ -343,7 +27,7 @@
     {
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_ZI_LI_GENG_SHENG_POWER.description",
-      "text": "Wait for the next Attack to fully resolve, then heal based on actual HP damage to its main target. Higher ranks can include attached follow-up Strength Path damage."
+      "text": "Wait for the next Attack to fully resolve, then heal based on actual HP damage to its main target."
     },
     {
       "table": "powers",
@@ -364,56 +48,6 @@
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_QUN_LI_POWER.description",
       "text": "After a Beast Phantom naturally manifests, roll the listed chance to continue until failure or the limit. Extra manifestations cannot retrigger Group Strength; Rank 6+ counts them as actual manifestations."
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_WO_LI_TEMP_HP_POWER.title",
-      "text": "Wo Li Temporary HP"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_WO_LI_TEMP_HP_POWER.description",
-      "text": "Temporary HP granted by Wo Li Phantoms; every 5 points lost from this source consumes 1 Wo Li Phantom."
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_GUANG_HUI_POWER.title",
-      "text": "Brilliance"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_GUANG_HUI_POWER.description",
-      "text": "A character resource capped at 9. Brilliance does not disappear at end of turn; Light Path cards can gain or spend it. Refraction: when the previous standard card you played has a different type, a Light Path card gains 1 Brilliance (up to 3 per turn)."
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZHAO_PO_POWER.title",
-      "text": "Illumination Break"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_ZHAO_PO_POWER.description",
-      "text": "The next time a single hit from an Attack card deals damage, take 3 additional damage and remove 1 Illumination Break. Multi-hit attacks can consume multiple stacks."
-    },
-    {
-      "table": "secondary_resources",
-      "key": "GU_ZHEN_REN_PERSONAL_SECONDARY_RESOURCE_YUAN_QI.title",
-      "text": "Primeval Essence"
-    },
-    {
-      "table": "secondary_resources",
-      "key": "GU_ZHEN_REN_PERSONAL_SECONDARY_RESOURCE_YUAN_QI.description",
-      "text": "Primeval essence stored in a Gu Master's aperture. Begin each combat with the amount granted by your aperture rank (rank 1: 4, rank 9: 8); from turn 2 onward, restore 2-4 each turn by rank (1-2: 2, 3-5: 3, 6-9: 4). Maximum essence rises with aperture rank: 5/5/6/6/7/7/8/8/9."
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_JU_GUANG_POWER.title",
-      "text": "Shine"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_JU_GUANG_POWER.description",
-      "text": "The first hit of your next Light Path Attack deals {Amount} more damage. Multi-hit attacks gain this bonus only once."
     },
     {
       "table": "powers",
@@ -487,26 +121,6 @@
     },
     {
       "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_YUE_GU_DELAY_POWER.title",
-      "text": "Stored Month"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_YUE_GU_DELAY_POWER.description",
-      "text": "Years scheduled by Month Gu will arrive at future turn starts."
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XI_YING_WATCHER_POWER.title",
-      "text": "Past Echo Watcher"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XI_YING_WATCHER_POWER.description",
-      "text": "Hidden watcher for Past Echo cards."
-    },
-    {
-      "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_SHANG_LI_HUI_TIAN_POWER.title",
       "text": "Return to Heaven"
     },
@@ -514,38 +128,6 @@
       "table": "powers",
       "key": "GU_ZHEN_REN_PERSONAL_POWER_SHANG_LI_HUI_TIAN_POWER.description",
       "text": "Records the highest actual HP damage dealt by a later single card. The first time you would die, heal the listed percentage and survive; otherwise heal after combat. Triggers once."
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_LIU_XUE_POWER.title",
-      "text": "Bleed"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_LIU_XUE_POWER.description",
-      "text": "At the end of the holder’s turn, lose 1 stack and take 3 damage."
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_JI_POWER.title",
-      "text": "Blood Parasite"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_JI_POWER.description",
-      "text": "Background listener for Blood Parasite resolution."
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_CHI_POWER.title",
-      "text": "Blood Pool"
-    },
-    {
-      "table": "powers",
-      "key": "GU_ZHEN_REN_PERSONAL_POWER_XUE_CHI_POWER.description",
-      "text": "The next actively played card that successfully triggers a Blood Parasite repeats that parasite effect. All stacks are consumed atomically on that hit."
     }
-  ],
-  "OPTION_GU_ZHEN_REN_PERSONAL_GU_RANK_UP.description": "Select Gu Worms to refine in one go. Each refinement has 2 slots: a mortal Gu Worm takes 1 slot and an immortal Gu Worm takes 2 slots, so you can refine up to 2 mortal or 1 immortal Gu Worm. Each selected Gu Worm gains one rank, including rank 5 to rank 6. Confirming with 0 selected cancels. Each rest site allows one successful refinement.",
-  "OPTION_GU_ZHEN_REN_PERSONAL_GU_RANK_UP.selectionPrompt": "Select Gu Worms to refine (mortal takes 1 slot each, immortal takes 2 slots each, 2 slots total). You may also confirm with 0 selected."
+  ]
 }

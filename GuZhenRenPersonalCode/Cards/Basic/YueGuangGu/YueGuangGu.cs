@@ -19,7 +19,6 @@ namespace GuZhenRen.Cards.GuangDao;
 [RegisterCharacterStarterCard(typeof(GuZhenRenCharacter), 2)]
 public sealed class YueGuangGu
     : AbstractGuWormCard,
-      IRefractionEffectCard,
       IRefractionRelevantCard
 {
     public override int MinimumAvailableGuRank => 1;
@@ -70,37 +69,23 @@ public sealed class YueGuangGu
                 cardPlay
             );
 
+        // 月光蛊的折光是“本次伤害增加”，不是追加一次伤害段数。
+        // 聚光令折光效果额外结算时，也把每次加伤继续累加到同一击。
         decimal damage = DynamicVars.Damage.BaseValue +
-            (refraction.Triggered
-                ? DynamicVars["RefractionDamage"].BaseValue
-                : 0m);
+            DynamicVars["RefractionDamage"].BaseValue *
+            refraction.EffectResolutionCount;
 
-        await AttackAsync(
-            choiceContext,
-            cardPlay,
-            target,
-            damage
-        );
+        await DamageCmd.Attack(damage)
+            .FromCard(this, cardPlay)
+            .Targeting(target)
+            .WithHitFx("vfx/vfx_attack_slash")
+            .Execute(choiceContext);
     }
 
     protected override void OnGuRankChanged()
     {
         base.OnGuRankChanged();
         RefreshRankValues();
-    }
-
-    private async Task AttackAsync(
-        PlayerChoiceContext choiceContext,
-        CardPlay cardPlay,
-        Creature target,
-        decimal damage
-    )
-    {
-        await DamageCmd.Attack(damage)
-            .FromCard(this, cardPlay)
-            .Targeting(target)
-            .WithHitFx("vfx/vfx_attack_slash")
-            .Execute(choiceContext);
     }
 
     private void RefreshRankValues()
